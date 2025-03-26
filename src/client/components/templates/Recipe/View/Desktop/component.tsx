@@ -1,0 +1,108 @@
+import React from 'react';
+import type { Recipe } from '@/client/types/recipe';
+import {
+    Divider,
+    IngredientsListView,
+    InstructionsView,
+    Rating,
+    RecipeInfo,
+    Typography
+} from '@/client/components';
+import Image from 'next/image';
+import { generateImgPlaceholder } from '@/client/utils';
+import { useLocale } from '@/client/store';
+
+export type DesktopRecipeViewProps = Readonly<{
+    className?: string;
+    recipe: Recipe;
+}>;
+
+export const DesktopRecipeViewTemplate: React.FC<DesktopRecipeViewProps> = ({
+    className,
+    recipe
+}) => {
+    const { t } = useLocale();
+
+    return (
+        <div className={`max-w-screen-md px-4 mx-auto ${className}`}>
+            <div className={'space-y-4'}>
+                <div className={'flex justify-between gap-12'}>
+                    <div
+                        className={
+                            'flex flex-col justify-between items-start w-full'
+                        }
+                    >
+                        <div className={'flex flex-col w-full gap-2'}>
+                            <Typography variant={'heading-xl'}>
+                                {recipe.title}
+                            </Typography>
+                            <Rating
+                                rating={recipe.rating}
+                                fill={'gold'}
+                                iconSize={22}
+                            />
+                        </div>
+
+                        <RecipeInfo
+                            recipe={recipe}
+                            verbose={true}
+                            typographyVariant={'body-sm'}
+                        />
+                    </div>
+
+                    {recipe.image_url ? (
+                        <Image
+                            src={recipe.image_url}
+                            alt={recipe.title}
+                            className={
+                                'w-full max-w-80 h-48 object-cover rounded-md'
+                            }
+                            width={320}
+                            height={192}
+                            placeholder={'blur'}
+                            blurDataURL={generateImgPlaceholder(80, 80, 80)}
+                        />
+                    ) : (
+                        <div className={'w-full max-w-80 h-48 rounded-md'} />
+                    )}
+                </div>
+
+                <Divider />
+
+                <div className={'flex gap-6'}>
+                    <div className={'space-y-2 w-[35%]'}>
+                        <Typography variant={'heading-sm'}>
+                            {t('app.recipe.ingredients')}
+                        </Typography>
+                        <IngredientsListView
+                            ingredients={recipe.ingredients}
+                            className={'pt-2'}
+                            variant={'desktop'}
+                        />
+                    </div>
+
+                    <div className={'space-y-2 w-[65%]'}>
+                        <Typography variant={'heading-sm'}>
+                            {t('app.recipe.instructions')}
+                        </Typography>
+                        <InstructionsView recipe={recipe} variant={'desktop'} />
+
+                        {recipe.notes ? (
+                            <React.Fragment>
+                                <Divider dashed={true} className={'!mt-8'} />
+                                <div className={'space-y-2 w-full'}>
+                                    <Typography variant={'heading-sm'}>
+                                        {t('app.recipe.notes')}
+                                    </Typography>
+                                    <Typography variant={'body-sm'}>
+                                        {recipe.notes}
+                                    </Typography>
+                                </div>
+                            </React.Fragment>
+                        ) : null}
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
