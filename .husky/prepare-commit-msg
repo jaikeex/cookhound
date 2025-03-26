@@ -1,0 +1,36 @@
+#!/bin/sh
+
+# Get the name of the branch
+branch=$(git symbolic-ref --short HEAD)
+# Default prefix
+prefix="[ROOT][${branch}] - "
+
+# Check for changes in specific directories
+client_changes=$(git diff --cached --name-only | grep ^src/client/ || true)
+server_changes=$(git diff --cached --name-only | grep ^src/server/ || true)
+
+if [ ! -z "$client_changes" ] && [ ! -z "$server_changes" ]; then
+    prefix="[PROJECT][${branch}] - "
+elif [ ! -z "$client_changes" ]; then
+    prefix="[CLIENT][${branch}] - "
+elif [ ! -z "$server_changes" ]; then
+    prefix="[SERVER][${branch}] - "
+fi
+# Check if the commit is a merge commit, in which case do not alter the commit message
+if [ "$2" = "merge" ]; then
+    exit 0
+fi
+
+# Temporary file to hold the new commit message
+temp_file=$(mktemp)
+
+# Check if the commit message is provided via command line
+if [ "$2" = "message" ]; then
+    echo "${prefix}$3" > "$temp_file"
+else
+    # Prepend the prefix to the commit message file
+    echo "${prefix}$(cat "$1")" > "$temp_file"
+fi
+
+# Move the temporary file to overwrite the original commit message file safely
+mv "$temp_file" "$1"
