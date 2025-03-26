@@ -1,0 +1,256 @@
+datasource db {
+  url      = env("DATABASE_URL")
+  provider = "mysql"
+  
+}
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated/db"
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  email     String   @unique
+  name      String?
+  password  String
+  role      String   @default("user")
+  status    String   @default("active")
+  avatarUrl String?
+  emailVerified Boolean @default(false)
+  emailVerificationToken String?
+  passwordResetToken String?
+  passwordResetTokenExpires DateTime?
+  lastLogin DateTime?
+  lastPasswordReset DateTime?
+
+  @@map("users")  
+}
+ 
+model Recipe {
+  id Int @id @default(autoincrement())
+  title String
+  description String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Ingredient {
+  id Int @id @default(autoincrement())
+  name String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Unit {
+  id Int @id @default(autoincrement())
+  name String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model RecipeIngredient {
+  id Int @id @default(autoincrement())
+  recipeId Int
+  ingredientId Int
+  quantity String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Rating {
+  id Int @id @default(autoincrement())
+  recipeId Int
+  userId Int
+  rating Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Instruction {
+  id Int @id @default(autoincrement())
+  recipeId Int
+  step Int
+  text String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+
+
+
+
+
+
+
+
+/*
+CREATE TABLE users
+(
+    id                           INT UNSIGNED AUTO_INCREMENT,
+    username                     VARCHAR(128) NOT NULL UNIQUE,
+    email                        VARCHAR(255) NOT NULL UNIQUE,
+    password_hash                CHAR(110)             DEFAULT NULL,
+    auth_type                    VARCHAR(50)  NOT NULL DEFAULT 'local',
+    role                         VARCHAR(50)  NOT NULL DEFAULT 'user',
+    status                       VARCHAR(50)  NOT NULL DEFAULT 'active',
+    avatar_url                   VARCHAR(255)          DEFAULT NULL,
+    email_verified               BOOLEAN               DEFAULT FALSE NOT NULL,
+    email_verification_token     CHAR(36)              DEFAULT NULL,
+    password_reset_token         CHAR(36)              DEFAULT NULL,
+    password_reset_token_expires TIMESTAMP             DEFAULT NULL,
+    created_at                   TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at                   TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    last_login                   TIMESTAMP             DEFAULT NULL,
+    last_password_reset          TIMESTAMP             DEFAULT NULL,
+
+    -- Primary key
+    PRIMARY KEY (id),
+
+    -- Single column indexes
+    INDEX (username),
+    INDEX (email),
+    INDEX (email_verification_token),
+    INDEX (password_reset_token)
+);
+
+# INSERT INTO users (username, email, auth_type, role, status, email_verified)
+# VALUES ('jaikeex', 'jaikeex@cookhound.com', 'google', 'admin', 'active', TRUE);
+
+
+ALTER TABLE users
+    AUTO_INCREMENT = 1000;
+
+CREATE TABLE recipes
+(
+    id           INT UNSIGNED AUTO_INCREMENT,
+    author_id    INT UNSIGNED NOT NULL,
+    language     VARCHAR(2)   NOT NULL,
+    title        VARCHAR(255) NOT NULL,
+    notes        TEXT                  DEFAULT NULL,
+    time         INT UNSIGNED          DEFAULT NULL,
+    difficulty   VARCHAR(50)           DEFAULT NULL,
+    portion_size INT UNSIGNED          DEFAULT NULL,
+    image_url    VARCHAR(255)          DEFAULT NULL,
+    rating       DECIMAL(2, 1)         DEFAULT NULL,
+    created_at   TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at   TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    -- Primary key
+    PRIMARY KEY (id),
+
+    -- Foreign keys
+    FOREIGN KEY (author_id) REFERENCES users (id),
+
+    -- Single column indexes
+    INDEX (author_id),
+    INDEX (language),
+    INDEX (title),
+    INDEX (difficulty),
+    INDEX (rating),
+    INDEX (time),
+    INDEX (created_at),
+
+    -- Composite indexes
+    INDEX idx_recipes_difficulty_rating_time (difficulty, rating, time),
+    INDEX idx_recipes_difficulty_rating (difficulty, rating),
+    INDEX idx_recipes_difficulty_time (difficulty, time),
+    INDEX idx_recipes_rating_time (rating, time)
+);
+
+CREATE TABLE instructions
+(
+    recipe_id INT UNSIGNED NOT NULL,
+    step      INT UNSIGNED NOT NULL,
+    text      TEXT         NOT NULL,
+
+    -- Primary key
+    PRIMARY KEY (recipe_id, step),
+
+    -- Foreign keys
+    FOREIGN KEY (recipe_id) REFERENCES recipes (id),
+
+    -- Single column indexes
+    INDEX (recipe_id),
+    INDEX (step)
+);
+
+CREATE TABLE ingredients
+(
+    id       INT UNSIGNED AUTO_INCREMENT,
+    language VARCHAR(2)  NOT NULL,
+    name     VARCHAR(50) NOT NULL UNIQUE,
+    -- alter to add more columns if needed later
+
+    -- Primary key
+    PRIMARY KEY (id),
+
+    -- Single column indexes
+    INDEX (language),
+    INDEX (name)
+);
+
+CREATE TABLE units
+(
+    id       INT UNSIGNED AUTO_INCREMENT,
+    language VARCHAR(2)  NOT NULL,
+    name     VARCHAR(50) NOT NULL,
+
+    UNIQUE (language, name),
+
+    -- Primary key
+    PRIMARY KEY (id),
+
+    -- Single column indexes
+    INDEX (language),
+    INDEX (name)
+);
+
+CREATE TABLE recipes_ingredients
+(
+    recipe_id        INT UNSIGNED NOT NULL,
+    ingredient_id    INT UNSIGNED NOT NULL,
+    quantity         VARCHAR(256) NOT NULL,
+    ingredient_order INT UNSIGNED NOT NULL,
+
+    -- Primary key
+    PRIMARY KEY (recipe_id, ingredient_id),
+
+    -- Foreign keys
+    FOREIGN KEY (recipe_id) REFERENCES recipes (id),
+    FOREIGN KEY (ingredient_id) REFERENCES ingredients (id),
+
+    -- Single column indexes
+    INDEX (recipe_id),
+    INDEX (ingredient_id)
+);
+
+CREATE TABLE ratings
+(
+    id         INT UNSIGNED AUTO_INCREMENT,
+    recipe_id  INT UNSIGNED  NOT NULL,
+    user_id    INT UNSIGNED  NOT NULL,
+    rating     DECIMAL(2, 1) NOT NULL,
+    created_at TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    CONSTRAINT unique_recipe_user UNIQUE (recipe_id, user_id),
+
+    -- Primary key
+    PRIMARY KEY (id),
+
+    -- Foreign keys
+    FOREIGN KEY (recipe_id) REFERENCES recipes (id),
+    FOREIGN KEY (user_id) REFERENCES users (id),
+
+    -- Single column indexes
+    INDEX (recipe_id),
+    INDEX (user_id)
+);
+
+
+
+
+
+*/
