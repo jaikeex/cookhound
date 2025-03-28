@@ -1,6 +1,5 @@
 import { apiService } from '@/client/services/ApiService';
-import type { Recipe } from '@/client/types/recipe';
-import type { RecipeForCreate } from '@/client/services';
+import type { Recipe, RecipeForCreate } from '@/common/types';
 
 /**
  * Service for recipe-related operations.

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { ENV_CONFIG } from '@/client/constants';
+import { ENV_CONFIG_PUBLIC } from '@/common/constants';
 
 export default function GoogleCallback() {
     useEffect(() => {
@@ -9,7 +9,7 @@ export default function GoogleCallback() {
             authCode: new URLSearchParams(window.location.search).get('code')
         };
 
-        window.opener.postMessage(data, ENV_CONFIG.ORIGIN);
+        window.opener.postMessage(data, ENV_CONFIG_PUBLIC.ORIGIN);
         window.close();
     }, []);
 

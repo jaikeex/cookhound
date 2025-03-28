@@ -1,0 +1,21 @@
+export const ENV_CONFIG_PUBLIC = Object.freeze({
+    ENV: process.env.NEXT_PUBLIC_ENV,
+    API_URL: process.env.NEXT_PUBLIC_API_URL,
+    GOOGLE_OAUTH_CLIENT_ID: process.env.NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID,
+    ORIGIN: process.env.NEXT_PUBLIC_ORIGIN,
+    COOKIE_DOMAIN: process.env.NEXT_PUBLIC_COOKIE_DOMAIN,
+    GOOGLE_STORAGE_BUCKET_RECIPE_IMAGES:
+        process.env.NEXT_PUBLIC_GOOGLE_STORAGE_BUCKET_RECIPE_IMAGES
+});
+
+export const ENV_CONFIG_PRIVATE = Object.freeze({
+    DB_NAME: process.env.DB_NAME,
+    DB_USER: process.env.DB_USER,
+    DB_PASSWORD: process.env.DB_PASSWORD,
+    DB_PORT: process.env.DB_PORT,
+    DATABASE_URL: process.env.DATABASE_URL,
+    DB_CONNECTIONS: process.env.DB_CONNECTIONS,
+    DB_IDLE_TIMEOUT: process.env.DB_IDLE_TIMEOUT,
+    DB_ACQUIRE_TIMEOUT: process.env.DB_ACQUIRE_TIMEOUT,
+    DB_MAX_ATTEMPTS: process.env.DB_MAX_ATTEMPTS
+});

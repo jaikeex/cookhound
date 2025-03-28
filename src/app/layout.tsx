@@ -1,7 +1,7 @@
 import React, { Suspense } from 'react';
 import type { Metadata } from 'next';
 import { Kalam, Open_Sans } from 'next/font/google';
-import '@/globals.css';
+import '@/client/globals.css';
 import { LocaleProvider, AuthProvider, SnackbarProvider } from '@/client/store';
 import { ThemeProvider } from 'next-themes';
 import { BottomNavigation, Navbar, TopNavigation } from '@/client/components';
@@ -51,7 +51,7 @@ export default async function RootLayout({
                     >
                         <AuthProvider>
                             <SnackbarProvider>
-                                <div className="page-background typography-base h-screen fixed top-0 overflow-y-auto">
+                                <div className="fixed top-0 h-screen overflow-y-auto page-background typography-base">
                                     <Suspense
                                         fallback={<Navbar avatarSrc={null} />}
                                     >

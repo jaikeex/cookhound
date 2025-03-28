@@ -1,5 +1,5 @@
 import { apiService } from '@/client/services/ApiService';
-import type { UserForCreate } from '@/client/services/user/types';
+import type { UserForCreate } from '@/common/types';
 
 /**
  * Service for user-related operations.

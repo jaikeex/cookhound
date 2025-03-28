@@ -1,7 +1,7 @@
 'use server';
 
 import { cookies } from 'next/headers';
-import { ENV_CONFIG } from '@/client/constants';
+import { ENV_CONFIG_PUBLIC } from '@/common/constants';
 
 export const setLocaleCookie = async (locale: string): Promise<void> => {
     const cookieStore = await cookies();
@@ -11,6 +11,6 @@ export const setLocaleCookie = async (locale: string): Promise<void> => {
         maxAge: 60 * 60 * 24 * 365,
         secure: true,
         sameSite: 'strict',
-        domain: ENV_CONFIG.COOKIE_DOMAIN
+        domain: ENV_CONFIG_PUBLIC.COOKIE_DOMAIN
     });
 };

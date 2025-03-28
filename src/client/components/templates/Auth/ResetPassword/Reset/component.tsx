@@ -6,12 +6,12 @@ import type {
     ResetPasswordFormErrors
 } from '@/client/components';
 import { ResetPasswordForm, Typography } from '@/client/components';
-import type { ResetPasswordPayload } from '@/client/services';
+import type { ResetPasswordPayload } from '@/common/types';
 import { authService } from '@/client/services';
-import { object, ref, string } fro@/client/utils;
+import { object, ref, string } from 'yup';
 import { useLocale } from '@/client/store';
 import type { SubmitHandler } from '@/client/components/organisms/Form/types';
-import { validateFormData } from '@/utils';
+import { validateFormData } from '@/client/utils';
 import Link from 'next/link';
 
 type ResetPasswordFormData = {
@@ -100,7 +100,7 @@ export const ResetPasswordTemplate: React.FC = () => {
     );
 
     return (
-        <div className="w-full max-w-md mx-auto space-y-4 flex items-center flex-col">
+        <div className="flex flex-col items-center w-full max-w-md mx-auto space-y-4">
             <Typography align="center">
                 {t('auth.form.reset-password.prompt')}
             </Typography>

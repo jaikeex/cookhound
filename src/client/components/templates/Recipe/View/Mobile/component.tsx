@@ -1,5 +1,5 @@
 import React from 'react';
-import type { Recipe } from '@/client/types/recipe';
+import type { Recipe } from '@/common/types/recipe';
 import {
     Divider,
     IngredientsListView,

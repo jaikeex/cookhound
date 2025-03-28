@@ -1,4 +1,4 @@
-import { DEFAULT_LOCALE, SUPPORTED_LOCALES } from '@/client/constants';
+import { DEFAULT_LOCALE, SUPPORTED_LOCALES } from '@/common/constants';
 import type { Locale } from '@/client/locales';
 import type { ReadonlyRequestCookies } from 'next/dist/server/web/spec-extension/adapters/request-cookies';
 

@@ -3,7 +3,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import type { ObjectSchema } from 'yup';
 import { object, ref, string } from 'yup';
-import type { UserForCreate } from '@/client/services';
+import type { UserForCreate } from '@/common/types';
 import { userService } from '@/client/services';
 import { useGoogleSignIn } from '@/client/hooks';
 import type { SubmitHandler } from '@/client/components/organisms/Form/types';
@@ -19,7 +19,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth, useLocale, useSnackbar } from '@/client/store';
 import type { I18nMessage } from '@/client/locales';
 import Link from 'next/link';
-import type { User } from '@/client/types';
+import type { User } from '@/common/types';
 
 export type RegisterTemplateProps = NonNullable<unknown>;
 
@@ -150,7 +150,7 @@ export const RegisterTemplate: React.FC<RegisterTemplateProps> = () => {
     }, [error]);
 
     return (
-        <div className="w-full max-w-md mx-auto space-y-4 flex items-center flex-col">
+        <div className="flex flex-col items-center w-full max-w-md mx-auto space-y-4">
             <form className="w-full" action={handleSubmit} ref={formRef}>
                 <RegisterForm errors={formErrors} />
             </form>

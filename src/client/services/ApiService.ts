@@ -1,5 +1,5 @@
 import { RequestError } from '@/client/error';
-import { ENV_CONFIG } from '@/client/constants';
+import { ENV_CONFIG_PUBLIC } from '@/common/constants';
 
 type UrlString = `/${string}`;
 
@@ -16,8 +16,8 @@ export type RequestConfig = {
  */
 class ApiService {
     private static instance: ApiService;
-    private readonly API_URL = ENV_CONFIG.API_URL;
-    private readonly ENV = ENV_CONFIG.ENV;
+    private readonly API_URL = ENV_CONFIG_PUBLIC.API_URL;
+    private readonly ENV = ENV_CONFIG_PUBLIC.ENV;
 
     private constructor() {}
 

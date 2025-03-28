@@ -2,11 +2,11 @@
 
 import React, { useCallback, useEffect, useState } from 'react';
 import {
-    ButtonBase,@/client/types
+    ButtonBase,
     DraggableList,
     IngredientRowCreate
 } from '@/client/components';
-import type { Ingredient } from '@/types';
+import type { Ingredient } from '@/common/types';
 import { useLocale } from '@/client/store';
 
 type IngredientsListCreateProps = Readonly<{

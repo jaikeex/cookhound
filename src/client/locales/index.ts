@@ -1,6 +1,6 @@
 import * as en from './en.json';
 import * as cs from './cs.json';
-import type { SUPPORTED_LOCALES } from '@/client/constants';
+import type { SUPPORTED_LOCALES } from '@/common/constants';
 
 export type Locale = (typeof SUPPORTED_LOCALES)[number];
 export type Messages = Record<I18nMessage, string>;

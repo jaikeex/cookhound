@@ -1,6 +1,5 @@
 import { apiService } from '@/client/services/ApiService';
-import type { FileForUpload } from '@/client/services/file/types';
-import type { FileUploadResponse } from '@/client/services/file/types';
+import type { FileForUpload, FileUploadResponse } from '@/common/types';
 
 class FileService {
     async uploadFile(

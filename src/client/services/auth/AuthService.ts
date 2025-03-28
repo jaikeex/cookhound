@@ -1,11 +1,11 @@
 import { apiService } from '@/client/services/ApiService';
-import type { User } from '@/client/types';
 import type {
+    User,
     AuthCodePayload,
     ResetPasswordEmailPayload,
     ResetPasswordPayload,
     UserForLogin
-} from '@/client/services/auth/types';
+} from '@/common/types';
 
 /**
  * Service for user-related operations.

@@ -14,7 +14,7 @@ import {
     generateRandomId,
     validateFormData
 } from '@/client/utils';
-import { ENV_CONFIG } from '@/client/constants';
+import { ENV_CONFIG_PUBLIC } from '@/common/constants';
 import type { ObjectSchema } from 'yup';
 import { array, number, object, string } from 'yup';
 import { useRouter } from 'next/navigation';
@@ -172,7 +172,7 @@ async function extractFormData(
             bytes: imageBytes,
             file_name: `recipe-image-${generateRandomId()}`,
             bucket:
-                ENV_CONFIG.GOOGLE_STORAGE_BUCKET_RECIPE_IMAGES ||
+                ENV_CONFIG_PUBLIC.GOOGLE_STORAGE_BUCKET_RECIPE_IMAGES ||
                 'cookhound-recipe-images',
             content_type: 'image/webp'
         });

@@ -4,7 +4,7 @@ import {
     isSupportedLocale,
     getUserLocale
 } from './functions';
-import { DEFAULT_LOCALE } from '@/client/constants';
+import { DEFAULT_LOCALE } from '@/common/constants';
 import type { ReadonlyRequestCookies } from 'next/dist/server/web/spec-extension/adapters/request-cookies';
 
 describe('Localization utilities', () => {

@@ -6,9 +6,9 @@ import React, {
     useMemo,
     useState
 } from 'react';
-import type { User } from '@/client/types';
+import type { User } from '@/common/types';
 import { authService } from '@/client/services';
-import { ENV_CONFIG } from '@/client/constants';
+import { ENV_CONFIG_PUBLIC } from '@/common/constants';
 
 type AuthContextType = {
     authResolved: boolean;
@@ -35,7 +35,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const [user, setUser] = useState<User | null | undefined>(undefined);
     useEffect(() => {
         const fetchUser = async () => {
-            const currentUser = await getCurrentUserOrNull();
+            // const currentUser = await getCurrentUserOrNull();
+            const currentUser = null;
             setUser(currentUser);
             setAuthResolved(true);
         };
@@ -53,7 +54,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     );
 
     useEffect(() => {
-        ENV_CONFIG.ENV === 'development' && console.log(user);
+        ENV_CONFIG_PUBLIC.ENV === 'development' && console.log(user);
     }, [user]);
 
     return (
@@ -63,6 +64,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     );
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const getCurrentUserOrNull = async () => {
     try {
         return await authService.getCurrentUser();

@@ -11,6 +11,12 @@ export type User = {
     last_login: string | null;
 };
 
+export type UserForCreate = {
+    username: string;
+    email: string;
+    password: string;
+};
+
 export enum UserRole {
     Guest = 'guest',
     User = 'user',

@@ -1,7 +1,10 @@
 'use client';
 
 import { useCallback, useState } from 'react';
-import { ENV_CONFIG, GOOGLE_SIGNIN_REDIRECT_URL } from '@/client/constants';
+import {
+    ENV_CONFIG_PUBLIC,
+    GOOGLE_SIGNIN_REDIRECT_URL
+} from '@/common/constants';
 import { authService } from '@/client/services';
 import { useEventListener } from '@/client/hooks';
 import type { User } from '@/client/types';
@@ -28,7 +31,10 @@ export const useGoogleSignIn: UseGoogleSignInType = ({ onSuccess }) => {
 
     const handleGoogleSignIn = useCallback(
         async (event: MessageEvent<any>) => {
-            if (event.origin === ENV_CONFIG.ORIGIN && event.data.authCode) {
+            if (
+                event.origin === ENV_CONFIG_PUBLIC.ORIGIN &&
+                event.data.authCode
+            ) {
                 try {
                     const user = await authService.loginWithGoogleOauth({
                         code: event.data.authCode

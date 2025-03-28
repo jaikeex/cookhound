@@ -6,12 +6,12 @@ import type {
     SimpleEmailFormErrors
 } from '@/client/components';
 import { SimpleEmailForm, Typography } from '@/client/components';
-import type { ResetPasswordEmailPayload } from '@/client/services';
+import type { ResetPasswordEmailPayload } from '@/common/types';
 import { authService } from '@/client/services';
-import { object, string } from 'yu@/client/utils
+import { object, string } from 'yup';
 import { useLocale } from '@/client/store';
 import type { SubmitHandler } from '@/client/components/organisms/Form/types';
-import { validateFormData } from '@/utils';
+import { validateFormData } from '@/client/utils';
 
 const sendResetPasswordEmailSchema = object().shape({
     email: string()
@@ -83,7 +83,7 @@ export const SendResetPasswordEmailTemplate: React.FC = () => {
     );
 
     return (
-        <div className="w-full max-w-md mx-auto space-y-4 flex items-center flex-col">
+        <div className="flex flex-col items-center w-full max-w-md mx-auto space-y-4">
             <Typography align="center">
                 {t('auth.form.reset-password.email-prompt')}
             </Typography>
