@@ -34,7 +34,7 @@ class UserService {
         token: string,
         next?: NextFetchRequestConfig
     ): Promise<void> {
-        await apiService.post({
+        await apiService.put({
             url: '/user/verify-email',
             params: { token },
             next
@@ -55,7 +55,7 @@ class UserService {
         next?: NextFetchRequestConfig
     ): Promise<void> {
         await apiService.post({
-            url: '/user/send-verification-email',
+            url: '/user/verify-email',
             data: { email },
             next
         });
