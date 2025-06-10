@@ -236,7 +236,7 @@ const config = {
         'isCustomOutput': true
     },
     'relativeEnvPaths': {
-        'rootEnvPath': '../../../../../.env',
+        'rootEnvPath': null,
         'schemaEnvPath': '../../../../../.env'
     },
     'relativePath': '../..',
@@ -244,7 +244,6 @@ const config = {
     'engineVersion': '81e4af48011447c3cc503a190e86995b66d2a28e',
     'datasourceNames': ['db'],
     'activeProvider': 'mysql',
-    'postinstall': false,
     'inlineDatasources': {
         'db': {
             'url': {
