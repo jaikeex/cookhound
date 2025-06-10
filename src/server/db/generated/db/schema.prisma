@@ -11,18 +11,19 @@ generator client {
 
 model User {
   id                        Int       @id @default(autoincrement())
+  username                  String    @unique @db.VarChar(128)
+  email                     String    @unique @db.VarChar(255)
+  passwordHash              String?   @db.Char(110)
+  authType                  String    @default("local") @db.VarChar(50)
+  role                      String    @default("user") @db.VarChar(50)
+  status                    String    @default("active") @db.VarChar(50)
+  avatarUrl                 String?   @db.VarChar(255)
+  emailVerified             Boolean   @default(false)
+  emailVerificationToken    String?   @db.Char(36)
+  passwordResetToken        String?   @db.Char(36)
+  passwordResetTokenExpires DateTime?
   createdAt                 DateTime  @default(now())
   updatedAt                 DateTime  @updatedAt
-  email                     String    @unique
-  username                  String
-  password                  String
-  role                      String    @default("user")
-  status                    String    @default("active")
-  avatarUrl                 String?
-  emailVerified             Boolean   @default(false)
-  emailVerificationToken    String?
-  passwordResetToken        String?
-  passwordResetTokenExpires DateTime?
   lastLogin                 DateTime?
   lastPasswordReset         DateTime?
 
