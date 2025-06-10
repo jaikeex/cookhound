@@ -1,5 +1,6 @@
 import { mailClient } from './client';
 import { emailVerificationTemplate } from './templates/email-verification';
+import { ENV_CONFIG_PUBLIC } from '@/common/constants';
 
 class MailService {
     async sendEmailVerification(
@@ -7,7 +8,7 @@ class MailService {
         username: string,
         token: string
     ) {
-        const verificationLink = `${process.env.NEXT_PUBLIC_APP_URL}/verify-email?token=${token}`;
+        const verificationLink = `${ENV_CONFIG_PUBLIC.ORIGIN}/auth/callback/verify-email?token=${token}`;
         const html = emailVerificationTemplate(username, verificationLink);
 
         await mailClient.send({

@@ -1,5 +1,6 @@
 import { RequestError } from '@/client/error';
 import { ENV_CONFIG_PUBLIC } from '@/common/constants';
+import { Logger } from '@/common/logger/console/logger';
 
 type UrlString = `/${string}`;
 
@@ -9,6 +10,8 @@ export type RequestConfig = {
     params?: any;
     next?: NextFetchRequestConfig;
 };
+
+const logger = new Logger('ApiService');
 
 /**
  * Service class which provides methods to perform HTTP requests using the fetch api.
@@ -142,7 +145,7 @@ class ApiService {
         try {
             response = await fetch(url.toString(), options);
         } catch (err) {
-            this.ENV === 'development' && console.error('API %O', err);
+            logger.error('API %O', err);
             throw RequestError.fromFetchError(err);
         }
 
@@ -153,8 +156,7 @@ class ApiService {
         }
 
         if (!response.ok) {
-            this.ENV === 'development' &&
-                console.error('API %O', response.status, data);
+            logger.error('API %O', response.status, data);
             throw new RequestError(
                 response.status,
                 data?.error || response.statusText

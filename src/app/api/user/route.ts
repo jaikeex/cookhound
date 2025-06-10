@@ -1,4 +1,6 @@
+import { userService } from '@/server/services';
 import type { NextRequest } from 'next/server';
+import { HttpError } from '@/common/errors/HttpError';
 
 export async function GET(request: NextRequest) {
     console.log('request', request);
@@ -7,9 +9,20 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-    console.log('request', request);
+    const body = await request.json();
 
-    return Response.json({ message: 'Hello, world!' });
+    try {
+        const user = await userService.createUser(body);
+        return Response.json({ user });
+    } catch (error: any) {
+        if (error instanceof HttpError) {
+            return Response.json(
+                { error: error.message },
+                { status: error.status }
+            );
+        }
+        return Response.json({ error: error.message }, { status: 500 });
+    }
 }
 
 export async function PUT(request: NextRequest) {
