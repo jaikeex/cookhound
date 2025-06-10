@@ -345,8 +345,8 @@ export namespace Prisma {
     export import Exact = $Public.Exact;
 
     /**
-     * Prisma Client JS version: 6.9.0
-     * Query Engine version: 81e4af48011447c3cc503a190e86995b66d2a28e
+     * Prisma Client JS version: 6.5.0
+     * Query Engine version: 173f8d54f8d52e692c7e27e72a88314ec7aeff60
      */
     export type PrismaVersion = {
         client: string;
@@ -1503,7 +1503,7 @@ export namespace Prisma {
         createdAt: Date | null;
         updatedAt: Date | null;
         email: string | null;
-        name: string | null;
+        username: string | null;
         password: string | null;
         role: string | null;
         status: string | null;
@@ -1521,7 +1521,7 @@ export namespace Prisma {
         createdAt: Date | null;
         updatedAt: Date | null;
         email: string | null;
-        name: string | null;
+        username: string | null;
         password: string | null;
         role: string | null;
         status: string | null;
@@ -1539,7 +1539,7 @@ export namespace Prisma {
         createdAt: number;
         updatedAt: number;
         email: number;
-        name: number;
+        username: number;
         password: number;
         role: number;
         status: number;
@@ -1566,7 +1566,7 @@ export namespace Prisma {
         createdAt?: true;
         updatedAt?: true;
         email?: true;
-        name?: true;
+        username?: true;
         password?: true;
         role?: true;
         status?: true;
@@ -1584,7 +1584,7 @@ export namespace Prisma {
         createdAt?: true;
         updatedAt?: true;
         email?: true;
-        name?: true;
+        username?: true;
         password?: true;
         role?: true;
         status?: true;
@@ -1602,7 +1602,7 @@ export namespace Prisma {
         createdAt?: true;
         updatedAt?: true;
         email?: true;
-        name?: true;
+        username?: true;
         password?: true;
         role?: true;
         status?: true;
@@ -1710,7 +1710,7 @@ export namespace Prisma {
         createdAt: Date;
         updatedAt: Date;
         email: string;
-        name: string | null;
+        username: string;
         password: string;
         role: string;
         status: string;
@@ -1750,7 +1750,7 @@ export namespace Prisma {
             createdAt?: boolean;
             updatedAt?: boolean;
             email?: boolean;
-            name?: boolean;
+            username?: boolean;
             password?: boolean;
             role?: boolean;
             status?: boolean;
@@ -1770,7 +1770,7 @@ export namespace Prisma {
         createdAt?: boolean;
         updatedAt?: boolean;
         email?: boolean;
-        name?: boolean;
+        username?: boolean;
         password?: boolean;
         role?: boolean;
         status?: boolean;
@@ -1790,7 +1790,7 @@ export namespace Prisma {
         | 'createdAt'
         | 'updatedAt'
         | 'email'
-        | 'name'
+        | 'username'
         | 'password'
         | 'role'
         | 'status'
@@ -1815,7 +1815,7 @@ export namespace Prisma {
                 createdAt: Date;
                 updatedAt: Date;
                 email: string;
-                name: string | null;
+                username: string;
                 password: string;
                 role: string;
                 status: string;
@@ -2347,7 +2347,7 @@ export namespace Prisma {
         readonly createdAt: FieldRef<'User', 'DateTime'>;
         readonly updatedAt: FieldRef<'User', 'DateTime'>;
         readonly email: FieldRef<'User', 'String'>;
-        readonly name: FieldRef<'User', 'String'>;
+        readonly username: FieldRef<'User', 'String'>;
         readonly password: FieldRef<'User', 'String'>;
         readonly role: FieldRef<'User', 'String'>;
         readonly status: FieldRef<'User', 'String'>;
@@ -9496,7 +9496,7 @@ export namespace Prisma {
         createdAt: 'createdAt';
         updatedAt: 'updatedAt';
         email: 'email';
-        name: 'name';
+        username: 'username';
         password: 'password';
         role: 'role';
         status: 'status';
@@ -9595,7 +9595,7 @@ export namespace Prisma {
 
     export const UserOrderByRelevanceFieldEnum: {
         email: 'email';
-        name: 'name';
+        username: 'username';
         password: 'password';
         role: 'role';
         status: 'status';
@@ -9699,7 +9699,7 @@ export namespace Prisma {
         createdAt?: DateTimeFilter<'User'> | Date | string;
         updatedAt?: DateTimeFilter<'User'> | Date | string;
         email?: StringFilter<'User'> | string;
-        name?: StringNullableFilter<'User'> | string | null;
+        username?: StringFilter<'User'> | string;
         password?: StringFilter<'User'> | string;
         role?: StringFilter<'User'> | string;
         status?: StringFilter<'User'> | string;
@@ -9725,7 +9725,7 @@ export namespace Prisma {
         createdAt?: SortOrder;
         updatedAt?: SortOrder;
         email?: SortOrder;
-        name?: SortOrderInput | SortOrder;
+        username?: SortOrder;
         password?: SortOrder;
         role?: SortOrder;
         status?: SortOrder;
@@ -9748,7 +9748,7 @@ export namespace Prisma {
             NOT?: UserWhereInput | UserWhereInput[];
             createdAt?: DateTimeFilter<'User'> | Date | string;
             updatedAt?: DateTimeFilter<'User'> | Date | string;
-            name?: StringNullableFilter<'User'> | string | null;
+            username?: StringFilter<'User'> | string;
             password?: StringFilter<'User'> | string;
             role?: StringFilter<'User'> | string;
             status?: StringFilter<'User'> | string;
@@ -9779,7 +9779,7 @@ export namespace Prisma {
         createdAt?: SortOrder;
         updatedAt?: SortOrder;
         email?: SortOrder;
-        name?: SortOrderInput | SortOrder;
+        username?: SortOrder;
         password?: SortOrder;
         role?: SortOrder;
         status?: SortOrder;
@@ -9809,7 +9809,7 @@ export namespace Prisma {
         createdAt?: DateTimeWithAggregatesFilter<'User'> | Date | string;
         updatedAt?: DateTimeWithAggregatesFilter<'User'> | Date | string;
         email?: StringWithAggregatesFilter<'User'> | string;
-        name?: StringNullableWithAggregatesFilter<'User'> | string | null;
+        username?: StringWithAggregatesFilter<'User'> | string;
         password?: StringWithAggregatesFilter<'User'> | string;
         role?: StringWithAggregatesFilter<'User'> | string;
         status?: StringWithAggregatesFilter<'User'> | string;
@@ -10226,7 +10226,7 @@ export namespace Prisma {
         createdAt?: Date | string;
         updatedAt?: Date | string;
         email: string;
-        name?: string | null;
+        username: string;
         password: string;
         role?: string;
         status?: string;
@@ -10244,7 +10244,7 @@ export namespace Prisma {
         createdAt?: Date | string;
         updatedAt?: Date | string;
         email: string;
-        name?: string | null;
+        username: string;
         password: string;
         role?: string;
         status?: string;
@@ -10261,7 +10261,7 @@ export namespace Prisma {
         createdAt?: DateTimeFieldUpdateOperationsInput | Date | string;
         updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string;
         email?: StringFieldUpdateOperationsInput | string;
-        name?: NullableStringFieldUpdateOperationsInput | string | null;
+        username?: StringFieldUpdateOperationsInput | string;
         password?: StringFieldUpdateOperationsInput | string;
         role?: StringFieldUpdateOperationsInput | string;
         status?: StringFieldUpdateOperationsInput | string;
@@ -10297,7 +10297,7 @@ export namespace Prisma {
         createdAt?: DateTimeFieldUpdateOperationsInput | Date | string;
         updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string;
         email?: StringFieldUpdateOperationsInput | string;
-        name?: NullableStringFieldUpdateOperationsInput | string | null;
+        username?: StringFieldUpdateOperationsInput | string;
         password?: StringFieldUpdateOperationsInput | string;
         role?: StringFieldUpdateOperationsInput | string;
         status?: StringFieldUpdateOperationsInput | string;
@@ -10333,7 +10333,7 @@ export namespace Prisma {
         createdAt?: Date | string;
         updatedAt?: Date | string;
         email: string;
-        name?: string | null;
+        username: string;
         password: string;
         role?: string;
         status?: string;
@@ -10350,7 +10350,7 @@ export namespace Prisma {
         createdAt?: DateTimeFieldUpdateOperationsInput | Date | string;
         updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string;
         email?: StringFieldUpdateOperationsInput | string;
-        name?: NullableStringFieldUpdateOperationsInput | string | null;
+        username?: StringFieldUpdateOperationsInput | string;
         password?: StringFieldUpdateOperationsInput | string;
         role?: StringFieldUpdateOperationsInput | string;
         status?: StringFieldUpdateOperationsInput | string;
@@ -10386,7 +10386,7 @@ export namespace Prisma {
         createdAt?: DateTimeFieldUpdateOperationsInput | Date | string;
         updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string;
         email?: StringFieldUpdateOperationsInput | string;
-        name?: NullableStringFieldUpdateOperationsInput | string | null;
+        username?: StringFieldUpdateOperationsInput | string;
         password?: StringFieldUpdateOperationsInput | string;
         role?: StringFieldUpdateOperationsInput | string;
         status?: StringFieldUpdateOperationsInput | string;
@@ -10826,7 +10826,7 @@ export namespace Prisma {
         createdAt?: SortOrder;
         updatedAt?: SortOrder;
         email?: SortOrder;
-        name?: SortOrder;
+        username?: SortOrder;
         password?: SortOrder;
         role?: SortOrder;
         status?: SortOrder;
@@ -10848,7 +10848,7 @@ export namespace Prisma {
         createdAt?: SortOrder;
         updatedAt?: SortOrder;
         email?: SortOrder;
-        name?: SortOrder;
+        username?: SortOrder;
         password?: SortOrder;
         role?: SortOrder;
         status?: SortOrder;
@@ -10866,7 +10866,7 @@ export namespace Prisma {
         createdAt?: SortOrder;
         updatedAt?: SortOrder;
         email?: SortOrder;
-        name?: SortOrder;
+        username?: SortOrder;
         password?: SortOrder;
         role?: SortOrder;
         status?: SortOrder;

@@ -4,11 +4,11 @@ export type User = {
     email: string;
     role: UserRole;
     status: Status;
-    avatar_url: string | null;
-    email_verified: boolean;
-    created_at: string;
-    updated_at: string;
-    last_login: string | null;
+    avatarUrl: string | null;
+    emailVerified: boolean;
+    createdAt: string;
+    updatedAt: string;
+    lastLogin: string | null;
 };
 
 export type UserForCreate = {
