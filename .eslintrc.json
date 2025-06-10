@@ -1,125 +1,94 @@
 {
-  "env": {
-    "browser": true,
-    "es2022": true,
-    "node": true
-  },
-  "settings": {
-    "react": {
-      "version": "detect"
-    }
-  },
-  "extends": [
-    "next/core-web-vitals",
-    "eslint:recommended",
-    "plugin:react/recommended",
-    "plugin:@typescript-eslint/recommended",
-    "prettier"
-  ],
-  "parser": "@typescript-eslint/parser",
-  "parserOptions": {
-    "ecmaFeatures": {
-      "jsx": true
+    "env": {
+        "browser": true,
+        "es2022": true,
+        "node": true
     },
-    "project": [
-      "./tsconfig.json"
-    ],
-    "ecmaVersion": "latest",
-    "sourceType": "module"
-  },
-  "plugins": [
-    "react",
-    "@typescript-eslint"
-  ],
-  "ignorePatterns": [
-    "tailwind.config.js",
-    "postcss.config.js",
-    "vitest.config.js",
-    "**/src/stories/**/*"
-  ],
-  "rules": {
-    //* Typescript specific rules
-    "@typescript-eslint/semi": [
-      "error",
-      "always"
-    ],
-    "@typescript-eslint/no-explicit-any": "off",
-    "@typescript-eslint/member-delimiter-style": [
-      "error",
-      {
-        "multiline": {
-          "delimiter": "semi",
-          "requireLast": true
-        },
-        "singleline": {
-          "delimiter": "semi",
-          "requireLast": true
+    "settings": {
+        "react": {
+            "version": "detect"
         }
-      }
+    },
+    "extends": [
+        "next/core-web-vitals",
+        "eslint:recommended",
+        "plugin:react/recommended",
+        "plugin:@typescript-eslint/recommended",
+        "prettier"
     ],
-    "@typescript-eslint/consistent-type-assertions": [
-      "error",
-      {
-        "assertionStyle": "as"
-      }
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+        "ecmaFeatures": {
+            "jsx": true
+        },
+        "project": ["./tsconfig.json"],
+        "ecmaVersion": "latest",
+        "sourceType": "module"
+    },
+    "plugins": ["react", "@typescript-eslint"],
+    "ignorePatterns": [
+        "tailwind.config.js",
+        "postcss.config.js",
+        "vitest.config.js",
+        "**/src/stories/**/*",
+        "**/src/server/db/generated/db"
     ],
-    "@typescript-eslint/consistent-type-imports": [
-      "error",
-      {
-        "prefer": "type-imports"
-      }
-    ],
-    //* React specific rules
-    "react/display-name": "off",
-    "react/jsx-indent-props": "off",
-    "react/jsx-no-bind": [
-      "error"
-    ],
-    "react/sort-prop-types": [
-      "error"
-    ],
-    "react/sort-default-props": [
-      "error"
-    ],
-    "react/jsx-no-constructed-context-values": [
-      "warn"
-    ],
-    "react/prefer-read-only-props": [
-      "error"
-    ],
-    "react/no-unused-prop-types": [
-      "error"
-    ],
-    "react/self-closing-comp": [
-      "error"
-    ],
-    "react/no-danger": [
-      "error"
-    ],
-    "react/jsx-first-prop-new-line": [
-      2,
-      "multiline"
-    ],
-    "react/jsx-max-props-per-line": [
-      2,
-      {
-        "maximum": 1,
-        "when": "multiline"
-      }
-    ],
-    "react/jsx-closing-bracket-location": [
-      2,
-      "tag-aligned"
-    ],
-    //* General rules
-    "prefer-const": "error",
-    "no-restricted-imports": [
-      "error",
-      {
-        "patterns": [
-          "../"
+    "rules": {
+        //* Typescript specific rules
+        "@typescript-eslint/semi": ["error", "always"],
+        "@typescript-eslint/no-explicit-any": "off",
+        "@typescript-eslint/member-delimiter-style": [
+            "error",
+            {
+                "multiline": {
+                    "delimiter": "semi",
+                    "requireLast": true
+                },
+                "singleline": {
+                    "delimiter": "semi",
+                    "requireLast": false
+                }
+            }
+        ],
+        "@typescript-eslint/consistent-type-assertions": [
+            "error",
+            {
+                "assertionStyle": "as"
+            }
+        ],
+        "@typescript-eslint/consistent-type-imports": [
+            "error",
+            {
+                "prefer": "type-imports"
+            }
+        ],
+        //* React specific rules
+        "react/display-name": "off",
+        "react/jsx-indent-props": "off",
+        "react/jsx-no-bind": ["error"],
+        "react/sort-prop-types": ["error"],
+        "react/sort-default-props": ["error"],
+        "react/jsx-no-constructed-context-values": ["warn"],
+        "react/prefer-read-only-props": ["error"],
+        "react/no-unused-prop-types": ["error"],
+        "react/self-closing-comp": ["error"],
+        "react/no-danger": ["error"],
+        "react/jsx-first-prop-new-line": [2, "multiline"],
+        "react/jsx-max-props-per-line": [
+            2,
+            {
+                "maximum": 1,
+                "when": "multiline"
+            }
+        ],
+        "react/jsx-closing-bracket-location": [2, "tag-aligned"],
+        //* General rules
+        "prefer-const": "error",
+        "no-restricted-imports": [
+            "error",
+            {
+                "patterns": ["../"]
+            }
         ]
-      }
-    ]
-  }
+    }
 }
