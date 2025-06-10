@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import { ENV_CONFIG_PUBLIC } from '@/common/constants';
-import pc from '@/utils/logger/console/pc';
+import pc from '@/common/logger/console/pc';
 
 export class Logger {
     constructor(private readonly context: string) {
