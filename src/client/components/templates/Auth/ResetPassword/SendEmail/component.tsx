@@ -7,7 +7,7 @@ import type {
 } from '@/client/components';
 import { SimpleEmailForm, Typography } from '@/client/components';
 import type { ResetPasswordEmailPayload } from '@/common/types';
-import apiClient from '@/client/services';
+import apiClient from '@/client/request';
 import { object, string } from 'yup';
 import { useLocale } from '@/client/store';
 import type { SubmitHandler } from '@/client/components/organisms/Form/types';

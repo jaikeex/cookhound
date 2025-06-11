@@ -1,4 +1,4 @@
-import { apiRequestWrapper } from '@/client/services/ApiRequestWrapper';
+import { apiRequestWrapper } from '@/client/request/ApiRequestWrapper';
 import type { Recipe, RecipeForCreate } from '@/common/types';
 
 /**

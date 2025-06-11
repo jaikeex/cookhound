@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useCallback } from 'react';
-import apiClient from '@/client/services';
+import apiClient from '@/client/request';
 import { ButtonWithCooldown, Typography } from '@/client/components';
 
 export const VerifyEmailTemplate: React.FC = () => {

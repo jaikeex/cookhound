@@ -8,7 +8,7 @@ import React, {
 } from 'react';
 import type { User } from '@/common/types';
 import { ENV_CONFIG_PUBLIC } from '@/common/constants';
-import apiClient from '@/client/services';
+import apiClient from '@/client/request';
 
 type AuthContextType = {
     authResolved: boolean;

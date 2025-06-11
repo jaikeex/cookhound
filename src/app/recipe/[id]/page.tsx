@@ -1,5 +1,5 @@
 import React from 'react';
-import apiClient from '@/client/services';
+import apiClient from '@/client/request';
 import { RecipeViewTemplate } from '@/client/components';
 
 type RecipePageParams = {

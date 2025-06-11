@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import apiClient from '@/client/services';
+import apiClient from '@/client/request';
 
 export default function VerifyEmailCallback() {
     const [result, setResult] = useState<boolean>(false);

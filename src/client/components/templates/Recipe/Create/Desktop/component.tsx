@@ -7,7 +7,7 @@ import type { SubmitHandler } from '@/client/components/organisms/Form/types';
 import type { RecipeForCreate, Ingredient, Recipe } from '@/common/types';
 import { useLocale, useSnackbar } from '@/client/store';
 import { DesktopRecipeViewTemplate } from '@/client/components/templates/Recipe/View/Desktop';
-import apiClient from '@/client/services';
+import apiClient from '@/client/request';
 import {
     fileToByteArray,
     generateRandomId,

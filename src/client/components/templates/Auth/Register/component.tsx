@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import type { ObjectSchema } from 'yup';
 import { object, ref, string } from 'yup';
 import type { UserForCreate } from '@/common/types';
-import apiClient from '@/client/services';
+import apiClient from '@/client/request';
 import { useGoogleSignIn } from '@/client/hooks';
 import type { SubmitHandler } from '@/client/components/organisms/Form/types';
 import type { RegisterFormErrors } from '@/client/components';

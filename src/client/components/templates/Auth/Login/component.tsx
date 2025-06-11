@@ -9,7 +9,7 @@ import {
     Typography
 } from '@/client/components';
 import type { User, UserForLogin } from '@/common/types';
-import apiClient from '@/client/services';
+import apiClient from '@/client/request';
 import type { ObjectSchema } from 'yup';
 import { boolean, object, string } from 'yup';
 import { validateFormData } from '@/client/utils/form';

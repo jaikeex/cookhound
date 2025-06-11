@@ -5,7 +5,7 @@ import type { BaseButtonProps } from '@/client/components';
 import { ButtonBase } from '@/client/components';
 import classnames from 'classnames';
 import { useRouter } from 'next/navigation';
-import apiClient from '@/client/services';
+import apiClient from '@/client/request';
 import { useAuth, useLocale, useSnackbar } from '@/client/store';
 
 type LogoutButtonProps = BaseButtonProps;

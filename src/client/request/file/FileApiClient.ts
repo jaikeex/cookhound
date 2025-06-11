@@ -1,4 +1,4 @@
-import { apiRequestWrapper } from '@/client/services/ApiRequestWrapper';
+import { apiRequestWrapper } from '@/client/request/ApiRequestWrapper';
 import type { FileForUpload, FileUploadResponse } from '@/common/types';
 
 class FileApiClient {

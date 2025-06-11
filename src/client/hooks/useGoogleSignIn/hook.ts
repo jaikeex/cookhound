@@ -5,7 +5,7 @@ import {
     ENV_CONFIG_PUBLIC,
     GOOGLE_SIGNIN_REDIRECT_URL
 } from '@/common/constants';
-import apiClient from '@/client/services';
+import apiClient from '@/client/request';
 import { useEventListener } from '@/client/hooks';
 import type { User } from '@/common/types';
 
