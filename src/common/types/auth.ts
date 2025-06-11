@@ -1,7 +1,8 @@
-export type UserForLogin = {
-    email: string;
-    password: string;
-    keepLoggedIn: boolean;
+import type { User } from './user';
+
+export type AuthResponse = {
+    token: string;
+    user: User;
 };
 
 export type AuthCodePayload = {

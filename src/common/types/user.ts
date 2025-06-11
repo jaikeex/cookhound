@@ -17,6 +17,12 @@ export type UserForCreate = {
     password: string;
 };
 
+export type UserForLogin = {
+    email: string;
+    password: string;
+    keepLoggedIn: boolean;
+};
+
 export enum UserRole {
     Guest = 'guest',
     User = 'user',
