@@ -4,7 +4,7 @@ import React, { forwardRef } from 'react';
 import classNames from 'classnames';
 import { AnonymousMenuContent } from './Anonymous';
 import { LoggedInMenuContent } from './LoggedIn';
-import type { User } from '@/client/types';
+import type { User } from '@/common/types';
 
 type NavMenuProps = Readonly<{
     className?: string;

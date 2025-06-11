@@ -3,7 +3,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { BaseInput } from '@/client/components';
 import { DraggableInputRow } from '@/client/components/molecules/Form/DraggableInputRow';
-import type { Ingredient } from '@/client/types';
+import type { Ingredient } from '@/common/types';
 
 type IngredientRowCreateProps = Readonly<{
     className?: string;

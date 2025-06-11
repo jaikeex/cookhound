@@ -13,7 +13,7 @@ import {
 } from '@/client/components';
 import { useFormStatus } from 'react-dom';
 import { useAuth, useLocale } from '@/client/store';
-import type { Ingredient } from '@/client/types';
+import type { Ingredient } from '@/common/types';
 import type { I18nMessage } from '@/client/locales';
 
 type RecipeFormProps = Readonly<{

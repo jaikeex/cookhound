@@ -1,5 +1,5 @@
 import React from 'react';
-import type { Ingredient } from '@/client/types';
+import type { Ingredient } from '@/common/types';
 import { IngredientRowView } from '@/client/components';
 import { useIngredientSelectStore } from '@/client/store';
 

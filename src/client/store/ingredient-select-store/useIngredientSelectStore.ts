@@ -1,4 +1,4 @@
-import type { Ingredient } from '@/client/types';
+import type { Ingredient } from '@/common/types';
 import { create } from 'zustand/index';
 
 type IngredientSelectStore = Readonly<{

@@ -1,7 +1,8 @@
 import React from 'react';
 import type { TypographyVariant } from '@/client/components';
 import { Typography } from '@/client/components';
-import type { Recipe, ViewPortVariant } from '@/client/types';
+import type { Recipe } from '@/common/types';
+import type { ViewPortVariant } from '@/client/types';
 
 // ---------------------------------- config ----------------------------------
 //                                    region

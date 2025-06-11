@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useCallback, useEffect, useState } from 'react';
-import type { Ingredient } from '@/client/types';
+import type { Ingredient } from '@/common/types';
 import type { TypographyVariant } from '@/client/components';
 import { Checkbox, Typography } from '@/client/components';
 
