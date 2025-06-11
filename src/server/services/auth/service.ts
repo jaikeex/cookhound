@@ -3,7 +3,8 @@ import type { UserForLogin, AuthResponse } from '@/common/types';
 import prisma from '@/server/db/prisma';
 import bcrypt from 'bcrypt';
 import { HttpError } from '@/common/errors/HttpError';
-import { createToken } from '@/server/utils/jwt';
+import { createToken, verifyToken } from '@/server/utils/jwt';
+import { cookies } from 'next/headers';
 
 class AuthService {
     async login(payload: UserForLogin): Promise<AuthResponse> {
@@ -57,7 +58,41 @@ class AuthService {
             lastLogin: user.lastLogin?.toISOString() || null
         };
 
+        console.log('userResponse', userResponse);
+
         return { token, user: userResponse };
+    }
+
+    async getCurrentUser(): Promise<User> {
+        const cookieStore = await cookies();
+        const token = cookieStore.get('jwt')?.value;
+
+        if (!token) {
+            throw new HttpError('Unauthorized', 401);
+        }
+
+        const decoded = verifyToken(token);
+
+        const user = await prisma.user.findUnique({
+            where: { id: Number(decoded.id) }
+        });
+
+        if (!user) {
+            throw new HttpError('User not found', 404);
+        }
+
+        return {
+            id: user.id,
+            email: user.email,
+            username: user.username,
+            avatarUrl: user.avatarUrl,
+            emailVerified: user.emailVerified,
+            createdAt: user.createdAt.toISOString(),
+            updatedAt: user.updatedAt.toISOString(),
+            role: user.role as UserRole,
+            status: user.status as Status,
+            lastLogin: user.lastLogin?.toISOString() || null
+        };
     }
 }
 

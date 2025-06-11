@@ -1,7 +1,11 @@
-import type { NextRequest } from 'next/server';
+import { authService } from '@/server/services/auth/service';
 
-export async function GET(request: NextRequest) {
-    console.log('request', request);
+export async function GET() {
+    const user = await authService.getCurrentUser();
 
-    return Response.json({ message: 'Hello, world!' });
+    if (!user) {
+        return Response.json({ message: 'Unauthorized' }, { status: 401 });
+    }
+
+    return Response.json(user);
 }

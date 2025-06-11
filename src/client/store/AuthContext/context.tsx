@@ -35,8 +35,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const [user, setUser] = useState<User | null | undefined>(undefined);
     useEffect(() => {
         const fetchUser = async () => {
-            // const currentUser = await getCurrentUserOrNull();
-            const currentUser = null;
+            const currentUser = await getCurrentUserOrNull();
             setUser(currentUser);
             setAuthResolved(true);
         };
