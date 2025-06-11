@@ -1,7 +1,7 @@
-import type { NextRequest } from 'next/server';
+import { authService } from '@/server/services/auth/service';
 
-export async function POST(request: NextRequest) {
-    console.log('request', request);
+export async function POST() {
+    await authService.logout();
 
-    return Response.json({ message: 'Hello, world!' });
+    return Response.json({ message: 'Logged out successfully' });
 }

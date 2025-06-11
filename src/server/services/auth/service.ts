@@ -58,8 +58,6 @@ class AuthService {
             lastLogin: user.lastLogin?.toISOString() || null
         };
 
-        console.log('userResponse', userResponse);
-
         return { token, user: userResponse };
     }
 
@@ -93,6 +91,12 @@ class AuthService {
             status: user.status as Status,
             lastLogin: user.lastLogin?.toISOString() || null
         };
+    }
+
+    async logout(): Promise<void> {
+        const cookieStore = await cookies();
+        cookieStore.delete('jwt');
+        return;
     }
 }
 
