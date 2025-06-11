@@ -9,6 +9,7 @@ export type RequestConfig = {
     data?: any;
     params?: any;
     next?: NextFetchRequestConfig;
+    headers?: HeadersInit;
 };
 
 const logger = new Logger('ApiService');
@@ -17,18 +18,17 @@ const logger = new Logger('ApiService');
  * Service class which provides methods to perform HTTP requests using the fetch api.
  * Implementations are provided for the following HTTP methods: get, post, put, and delete.
  */
-class ApiService {
-    private static instance: ApiService;
+class ApiRequestWrapper {
+    private static instance: ApiRequestWrapper;
     private readonly API_URL = ENV_CONFIG_PUBLIC.API_URL;
-    private readonly ENV = ENV_CONFIG_PUBLIC.ENV;
 
     private constructor() {}
 
-    public static getInstance(): ApiService {
-        if (!ApiService.instance) {
-            ApiService.instance = new ApiService();
+    public static getInstance(): ApiRequestWrapper {
+        if (!ApiRequestWrapper.instance) {
+            ApiRequestWrapper.instance = new ApiRequestWrapper();
         }
-        return ApiService.instance;
+        return ApiRequestWrapper.instance;
     }
 
     /**
@@ -118,7 +118,8 @@ class ApiService {
         let response: Response;
         let data: any;
         const headers = new Headers({
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            ...config.headers
         }) as HeadersInit;
 
         const options: RequestInit = {
@@ -167,4 +168,4 @@ class ApiService {
     }
 }
 
-export const apiService = ApiService.getInstance();
+export const apiRequestWrapper = ApiRequestWrapper.getInstance();

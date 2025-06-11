@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { userService } from '@/client/services';
+import apiClient from '@/client/services';
 
 export default function VerifyEmailCallback() {
     const [result, setResult] = useState<boolean>(false);
@@ -17,7 +17,7 @@ export default function VerifyEmailCallback() {
         }
 
         try {
-            await userService.verifyEmail(data.token);
+            await apiClient.user.verifyEmail(data.token);
             setResult(true);
         } catch (error: any) {
             setError(error.message);

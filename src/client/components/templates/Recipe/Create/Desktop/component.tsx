@@ -4,11 +4,10 @@ import React, { useCallback, useState } from 'react';
 import type { RecipeFormErrors } from '@/client/components';
 import { RecipeForm } from '@/client/components';
 import type { SubmitHandler } from '@/client/components/organisms/Form/types';
-import type { RecipeForCreate } from '@/client/services';
+import type { RecipeForCreate, Ingredient, Recipe } from '@/common/types';
 import { useLocale, useSnackbar } from '@/client/store';
-import type { Ingredient, Recipe } from '@/client/types';
 import { DesktopRecipeViewTemplate } from '@/client/components/templates/Recipe/View/Desktop';
-import { fileService, recipeService } from '@/client/services';
+import apiClient from '@/client/services';
 import {
     fileToByteArray,
     generateRandomId,
@@ -114,7 +113,7 @@ export const DesktopRecipeCreate: React.FC<DesktopRecipeCreateProps> = ({
                 };
 
                 const createdRecipe =
-                    await recipeService.createRecipe(recipeForCreate);
+                    await apiClient.recipe.createRecipe(recipeForCreate);
 
                 console.log(createdRecipe);
 
@@ -168,7 +167,7 @@ async function extractFormData(
         const imageBytes = await fileToByteArray(
             data.get('recipe-image') as File
         );
-        const response = await fileService.uploadFile({
+        const response = await apiClient.file.uploadFile({
             bytes: imageBytes,
             file_name: `recipe-image-${generateRandomId()}`,
             bucket:

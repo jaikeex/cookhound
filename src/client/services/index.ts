@@ -1,4 +1,3 @@
-export * from './auth';
-export * from './file';
-export * from './recipe';
-export * from './user';
+import apiClient from './client';
+
+export default apiClient;

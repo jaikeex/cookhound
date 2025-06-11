@@ -8,8 +8,8 @@ import {
     LoginForm,
     Typography
 } from '@/client/components';
-import type { UserForLogin } from '@/client/services';
-import { authService } from '@/client/services';
+import type { User, UserForLogin } from '@/common/types';
+import apiClient from '@/client/services';
 import type { ObjectSchema } from 'yup';
 import { boolean, object, string } from 'yup';
 import { validateFormData } from '@/client/utils/form';
@@ -19,7 +19,6 @@ import { useAuth, useLocale, useSnackbar } from '@/client/store';
 import type { I18nMessage } from '@/client/locales';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import type { User } from '@/client/types';
 
 export type LoginTemplateProps = NonNullable<unknown>;
 
@@ -87,7 +86,7 @@ export const LoginTemplate: React.FC<LoginTemplateProps> = () => {
             try {
                 setFormErrors({});
 
-                const user = await authService.login(formData);
+                const user = await apiClient.auth.login(formData);
                 cleanUpAndRedirectAfterLogin(user);
             } catch (error: any) {
                 setFormErrors({

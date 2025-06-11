@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useCallback } from 'react';
-import { userService } from '@/client/services';
+import apiClient from '@/client/services';
 import { ButtonWithCooldown, Typography } from '@/client/components';
 
 export const VerifyEmailTemplate: React.FC = () => {
@@ -12,7 +12,7 @@ export const VerifyEmailTemplate: React.FC = () => {
 
         try {
             if (!email) return;
-            await userService.resendVerificationEmail(email);
+            await apiClient.user.resendVerificationEmail(email);
         } catch (error: any) {
             setError(error.message);
         }

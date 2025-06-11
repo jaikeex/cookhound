@@ -7,7 +7,7 @@ import type {
 } from '@/client/components';
 import { ResetPasswordForm, Typography } from '@/client/components';
 import type { ResetPasswordPayload } from '@/common/types';
-import { authService } from '@/client/services';
+import apiClient from '@/client/services';
 import { object, ref, string } from 'yup';
 import { useLocale } from '@/client/store';
 import type { SubmitHandler } from '@/client/components/organisms/Form/types';
@@ -85,7 +85,7 @@ export const ResetPasswordTemplate: React.FC = () => {
                     token
                 };
 
-                await authService.resetPassword(payload);
+                await apiClient.auth.resetPassword(payload);
                 formRef.current?.reset();
                 disableForm();
                 setSubmitted(true);

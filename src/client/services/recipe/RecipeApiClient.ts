@@ -1,10 +1,10 @@
-import { apiService } from '@/client/services/ApiService';
+import { apiRequestWrapper } from '@/client/services/ApiRequestWrapper';
 import type { Recipe, RecipeForCreate } from '@/common/types';
 
 /**
  * Service for recipe-related operations.
  */
-class RecipeService {
+class RecipeApiClient {
     /**
      * Gets recipe by id.
      *
@@ -18,15 +18,19 @@ class RecipeService {
         id: string,
         next?: NextFetchRequestConfig
     ): Promise<Recipe> {
-        return await apiService.get({ url: `/recipe/${id}`, next });
+        return await apiRequestWrapper.get({ url: `/recipe/${id}`, next });
     }
 
     async createRecipe(
         recipe: RecipeForCreate,
         next?: NextFetchRequestConfig
     ): Promise<Recipe> {
-        return await apiService.post({ url: '/recipe', data: recipe, next });
+        return await apiRequestWrapper.post({
+            url: '/recipe',
+            data: recipe,
+            next
+        });
     }
 }
 
-export const recipeService = new RecipeService();
+export const recipeApiClient = new RecipeApiClient();

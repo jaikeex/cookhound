@@ -3,7 +3,7 @@
 import React, { useEffect } from 'react';
 import { DesktopRecipeViewTemplate } from './Desktop';
 import { MobileRecipeViewTemplate } from './Mobile';
-import type { Recipe } from '@/client/types';
+import type { Recipe } from '@/common/types';
 import { useIngredientSelectStore } from '@/client/store';
 
 export type RecipeViewProps = Readonly<{

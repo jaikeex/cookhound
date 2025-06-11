@@ -1,1 +1,1 @@
-export * from './AuthService';
+export * from './AuthApiClient';

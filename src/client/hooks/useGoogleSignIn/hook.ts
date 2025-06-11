@@ -5,9 +5,9 @@ import {
     ENV_CONFIG_PUBLIC,
     GOOGLE_SIGNIN_REDIRECT_URL
 } from '@/common/constants';
-import { authService } from '@/client/services';
+import apiClient from '@/client/services';
 import { useEventListener } from '@/client/hooks';
-import type { User } from '@/client/types';
+import type { User } from '@/common/types';
 
 type UseGoogleSignInArgs = {
     onSuccess?: (user: User) => void;
@@ -36,7 +36,7 @@ export const useGoogleSignIn: UseGoogleSignInType = ({ onSuccess }) => {
                 event.data.authCode
             ) {
                 try {
-                    const user = await authService.loginWithGoogleOauth({
+                    const user = await apiClient.auth.loginWithGoogleOauth({
                         code: event.data.authCode
                     });
                     onSuccess && onSuccess(user);

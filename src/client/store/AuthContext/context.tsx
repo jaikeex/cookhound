@@ -7,8 +7,8 @@ import React, {
     useState
 } from 'react';
 import type { User } from '@/common/types';
-import { authService } from '@/client/services';
 import { ENV_CONFIG_PUBLIC } from '@/common/constants';
+import apiClient from '@/client/services';
 
 type AuthContextType = {
     authResolved: boolean;
@@ -67,7 +67,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const getCurrentUserOrNull = async () => {
     try {
-        return await authService.getCurrentUser();
+        return await apiClient.auth.getCurrentUser();
     } catch (err) {
         return null;
     }

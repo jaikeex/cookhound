@@ -1,12 +1,12 @@
-import { apiService } from '@/client/services/ApiService';
+import { apiRequestWrapper } from '@/client/services/ApiRequestWrapper';
 import type { UserForCreate } from '@/common/types';
 
 /**
  * Service for user-related operations.
  */
-class UserService {
+class UserApiClient {
     /**
-     * Gets the currently logged-in user.
+     * Creates a new user.
      *
      * @param data - The user data to create.
      * @param next - The Next.js fetch request configuration.
@@ -18,7 +18,7 @@ class UserService {
         data: UserForCreate,
         next?: NextFetchRequestConfig
     ): Promise<void> {
-        await apiService.post({ url: '/user', data, next });
+        await apiRequestWrapper.post({ url: '/user', data, next });
     }
 
     /**
@@ -34,7 +34,7 @@ class UserService {
         token: string,
         next?: NextFetchRequestConfig
     ): Promise<void> {
-        await apiService.put({
+        await apiRequestWrapper.put({
             url: '/user/verify-email',
             params: { token },
             next
@@ -54,7 +54,7 @@ class UserService {
         email: string,
         next?: NextFetchRequestConfig
     ): Promise<void> {
-        await apiService.post({
+        await apiRequestWrapper.post({
             url: '/user/verify-email',
             data: { email },
             next
@@ -62,4 +62,4 @@ class UserService {
     }
 }
 
-export const userService = new UserService();
+export const userApiClient = new UserApiClient();

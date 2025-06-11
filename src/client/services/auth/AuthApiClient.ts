@@ -1,4 +1,4 @@
-import { apiService } from '@/client/services/ApiService';
+import { apiRequestWrapper } from '@/client/services/ApiRequestWrapper';
 import type {
     User,
     AuthCodePayload,
@@ -10,7 +10,7 @@ import type {
 /**
  * Service for user-related operations.
  */
-class AuthService {
+class AuthApiClient {
     /**
      * Gets the currently logged-in user.
      *
@@ -20,7 +20,7 @@ class AuthService {
      * @throws {Error} Throws an error if the request fails.
      */
     async getCurrentUser(next?: NextFetchRequestConfig): Promise<User> {
-        return await apiService.get({ url: '/auth/current', next });
+        return await apiRequestWrapper.get({ url: '/auth/current', next });
     }
 
     /**
@@ -36,7 +36,7 @@ class AuthService {
         data: UserForLogin,
         next?: NextFetchRequestConfig
     ): Promise<User> {
-        return await apiService.post<User>({
+        return await apiRequestWrapper.post<User>({
             url: '/auth/login',
             data,
             next
@@ -56,7 +56,7 @@ class AuthService {
         data: AuthCodePayload,
         next?: NextFetchRequestConfig
     ): Promise<User> {
-        return await apiService.post<User>({
+        return await apiRequestWrapper.post<User>({
             url: '/auth/google',
             data,
             next
@@ -72,7 +72,7 @@ class AuthService {
      * @throws {Error} Throws an error if the request fails.
      */
     async logout(next?: NextFetchRequestConfig): Promise<void> {
-        await apiService.post({
+        await apiRequestWrapper.post({
             url: '/auth/logout',
             next
         });
@@ -91,7 +91,7 @@ class AuthService {
         data: ResetPasswordEmailPayload,
         next?: NextFetchRequestConfig
     ): Promise<void> {
-        await apiService.post({
+        await apiRequestWrapper.post({
             url: '/auth/password-reset',
             data,
             next
@@ -111,7 +111,7 @@ class AuthService {
         data: ResetPasswordPayload,
         next?: NextFetchRequestConfig
     ): Promise<void> {
-        await apiService.put({
+        await apiRequestWrapper.put({
             url: '/auth/password-reset',
             data,
             next
@@ -119,4 +119,4 @@ class AuthService {
     }
 }
 
-export const authService = new AuthService();
+export const authApiClient = new AuthApiClient();

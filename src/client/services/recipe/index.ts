@@ -1,1 +1,1 @@
-export * from './RecipeService';
+export * from './RecipeApiClient';

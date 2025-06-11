@@ -7,7 +7,7 @@ import type {
 } from '@/client/components';
 import { SimpleEmailForm, Typography } from '@/client/components';
 import type { ResetPasswordEmailPayload } from '@/common/types';
-import { authService } from '@/client/services';
+import apiClient from '@/client/services';
 import { object, string } from 'yup';
 import { useLocale } from '@/client/store';
 import type { SubmitHandler } from '@/client/components/organisms/Form/types';
@@ -68,7 +68,7 @@ export const SendResetPasswordEmailTemplate: React.FC = () => {
 
             try {
                 setFormErrors({});
-                await authService.sendResetPasswordEmail(formData);
+                await apiClient.auth.sendResetPasswordEmail(formData);
                 formRef.current?.reset();
                 disableForm();
                 setSubmitted(true);

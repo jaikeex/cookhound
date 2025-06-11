@@ -1,5 +1,5 @@
 import React from 'react';
-import { recipeService } from '@/client/services';
+import apiClient from '@/client/services';
 import { RecipeViewTemplate } from '@/client/components';
 
 type RecipePageParams = {
@@ -12,7 +12,7 @@ export default async function Page({ params }: RecipePageParams) {
     const paramsResolved = await params;
     const recipeId = paramsResolved.id;
 
-    const recipe = await recipeService.getRecipeById(recipeId, {
+    const recipe = await apiClient.recipe.getRecipeById(recipeId, {
         revalidate: 3600
     });
 

@@ -5,7 +5,7 @@ import type { BaseButtonProps } from '@/client/components';
 import { ButtonBase } from '@/client/components';
 import classnames from 'classnames';
 import { useRouter } from 'next/navigation';
-import { authService } from '@/client/services';
+import apiClient from '@/client/services';
 import { useAuth, useLocale, useSnackbar } from '@/client/store';
 
 type LogoutButtonProps = BaseButtonProps;
@@ -17,7 +17,7 @@ export const LogoutButton: React.FC<LogoutButtonProps> = ({ className }) => {
     const { t } = useLocale();
 
     const handleClick = useCallback(async () => {
-        await authService.logout();
+        await apiClient.auth.logout();
         setUser(null);
         alert({
             message: t('auth.success.logout'),
