@@ -9,7 +9,7 @@ export class RequestError extends Error {
     static fromFetchError(error: any) {
         return new RequestError(
             error.status || 500,
-            error.message || 'Something went wrong...'
+            error.message || error.statusText || 'Something went wrong...'
         );
     }
 }

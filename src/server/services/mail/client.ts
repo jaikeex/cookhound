@@ -100,7 +100,6 @@ export class MailClient {
                 ) {
                     this.socket.removeListener('data', onData);
                     this.socket.removeListener('error', onError);
-                    console.log(`S: ${response.trim()}`);
                     resolve(response);
                 }
             };
@@ -117,7 +116,6 @@ export class MailClient {
         command: string,
         expectedCode: number
     ): Promise<string> {
-        console.log(`C: ${command}`);
         this.socket.write(command + '\r\n');
         const response = await this.readResponse();
         const responseCode = parseInt(response.substring(0, 3), 10);
@@ -163,7 +161,6 @@ export class MailClient {
         );
 
         const pass64 = Buffer.from(this.pass).toString('base64');
-        console.log('C: ...password...');
         this.socket.write(pass64 + '\r\n');
         const response = await this.readResponse();
         if (parseInt(response.substring(0, 3), 10) !== 235) {

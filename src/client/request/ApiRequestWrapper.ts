@@ -115,7 +115,6 @@ class ApiRequestWrapper {
         config: RequestConfig,
         method: string
     ): Promise<R> {
-        let response: Response;
         let data: any;
         const headers = new Headers({
             'Content-Type': 'application/json',
@@ -143,12 +142,7 @@ class ApiRequestWrapper {
             );
         }
 
-        try {
-            response = await fetch(url.toString(), options);
-        } catch (err) {
-            logger.error('API %O', err);
-            throw RequestError.fromFetchError(err);
-        }
+        const response = await fetch(url.toString(), options);
 
         try {
             data = await response.json();
@@ -158,10 +152,7 @@ class ApiRequestWrapper {
 
         if (!response.ok) {
             logger.error('API %O', response.status, data);
-            throw new RequestError(
-                response.status,
-                data?.error || response.statusText
-            );
+            throw RequestError.fromFetchError(response);
         }
 
         return data;
