@@ -15,7 +15,20 @@ import {
     type UserForLocalCreate
 } from './types';
 
+/**
+ * Service class for user-related business logic.
+ * It handles user creation, email verification, and other user-centric operations.
+ */
 class UserService {
+    /**
+     * Creates a new user with local authentication (email and password).
+     * It hashes the password, generates a verification token, and sends a verification email.
+     *
+     * @param payload - The data for creating a new user, including email, password, and username.
+     * @returns A promise that resolves to the newly created user object.
+     * @throws {HttpError} Throws an error with status 400 if required fields are missing.
+     * @throws {HttpError} Throws an error with status 409 if email or username is already taken.
+     */
     async createUser(payload: UserForCreatePayload): Promise<User> {
         const { email, password, username } = payload;
 
@@ -38,11 +51,11 @@ class UserService {
         };
 
         if (!availability.email) {
-            throw new HttpError('Email is already taken', 400);
+            throw new HttpError('Email is already taken', 409);
         }
 
         if (!availability.username) {
-            throw new HttpError('Username is already taken', 400);
+            throw new HttpError('Username is already taken', 409);
         }
 
         const salt = await bcrypt.genSalt(10);
@@ -86,6 +99,13 @@ class UserService {
         return userResponse;
     }
 
+    /**
+     * Creates a new user from a Google OAuth sign-in.
+     *
+     * @param payload - The data from Google, including email, username, and avatar URL.
+     * @returns A promise that resolves to the newly created user object.
+     * @throws {HttpError} Throws an error if a user with the same email already exists.
+     */
     async createUserFromGoogle(
         payload: UserForGoogleCreatePayload
     ): Promise<User> {
@@ -131,6 +151,14 @@ class UserService {
         return userResponse;
     }
 
+    /**
+     * Verifies a user's email address using a verification token.
+     *
+     * @param token - The email verification token.
+     * @throws {HttpError} Throws an error with status 400 if the token is missing.
+     * @throws {HttpError} Throws an error with status 404 if the user is not found.
+     * @throws {HttpError} Throws an error with status 403 if the email is already verified.
+     */
     async verifyEmail(token: string): Promise<void> {
         if (!token) {
             throw new HttpError('Token is required', 400);
@@ -147,7 +175,7 @@ class UserService {
         }
 
         if (user.emailVerified) {
-            throw new HttpError('Email already verified', 400);
+            throw new HttpError('Email already verified', 403);
         }
 
         await prisma.user.update({
@@ -159,6 +187,13 @@ class UserService {
         });
     }
 
+    /**
+     * Resends an email verification link to a user.
+     * It generates a new token and sends it to the user's email.
+     *
+     * @param email - The email address of the user.
+     * @throws {HttpError} Throws an error if the email is missing, user not found, or email is already verified.
+     */
     async resendVerificationEmail(email: string): Promise<void> {
         if (!email) {
             throw new HttpError('Email is required', 400);

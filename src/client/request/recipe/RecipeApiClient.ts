@@ -6,12 +6,11 @@ import type { Recipe, RecipeForCreate } from '@/common/types';
  */
 class RecipeApiClient {
     /**
-     * Gets recipe by id.
+     * Gets a recipe by its ID by calling `GET /api/recipe/{id}`.
      *
-     * @param id - The id of the recipe to get.
-     * @param next - The Next.js fetch request configuration.
-     *
-     * @returns {Promise<void>} A promise that resolves when the recipe is retrieved.
+     * @param id - The ID of the recipe to retrieve.
+     * @param next - Optional Next.js fetch request configuration.
+     * @returns A promise that resolves to the recipe.
      * @throws {Error} Throws an error if the request fails.
      */
     async getRecipeById(
@@ -21,6 +20,14 @@ class RecipeApiClient {
         return await apiRequestWrapper.get({ url: `/recipe/${id}`, next });
     }
 
+    /**
+     * Creates a new recipe by calling `POST /api/recipe`.
+     *
+     * @param recipe - The recipe data for creation.
+     * @param next - Optional Next.js fetch request configuration.
+     * @returns A promise that resolves to the created recipe.
+     * @throws {Error} Throws an error if the request fails.
+     */
     async createRecipe(
         recipe: RecipeForCreate,
         next?: NextFetchRequestConfig

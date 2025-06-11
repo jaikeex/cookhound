@@ -2,21 +2,32 @@ import { RequestError } from '@/client/error';
 import { ENV_CONFIG_PUBLIC } from '@/common/constants';
 import { Logger } from '@/common/logger/console/logger';
 
+/**
+ * A type alias for a URL string that must start with a forward slash.
+ */
 type UrlString = `/${string}`;
 
+/**
+ * The configuration object for an API request.
+ */
 export type RequestConfig = {
+    /** The URL of the API endpoint. */
     url: UrlString;
+    /** The data to be sent in the request body. */
     data?: any;
+    /** The URL parameters to be appended to the URL. */
     params?: any;
+    /** Optional Next.js fetch request configuration. */
     next?: NextFetchRequestConfig;
+    /** Optional custom headers for the request. */
     headers?: HeadersInit;
 };
 
 const logger = new Logger('ApiService');
 
 /**
- * Service class which provides methods to perform HTTP requests using the fetch api.
- * Implementations are provided for the following HTTP methods: get, post, put, and delete.
+ * A singleton service class which provides methods to perform HTTP requests using the fetch API.
+ * It's a wrapper around the native `fetch` API that adds common headers, error handling, and logging.
  */
 class ApiRequestWrapper {
     private static instance: ApiRequestWrapper;
@@ -24,6 +35,11 @@ class ApiRequestWrapper {
 
     private constructor() {}
 
+    /**
+     * Gets the singleton instance of the ApiRequestWrapper.
+     *
+     * @returns The singleton instance.
+     */
     public static getInstance(): ApiRequestWrapper {
         if (!ApiRequestWrapper.instance) {
             ApiRequestWrapper.instance = new ApiRequestWrapper();
@@ -37,7 +53,7 @@ class ApiRequestWrapper {
      * @template R - The type of the data to be returned in the response.
      * @param {RequestConfig} config - Configuration object including the URL, any data to be sent, and URL parameters.
      * @returns {Promise<R>} The body of the response as a promise.
-     * @throws {Error} Throws an error if the request fails.
+     * @throws {RequestError} Throws a RequestError if the request fails.
      *
      * @example
      *  const response = await apiService.get<User>({
@@ -56,7 +72,7 @@ class ApiRequestWrapper {
      * @template R - The type of the data to be returned in the response.
      * @param {RequestConfig} config - Configuration object including the URL, any data to be sent, and URL parameters.
      * @returns {Promise<R>} The body of the response as a promise.
-     * @throws {Error} Throws an error if the request fails.
+     * @throws {RequestError} Throws a RequestError if the request fails.
      *
      * @example
      *  const response = await apiService.post<User>({
@@ -78,7 +94,7 @@ class ApiRequestWrapper {
      * @template R - The type of the data to be returned in the response.
      * @param {RequestConfig} config - Configuration object including the URL, any data to be sent, and URL parameters.
      * @returns {Promise<R>} The body of the response as a promise.
-     * @throws {Error} Throws an error if the request fails.
+     * @throws {RequestError} Throws a RequestError if the request fails.
      *
      * @example
      *  const response = await apiService.put<User>({
@@ -100,7 +116,7 @@ class ApiRequestWrapper {
      * @template R - The type of the data to be returned in the response.
      * @param {RequestConfig} config - Configuration object including the URL, any data to be sent, and URL parameters.
      * @returns {Promise<R>} The body of the response as a promise.
-     * @throws {Error} Throws an error if the request fails.
+     * @throws {RequestError} Throws a RequestError if the request fails.
      *
      * @example
      *  const response = await apiService.delete<User>({
@@ -111,6 +127,16 @@ class ApiRequestWrapper {
         return this.request<R>(config, 'DELETE');
     }
 
+    /**
+     * The core request method that all other request methods call.
+     *
+     * @template R - The type of the data to be returned in the response.
+     * @param config - The request configuration.
+     * @param method - The HTTP method to use.
+     * @returns The body of the response as a promise.
+     * @throws {RequestError} Throws a RequestError if the request fails.
+     * @internal
+     */
     private async request<R>(
         config: RequestConfig,
         method: string

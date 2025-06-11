@@ -12,7 +12,22 @@ import { cookies } from 'next/headers';
 import { ENV_CONFIG_PRIVATE, ENV_CONFIG_PUBLIC } from '@/common/constants';
 import { userService } from '@/server/services/user/service';
 
+/**
+ * Service class for handling authentication-related logic.
+ * This includes user login, logout, session management, and OAuth.
+ */
 class AuthService {
+    /**
+     * Authenticates a user with their email and password.
+     * It validates credentials, and on success, updates the last login time
+     * and returns a JWT and user data.
+     *
+     * @param payload - The user's login credentials.
+     * @returns A promise that resolves to an object containing the JWT and user data.
+     * @throws {HttpError} Throws an error with status 400 if email or password are not provided.
+     * @throws {HttpError} Throws an error with status 401 for invalid credentials.
+     * @throws {HttpError} Throws an error with status 403 if the user's email is not verified.
+     */
     async login(payload: UserForLogin): Promise<AuthResponse> {
         const { email, password } = payload;
 
@@ -67,6 +82,13 @@ class AuthService {
         return { token, user: userResponse };
     }
 
+    /**
+     * Retrieves the currently authenticated user based on the JWT cookie.
+     *
+     * @returns A promise that resolves to the authenticated user's data.
+     * @throws {HttpError} Throws an error with status 401 if the user is not authenticated.
+     * @throws {HttpError} Throws an error with status 404 if the user is not found.
+     */
     async getCurrentUser(): Promise<User> {
         const cookieStore = await cookies();
         const token = cookieStore.get('jwt')?.value;
@@ -99,16 +121,37 @@ class AuthService {
         };
     }
 
+    /**
+     * Logs out the currently authenticated user by deleting the JWT cookie.
+     *
+     * @returns void.
+     * @throws {HttpError} Throws an error with status 500 if there is an error.
+     */
     async logout(): Promise<void> {
         const cookieStore = await cookies();
         cookieStore.delete('jwt');
         return;
     }
 
+    /**
+     * Authenticates a user using a Google OAuth authorization code.
+     * It exchanges the code for an access token, fetches user info from Google,
+     * and then either finds an existing user or creates a new one.
+     *
+     * @param payload - The payload containing the Google OAuth authorization code.
+     * @returns A promise that resolves to an object containing the JWT and user data.
+     * @throws {HttpError} Throws an error with status 400 if the Google OAuth code is missing.
+     * @throws {HttpError} Throws an error with status 401 if the access token is missing.
+     * @throws {HttpError} Throws an error with status 401 if the user info is missing.
+     */
     async loginWithGoogleOauth(
         payload: AuthCodePayload
     ): Promise<AuthResponse> {
         const { code } = payload;
+
+        if (!code) {
+            throw new HttpError('Google OAuth code is required', 400);
+        }
 
         const accessTokenParams = new URLSearchParams({
             code,
@@ -131,6 +174,10 @@ class AuthService {
             }
         );
 
+        if (!accessTokenResponse.ok) {
+            throw new HttpError('Failed to get access token', 401);
+        }
+
         const accessTokenData = await accessTokenResponse.json();
         const accessToken = accessTokenData.access_token;
 
@@ -142,6 +189,10 @@ class AuthService {
                 }
             }
         );
+
+        if (!userInfoResponse.ok) {
+            throw new HttpError('Failed to get user info', 401);
+        }
 
         const userInfoData: UserFromGoogle = await userInfoResponse.json();
 

@@ -49,6 +49,7 @@ export class MailClient {
     /**
      * Sends an email by establishing a connection to the SMTP server,
      * authenticating, and sending the email data.
+     *
      * @param options - The email options.
      */
     public async send(options: MailOptions): Promise<void> {
@@ -72,6 +73,11 @@ export class MailClient {
         }
     }
 
+    /**
+     * Establishes a raw socket connection to the SMTP server.
+     *
+     * @internal
+     */
     private connect(): Promise<void> {
         return new Promise((resolve, reject) => {
             this.socket = net.createConnection({
@@ -88,6 +94,11 @@ export class MailClient {
         });
     }
 
+    /**
+     * Reads a response from the SMTP server.
+     *
+     * @internal
+     */
     private readResponse(): Promise<string> {
         return new Promise((resolve, reject) => {
             let response = '';
@@ -112,6 +123,14 @@ export class MailClient {
         });
     }
 
+    /**
+     * Sends a command to the SMTP server and verifies the response code.
+     *
+     * @param command - The SMTP command to send.
+     * @param expectedCode - The expected response code.
+     * @returns The server's response.
+     * @internal
+     */
     private async sendAndVerify(
         command: string,
         expectedCode: number
@@ -127,6 +146,11 @@ export class MailClient {
         return response;
     }
 
+    /**
+     * Upgrades the connection to TLS.
+     *
+     * @internal
+     */
     private async upgradeToTls(): Promise<void> {
         const greeting = await this.readResponse();
         if (parseInt(greeting.substring(0, 3), 10) !== 220) {
@@ -152,6 +176,11 @@ export class MailClient {
         });
     }
 
+    /**
+     * Authenticates with the SMTP server using the configured credentials.
+     *
+     * @internal
+     */
     private async authenticate(): Promise<void> {
         await this.sendAndVerify(`EHLO ${this.smtpHost}`, 250);
         await this.sendAndVerify('AUTH LOGIN', 334);
@@ -169,6 +198,13 @@ export class MailClient {
         console.log('Authentication successful.');
     }
 
+    /**
+     * Builds the raw email string from the mail options.
+     *
+     * @param options - The email options.
+     * @returns The raw email string.
+     * @internal
+     */
     private buildEmail(options: MailOptions): string {
         const from = `"${options.from.name}" <${options.from.address}>`;
         const to = `"${options.to.name}" <${options.to.address}>`;
@@ -182,6 +218,12 @@ export class MailClient {
         return email;
     }
 
+    /**
+     * Sends the email data to the server.
+     *
+     * @param options - The email options.
+     * @internal
+     */
     private async sendEmail(options: MailOptions): Promise<void> {
         await this.sendAndVerify(`MAIL FROM:<${options.from.address}>`, 250);
         await this.sendAndVerify(`RCPT TO:<${options.to.address}>`, 250);
@@ -192,6 +234,11 @@ export class MailClient {
         console.log('Email sent successfully.');
     }
 
+    /**
+     * Sends the QUIT command to the server and closes the connection.
+     *
+     * @internal
+     */
     private async quit(): Promise<void> {
         try {
             await this.sendAndVerify('QUIT', 221);
