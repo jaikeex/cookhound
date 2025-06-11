@@ -1,14 +1,22 @@
 import prisma from '@/server/db/prisma';
 import { Status, UserRole } from '@/common/types';
-import { type User, type UserForCreate } from '@/common/types';
+import {
+    type User,
+    type UserForCreatePayload,
+    type UserForGoogleCreatePayload
+} from '@/common/types';
 import bcrypt from 'bcrypt';
 import { v4 as uuid } from 'uuid';
 import { mailService } from '@/server/services';
 import { HttpError } from '@/common/errors/HttpError';
-import { AuthType, type UserForLocalCreate } from './types';
+import {
+    AuthType,
+    type UserForGoogleCreate,
+    type UserForLocalCreate
+} from './types';
 
 class UserService {
-    async createUser(payload: UserForCreate): Promise<User> {
+    async createUser(payload: UserForCreatePayload): Promise<User> {
         const { email, password, username } = payload;
 
         if (!email || !password || !username) {
@@ -61,6 +69,51 @@ class UserService {
             user.username,
             verificationToken
         );
+
+        const userResponse: User = {
+            id: user.id,
+            email: user.email,
+            username: user.username,
+            avatarUrl: user.avatarUrl,
+            emailVerified: user.emailVerified,
+            createdAt: user.createdAt.toISOString(),
+            updatedAt: user.updatedAt.toISOString(),
+            role: user.role as UserRole,
+            status: user.status as Status,
+            lastLogin: user.lastLogin?.toISOString() || null
+        };
+
+        return userResponse;
+    }
+
+    async createUserFromGoogle(
+        payload: UserForGoogleCreatePayload
+    ): Promise<User> {
+        const { email, username, avatarUrl } = payload;
+
+        const existingUser = await prisma.user.findFirst({
+            where: {
+                email
+            }
+        });
+
+        if (existingUser) {
+            throw new HttpError('User already exists', 400);
+        }
+
+        const userForCreate: UserForGoogleCreate = {
+            email,
+            username,
+            avatarUrl,
+            authType: AuthType.Google,
+            role: UserRole.User,
+            status: Status.Active,
+            emailVerified: true
+        };
+
+        const user = await prisma.user.create({
+            data: userForCreate
+        });
 
         const userResponse: User = {
             id: user.id,

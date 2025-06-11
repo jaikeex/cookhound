@@ -1,5 +1,5 @@
 import { apiRequestWrapper } from '@/client/request/ApiRequestWrapper';
-import type { UserForCreate } from '@/common/types';
+import type { UserForCreatePayload } from '@/common/types';
 
 /**
  * Service for user-related operations.
@@ -15,7 +15,7 @@ class UserApiClient {
      * @throws {Error} Throws an error if the request fails.
      */
     async createUser(
-        data: UserForCreate,
+        data: UserForCreatePayload,
         next?: NextFetchRequestConfig
     ): Promise<void> {
         await apiRequestWrapper.post({ url: '/user', data, next });

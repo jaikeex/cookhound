@@ -8,7 +8,7 @@ import {
     ThemeSwitcher,
     Typography
 } from '@/client/components';
-import type { User } from '@/client/types';
+import type { User } from '@/common/types';
 
 type LoggedInMenuContentProps = Readonly<{
     user: User;
@@ -20,12 +20,12 @@ export const LoggedInMenuContent: React.FC<LoggedInMenuContentProps> = ({
     return (
         <React.Fragment>
             <Avatar
-                src={user.avatar_url || 'default'}
+                src={user.avatarUrl || 'default'}
                 size="xxl"
                 className="mx-auto"
             />
 
-            <Typography variant="body-sm" className="text-center mt-4">
+            <Typography variant="body-sm" className="mt-4 text-center">
                 {user.username}
             </Typography>
 

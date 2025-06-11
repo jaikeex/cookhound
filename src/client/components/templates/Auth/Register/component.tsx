@@ -3,7 +3,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import type { ObjectSchema } from 'yup';
 import { object, ref, string } from 'yup';
-import type { UserForCreate } from '@/common/types';
+import type { UserForCreatePayload } from '@/common/types';
 import apiClient from '@/client/request';
 import { useGoogleSignIn } from '@/client/hooks';
 import type { SubmitHandler } from '@/client/components/organisms/Form/types';
@@ -30,7 +30,7 @@ type UserForCreateFormData = {
     repeatPassword: string;
 };
 
-export const registerSchema: ObjectSchema<UserForCreate> = object({
+export const registerSchema: ObjectSchema<UserForCreatePayload> = object({
     username: string()
         .matches(/^[a-zA-Z0-9_]*$/, 'auth.error.invalid-characters')
         .required('auth.error.username-required')
@@ -119,7 +119,7 @@ export const RegisterTemplate: React.FC<RegisterTemplateProps> = () => {
 
             try {
                 setFormErrors({});
-                const userForCreate: UserForCreate = {
+                const userForCreate: UserForCreatePayload = {
                     username: formData.username,
                     email: formData.email,
                     password: formData.password

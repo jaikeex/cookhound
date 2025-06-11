@@ -14,7 +14,7 @@ export const TopNavigation: React.FC<TopNavigationProps> = () => {
         useNavigationMenu();
 
     const isLoggedin = authResolved && !!user;
-    const avatarSrc = user ? (user.avatar_url ?? 'default') : 'anonymous';
+    const avatarSrc = user ? (user.avatarUrl ?? 'default') : 'anonymous';
 
     return (
         <React.Fragment>

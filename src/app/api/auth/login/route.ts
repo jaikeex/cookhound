@@ -31,7 +31,6 @@ export async function POST(request: NextRequest) {
         );
     } catch (error) {
         if (error instanceof HttpError) {
-            console.log('error', error);
             return Response.json(
                 { message: error.message },
                 { status: error.status }

@@ -11,10 +11,16 @@ export type User = {
     lastLogin: string | null;
 };
 
-export type UserForCreate = {
+export type UserForCreatePayload = {
     username: string;
     email: string;
     password: string;
+};
+
+export type UserForGoogleCreatePayload = {
+    email: string;
+    username: string;
+    avatarUrl: string;
 };
 
 export type UserForLogin = {

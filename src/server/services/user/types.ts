@@ -14,7 +14,7 @@ export type UserForLocalCreate = {
 export type UserForGoogleCreate = {
     username: string;
     email: string;
-    auth_type: AuthType;
+    authType: AuthType;
     role: UserRole;
     status: string;
     avatarUrl: string;

@@ -50,7 +50,6 @@ export const Avatar: React.FC<AvatarProps> = ({
                 width={96}
                 height={96}
                 className={imgClassName}
-                unoptimized
             />
         </div>
     );
