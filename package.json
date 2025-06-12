@@ -11,8 +11,8 @@
         "lint": "prettier --write . && eslint . --fix",
         "storybook": "storybook dev -p 6006",
         "build-storybook": "storybook build",
-        "migrate": "npx prisma migrate dev --name init && prettier --write src/server/db/generated/db",
-        "generate": "npx prisma generate && prettier --write src/server/db/generated/db"
+        "migrate": "npx prisma migrate dev --name init",
+        "generate": "npx prisma generate"
     },
     "dependencies": {
         "@prisma/client": "^6.5.0",

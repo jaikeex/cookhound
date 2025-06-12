@@ -30,8 +30,7 @@
         "tailwind.config.js",
         "postcss.config.js",
         "vitest.config.js",
-        "**/src/stories/**/*",
-        "**/src/server/db/generated/db"
+        "**/src/stories/**/*"
     ],
     "rules": {
         //* Typescript specific rules
