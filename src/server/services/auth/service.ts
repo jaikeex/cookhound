@@ -4,13 +4,13 @@ import type {
     AuthResponse,
     AuthCodePayload
 } from '@/common/types';
-import prisma from '@/server/db/prisma';
 import bcrypt from 'bcrypt';
 import { HttpError } from '@/common/errors/HttpError';
 import { createToken, verifyToken } from '@/server/utils/jwt';
 import { cookies } from 'next/headers';
 import { ENV_CONFIG_PRIVATE, ENV_CONFIG_PUBLIC } from '@/common/constants';
 import { userService } from '@/server/services/user/service';
+import db from '@/server/db/model';
 
 /**
  * Service class for handling authentication-related logic.
@@ -39,9 +39,7 @@ class AuthService {
             throw new HttpError('auth.error.password-required', 400);
         }
 
-        const user = await prisma.user.findUnique({
-            where: { email }
-        });
+        const user = await db.user.getOneByEmail(email);
 
         if (!user || !user.passwordHash) {
             throw new HttpError('auth.error.invalid-credentials', 401);
@@ -60,10 +58,7 @@ class AuthService {
             throw new HttpError('auth.error.invalid-credentials', 401);
         }
 
-        await prisma.user.update({
-            where: { id: user.id },
-            data: { lastLogin: new Date() }
-        });
+        await db.user.updateOneById(user.id, { lastLogin: new Date() });
 
         const token = createToken({
             id: user.id.toString(),
@@ -100,10 +95,7 @@ class AuthService {
         }
 
         const decoded = verifyToken(token);
-
-        const user = await prisma.user.findUnique({
-            where: { id: Number(decoded.id) }
-        });
+        const user = await db.user.getOneById(Number(decoded.id));
 
         if (!user) {
             throw new HttpError('User not found', 404);
@@ -195,10 +187,7 @@ class AuthService {
         }
 
         const userInfoData: UserFromGoogle = await userInfoResponse.json();
-
-        const dbUser = await prisma.user.findUnique({
-            where: { email: userInfoData.email }
-        });
+        const dbUser = await db.user.getOneByEmail(userInfoData.email);
 
         let user: UserDTO;
 

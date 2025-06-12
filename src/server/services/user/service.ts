@@ -1,4 +1,3 @@
-import prisma from '@/server/db/prisma';
 import { AuthType, Status, UserRole } from '@/common/types';
 import {
     type UserDTO,
@@ -11,6 +10,7 @@ import { mailService } from '@/server/services';
 import { HttpError } from '@/common/errors/HttpError';
 import { type UserForGoogleCreate, type UserForLocalCreate } from './types';
 import { createUserDTO } from './utils';
+import db from '@/server/db/model';
 
 /**
  * Service class for user-related business logic.
@@ -36,11 +36,10 @@ class UserService {
             );
         }
 
-        const existingUser = await prisma.user.findFirst({
-            where: {
-                OR: [{ email }, { username }]
-            }
-        });
+        const existingUser = await db.user.getOneByEmailOrUsername(
+            email,
+            username
+        );
 
         const availability = {
             email: existingUser?.email !== email,
@@ -70,9 +69,7 @@ class UserService {
             emailVerificationToken: verificationToken
         };
 
-        const user = await prisma.user.create({
-            data: userForCreate
-        });
+        const user = await db.user.createOne(userForCreate);
 
         await mailService.sendEmailVerification(
             user.email,
@@ -97,11 +94,7 @@ class UserService {
     ): Promise<UserDTO> {
         const { email, username, avatarUrl } = payload;
 
-        const existingUser = await prisma.user.findFirst({
-            where: {
-                email
-            }
-        });
+        const existingUser = await db.user.getOneByEmail(email);
 
         if (existingUser) {
             throw new HttpError('User already exists', 400);
@@ -117,9 +110,7 @@ class UserService {
             emailVerified: true
         };
 
-        const user = await prisma.user.create({
-            data: userForCreate
-        });
+        const user = await db.user.createOne(userForCreate);
 
         const userResponse: UserDTO = createUserDTO(user);
 
@@ -139,11 +130,7 @@ class UserService {
             throw new HttpError('Token is required', 400);
         }
 
-        const user = await prisma.user.findFirst({
-            where: {
-                emailVerificationToken: token
-            }
-        });
+        const user = await db.user.getOneByEmailVerificationToken(token);
 
         if (!user) {
             throw new HttpError('User not found', 404);
@@ -153,12 +140,9 @@ class UserService {
             throw new HttpError('Email already verified', 403);
         }
 
-        await prisma.user.update({
-            where: { id: user.id },
-            data: {
-                emailVerified: true,
-                emailVerificationToken: null
-            }
+        await db.user.updateOneById(user.id, {
+            emailVerified: true,
+            emailVerificationToken: null
         });
     }
 
@@ -174,9 +158,7 @@ class UserService {
             throw new HttpError('Email is required', 400);
         }
 
-        const user = await prisma.user.findFirst({
-            where: { email }
-        });
+        const user = await db.user.getOneByEmail(email);
 
         if (!user) {
             throw new HttpError('User not found', 404);
@@ -188,11 +170,8 @@ class UserService {
 
         const verificationToken = uuid();
 
-        await prisma.user.update({
-            where: { id: user.id },
-            data: {
-                emailVerificationToken: verificationToken
-            }
+        await db.user.updateOneById(user.id, {
+            emailVerificationToken: verificationToken
         });
 
         await mailService.sendEmailVerification(

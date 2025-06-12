@@ -21,8 +21,6 @@ class UserModel {
             where: { email }
         });
 
-        console.log(cacheKey);
-
         const user = await cachePrismaQuery(
             cacheKey,
             () => prisma.user.findUnique({ where: { email } }),
@@ -41,8 +39,6 @@ class UserModel {
         const cacheKey = generateCacheKey('user', 'findUnique', {
             where: { id }
         });
-
-        console.log(cacheKey);
 
         const user = await cachePrismaQuery(
             cacheKey,
@@ -148,6 +144,11 @@ class UserModel {
         await this.invalidateUserCache(user, originalUser);
 
         return this.reviveUserDates(user);
+    }
+
+    async createOne(data: Prisma.UserCreateInput): Promise<User> {
+        const user = await prisma.user.create({ data });
+        return user;
     }
 
     // ***************************************************************************************** //
