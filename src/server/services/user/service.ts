@@ -31,7 +31,7 @@ class UserService {
 
         if (!email || !password || !username) {
             throw new HttpError(
-                'Email, password, and username are required',
+                'auth.error.email-password-username-required',
                 400
             );
         }
@@ -47,11 +47,11 @@ class UserService {
         };
 
         if (!availability.email) {
-            throw new HttpError('Email is already taken', 409);
+            throw new HttpError('auth.error.email-already-taken', 409);
         }
 
         if (!availability.username) {
-            throw new HttpError('Username is already taken', 409);
+            throw new HttpError('auth.error.username-already-taken', 409);
         }
 
         const salt = await bcrypt.genSalt(10);
@@ -97,7 +97,7 @@ class UserService {
         const existingUser = await db.user.getOneByEmail(email);
 
         if (existingUser) {
-            throw new HttpError('User already exists', 400);
+            throw new HttpError('auth.error.user-already-exists', 400);
         }
 
         const userForCreate: UserForGoogleCreate = {
@@ -127,17 +127,17 @@ class UserService {
      */
     async verifyEmail(token: string): Promise<void> {
         if (!token) {
-            throw new HttpError('Token is required', 400);
+            throw new HttpError('auth.error.missing-token', 400);
         }
 
         const user = await db.user.getOneByEmailVerificationToken(token);
 
         if (!user) {
-            throw new HttpError('User not found', 404);
+            throw new HttpError('auth.error.user-not-found', 404);
         }
 
         if (user.emailVerified) {
-            throw new HttpError('Email already verified', 403);
+            throw new HttpError('auth.error.email-already-verified', 403);
         }
 
         await db.user.updateOneById(user.id, {
@@ -155,17 +155,17 @@ class UserService {
      */
     async resendVerificationEmail(email: string): Promise<void> {
         if (!email) {
-            throw new HttpError('Email is required', 400);
+            throw new HttpError('auth.error.email-required', 400);
         }
 
         const user = await db.user.getOneByEmail(email);
 
         if (!user) {
-            throw new HttpError('User not found', 404);
+            throw new HttpError('auth.error.user-not-found', 404);
         }
 
         if (user.emailVerified) {
-            throw new HttpError('Email already verified', 400);
+            throw new HttpError('auth.error.email-already-verified', 400);
         }
 
         const verificationToken = uuid();

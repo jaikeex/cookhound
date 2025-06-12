@@ -91,14 +91,14 @@ class AuthService {
         const token = cookieStore.get('jwt')?.value;
 
         if (!token) {
-            throw new HttpError('Unauthorized', 401);
+            throw new HttpError('auth.error.unauthorized', 401);
         }
 
         const decoded = verifyToken(token);
         const user = await db.user.getOneById(Number(decoded.id));
 
         if (!user) {
-            throw new HttpError('User not found', 404);
+            throw new HttpError('auth.error.user-not-found', 404);
         }
 
         return {
@@ -142,7 +142,7 @@ class AuthService {
         const { code } = payload;
 
         if (!code) {
-            throw new HttpError('Google OAuth code is required', 400);
+            throw new HttpError('auth.error.google-oauth-code-required', 400);
         }
 
         const accessTokenParams = new URLSearchParams({
@@ -167,7 +167,7 @@ class AuthService {
         );
 
         if (!accessTokenResponse.ok) {
-            throw new HttpError('Failed to get access token', 401);
+            throw new HttpError('auth.error.failed-to-get-access-token', 401);
         }
 
         const accessTokenData = await accessTokenResponse.json();
@@ -183,7 +183,7 @@ class AuthService {
         );
 
         if (!userInfoResponse.ok) {
-            throw new HttpError('Failed to get user info', 401);
+            throw new HttpError('auth.error.failed-to-get-user-info', 401);
         }
 
         const userInfoData: UserFromGoogle = await userInfoResponse.json();
