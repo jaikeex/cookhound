@@ -178,7 +178,7 @@ class ApiRequestWrapper {
 
         if (!response.ok) {
             logger.error('API %O', response.status, data);
-            throw RequestError.fromFetchError(response);
+            throw RequestError.fromFetchError(response, data);
         }
 
         return data;

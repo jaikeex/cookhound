@@ -6,10 +6,10 @@ export class RequestError extends Error {
         super(message);
     }
 
-    static fromFetchError(error: any) {
+    static fromFetchError(response: Response, error: any) {
         return new RequestError(
-            error.status || 500,
-            error.message || error.statusText || 'Something went wrong...'
+            response.status,
+            error.message || response.statusText || 'Something went wrong...'
         );
     }
 }

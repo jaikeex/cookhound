@@ -31,8 +31,12 @@ class AuthService {
     async login(payload: UserForLogin): Promise<AuthResponse> {
         const { email, password } = payload;
 
-        if (!email || !password) {
-            throw new HttpError('Email and password are required', 400);
+        if (!email) {
+            throw new HttpError('auth.error.email-required', 400);
+        }
+
+        if (!password) {
+            throw new HttpError('auth.error.password-required', 400);
         }
 
         const user = await prisma.user.findUnique({
@@ -40,11 +44,11 @@ class AuthService {
         });
 
         if (!user || !user.passwordHash) {
-            throw new HttpError('Invalid credentials', 401);
+            throw new HttpError('auth.error.invalid-credentials', 401);
         }
 
         if (!user.emailVerified) {
-            throw new HttpError('Email not verified', 403);
+            throw new HttpError('auth.error.email-not-verified', 403);
         }
 
         const isPasswordValid = await bcrypt.compare(
@@ -53,7 +57,7 @@ class AuthService {
         );
 
         if (!isPasswordValid) {
-            throw new HttpError('Invalid credentials', 401);
+            throw new HttpError('auth.error.invalid-credentials', 401);
         }
 
         await prisma.user.update({
