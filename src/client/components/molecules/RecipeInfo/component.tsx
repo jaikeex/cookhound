@@ -21,12 +21,12 @@ export const RecipeInfo: React.FC<RecipeInfoProps> = ({
 
     return (
         <div className={'flex items-center gap-8'}>
-            {recipe.portion_size ? (
+            {recipe.portionSize ? (
                 <div className={'flex items-center gap-2'}>
                     <Icon name={'servings'} size={24} />
                     <Typography variant={typographyVariant}>
                         {verbose ? `${t('app.recipe.servings')}: ` : null}
-                        {recipe.portion_size}
+                        {recipe.portionSize}
                     </Typography>
                 </div>
             ) : null}

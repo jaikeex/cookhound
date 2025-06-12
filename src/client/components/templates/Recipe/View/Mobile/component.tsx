@@ -65,9 +65,9 @@ export const MobileRecipeViewTemplate: React.FC<MobileRecipeViewProps> = ({
     return (
         <div className={`max-w-screen-md mx-auto ${className}`}>
             <div className={'space-y-4'}>
-                {recipe.image_url ? (
+                {recipe.imageUrl ? (
                     <Image
-                        src={recipe.image_url}
+                        src={recipe.imageUrl}
                         alt={recipe.title}
                         className={'w-full h-48 object-cover rounded-md'}
                         width={500}

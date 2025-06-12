@@ -50,9 +50,9 @@ export const DesktopRecipeViewTemplate: React.FC<DesktopRecipeViewProps> = ({
                         />
                     </div>
 
-                    {recipe.image_url ? (
+                    {recipe.imageUrl ? (
                         <Image
-                            src={recipe.image_url}
+                            src={recipe.imageUrl}
                             alt={recipe.title}
                             className={
                                 'w-full max-w-80 h-48 object-cover rounded-md'
