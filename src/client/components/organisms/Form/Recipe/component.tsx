@@ -11,15 +11,16 @@ import {
     TextInput,
     Typography
 } from '@/client/components';
-import { useFormStatus } from 'react-dom';
 import { useAuth, useLocale } from '@/client/store';
 import type { Ingredient } from '@/common/types';
 import type { I18nMessage } from '@/client/locales';
+// import { useFormStatus } from 'react-dom';
 
 type RecipeFormProps = Readonly<{
     className?: string;
     errors?: RecipeFormErrors;
     onChange?: (name: string, value: any) => void;
+    pending?: boolean;
 }>;
 
 export type RecipeFormErrors = {
@@ -32,12 +33,14 @@ export type RecipeFormErrors = {
 export const RecipeForm: React.FC<RecipeFormProps> = ({
     className,
     errors,
-    onChange
+    onChange,
+    pending
 }) => {
-    const { pending } = useFormStatus();
+    // This hook call does nothing at the moment as it only works with react server actions.
+    // It is left here for reference and to possibly inspire another solution in the future :D
+    // const { pending } = useFormStatus();
     const { authResolved, user } = useAuth();
     const { t } = useLocale();
-
     const isLoggedin = authResolved && !!user;
 
     const handleImageChange = useCallback(
@@ -85,7 +88,11 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({
 
     return (
         <div className={`space-y-4 px-4 md:px-8 ${className}`}>
-            <ImageInput onUpload={handleImageChange} name={'recipe-image'} />
+            <ImageInput
+                onUpload={handleImageChange}
+                name={'recipe-image'}
+                showPreview
+            />
 
             <TextInput
                 id={'recipe-title'}

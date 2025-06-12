@@ -10,7 +10,7 @@ import type { ResetPasswordEmailPayload } from '@/common/types';
 import apiClient from '@/client/request';
 import { object, string } from 'yup';
 import { useLocale } from '@/client/store';
-import type { SubmitHandler } from '@/client/components/organisms/Form/types';
+
 import { validateFormData } from '@/client/utils';
 
 const sendResetPasswordEmailSchema = object().shape({
@@ -23,6 +23,7 @@ export const SendResetPasswordEmailTemplate: React.FC = () => {
     const formRef = React.useRef<HTMLFormElement>(null);
 
     const [formErrors, setFormErrors] = useState<LoginFormErrors>({});
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [disabled, setDisabled] = React.useState(false);
     const [submitted, setSubmitted] = React.useState(false);
 
@@ -44,9 +45,15 @@ export const SendResetPasswordEmailTemplate: React.FC = () => {
      * Validates the form data and sends a reset password email.
      * If the request is successful, the form is locked and the user is notified.
      */
-    const handleSubmit: SubmitHandler = useCallback(
-        async (data: FormData) => {
+    const handleSubmit = useCallback(
+        async (event: React.FormEvent<HTMLFormElement>) => {
+            event.preventDefault();
+
+            const formElement = event.currentTarget;
+            const data = new FormData(formElement);
             let formData: ResetPasswordEmailPayload;
+
+            setIsSubmitting(true);
 
             try {
                 formData = extractFormData(data);
@@ -59,10 +66,12 @@ export const SendResetPasswordEmailTemplate: React.FC = () => {
 
                 if (Object.keys(validationErrors).length > 0) {
                     setFormErrors(validationErrors);
+                    setIsSubmitting(false);
                     return;
                 }
             } catch (error) {
                 setFormErrors({ server: 'auth.error.default' });
+                setIsSubmitting(false);
                 return;
             }
 
@@ -77,6 +86,8 @@ export const SendResetPasswordEmailTemplate: React.FC = () => {
                 setFormErrors({
                     server: error.message ?? 'auth.error.default'
                 });
+            } finally {
+                setIsSubmitting(false);
             }
         },
         [disableForm, submitted]
@@ -88,8 +99,12 @@ export const SendResetPasswordEmailTemplate: React.FC = () => {
                 {t('auth.form.reset-password.email-prompt')}
             </Typography>
 
-            <form className="w-full" action={handleSubmit} ref={formRef}>
-                <SimpleEmailForm errors={formErrors} disabled={disabled} />
+            <form className="w-full" onSubmit={handleSubmit} ref={formRef}>
+                <SimpleEmailForm
+                    errors={formErrors}
+                    disabled={disabled}
+                    pending={isSubmitting}
+                />
             </form>
 
             {submitted ? (

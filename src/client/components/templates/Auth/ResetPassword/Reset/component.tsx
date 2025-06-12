@@ -10,7 +10,7 @@ import type { ResetPasswordPayload } from '@/common/types';
 import apiClient from '@/client/request';
 import { object, ref, string } from 'yup';
 import { useLocale } from '@/client/store';
-import type { SubmitHandler } from '@/client/components/organisms/Form/types';
+
 import { validateFormData } from '@/client/utils';
 import Link from 'next/link';
 
@@ -37,6 +37,7 @@ export const ResetPasswordTemplate: React.FC = () => {
     const formRef = React.useRef<HTMLFormElement>(null);
 
     const [formErrors, setFormErrors] = useState<LoginFormErrors>({});
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [disabled, setDisabled] = React.useState(false);
     const [submitted, setSubmitted] = React.useState(false);
 
@@ -51,9 +52,15 @@ export const ResetPasswordTemplate: React.FC = () => {
      * Validates the form data and sends a request to reset the user's password.
      * If the request is successful, the form is locked and the user is notified.
      */
-    const handleSubmit: SubmitHandler = useCallback(
-        async (data: FormData) => {
+    const handleSubmit = useCallback(
+        async (event: React.FormEvent<HTMLFormElement>) => {
+            event.preventDefault();
+
+            const formElement = event.currentTarget;
+            const data = new FormData(formElement);
             let formData: ResetPasswordFormData;
+
+            setIsSubmitting(true);
 
             try {
                 formData = extractFormData(data);
@@ -62,10 +69,12 @@ export const ResetPasswordTemplate: React.FC = () => {
 
                 if (Object.keys(validationErrors).length > 0) {
                     setFormErrors(validationErrors);
+                    setIsSubmitting(false);
                     return;
                 }
             } catch (error) {
                 setFormErrors({ server: 'auth.error.default' });
+                setIsSubmitting(false);
                 return;
             }
 
@@ -76,6 +85,7 @@ export const ResetPasswordTemplate: React.FC = () => {
 
                 if (!token) {
                     setFormErrors({ server: 'auth.error.missing-token' });
+                    setIsSubmitting(false);
                     return;
                 }
 
@@ -94,6 +104,8 @@ export const ResetPasswordTemplate: React.FC = () => {
                 setFormErrors({
                     server: error.message ?? 'auth.error.default'
                 });
+            } finally {
+                setIsSubmitting(false);
             }
         },
         [disableForm, submitted]
@@ -105,8 +117,12 @@ export const ResetPasswordTemplate: React.FC = () => {
                 {t('auth.form.reset-password.prompt')}
             </Typography>
 
-            <form className="w-full" action={handleSubmit} ref={formRef}>
-                <ResetPasswordForm errors={formErrors} disabled={disabled} />
+            <form className="w-full" onSubmit={handleSubmit} ref={formRef}>
+                <ResetPasswordForm
+                    errors={formErrors}
+                    disabled={disabled}
+                    pending={isSubmitting}
+                />
             </form>
 
             {submitted ? (

@@ -6,7 +6,7 @@ import { object, ref, string } from 'yup';
 import type { UserForCreatePayload } from '@/common/types';
 import apiClient from '@/client/request';
 import { useGoogleSignIn } from '@/client/hooks';
-import type { SubmitHandler } from '@/client/components/organisms/Form/types';
+
 import type { RegisterFormErrors } from '@/client/components';
 import {
     Divider,
@@ -56,6 +56,7 @@ export const RegisterTemplate: React.FC<RegisterTemplateProps> = () => {
     const formRef = React.useRef<HTMLFormElement>(null);
 
     const [formErrors, setFormErrors] = useState<RegisterFormErrors>({});
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const router = useRouter();
     const { setUser } = useAuth();
@@ -99,9 +100,15 @@ export const RegisterTemplate: React.FC<RegisterTemplateProps> = () => {
      * If the form data is valid, it sends a registration request to the server.
      * If the registration request is successful, the cleanup function is called.
      */
-    const handleSubmit: SubmitHandler = useCallback(
-        async (data: FormData) => {
+    const handleSubmit = useCallback(
+        async (event: React.FormEvent<HTMLFormElement>) => {
+            event.preventDefault();
+
+            const formElement = event.currentTarget;
+            const data = new FormData(formElement);
             let formData: UserForCreateFormData;
+
+            setIsSubmitting(true);
 
             try {
                 formData = extractFormData(data);
@@ -110,10 +117,12 @@ export const RegisterTemplate: React.FC<RegisterTemplateProps> = () => {
 
                 if (Object.keys(validationErrors).length > 0) {
                     setFormErrors(validationErrors);
+                    setIsSubmitting(false);
                     return;
                 }
             } catch (error) {
                 setFormErrors({ server: 'auth.error.default' });
+                setIsSubmitting(false);
                 return;
             }
 
@@ -137,6 +146,8 @@ export const RegisterTemplate: React.FC<RegisterTemplateProps> = () => {
                 setFormErrors({
                     server: error.message ?? 'auth.error.default'
                 });
+            } finally {
+                setIsSubmitting(false);
             }
         },
         [alert, cleanUpAndRedirectAfterSubmit, t]
@@ -151,8 +162,8 @@ export const RegisterTemplate: React.FC<RegisterTemplateProps> = () => {
 
     return (
         <div className="flex flex-col items-center w-full max-w-md mx-auto space-y-4">
-            <form className="w-full" action={handleSubmit} ref={formRef}>
-                <RegisterForm errors={formErrors} />
+            <form className="w-full" onSubmit={handleSubmit} ref={formRef}>
+                <RegisterForm errors={formErrors} pending={isSubmitting} />
             </form>
 
             <Typography variant="body-sm" className="text-center">

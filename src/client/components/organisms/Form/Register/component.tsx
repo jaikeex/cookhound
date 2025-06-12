@@ -7,9 +7,9 @@ import {
     TextInput,
     Typography
 } from '@/client/components';
-import { useFormStatus } from 'react-dom';
 import { useLocale } from '@/client/store';
 import type { I18nMessage } from '@/client/locales';
+// import { useFormStatus } from 'react-dom';
 
 export type RegisterFormErrors = {
     email?: I18nMessage;
@@ -21,10 +21,17 @@ export type RegisterFormErrors = {
 
 export type RegisterFormProps = Readonly<{
     errors: RegisterFormErrors;
+    pending?: boolean;
 }>;
 
-export const RegisterForm: React.FC<RegisterFormProps> = ({ errors }) => {
-    const { pending } = useFormStatus();
+export const RegisterForm: React.FC<RegisterFormProps> = ({
+    errors,
+    pending
+}) => {
+    // This hook call does nothing at the moment as it only works with react server actions.
+    // It is left here for reference and to possibly inspire another solution in the future :D
+    // const { pending } = useFormStatus();
+
     const { t } = useLocale();
 
     return (

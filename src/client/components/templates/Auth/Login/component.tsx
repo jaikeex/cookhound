@@ -13,7 +13,7 @@ import apiClient from '@/client/request';
 import type { ObjectSchema } from 'yup';
 import { boolean, object, string } from 'yup';
 import { validateFormData } from '@/client/utils/form';
-import type { SubmitHandler } from '@/client/components/organisms/Form/types';
+
 import { useGoogleSignIn } from '@/client/hooks';
 import { useAuth, useLocale, useSnackbar } from '@/client/store';
 import type { I18nMessage } from '@/client/locales';
@@ -34,6 +34,7 @@ export const LoginTemplate: React.FC<LoginTemplateProps> = () => {
     const formRef = React.useRef<HTMLFormElement>(null);
 
     const [formErrors, setFormErrors] = useState<LoginFormErrors>({});
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const router = useRouter();
     const { setUser } = useAuth();
@@ -65,9 +66,15 @@ export const LoginTemplate: React.FC<LoginTemplateProps> = () => {
      * If the form data is valid, it sends a login request to the server.
      * If the login request is successful, the cleanup function is called.
      */
-    const handleSubmit: SubmitHandler = useCallback(
-        async (data: FormData) => {
+    const handleSubmit = useCallback(
+        async (event: React.FormEvent<HTMLFormElement>) => {
+            event.preventDefault();
+
+            const formElement = event.currentTarget;
+            const data = new FormData(formElement);
             let formData: UserForLogin;
+
+            setIsSubmitting(true);
 
             try {
                 formData = extractFormData(data);
@@ -76,10 +83,12 @@ export const LoginTemplate: React.FC<LoginTemplateProps> = () => {
 
                 if (Object.keys(validationErrors).length > 0) {
                     setFormErrors(validationErrors);
+                    setIsSubmitting(false);
                     return;
                 }
             } catch (error) {
                 setFormErrors({ server: 'auth.error.default' });
+                setIsSubmitting(false);
                 return;
             }
 
@@ -92,6 +101,8 @@ export const LoginTemplate: React.FC<LoginTemplateProps> = () => {
                 setFormErrors({
                     server: error.message ?? 'auth.error.default'
                 });
+            } finally {
+                setIsSubmitting(false);
             }
         },
         [cleanUpAndRedirectAfterLogin]
@@ -106,8 +117,8 @@ export const LoginTemplate: React.FC<LoginTemplateProps> = () => {
 
     return (
         <div className="flex flex-col items-center w-full max-w-md mx-auto space-y-4">
-            <form className="w-full" action={handleSubmit} ref={formRef}>
-                <LoginForm errors={formErrors} />
+            <form className="w-full" onSubmit={handleSubmit} ref={formRef}>
+                <LoginForm errors={formErrors} pending={isSubmitting} />
             </form>
 
             <Typography variant="body-sm" className="text-center">

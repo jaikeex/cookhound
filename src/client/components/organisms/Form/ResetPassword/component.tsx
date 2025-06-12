@@ -2,9 +2,9 @@
 
 import React from 'react';
 import { PasswordInput, Submit, Typography } from '@/client/components';
-import { useFormStatus } from 'react-dom';
 import { useLocale } from '@/client/store';
 import type { I18nMessage } from '@/client/locales';
+// import { useFormStatus } from 'react-dom';
 
 export type ResetPasswordFormErrors = {
     password?: I18nMessage;
@@ -15,13 +15,18 @@ export type ResetPasswordFormErrors = {
 export type ResetPasswordFormProps = Readonly<{
     disabled: boolean;
     errors: ResetPasswordFormErrors;
+    pending?: boolean;
 }>;
 
 export const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({
     disabled,
-    errors
+    errors,
+    pending
 }) => {
-    const { pending } = useFormStatus();
+    // This hook call does nothing at the moment as it only works with react server actions.
+    // It is left here for reference and to possibly inspire another solution in the future :D
+    // const { pending } = useFormStatus();
+
     const { t } = useLocale();
 
     return (

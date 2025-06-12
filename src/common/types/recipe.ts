@@ -2,17 +2,17 @@ export type Recipe = {
     id: number;
     title: string;
     language: string;
-    author_id: number;
+    authorId: number;
     time: number | null;
     difficulty: string;
-    portion_size: number | null;
+    portionSize: number | null;
     ingredients: Ingredient[];
     instructions: string[];
     notes: string | null;
-    image_url: string;
+    imageUrl: string;
     rating: number | null;
-    created_at: string;
-    updated_at: string;
+    createdAt: string;
+    updatedAt: string;
 };
 
 export type Ingredient = {
@@ -28,8 +28,8 @@ export type RecipeForCreate = {
     notes: string | null;
     time: number | null;
     difficulty: string;
-    portion_size: number | null;
-    image_url: string | null;
+    portionSize: number | null;
+    imageUrl: string | null;
     ingredients: IngredientForCreate[];
 };
 

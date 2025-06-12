@@ -2,9 +2,9 @@
 
 import React from 'react';
 import { Submit, TextInput, Typography } from '@/client/components';
-import { useFormStatus } from 'react-dom';
 import { useLocale } from '@/client/store';
 import type { I18nMessage } from '@/client/locales';
+// import { useFormStatus } from 'react-dom';
 
 export type SimpleEmailFormErrors = {
     email?: I18nMessage;
@@ -15,14 +15,19 @@ export type SimpleEmailFormProps = Readonly<{
     disabled: boolean;
     errors: SimpleEmailFormErrors;
     submitLabel?: string;
+    pending?: boolean;
 }>;
 
 export const SimpleEmailForm: React.FC<SimpleEmailFormProps> = ({
     disabled,
     errors,
-    submitLabel
+    submitLabel,
+    pending
 }) => {
-    const { pending } = useFormStatus();
+    // This hook call does nothing at the moment as it only works with react server actions.
+    // It is left here for reference and to possibly inspire another solution in the future :D
+    // const { pending } = useFormStatus();
+
     const { t } = useLocale();
 
     return (

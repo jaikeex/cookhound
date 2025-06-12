@@ -3,7 +3,7 @@
 import React, { useCallback, useState } from 'react';
 import type { RecipeFormErrors } from '@/client/components';
 import { RecipeForm } from '@/client/components';
-import type { SubmitHandler } from '@/client/components/organisms/Form/types';
+
 import type { RecipeForCreate, Ingredient, Recipe } from '@/common/types';
 import { useLocale, useSnackbar } from '@/client/store';
 import { DesktopRecipeViewTemplate } from '@/client/components/templates/Recipe/View/Desktop';
@@ -13,7 +13,6 @@ import {
     generateRandomId,
     validateFormData
 } from '@/client/utils';
-import { ENV_CONFIG_PUBLIC } from '@/common/constants';
 import type { ObjectSchema } from 'yup';
 import { array, number, object, string } from 'yup';
 import { useRouter } from 'next/navigation';
@@ -26,9 +25,9 @@ type DesktopRecipeCreateProps = Readonly<{
 type RecipeForCreateFormData = {
     title: string;
     difficulty: string;
-    portion_size: number | null;
+    portionSize: number | null;
     time: number | null;
-    image_url: string | null;
+    imageUrl: string | null;
     notes: string | null;
     ingredients: Omit<Ingredient, 'id'>[];
     instructions: string[];
@@ -38,13 +37,13 @@ const createRecipePlaceholder = (t: (key: I18nMessage) => string): Recipe => ({
     id: 1,
     language: 'en',
     rating: 0,
-    author_id: 1000,
-    created_at: '2021-09-01T00:00:00Z',
-    updated_at: '2021-09-01T00:00:00Z',
-    image_url: '/img/recipe-placeholder.png',
+    authorId: 1000,
+    createdAt: '2021-09-01T00:00:00Z',
+    updatedAt: '2021-09-01T00:00:00Z',
+    imageUrl: '/img/recipe-placeholder.png',
     title: t('app.recipe.title'),
     difficulty: 'easy',
-    portion_size: null,
+    portionSize: null,
     time: null,
     notes: null,
     ingredients: [],
@@ -55,9 +54,9 @@ export const createRecipeSchema: ObjectSchema<RecipeForCreateFormData> = object(
     {
         title: string().required('app.recipe.error.title-required'),
         difficulty: string().required(),
-        portion_size: number().nullable().defined(),
+        portionSize: number().nullable().defined(),
         time: number().nullable().defined(),
-        image_url: string().nullable().defined(),
+        imageUrl: string().nullable().defined(),
         notes: string().nullable().defined(),
         ingredients: array()
             .of(
@@ -82,13 +81,20 @@ export const DesktopRecipeCreate: React.FC<DesktopRecipeCreateProps> = ({
     const { push } = useRouter();
     const { t } = useLocale();
     const [formErrors, setFormErrors] = useState<RecipeFormErrors>({});
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [recipeForDisplay, setRecipeForDisplay] = useState<Recipe>(
         createRecipePlaceholder(t)
     );
 
-    const handleSubmit: SubmitHandler = useCallback(
-        async (data: FormData) => {
+    const handleSubmit = useCallback(
+        async (event: React.FormEvent<HTMLFormElement>) => {
+            event.preventDefault(); // Prevent default form submission
+
+            const formElement = event.currentTarget;
+            const data = new FormData(formElement);
             let formData: RecipeForCreateFormData;
+
+            setIsSubmitting(true);
 
             try {
                 formData = await extractFormData(data);
@@ -98,15 +104,23 @@ export const DesktopRecipeCreate: React.FC<DesktopRecipeCreateProps> = ({
 
                 if (Object.keys(validationErrors).length > 0) {
                     setFormErrors(validationErrors);
+                    setIsSubmitting(false);
                     return;
                 }
             } catch (error) {
                 setFormErrors({ server: 'auth.error.default' });
+                setIsSubmitting(false);
                 return;
             }
 
             try {
                 setFormErrors({});
+
+                const imageUrl = await uploadImage(data);
+                if (imageUrl) {
+                    formData.imageUrl = imageUrl;
+                }
+
                 const recipeForCreate: RecipeForCreate = {
                     ...formData,
                     language: locale
@@ -123,10 +137,14 @@ export const DesktopRecipeCreate: React.FC<DesktopRecipeCreateProps> = ({
                 });
 
                 if (createdRecipe) {
+                    // Only reset the form on successful submission
+                    formElement.reset();
                     push(`/recipe/${createdRecipe.id}`);
                 }
             } catch (error) {
                 setFormErrors({ server: 'auth.error.default' });
+            } finally {
+                setIsSubmitting(false);
             }
         },
         [alert, locale, push, t]
@@ -141,8 +159,15 @@ export const DesktopRecipeCreate: React.FC<DesktopRecipeCreateProps> = ({
 
     return (
         <div className={`${className} grid grid-cols-5 gap-10`}>
-            <form className={'col-span-2 overflow-auto'} action={handleSubmit}>
-                <RecipeForm onChange={handleFormChange} errors={formErrors} />
+            <form
+                className={'col-span-2 overflow-auto'}
+                onSubmit={handleSubmit}
+            >
+                <RecipeForm
+                    onChange={handleFormChange}
+                    errors={formErrors}
+                    pending={isSubmitting}
+                />
             </form>
             <div className={'col-span-3 px-12'}>
                 <DesktopRecipeViewTemplate recipe={recipeForDisplay} />
@@ -151,36 +176,27 @@ export const DesktopRecipeCreate: React.FC<DesktopRecipeCreateProps> = ({
     );
 };
 
-async function extractFormData(
-    data: FormData
-): Promise<RecipeForCreateFormData> {
-    // -------------------------------------------------------
-    // Upload the image file to Google Cloud Storage and get the URL
-
+async function uploadImage(data: FormData): Promise<string | null> {
     const imageFile = data.get('recipe-image') as File;
 
     let image_url: string | null = null;
 
-    console.log('Image File: ', imageFile);
-
     if (imageFile.size > 0) {
-        const imageBytes = await fileToByteArray(
-            data.get('recipe-image') as File
-        );
-        const response = await apiClient.file.uploadFile({
+        const imageBytes = await fileToByteArray(imageFile);
+        const response = await apiClient.file.uploadRecipeImage({
             bytes: imageBytes,
-            file_name: `recipe-image-${generateRandomId()}`,
-            bucket:
-                ENV_CONFIG_PUBLIC.GOOGLE_STORAGE_BUCKET_RECIPE_IMAGES ||
-                'cookhound-recipe-images',
-            content_type: 'image/webp'
+            fileName: `recipe-image-${generateRandomId()}`
         });
 
-        image_url = response.object_url;
+        image_url = response.objectUrl;
     }
 
-    // -------------------------------------------------------
+    return image_url;
+}
 
+async function extractFormData(
+    data: FormData
+): Promise<RecipeForCreateFormData> {
     // -------------------------------------------------------
     // Extract the ingredients array from the form data
 
@@ -219,9 +235,9 @@ async function extractFormData(
     return {
         title: data.get('title') as string,
         difficulty: 'easy',
-        portion_size: parseInt(data.get('portion_size') as string) || null,
+        portionSize: parseInt(data.get('portion_size') as string) || null,
         time: parseInt(data.get('time') as string) || null,
-        image_url,
+        imageUrl: null,
         notes: data.get('notes') as string,
         ingredients,
         instructions
