@@ -1,10 +1,13 @@
 import type { NextRequest } from 'next/server';
 import { authService } from '@/server/services/auth/service';
 import { serialize } from 'cookie';
-import { handleApiError } from '@/server/utils';
+import { handleApiError, verifyIsGuestWithRedirect } from '@/server/utils';
+import { ENV_CONFIG_PUBLIC } from '@/common/constants/env';
 
 /**
  * Handles POST requests to `/auth/login` to authenticate a user with email and password.
+ *
+ * ! This endpoint is restricted and only accessible to guests.
  *
  * @param request - The incoming Next.js request object containing the user's email,
  *                  password, and keepLoggedIn flag.
@@ -17,6 +20,8 @@ import { handleApiError } from '@/server/utils';
  * - 500: Internal Server Error, if there is another error during authentication.
  */
 export async function POST(request: NextRequest) {
+    await verifyIsGuestWithRedirect();
+
     const { email, password, keepLoggedIn } = await request.json();
 
     try {
@@ -28,7 +33,7 @@ export async function POST(request: NextRequest) {
 
         const cookie = serialize('jwt', response.token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV !== 'development',
+            secure: ENV_CONFIG_PUBLIC.ENV !== 'development',
             sameSite: 'strict',
             maxAge: keepLoggedIn ? 60 * 60 * 24 * 30 : undefined,
             path: '/'

@@ -40,6 +40,7 @@
     "auth.success.login": "You have successfully logged in",
     "auth.success.logout": "You have successfully logged out",
     "auth.success.register": "Your account has been created!",
+    "auth.success.already-logged-in": "You are already logged in",
     "app.general.or": "or",
     "app.general.submit": "Submit",
     "app.general.anonymous": "You are not logged in",

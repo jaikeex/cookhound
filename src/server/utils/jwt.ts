@@ -29,6 +29,7 @@ export const verifyToken = (token: string): JwtPayload => {
     if (!JWT_SECRET) {
         throw new Error('JWT_SECRET is not defined in environment variables');
     }
+
     try {
         const decoded = jwt.verify(token, JWT_SECRET, {
             issuer: JWT_ISSUER

@@ -1,7 +1,10 @@
 import React from 'react';
 import { VerifyEmailTemplate } from '@/client/components';
+import { verifyIsGuestWithRedirect } from '@/server/utils';
 
-const VerifyEmailNotificationPage: React.FC = () => {
+const VerifyEmailNotificationPage: React.FC = async () => {
+    await verifyIsGuestWithRedirect();
+
     return <VerifyEmailTemplate />;
 };
 

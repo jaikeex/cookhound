@@ -1,8 +1,10 @@
 import { authService } from '@/server/services/auth/service';
-import { handleApiError } from '@/server/utils';
+import { handleApiError, verifySession } from '@/server/utils';
 
 /**
  * Handles POST requests to `/auth/logout` to log out the current user.
+ *
+ * ! This endpoint is restricted and only accessible to authenticated users.
  *
  * @returns A JSON response with a success message on success, or an error
  * response on failure.
@@ -11,6 +13,8 @@ import { handleApiError } from '@/server/utils';
  * - 500: Internal Server Error, if there is another error during logout.
  */
 export async function POST() {
+    await verifySession();
+
     try {
         await authService.logout();
 

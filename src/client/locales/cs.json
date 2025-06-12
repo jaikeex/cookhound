@@ -40,6 +40,7 @@
     "auth.success.login": "Přihlášení proběhlo úspěšně",
     "auth.success.logout": "Odhlášení proběhlo úspěšně",
     "auth.success.register": "Váš účet byl úspěšně vytvořen!",
+    "auth.success.already-logged-in": "Již jste přihlášeni",
     "app.general.or": "nebo",
     "app.general.submit": "Odeslat",
     "app.general.anonymous": "Nejste přihlášeni",

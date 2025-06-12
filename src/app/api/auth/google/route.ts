@@ -1,10 +1,12 @@
 import type { NextRequest } from 'next/server';
 import { authService } from '@/server/services/auth/service';
 import { serialize } from 'cookie';
-import { handleApiError } from '@/server/utils';
+import { handleApiError, verifyIsGuestWithRedirect } from '@/server/utils';
 
 /**
  * Handles POST requests to `/auth/google` to authenticate a user using Google OAuth.
+ *
+ * ! This endpoint is restricted and only accessible to guests.
  *
  * @param request - The incoming Next.js request object containing the Google OAuth code.
  * @returns A JSON response with the user object on success, or an error
@@ -17,6 +19,8 @@ import { handleApiError } from '@/server/utils';
  * - 500: Internal Server Error, if there is an error during authentication.
  */
 export async function POST(request: NextRequest) {
+    await verifyIsGuestWithRedirect();
+
     const { code } = await request.json();
     try {
         const response = await authService.loginWithGoogleOauth({ code });

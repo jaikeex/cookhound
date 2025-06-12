@@ -1,6 +1,9 @@
 import React from 'react';
 import { RegisterTemplate } from '@/client/components';
+import { verifyIsGuestWithRedirect } from '@/server/utils';
 
-export default function RegisterPage() {
+export default async function RegisterPage() {
+    await verifyIsGuestWithRedirect();
+
     return <RegisterTemplate />;
 }
