@@ -1,6 +1,6 @@
 import { apiRequestWrapper } from '@/client/request/ApiRequestWrapper';
 import type {
-    User,
+    UserDTO,
     AuthCodePayload,
     ResetPasswordEmailPayload,
     ResetPasswordPayload,
@@ -16,7 +16,7 @@ class AuthApiClient {
      *
      * @param next - The Next.js fetch request configuration.
      *
-     * @returns {Promise<User>} The currently logged-in user.
+     * @returns {Promise<UserDTO>} The currently logged-in user.
      * - 200: Success, with user object.
      *
      * @throws {Error} Throws an error if the request fails.
@@ -24,7 +24,7 @@ class AuthApiClient {
      * - 404: Not Found, if user from JWT does not exist.
      * - 500: Internal Server Error, if there is another error during authentication.
      */
-    async getCurrentUser(next?: NextFetchRequestConfig): Promise<User> {
+    async getCurrentUser(next?: NextFetchRequestConfig): Promise<UserDTO> {
         return await apiRequestWrapper.get({ url: '/auth/current', next });
     }
 
@@ -34,7 +34,7 @@ class AuthApiClient {
      * @param data - The user's email and password.
      * @param next - The Next.js fetch request configuration.
      *
-     * @returns {Promise<User>} The user that was logged in.
+     * @returns {Promise<UserDTO>} The user that was logged in.
      * - 200: Success, with user object.
      *
      * @throws {Error} Throws an error if the request fails.
@@ -46,8 +46,8 @@ class AuthApiClient {
     async login(
         data: UserForLogin,
         next?: NextFetchRequestConfig
-    ): Promise<User> {
-        return await apiRequestWrapper.post<User>({
+    ): Promise<UserDTO> {
+        return await apiRequestWrapper.post<UserDTO>({
             url: '/auth/login',
             data,
             next
@@ -60,7 +60,7 @@ class AuthApiClient {
      * @param data - The Google OAuth code.
      * @param next - The Next.js fetch request configuration.
      *
-     * @returns {Promise<User>} The user that was logged in.
+     * @returns {Promise<UserDTO>} The user that was logged in.
      * - 200: Success, with user object.
      *
      * @throws {Error} Throws an error if the request fails.
@@ -73,8 +73,8 @@ class AuthApiClient {
     async loginWithGoogleOauth(
         data: AuthCodePayload,
         next?: NextFetchRequestConfig
-    ): Promise<User> {
-        return await apiRequestWrapper.post<User>({
+    ): Promise<UserDTO> {
+        return await apiRequestWrapper.post<UserDTO>({
             url: '/auth/google',
             data,
             next

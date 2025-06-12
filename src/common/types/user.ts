@@ -1,13 +1,11 @@
-export type User = {
+export type UserDTO = {
     id: number;
     username: string;
     email: string;
     role: UserRole;
     status: Status;
     avatarUrl: string | null;
-    emailVerified: boolean;
     createdAt: string;
-    updatedAt: string;
     lastLogin: string | null;
 };
 
@@ -37,4 +35,9 @@ export enum UserRole {
 
 export enum Status {
     Active = 'active'
+}
+
+export enum AuthType {
+    Local = 'local',
+    Google = 'google'
 }

@@ -1,7 +1,7 @@
 import prisma from '@/server/db/prisma';
-import { Status, UserRole } from '@/common/types';
+import { AuthType, Status, UserRole } from '@/common/types';
 import {
-    type User,
+    type UserDTO,
     type UserForCreatePayload,
     type UserForGoogleCreatePayload
 } from '@/common/types';
@@ -9,11 +9,8 @@ import bcrypt from 'bcrypt';
 import { v4 as uuid } from 'uuid';
 import { mailService } from '@/server/services';
 import { HttpError } from '@/common/errors/HttpError';
-import {
-    AuthType,
-    type UserForGoogleCreate,
-    type UserForLocalCreate
-} from './types';
+import { type UserForGoogleCreate, type UserForLocalCreate } from './types';
+import { createUserDTO } from './utils';
 
 /**
  * Service class for user-related business logic.
@@ -29,7 +26,7 @@ class UserService {
      * @throws {HttpError} Throws an error with status 400 if required fields are missing.
      * @throws {HttpError} Throws an error with status 409 if email or username is already taken.
      */
-    async createUser(payload: UserForCreatePayload): Promise<User> {
+    async createUser(payload: UserForCreatePayload): Promise<UserDTO> {
         const { email, password, username } = payload;
 
         if (!email || !password || !username) {
@@ -83,18 +80,7 @@ class UserService {
             verificationToken
         );
 
-        const userResponse: User = {
-            id: user.id,
-            email: user.email,
-            username: user.username,
-            avatarUrl: user.avatarUrl,
-            emailVerified: user.emailVerified,
-            createdAt: user.createdAt.toISOString(),
-            updatedAt: user.updatedAt.toISOString(),
-            role: user.role as UserRole,
-            status: user.status as Status,
-            lastLogin: user.lastLogin?.toISOString() || null
-        };
+        const userResponse: UserDTO = createUserDTO(user);
 
         return userResponse;
     }
@@ -108,7 +94,7 @@ class UserService {
      */
     async createUserFromGoogle(
         payload: UserForGoogleCreatePayload
-    ): Promise<User> {
+    ): Promise<UserDTO> {
         const { email, username, avatarUrl } = payload;
 
         const existingUser = await prisma.user.findFirst({
@@ -135,18 +121,7 @@ class UserService {
             data: userForCreate
         });
 
-        const userResponse: User = {
-            id: user.id,
-            email: user.email,
-            username: user.username,
-            avatarUrl: user.avatarUrl,
-            emailVerified: user.emailVerified,
-            createdAt: user.createdAt.toISOString(),
-            updatedAt: user.updatedAt.toISOString(),
-            role: user.role as UserRole,
-            status: user.status as Status,
-            lastLogin: user.lastLogin?.toISOString() || null
-        };
+        const userResponse: UserDTO = createUserDTO(user);
 
         return userResponse;
     }

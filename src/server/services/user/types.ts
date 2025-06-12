@@ -1,4 +1,4 @@
-import type { UserRole } from '@/common/types';
+import type { AuthType, UserRole } from '@/common/types';
 
 export type UserForLocalCreate = {
     username: string;
@@ -20,8 +20,3 @@ export type UserForGoogleCreate = {
     avatarUrl: string;
     emailVerified: boolean;
 };
-
-export enum AuthType {
-    Local = 'local',
-    Google = 'google'
-}

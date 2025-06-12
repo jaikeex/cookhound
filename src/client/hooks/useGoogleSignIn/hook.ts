@@ -7,10 +7,10 @@ import {
 } from '@/common/constants';
 import apiClient from '@/client/request';
 import { useEventListener } from '@/client/hooks';
-import type { User } from '@/common/types';
+import type { UserDTO } from '@/common/types';
 
 type UseGoogleSignInArgs = {
-    onSuccess?: (user: User) => void;
+    onSuccess?: (user: UserDTO) => void;
 };
 
 type UseGoogleSignInType = (options: UseGoogleSignInArgs) => {

@@ -19,7 +19,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth, useLocale, useSnackbar } from '@/client/store';
 import type { I18nMessage } from '@/client/locales';
 import Link from 'next/link';
-import type { User } from '@/common/types';
+import type { UserDTO } from '@/common/types';
 
 export type RegisterTemplateProps = NonNullable<unknown>;
 
@@ -78,7 +78,7 @@ export const RegisterTemplate: React.FC<RegisterTemplateProps> = () => {
      * Handles the Google sign-in success event.
      */
     const handleGoogleSignin = useCallback(
-        (user: User) => {
+        (user: UserDTO) => {
             setUser(user);
             alert({
                 message: t('auth.success.login'),

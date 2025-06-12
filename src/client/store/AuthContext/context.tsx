@@ -6,14 +6,14 @@ import React, {
     useMemo,
     useState
 } from 'react';
-import type { User } from '@/common/types';
+import type { UserDTO } from '@/common/types';
 import { ENV_CONFIG_PUBLIC } from '@/common/constants';
 import apiClient from '@/client/request';
 
 type AuthContextType = {
     authResolved: boolean;
-    user: User | null;
-    setUser: (user: User | null) => void;
+    user: UserDTO | null;
+    setUser: (user: UserDTO | null) => void;
 };
 
 const AuthContext = createContext({} as AuthContextType);
@@ -32,7 +32,7 @@ type AuthProviderProps = React.PropsWithChildren<NonNullable<unknown>>;
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const [authResolved, setAuthResolved] = useState(false);
-    const [user, setUser] = useState<User | null | undefined>(undefined);
+    const [user, setUser] = useState<UserDTO | null | undefined>(undefined);
     useEffect(() => {
         const fetchUser = async () => {
             const currentUser = await getCurrentUserOrNull();

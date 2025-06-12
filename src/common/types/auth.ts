@@ -1,8 +1,8 @@
-import type { User } from './user';
+import type { UserDTO } from './user';
 
 export type AuthResponse = {
     token: string;
-    user: User;
+    user: UserDTO;
 };
 
 export type AuthCodePayload = {

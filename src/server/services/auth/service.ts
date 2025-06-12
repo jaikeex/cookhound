@@ -1,4 +1,4 @@
-import type { Status, User, UserRole } from '@/common/types/user';
+import type { Status, UserDTO, UserRole } from '@/common/types/user';
 import type {
     UserForLogin,
     AuthResponse,
@@ -70,14 +70,12 @@ class AuthService {
             role: user.role as UserRole
         });
 
-        const userResponse: User = {
+        const userResponse: UserDTO = {
             id: user.id,
             email: user.email,
             username: user.username,
             avatarUrl: user.avatarUrl,
-            emailVerified: user.emailVerified,
             createdAt: user.createdAt.toISOString(),
-            updatedAt: user.updatedAt.toISOString(),
             role: user.role as UserRole,
             status: user.status as Status,
             lastLogin: user.lastLogin?.toISOString() || null
@@ -93,7 +91,7 @@ class AuthService {
      * @throws {HttpError} Throws an error with status 401 if the user is not authenticated.
      * @throws {HttpError} Throws an error with status 404 if the user is not found.
      */
-    async getCurrentUser(): Promise<User> {
+    async getCurrentUser(): Promise<UserDTO> {
         const cookieStore = await cookies();
         const token = cookieStore.get('jwt')?.value;
 
@@ -116,9 +114,7 @@ class AuthService {
             email: user.email,
             username: user.username,
             avatarUrl: user.avatarUrl,
-            emailVerified: user.emailVerified,
             createdAt: user.createdAt.toISOString(),
-            updatedAt: user.updatedAt.toISOString(),
             role: user.role as UserRole,
             status: user.status as Status,
             lastLogin: user.lastLogin?.toISOString() || null
@@ -204,7 +200,7 @@ class AuthService {
             where: { email: userInfoData.email }
         });
 
-        let user: User;
+        let user: UserDTO;
 
         if (dbUser) {
             user = {
@@ -212,9 +208,7 @@ class AuthService {
                 email: dbUser.email,
                 username: dbUser.username,
                 avatarUrl: dbUser.avatarUrl,
-                emailVerified: dbUser.emailVerified,
                 createdAt: dbUser.createdAt.toISOString(),
-                updatedAt: dbUser.updatedAt.toISOString(),
                 role: dbUser.role as UserRole,
                 status: dbUser.status as Status,
                 lastLogin: dbUser.lastLogin?.toISOString() ?? null

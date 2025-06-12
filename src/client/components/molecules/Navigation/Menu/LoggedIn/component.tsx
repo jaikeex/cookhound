@@ -8,10 +8,10 @@ import {
     ThemeSwitcher,
     Typography
 } from '@/client/components';
-import type { User } from '@/common/types';
+import type { UserDTO } from '@/common/types';
 
 type LoggedInMenuContentProps = Readonly<{
-    user: User;
+    user: UserDTO;
 }>;
 
 export const LoggedInMenuContent: React.FC<LoggedInMenuContentProps> = ({

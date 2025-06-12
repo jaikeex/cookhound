@@ -4,12 +4,12 @@ import React, { forwardRef } from 'react';
 import classNames from 'classnames';
 import { AnonymousMenuContent } from './Anonymous';
 import { LoggedInMenuContent } from './LoggedIn';
-import type { User } from '@/common/types';
+import type { UserDTO } from '@/common/types';
 
 type NavMenuProps = Readonly<{
     className?: string;
     ref?: React.Ref<HTMLDivElement>;
-    user: User | null;
+    user: UserDTO | null;
 }>;
 
 export const NavMenu: React.ForwardRefExoticComponent<
