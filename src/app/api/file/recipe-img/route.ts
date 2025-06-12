@@ -1,4 +1,4 @@
-import { verifySession } from '@/server/utils';
+import { verifySessionWithRedirect } from '@/server/utils';
 import { uploadRecipeImage } from '@/server/services/google-api';
 import type { NextRequest } from 'next/server';
 import { ENV_CONFIG_PRIVATE } from '@/common/constants';
@@ -11,7 +11,7 @@ import { ENV_CONFIG_PRIVATE } from '@/common/constants';
  * @returns A JSON response with the uploaded file's object URL.
  */
 export async function POST(request: NextRequest) {
-    await verifySession();
+    await verifySessionWithRedirect();
 
     const data = await request.json();
 

@@ -1,4 +1,4 @@
-import { verifySession } from '@/server/utils';
+import { verifySessionWithRedirect } from '@/server/utils';
 
 /**
  * Handles POST requests to `/api/recipe` to create a new recipe.
@@ -9,7 +9,7 @@ import { verifySession } from '@/server/utils';
  * @todo Implement the logic to create a new recipe.
  */
 export async function POST() {
-    await verifySession();
+    await verifySessionWithRedirect();
 
     return Response.json({ message: 'Hello, world!' });
 }

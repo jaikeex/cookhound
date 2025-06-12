@@ -1,9 +1,9 @@
 import React from 'react';
 import { RecipeCreate } from '@/client/components';
-import { verifySession } from '@/server/utils';
+import { verifySessionWithRedirect } from '@/server/utils';
 
 export default async function Page() {
-    await verifySession();
+    await verifySessionWithRedirect();
 
     return <RecipeCreate />;
 }
