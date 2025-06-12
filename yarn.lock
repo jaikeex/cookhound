@@ -3200,6 +3200,51 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@redis/bloom@npm:5.5.6":
+  version: 5.5.6
+  resolution: "@redis/bloom@npm:5.5.6"
+  peerDependencies:
+    "@redis/client": ^5.5.6
+  checksum: 10c0/1e50b2c94000b15e9555409692738e6acba796a469a0163e0abf2d2e0bc82304cd52dc4c2ad4f56bcc169030694f0777ab589548f7a47c55f09e5237a81bff95
+  languageName: node
+  linkType: hard
+
+"@redis/client@npm:5.5.6":
+  version: 5.5.6
+  resolution: "@redis/client@npm:5.5.6"
+  dependencies:
+    cluster-key-slot: "npm:1.1.2"
+  checksum: 10c0/92527c088410211aaa6038b38b4604bd930c9db3761603215b8ff025571f6ccdf6f93508c6de83b4e4caf76fedbf1e33ea0e72bfbe8a7bcff84d92f8b5d0af53
+  languageName: node
+  linkType: hard
+
+"@redis/json@npm:5.5.6":
+  version: 5.5.6
+  resolution: "@redis/json@npm:5.5.6"
+  peerDependencies:
+    "@redis/client": ^5.5.6
+  checksum: 10c0/142fc10510ab0392848662ea88244fa7d9cacbc8d746bd2dae4eb325227106a14e2f40256b790b2ded45c90bf9822fca2d5d4463e8e1a2176a1f6eff9f9666cb
+  languageName: node
+  linkType: hard
+
+"@redis/search@npm:5.5.6":
+  version: 5.5.6
+  resolution: "@redis/search@npm:5.5.6"
+  peerDependencies:
+    "@redis/client": ^5.5.6
+  checksum: 10c0/9f4516a23dcbb0bbcad3deecc9a39412bac24a1648eadccfae0c4710fc9f829728bbbe2774bfc2fe3bd8d61bd2e2c974183d3a37fa7c7f0a949a6c844da633c7
+  languageName: node
+  linkType: hard
+
+"@redis/time-series@npm:5.5.6":
+  version: 5.5.6
+  resolution: "@redis/time-series@npm:5.5.6"
+  peerDependencies:
+    "@redis/client": ^5.5.6
+  checksum: 10c0/7a30965bfdb104de383cd9ccf11e7850fdb45721c9159628b8b787d892871821df40ac6e041eee6695bbcf150e536ba9900a1b6e68485f75f10e8cbbb374fb27
+  languageName: node
+  linkType: hard
+
 "@rollup/plugin-commonjs@npm:28.0.1":
   version: 28.0.1
   resolution: "@rollup/plugin-commonjs@npm:28.0.1"
@@ -5470,6 +5515,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"cluster-key-slot@npm:1.1.2":
+  version: 1.1.2
+  resolution: "cluster-key-slot@npm:1.1.2"
+  checksum: 10c0/d7d39ca28a8786e9e801eeb8c770e3c3236a566625d7299a47bb71113fb2298ce1039596acb82590e598c52dbc9b1f088c8f587803e697cb58e1867a95ff94d3
+  languageName: node
+  linkType: hard
+
 "color-convert@npm:^1.9.0":
   version: 1.9.3
   resolution: "color-convert@npm:1.9.3"
@@ -5621,6 +5673,7 @@ __metadata:
     prisma: "npm:^6.5.0"
     react: "npm:^19.0.0"
     react-dom: "npm:^19.0.0"
+    redis: "npm:^5.5.6"
     tailwindcss: "npm:^3.4.17"
     tsx: "npm:^4.19.3"
     typescript: "npm:5.7.3"
@@ -9738,6 +9791,19 @@ __metadata:
   dependencies:
     picomatch: "npm:^2.2.1"
   checksum: 10c0/6fa848cf63d1b82ab4e985f4cf72bd55b7dcfd8e0a376905804e48c3634b7e749170940ba77b32804d5fe93b3cc521aa95a8d7e7d725f830da6d93f3669ce66b
+  languageName: node
+  linkType: hard
+
+"redis@npm:^5.5.6":
+  version: 5.5.6
+  resolution: "redis@npm:5.5.6"
+  dependencies:
+    "@redis/bloom": "npm:5.5.6"
+    "@redis/client": "npm:5.5.6"
+    "@redis/json": "npm:5.5.6"
+    "@redis/search": "npm:5.5.6"
+    "@redis/time-series": "npm:5.5.6"
+  checksum: 10c0/e9a9f92545524dc33fba41b8a966a66b4c0ffd99944b9dd45931e2fdbc312f996361f96d1fe83321b32faed3da5aff40027e57f7515f423c9249cb44142fe543
   languageName: node
   linkType: hard
 

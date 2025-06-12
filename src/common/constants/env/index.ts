@@ -39,6 +39,8 @@ export const ENV_CONFIG_PRIVATE = createConfig(
         DB_IDLE_TIMEOUT: process.env.DB_IDLE_TIMEOUT,
         DB_ACQUIRE_TIMEOUT: process.env.DB_ACQUIRE_TIMEOUT,
         DB_MAX_ATTEMPTS: process.env.DB_MAX_ATTEMPTS,
+        REDIS_TTL: process.env.REDIS_TTL,
+        REDIS_PASSWORD: process.env.REDIS_PASSWORD,
         GOOGLE_SMTP_USERNAME: process.env.GOOGLE_SMTP_USERNAME,
         GOOGLE_SMTP_PASSWORD: process.env.GOOGLE_SMTP_PASSWORD,
         JWT_SECRET: process.env.JWT_SECRET,
