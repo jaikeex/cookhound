@@ -6,3 +6,4 @@ export * from './locale';
 export * from './fileToByteArray';
 export * from './generateRandomId';
 export * from './revalidateRouteCache';
+export * from './getCookieValue';

@@ -11,6 +11,7 @@ import React, {
 import type { I18nMessage, Locale, Messages } from '@/client/locales';
 import { locales } from '@/client/locales';
 import { setLocaleCookie } from '@/app/actions';
+import { getCookieValue } from '@/client/utils';
 
 type LocaleContextType = {
     locale: Locale;
@@ -47,7 +48,6 @@ export const LocaleProvider: React.FC<LocaleProviderProps> = ({
 }) => {
     const [locale, setLocale] = useState<Locale>(defaultLocale);
     const [messages, setMessages] = useState<Messages>(defaultMessages);
-
     const t = useCallback(
         (
             key: I18nMessage | undefined,
@@ -72,14 +72,14 @@ export const LocaleProvider: React.FC<LocaleProviderProps> = ({
     );
 
     useEffect(() => {
-        setLocaleCookie(locale);
+        const localeCookie = getCookieValue('locale');
 
-        if (locale === defaultLocale) {
-            return;
+        if (!localeCookie) {
+            setLocaleCookie(locale);
         }
 
         setMessages(locales[locale]);
-    }, [defaultLocale, locale]);
+    }, [locale]);
 
     const contextValue = useMemo(
         () => ({ locale, setLocale, messages, t }),
