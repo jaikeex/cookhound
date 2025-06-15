@@ -10,7 +10,10 @@ import type {
     RecipeDTO
 } from '@/common/types';
 import { useLocale, useSnackbar } from '@/client/store';
-import { DesktopRecipeViewTemplate } from '@/client/components/templates/Recipe/View/Desktop';
+import {
+    DesktopRecipeViewSkeleton,
+    DesktopRecipeViewTemplate
+} from '@/client/components/templates/Recipe/View/Desktop';
 import apiClient from '@/client/request';
 import {
     fileToByteArray,
@@ -190,7 +193,9 @@ export const DesktopRecipeCreate: React.FC<DesktopRecipeCreateProps> = ({
             <div className={'col-span-3 px-2 hidden xl:block'}>
                 {recipeObject ? (
                     <DesktopRecipeViewTemplate recipe={recipeObject} />
-                ) : null}
+                ) : (
+                    <DesktopRecipeViewSkeleton />
+                )}
             </div>
         </div>
     );

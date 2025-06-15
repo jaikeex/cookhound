@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import type { RecipeDTO } from '@/common/types/recipe';
 import {
@@ -76,9 +78,7 @@ export const MobileRecipeViewTemplate: React.FC<MobileRecipeViewProps> = ({
                         placeholder={'blur'}
                         blurDataURL={generateImgPlaceholder(80, 80, 80)}
                     />
-                ) : (
-                    <div className={'w-full h-48 rounded-md'} />
-                )}
+                ) : null}
 
                 <Typography variant={'heading-xl'} className={'text-center'}>
                     {recipe.title}

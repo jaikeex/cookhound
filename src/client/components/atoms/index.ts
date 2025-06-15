@@ -6,6 +6,7 @@ export * from './Loader';
 export * from './Logo';
 export * from './Icons';
 export * from './Input';
+export * from './Skeleton';
 export * from './Star';
 export * from './Tooltip';
 export * from './Typography';

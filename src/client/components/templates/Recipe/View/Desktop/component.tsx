@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import type { RecipeDTO } from '@/common/types/recipe';
 import {
@@ -69,7 +71,7 @@ export const DesktopRecipeViewTemplate: React.FC<DesktopRecipeViewProps> = ({
 
                 <Divider />
 
-                <div className={'flex gap-6'}>
+                <div className={'flex gap-12'}>
                     <div className={'space-y-2 w-[35%]'}>
                         <Typography variant={'heading-sm'}>
                             {t('app.recipe.ingredients')}
