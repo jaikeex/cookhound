@@ -1,16 +1,15 @@
 'use client';
 
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import type { RecipeFormErrors } from '@/client/components';
 import { RecipeForm } from '@/client/components';
 
 import type {
     RecipeForCreatePayload,
     Ingredient,
-    RecipeDTO,
-    UserDTO
+    RecipeDTO
 } from '@/common/types';
-import { useAuth, useLocale, useSnackbar } from '@/client/store';
+import { useLocale, useSnackbar } from '@/client/store';
 import { DesktopRecipeViewTemplate } from '@/client/components/templates/Recipe/View/Desktop';
 import apiClient from '@/client/request';
 import {
@@ -23,6 +22,7 @@ import type { ObjectSchema } from 'yup';
 import { array, number, object, string } from 'yup';
 import { useRouter } from 'next/navigation';
 import type { I18nMessage } from '@/client/locales';
+import { useCreateRecipeStore } from '@/client/store/app-store/useCreateRecipeStore';
 
 type DesktopRecipeCreateProps = Readonly<{
     className?: string;
@@ -40,8 +40,7 @@ type RecipeForCreateFormData = {
 };
 
 const createRecipePlaceholder = (
-    t: (key: I18nMessage) => string,
-    user: UserDTO | null
+    t: (key: I18nMessage) => string
 ): RecipeDTO => ({
     id: 0,
     rating: null,
@@ -54,7 +53,7 @@ const createRecipePlaceholder = (
     notes: null,
     ingredients: [],
     instructions: [],
-    authorId: user?.id || 0
+    authorId: 0
 });
 
 export const createRecipeSchema: ObjectSchema<RecipeForCreateFormData> = object(
@@ -87,12 +86,10 @@ export const DesktopRecipeCreate: React.FC<DesktopRecipeCreateProps> = ({
     const { alert } = useSnackbar();
     const { push } = useRouter();
     const { t } = useLocale();
-    const { user } = useAuth();
     const [formErrors, setFormErrors] = useState<RecipeFormErrors>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [recipeForDisplay, setRecipeForDisplay] = useState<RecipeDTO>(
-        createRecipePlaceholder(t, user)
-    );
+    const { recipeObject, setRecipeObject, updateRecipeObject } =
+        useCreateRecipeStore();
 
     const handleSubmit = useCallback(
         async (event: React.FormEvent<HTMLFormElement>) => {
@@ -156,26 +153,32 @@ export const DesktopRecipeCreate: React.FC<DesktopRecipeCreateProps> = ({
         [alert, locale, push, t]
     );
 
-    const handleFormChange = useCallback((name: string, value: any) => {
-        let newValue: any = value;
+    const handleFormChange = useCallback(
+        (name: string, value: any) => {
+            let newValue: any = value;
 
-        if (name === 'ingredients' && value) {
-            newValue = value.map((ingredient: Ingredient) => ({
-                ...ingredient,
-                name: lowerCaseFirstLetter(ingredient.name)
-            }));
-        }
+            if (name === 'ingredients' && value) {
+                newValue = value.map((ingredient: Ingredient) => ({
+                    ...ingredient,
+                    name: lowerCaseFirstLetter(ingredient.name)
+                }));
+            }
 
-        setRecipeForDisplay((prev) => ({
-            ...prev,
-            [name]: newValue
-        }));
-    }, []);
+            updateRecipeObject(name, newValue);
+        },
+        [updateRecipeObject]
+    );
+
+    useEffect(() => {
+        setRecipeObject(createRecipePlaceholder(t));
+    }, [setRecipeObject, t]);
 
     return (
-        <div className={`${className} grid grid-cols-5 gap-10`}>
+        <div className={`${className} grid grid-rows-1 grid-cols-5`}>
             <form
-                className={'col-span-2 overflow-auto'}
+                className={
+                    'col-span-5 xl:col-span-2 overflow-auto min-w-[480px]'
+                }
                 onSubmit={handleSubmit}
             >
                 <RecipeForm
@@ -184,8 +187,10 @@ export const DesktopRecipeCreate: React.FC<DesktopRecipeCreateProps> = ({
                     pending={isSubmitting}
                 />
             </form>
-            <div className={'col-span-3 px-12'}>
-                <DesktopRecipeViewTemplate recipe={recipeForDisplay} />
+            <div className={'col-span-3 px-2 hidden xl:block'}>
+                {recipeObject ? (
+                    <DesktopRecipeViewTemplate recipe={recipeObject} />
+                ) : null}
             </div>
         </div>
     );
@@ -231,7 +236,8 @@ async function extractFormData(
 
             return {
                 name,
-                quantity: data.get(`ingredient-quantity-${index}`) || null
+                quantity:
+                    (data.get(`ingredient-quantity-${index}`) as string) || null
             };
         })
         .filter((ingredient) => ingredient?.name && ingredient.name.length > 0);
@@ -254,7 +260,7 @@ async function extractFormData(
     return {
         title: data.get('title') as string,
         difficulty: 'easy',
-        portionSize: parseInt(data.get('portion_size') as string) || null,
+        portionSize: parseInt(data.get('portionSize') as string) || null,
         time: parseInt(data.get('time') as string) || null,
         imageUrl: null,
         notes: data.get('notes') as string,

@@ -8,6 +8,7 @@ import {
     InputError,
     InstructionsListCreate,
     Submit,
+    Textarea,
     TextInput,
     Typography
 } from '@/client/components';
@@ -99,18 +100,18 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({
                 label={t('app.recipe.title')}
                 name={'title'}
                 onChange={handleInputChange('title')}
-                onKeyDown={handleInputKeyPress('recipe-portion_size')}
+                onKeyDown={handleInputKeyPress('recipe-portionSize')}
                 error={t(errors?.title)}
             />
 
             <div className={'grid grid-cols-2 gap-4'}>
                 <TextInput
                     className={'mt-auto'}
-                    id={'recipe-portion_size'}
+                    id={'recipe-portionSize'}
                     label={t('app.recipe.servings')}
-                    name={'portion_size'}
+                    name={'portionSize'}
                     type={'number'}
-                    onChange={handleInputChange('portion_size')}
+                    onChange={handleInputChange('portionSize')}
                     onKeyDown={handleInputKeyPress('recipe-time')}
                 />
                 <TextInput
@@ -153,7 +154,7 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({
 
             <Divider />
 
-            <TextInput
+            <Textarea
                 id={'notes'}
                 label={t('app.recipe.notes')}
                 name={'notes'}

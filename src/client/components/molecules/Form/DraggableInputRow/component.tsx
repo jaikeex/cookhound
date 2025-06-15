@@ -4,6 +4,8 @@ import { Reorder, useDragControls } from 'framer-motion';
 
 type DraggableInputRowProps = Readonly<{
     className?: string;
+    disableDrag?: boolean;
+    disableRemove?: boolean;
     index: number;
     onRemove: () => void;
 }> &
@@ -12,6 +14,8 @@ type DraggableInputRowProps = Readonly<{
 export const DraggableInputRow: React.FC<DraggableInputRowProps> = ({
     children,
     className,
+    disableDrag,
+    disableRemove,
     index,
     onRemove
 }) => {
@@ -20,9 +24,11 @@ export const DraggableInputRow: React.FC<DraggableInputRowProps> = ({
     const handleDragStart = useCallback(
         (e: React.PointerEvent) => {
             e.preventDefault(); // Prevents the input texts from being selected.
-            controls.start(e);
+            if (!disableDrag) {
+                controls.start(e);
+            }
         },
-        [controls]
+        [controls, disableDrag]
     );
 
     return (
@@ -36,12 +42,13 @@ export const DraggableInputRow: React.FC<DraggableInputRowProps> = ({
             <div className={'flex items-center'}>
                 <Icon
                     name={'drag'}
-                    className={'cursor-move'}
+                    className={`cursor-move ${disableDrag ? 'opacity-50  pointer-events-none' : ''}`}
                     size={20}
                     onPointerDown={handleDragStart}
                 />
                 <IconButton
                     tabIndex={-1}
+                    disabled={disableRemove}
                     className={'min-w-5'}
                     icon={'close'}
                     size={12}

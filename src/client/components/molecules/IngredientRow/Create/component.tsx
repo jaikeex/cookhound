@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { BaseInput } from '@/client/components';
 import { DraggableInputRow } from '@/client/components/molecules/Form/DraggableInputRow';
 import type { Ingredient } from '@/common/types';
+import { useCreateRecipeStore } from '@/client/store/app-store/useCreateRecipeStore';
 
 type IngredientRowCreateProps = Readonly<{
     className?: string;
@@ -23,6 +24,10 @@ export const IngredientRowCreate: React.FC<IngredientRowCreateProps> = ({
     onRemove
 }) => {
     const [ingredient, setIngredient] = useState<Ingredient>({} as Ingredient);
+    const { recipeObject } = useCreateRecipeStore();
+
+    const disableHandling =
+        index === 0 && recipeObject?.ingredients.length === 1;
 
     const handleRemove = useCallback(() => {
         onRemove && onRemove(index);
@@ -87,6 +92,8 @@ export const IngredientRowCreate: React.FC<IngredientRowCreateProps> = ({
             index={dragIndex}
             className={className}
             onRemove={handleRemove}
+            disableRemove={disableHandling}
+            disableDrag={disableHandling}
         >
             <BaseInput
                 className={'w-1/4'}

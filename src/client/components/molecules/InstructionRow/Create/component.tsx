@@ -2,6 +2,7 @@
 
 import React, { useCallback, useEffect, useState } from 'react';
 import { BaseTextarea, DraggableInputRow } from '@/client/components';
+import { useCreateRecipeStore } from '@/client/store/app-store/useCreateRecipeStore';
 
 type InstructionRowCreateProps = Readonly<{
     className?: string;
@@ -21,6 +22,10 @@ export const InstructionRowCreate: React.FC<InstructionRowCreateProps> = ({
     onRemove
 }) => {
     const [instruction, setInstruction] = useState<string>('');
+    const { recipeObject } = useCreateRecipeStore();
+
+    const disableHandling =
+        index === 0 && recipeObject?.instructions.length === 1;
 
     const handleRemove = useCallback(() => {
         onRemove && onRemove(index);
@@ -55,6 +60,8 @@ export const InstructionRowCreate: React.FC<InstructionRowCreateProps> = ({
             index={dragIndex}
             className={className}
             onRemove={handleRemove}
+            disableRemove={disableHandling}
+            disableDrag={disableHandling}
         >
             <BaseTextarea
                 id={`instruction-${index}`}
