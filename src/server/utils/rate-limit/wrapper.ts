@@ -1,4 +1,4 @@
-import type { NextRequest} from 'next/server';
+import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { SlidingWindowRateLimit } from './limiters/SlidingWindow';
 import type { RateLimitConfig, RateLimiter, RateLimitResult } from './types';
@@ -48,21 +48,14 @@ export function withRateLimit(
         if (!result.allowed) {
             const response = options.onRateLimitExceeded
                 ? options.onRateLimitExceeded(req)
-                : NextResponse.json(
-                      {
-                          error: 'Too Many Requests',
-                          message:
-                              'Rate limit exceeded. Please try again later.'
-                      },
-                      {
-                          status: 429
-                      }
+                : NextResponse.redirect(
+                      new URL('/error/too-many-requests', req.url)
                   );
 
             return response;
+        } else {
+            return await handler(req, context);
         }
-
-        return await handler(req, context);
     };
 }
 

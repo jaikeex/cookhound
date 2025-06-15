@@ -1,6 +1,7 @@
 import { RequestError } from '@/client/error';
 import { ENV_CONFIG_PUBLIC } from '@/common/constants';
 import { Logger } from '@/common/logger/console/logger';
+import { redirect } from 'next/navigation';
 
 /**
  * A type alias for a URL string that must start with a forward slash.
@@ -59,8 +60,6 @@ class ApiRequestWrapper {
      *  const response = await apiService.get<User>({
      *    url: '/user/current'
      *   });
-     *
-     *  console.log(response);
      */
     async get<R>(config: RequestConfig): Promise<R> {
         return this.request<R>(config, 'GET');
@@ -150,7 +149,8 @@ class ApiRequestWrapper {
         const options: RequestInit = {
             method,
             headers,
-            credentials: 'include'
+            credentials: 'include',
+            redirect: 'manual'
         };
 
         if (config.next) {
@@ -170,13 +170,28 @@ class ApiRequestWrapper {
 
         const response = await fetch(url.toString(), options);
 
+        const isRedirect = response.status === 307 || response.status === 302;
+
+        /**
+         * Redirects need to be handled manually on the server side. I blame the
+         * Next.js team for this.
+         */
+        if (isRedirect && typeof window === 'undefined') {
+            const redirectUrl = response.headers.get('location');
+            if (redirectUrl) {
+                const url = new URL(redirectUrl, this.API_URL);
+                const redirectPath = url.pathname + url.search;
+                redirect(redirectPath);
+            }
+        }
+
         try {
             data = await response.json();
         } catch (err) {
             data = null;
         }
 
-        if (!response.ok) {
+        if (!response.ok && !isRedirect) {
             logger.error('API %O', response.status, data);
             throw RequestError.fromFetchError(response, data);
         }
