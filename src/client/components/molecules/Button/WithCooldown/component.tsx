@@ -27,12 +27,6 @@ export const ButtonWithCooldown: React.FC<ButtonWithCooldownProps> = ({
                 setIsCooldown(false);
             }, cooldown);
 
-            console.log('ButtonWithCooldown handleClick', {
-                cooldown,
-                onClick,
-                event
-            });
-
             if (onClick === undefined) {
                 return;
             }

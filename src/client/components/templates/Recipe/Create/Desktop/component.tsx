@@ -137,9 +137,6 @@ export const DesktopRecipeCreate: React.FC<DesktopRecipeCreateProps> = ({
                 const createdRecipe =
                     await apiClient.recipe.createRecipe(recipeForCreate);
 
-                console.log('_________________________');
-                console.log(createdRecipe);
-
                 alert({
                     message: t('app.recipe.create-success'),
                     variant: 'success'
