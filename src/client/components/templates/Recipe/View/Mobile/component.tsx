@@ -29,6 +29,7 @@ export const MobileRecipeViewTemplate: React.FC<MobileRecipeViewProps> = ({
             title: t('app.recipe.ingredients'),
             content: (
                 <IngredientsListView
+                    key={`${recipe.id}-ingredients-list-view-mobile`}
                     ingredients={recipe.ingredients}
                     className={'pt-4'}
                     variant={'mobile'}

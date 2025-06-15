@@ -75,6 +75,7 @@ export const DesktopRecipeViewTemplate: React.FC<DesktopRecipeViewProps> = ({
                             {t('app.recipe.ingredients')}
                         </Typography>
                         <IngredientsListView
+                            key={`${recipe.id}-ingredients-list-view-desktop`}
                             ingredients={recipe.ingredients}
                             className={'pt-2'}
                             variant={'desktop'}

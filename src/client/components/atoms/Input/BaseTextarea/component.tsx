@@ -1,18 +1,76 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useRef, useCallback } from 'react';
 import classnames from 'classnames';
 
 export type BaseTextareaProps = Readonly<{
     className?: string;
+    minRows?: number;
+    maxRows?: number;
 }> &
     React.TextareaHTMLAttributes<HTMLTextAreaElement>;
 
 export const BaseTextarea: React.FC<BaseTextareaProps> = ({
     className,
+    minRows = 2,
+    maxRows,
+    onInput,
+    style,
     ...props
 }) => {
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+    const adjustHeight = useCallback(() => {
+        const textarea = textareaRef.current;
+        if (!textarea) return;
+
+        textarea.style.height = 'auto';
+
+        const computedStyle = window.getComputedStyle(textarea);
+        const lineHeight = parseInt(computedStyle.lineHeight) || 20;
+
+        const minHeight = lineHeight * minRows;
+        const maxHeight = maxRows ? lineHeight * maxRows : Infinity;
+
+        // Set the new height based on content, respecting min/max constraints
+        const newHeight = Math.min(
+            Math.max(textarea.scrollHeight, minHeight),
+            maxHeight
+        );
+        textarea.style.height = `${newHeight}px`;
+
+        // Enable/disable scrolling based on whether we've hit the max height
+        textarea.style.overflowY =
+            textarea.scrollHeight > maxHeight ? 'auto' : 'hidden';
+    }, [minRows, maxRows]);
+
+    useEffect(() => {
+        adjustHeight();
+    }, [adjustHeight]);
+
+    const handleInput = useCallback(
+        (e: React.FormEvent<HTMLTextAreaElement>) => {
+            adjustHeight();
+            if (onInput) {
+                onInput(e);
+            }
+        },
+        [adjustHeight, onInput]
+    );
+
     return (
-        <textarea {...props} className={classnames('base-input', className)} />
+        <textarea
+            {...props}
+            ref={textareaRef}
+            onInput={handleInput}
+            className={classnames(
+                'base-input resize-none overflow-hidden',
+                className
+            )}
+            style={{
+                minHeight: `${parseInt(typeof window !== 'undefined' ? window.getComputedStyle(document.documentElement).fontSize : '16') * 1.5 * minRows || 16}px`,
+                ...style
+            }}
+        />
     );
 };

@@ -5,6 +5,7 @@ import classnames from 'classnames';
 
 export type IconButtonProps = Readonly<{
     className?: string;
+    disabled?: boolean;
     icon: IconName;
     onClick: () => void;
     size?: number;
@@ -13,6 +14,7 @@ export type IconButtonProps = Readonly<{
 
 export const IconButton: React.FC<IconButtonProps> = ({
     className,
+    disabled,
     icon,
     onClick,
     size,
@@ -23,12 +25,13 @@ export const IconButton: React.FC<IconButtonProps> = ({
             className={classnames(
                 'min-h-7 min-w-7 flex items-center justify-center rounded hover:bg-gray-200',
                 'dark:hover:bg-gray-800 transition-colors',
-
+                disabled && 'opacity-50 cursor-not-allowed',
                 className
             )}
             tabIndex={tabIndex}
             type={'button'}
             onClick={onClick}
+            disabled={disabled}
         >
             <Icon name={icon} size={size} />
         </button>
