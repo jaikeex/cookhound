@@ -4,6 +4,8 @@ import { ENV_CONFIG_PRIVATE } from '@/common/constants';
 class RedisClient {
     private client;
     private isConnected: boolean = false;
+    private isConnecting: boolean = false;
+    private connectionPromise: Promise<any> | null = null;
 
     constructor() {
         this.client = createClient({
@@ -14,15 +16,37 @@ class RedisClient {
         this.client.on('error', (err: Error) =>
             console.error('Redis Client Error:', err)
         );
-        this.client.on('connect', () => (this.isConnected = true));
-        this.client.on('disconnect', () => (this.isConnected = false));
+        this.client.on('connect', () => {
+            this.isConnected = true;
+            this.isConnecting = false;
+        });
+        this.client.on('disconnect', () => {
+            this.isConnected = false;
+            this.isConnecting = false;
+        });
     }
 
     async connect() {
-        if (!this.isConnected) {
-            await this.client.connect();
+        if (this.isConnected) {
+            return this.client;
         }
-        return this.client;
+
+        if (this.isConnecting && this.connectionPromise) {
+            await this.connectionPromise;
+            return this.client;
+        }
+
+        this.isConnecting = true;
+        this.connectionPromise = this.client.connect();
+
+        try {
+            await this.connectionPromise;
+            return this.client;
+        } catch (error) {
+            this.isConnecting = false;
+            this.connectionPromise = null;
+            throw error;
+        }
     }
 
     async get<T>(key: string): Promise<T | null> {
