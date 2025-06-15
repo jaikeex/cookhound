@@ -3,11 +3,11 @@
 import React from 'react';
 import type { TypographyVariant } from '@/client/components';
 import { Icon, Typography } from '@/client/components';
-import type { Recipe } from '@/common/types';
+import type { RecipeDTO } from '@/common/types';
 import { useLocale } from '@/client/store';
 
 type RecipeInfoProps = Readonly<{
-    recipe: Recipe;
+    recipe: RecipeDTO;
     typographyVariant?: TypographyVariant;
     verbose?: boolean;
 }>;

@@ -12,7 +12,7 @@
         "storybook": "storybook dev -p 6006",
         "build-storybook": "storybook build",
         "migrate": "npx prisma migrate dev --name init",
-        "generate": "npx prisma generate"
+        "generate": "npx prisma generate --sql"
     },
     "dependencies": {
         "@prisma/client": "^6.5.0",

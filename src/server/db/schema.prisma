@@ -6,6 +6,7 @@ datasource db {
 
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["typedSql"]
 }
 
 model User {
@@ -41,17 +42,17 @@ model User {
  
 model Recipe {
   id           Int       @id @default(autoincrement())
-  authorId     Int       @map("author_id")
+  authorId     Int       @db.Int
   language     String    @db.VarChar(2)
   title        String    @db.VarChar(255)
   notes        String?   @db.Text
   time         Int?
   difficulty   String?   @db.VarChar(50)
-  portionSize  Int?      @map("portion_size")
-  imageUrl     String?   @db.VarChar(255) @map("image_url")
+  portionSize  Int?      @db.Int
+  imageUrl     String?   @db.VarChar(255)
   rating       Decimal?  @db.Decimal(2, 1)
-  createdAt    DateTime  @default(now()) @map("created_at")
-  updatedAt    DateTime  @updatedAt @map("updated_at")
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 
   // Relations
   author       User                @relation(fields: [authorId], references: [id])
@@ -75,7 +76,7 @@ model Recipe {
 }
 
 model Instruction {
-  recipeId Int    @map("recipe_id")
+  recipeId Int    @db.Int
   step     Int
   text     String @db.Text
 
@@ -116,10 +117,10 @@ model Unit {
 }
 
 model RecipeIngredient {
-  recipeId        Int    @map("recipe_id")
-  ingredientId    Int    @map("ingredient_id")
-  quantity        String @db.VarChar(256)
-  ingredientOrder Int    @map("ingredient_order")
+  recipeId        Int     @db.Int
+  ingredientId    Int     @db.Int
+  quantity        String? @db.VarChar(256)
+  ingredientOrder Int     @db.Int
 
   // Relations
   recipe     Recipe     @relation(fields: [recipeId], references: [id])
@@ -134,11 +135,11 @@ model RecipeIngredient {
 
 model Rating {
   id        Int      @id @default(autoincrement())
-  recipeId  Int      @map("recipe_id")
-  userId    Int      @map("user_id")
+  recipeId  Int      @db.Int
+  userId    Int      @db.Int
   rating    Decimal  @db.Decimal(2, 1)
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Relations
   recipe Recipe @relation(fields: [recipeId], references: [id])

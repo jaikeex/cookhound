@@ -1,5 +1,5 @@
 import { apiRequestWrapper } from '@/client/request/ApiRequestWrapper';
-import type { Recipe, RecipeForCreate } from '@/common/types';
+import type { RecipeDTO, RecipeForCreatePayload } from '@/common/types';
 
 /**
  * Service for recipe-related operations.
@@ -16,7 +16,7 @@ class RecipeApiClient {
     async getRecipeById(
         id: string,
         next?: NextFetchRequestConfig
-    ): Promise<Recipe> {
+    ): Promise<RecipeDTO> {
         return await apiRequestWrapper.get({ url: `/recipe/${id}`, next });
     }
 
@@ -29,9 +29,9 @@ class RecipeApiClient {
      * @throws {Error} Throws an error if the request fails.
      */
     async createRecipe(
-        recipe: RecipeForCreate,
+        recipe: RecipeForCreatePayload,
         next?: NextFetchRequestConfig
-    ): Promise<Recipe> {
+    ): Promise<RecipeDTO> {
         return await apiRequestWrapper.post({
             url: '/recipe',
             data: recipe,

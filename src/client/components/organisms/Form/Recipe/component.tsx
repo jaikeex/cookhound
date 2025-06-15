@@ -46,7 +46,7 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({
     const handleImageChange = useCallback(
         (file: File) => {
             const imageUrl = URL.createObjectURL(file);
-            onChange && onChange('image_url', imageUrl);
+            onChange && onChange('imageUrl', imageUrl);
         },
         [onChange]
     );
@@ -105,6 +105,7 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({
 
             <div className={'grid grid-cols-2 gap-4'}>
                 <TextInput
+                    className={'mt-auto'}
                     id={'recipe-portion_size'}
                     label={t('app.recipe.servings')}
                     name={'portion_size'}

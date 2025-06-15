@@ -4,13 +4,19 @@ import React, { useCallback, useState } from 'react';
 import type { RecipeFormErrors } from '@/client/components';
 import { RecipeForm } from '@/client/components';
 
-import type { RecipeForCreate, Ingredient, Recipe } from '@/common/types';
-import { useLocale, useSnackbar } from '@/client/store';
+import type {
+    RecipeForCreatePayload,
+    Ingredient,
+    RecipeDTO,
+    UserDTO
+} from '@/common/types';
+import { useAuth, useLocale, useSnackbar } from '@/client/store';
 import { DesktopRecipeViewTemplate } from '@/client/components/templates/Recipe/View/Desktop';
 import apiClient from '@/client/request';
 import {
     fileToByteArray,
     generateRandomId,
+    lowerCaseFirstLetter,
     validateFormData
 } from '@/client/utils';
 import type { ObjectSchema } from 'yup';
@@ -33,13 +39,13 @@ type RecipeForCreateFormData = {
     instructions: string[];
 };
 
-const createRecipePlaceholder = (t: (key: I18nMessage) => string): Recipe => ({
-    id: 1,
+const createRecipePlaceholder = (
+    t: (key: I18nMessage) => string,
+    user: UserDTO | null
+): RecipeDTO => ({
+    id: 0,
+    rating: null,
     language: 'en',
-    rating: 0,
-    authorId: 1000,
-    createdAt: '2021-09-01T00:00:00Z',
-    updatedAt: '2021-09-01T00:00:00Z',
     imageUrl: '/img/recipe-placeholder.png',
     title: t('app.recipe.title'),
     difficulty: 'easy',
@@ -47,7 +53,8 @@ const createRecipePlaceholder = (t: (key: I18nMessage) => string): Recipe => ({
     time: null,
     notes: null,
     ingredients: [],
-    instructions: []
+    instructions: [],
+    authorId: user?.id || 0
 });
 
 export const createRecipeSchema: ObjectSchema<RecipeForCreateFormData> = object(
@@ -80,10 +87,11 @@ export const DesktopRecipeCreate: React.FC<DesktopRecipeCreateProps> = ({
     const { alert } = useSnackbar();
     const { push } = useRouter();
     const { t } = useLocale();
+    const { user } = useAuth();
     const [formErrors, setFormErrors] = useState<RecipeFormErrors>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [recipeForDisplay, setRecipeForDisplay] = useState<Recipe>(
-        createRecipePlaceholder(t)
+    const [recipeForDisplay, setRecipeForDisplay] = useState<RecipeDTO>(
+        createRecipePlaceholder(t, user)
     );
 
     const handleSubmit = useCallback(
@@ -121,7 +129,7 @@ export const DesktopRecipeCreate: React.FC<DesktopRecipeCreateProps> = ({
                     formData.imageUrl = imageUrl;
                 }
 
-                const recipeForCreate: RecipeForCreate = {
+                const recipeForCreate: RecipeForCreatePayload = {
                     ...formData,
                     language: locale
                 };
@@ -129,6 +137,7 @@ export const DesktopRecipeCreate: React.FC<DesktopRecipeCreateProps> = ({
                 const createdRecipe =
                     await apiClient.recipe.createRecipe(recipeForCreate);
 
+                console.log('_________________________');
                 console.log(createdRecipe);
 
                 alert({
@@ -151,9 +160,18 @@ export const DesktopRecipeCreate: React.FC<DesktopRecipeCreateProps> = ({
     );
 
     const handleFormChange = useCallback((name: string, value: any) => {
+        let newValue: any = value;
+
+        if (name === 'ingredients' && value) {
+            newValue = value.map((ingredient: Ingredient) => ({
+                ...ingredient,
+                name: lowerCaseFirstLetter(ingredient.name)
+            }));
+        }
+
         setRecipeForDisplay((prev) => ({
             ...prev,
-            [name]: value
+            [name]: newValue
         }));
     }, []);
 
@@ -205,17 +223,21 @@ async function extractFormData(
     );
 
     const ingredients = ingredientKeys
-        .map((name) => {
-            const index = name.split('-')[2];
+        .map((key) => {
+            const index = key.split('-')[2];
+            const name =
+                data
+                    .get(`ingredient-name-${index}`)
+                    ?.toString()
+                    .toLowerCase()
+                    .trim() || '';
+
             return {
-                name: data.get(`ingredient-name-${index}`) as string,
-                quantity: data.get(`ingredient-quantity-${index}`) as string
+                name,
+                quantity: data.get(`ingredient-quantity-${index}`) || null
             };
         })
-        .filter(
-            (ingredient) =>
-                ingredient.name.length > 0 && ingredient.quantity.length > 0
-        );
+        .filter((ingredient) => ingredient?.name && ingredient.name.length > 0);
 
     // -------------------------------------------------------
 

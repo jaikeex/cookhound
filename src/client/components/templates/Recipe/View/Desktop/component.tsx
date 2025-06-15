@@ -1,5 +1,5 @@
 import React from 'react';
-import type { Recipe } from '@/common/types/recipe';
+import type { RecipeDTO } from '@/common/types/recipe';
 import {
     Divider,
     IngredientsListView,
@@ -14,7 +14,7 @@ import { useLocale } from '@/client/store';
 
 export type DesktopRecipeViewProps = Readonly<{
     className?: string;
-    recipe: Recipe;
+    recipe: RecipeDTO;
 }>;
 
 export const DesktopRecipeViewTemplate: React.FC<DesktopRecipeViewProps> = ({

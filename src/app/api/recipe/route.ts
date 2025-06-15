@@ -1,3 +1,4 @@
+import { recipeService } from '@/server/services/recipe/service';
 import { verifySessionWithRedirect } from '@/server/utils';
 
 /**
@@ -8,8 +9,12 @@ import { verifySessionWithRedirect } from '@/server/utils';
  * @returns A JSON response indicating the result of the creation operation.
  * @todo Implement the logic to create a new recipe.
  */
-export async function POST() {
+export async function POST(request: Request) {
     await verifySessionWithRedirect();
 
-    return Response.json({ message: 'Hello, world!' });
+    const payload = await request.json();
+
+    const recipe = await recipeService.createRecipe(payload);
+
+    return Response.json(recipe);
 }

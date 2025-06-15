@@ -15,8 +15,6 @@ export async function POST(request: NextRequest) {
 
     const data = await request.json();
 
-    console.log('data', data);
-
     await uploadRecipeImage(data.fileName, data.bytes);
 
     // Generate the public URL for the uploaded image

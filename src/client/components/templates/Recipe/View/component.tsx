@@ -3,11 +3,11 @@
 import React, { useEffect } from 'react';
 import { DesktopRecipeViewTemplate } from './Desktop';
 import { MobileRecipeViewTemplate } from './Mobile';
-import type { Recipe } from '@/common/types';
+import type { RecipeDTO } from '@/common/types';
 import { useIngredientSelectStore } from '@/client/store';
 
 export type RecipeViewProps = Readonly<{
-    recipe: Recipe;
+    recipe: RecipeDTO;
 }>;
 
 export const RecipeViewTemplate: React.FC<RecipeViewProps> = ({ recipe }) => {

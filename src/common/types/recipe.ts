@@ -1,8 +1,10 @@
-export type Recipe = {
+import type { Locale } from '@/client/locales';
+
+export type RecipeDTO = {
     id: number;
     title: string;
-    language: string;
     authorId: number;
+    language: Locale;
     time: number | null;
     difficulty: string;
     portionSize: number | null;
@@ -11,18 +13,16 @@ export type Recipe = {
     notes: string | null;
     imageUrl: string;
     rating: number | null;
-    createdAt: string;
-    updatedAt: string;
 };
 
 export type Ingredient = {
     id: number;
     name: string;
-    quantity: string;
+    quantity: string | null;
 };
 
-export type RecipeForCreate = {
-    language: string;
+export type RecipeForCreatePayload = {
+    language: Locale;
     title: string;
     instructions: string[];
     notes: string | null;
@@ -35,5 +35,5 @@ export type RecipeForCreate = {
 
 export type IngredientForCreate = {
     name: string;
-    quantity: string;
+    quantity: string | null;
 };

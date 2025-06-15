@@ -1,6 +1,7 @@
 export * from './form';
 export * from './img';
 export * from './locale';
+export * from './string';
 
 // other
 export * from './fileToByteArray';
