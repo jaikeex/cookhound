@@ -59,10 +59,7 @@ export const IngredientRowView: React.FC<IngredientRowViewProps> = ({
     }, [selected]);
 
     return (
-        <div
-            className={`flex items-center  ${checked ? '[&>p]:text-gray-500' : ''}`}
-            onClick={handleRowClick}
-        >
+        <div className={`flex items-center `} onClick={handleRowClick}>
             {/* DESKTOP view has the checkbox on the left side */}
             {/* ---------------------------------------------- */}
 
@@ -80,21 +77,28 @@ export const IngredientRowView: React.FC<IngredientRowViewProps> = ({
 
             {/* ---------------------------------------------- */}
 
-            <Typography variant={typographyVariant} className={`font-bold`}>
-                {ingredient.quantity}&#160;
-            </Typography>
-            <Typography variant={typographyVariant} className={'ml-3'}>
-                &#8208;
-            </Typography>
-            <Typography variant={typographyVariant} className={'ml-3'}>
-                {ingredient.name}
-            </Typography>
-
+            <div
+                className={`flex items-center ${checked ? '[&>p]:text-gray-500' : ''} justify-between w-full`}
+            >
+                <Typography variant={typographyVariant}>
+                    {ingredient.name}
+                </Typography>
+                {ingredient.quantity && ingredient.name ? (
+                    <React.Fragment>
+                        <Typography
+                            variant={typographyVariant}
+                            className={`font-bold`}
+                        >
+                            {ingredient.quantity}
+                        </Typography>
+                    </React.Fragment>
+                ) : null}
+            </div>
             {/* MOBILE view has the checkbox on the right side */}
             {/* ---------------------------------------------- */}
             {variant === 'mobile' ? (
                 <Checkbox
-                    className={`ml-auto`}
+                    className={`ml-3`}
                     color={'secondary'}
                     checked={checked}
                     // eslint-disable-next-line @typescript-eslint/no-empty-function

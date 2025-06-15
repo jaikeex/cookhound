@@ -41,6 +41,7 @@ export const DraggableInputRow: React.FC<DraggableInputRowProps> = ({
                     onPointerDown={handleDragStart}
                 />
                 <IconButton
+                    tabIndex={-1}
                     className={'min-w-5'}
                     icon={'close'}
                     size={12}
