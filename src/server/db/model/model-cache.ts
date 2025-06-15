@@ -1,4 +1,4 @@
-import { redisClient } from './redis';
+import { redisClient } from '@/server/db/redis';
 import { ENV_CONFIG_PRIVATE } from '@/common/constants';
 
 /**
@@ -17,12 +17,16 @@ export async function cachePrismaQuery<T>(
     fetchFn: () => Promise<T>,
     ttl: number = Number(ENV_CONFIG_PRIVATE.REDIS_TTL)
 ): Promise<T> {
+    const now = new Date();
+
     // Try to get data from cache
     const cachedData = await redisClient.get<T>(key);
 
     // If cache hit, return the cached data
     if (cachedData !== null) {
         console.log(`Cache hit for key: ${key}`);
+        const time = new Date().getTime() - now.getTime();
+        console.log(`Time taken to fetch data: ${time}ms`);
         return cachedData;
     }
 
@@ -32,6 +36,9 @@ export async function cachePrismaQuery<T>(
 
     // Store in cache
     await redisClient.set(key, data, ttl);
+
+    const time = new Date().getTime() - now.getTime();
+    console.log(`Time taken to fetch data: ${time}ms`);
 
     return data;
 }

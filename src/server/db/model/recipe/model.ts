@@ -1,4 +1,7 @@
-import { cachePrismaQuery, generateCacheKey } from '@/server/db/cache';
+import {
+    cachePrismaQuery,
+    generateCacheKey
+} from '@/server/db/model/model-cache';
 import prisma from '@/server/db/prisma';
 import type { Prisma, Recipe } from '@prisma/client';
 import { getRecipeById } from '@prisma/client/sql';

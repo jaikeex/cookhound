@@ -2,7 +2,7 @@ import {
     cachePrismaQuery,
     generateCacheKey,
     invalidateModelCache
-} from '@/server/db/cache';
+} from '@/server/db/model/model-cache';
 import prisma from '@/server/db/prisma';
 import type { Prisma, User } from '@prisma/client';
 
