@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useCallback, useEffect, useState } from 'react';
-import { BaseInput, DraggableInputRow } from '@/client/components';
+import { BaseTextarea, DraggableInputRow } from '@/client/components';
 
 type InstructionRowCreateProps = Readonly<{
     className?: string;
@@ -27,7 +27,7 @@ export const InstructionRowCreate: React.FC<InstructionRowCreateProps> = ({
     }, [index, onRemove]);
 
     const handleKeyPress = useCallback(
-        (e: React.KeyboardEvent<HTMLInputElement>) => {
+        (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
             if (e.key === 'Enter') {
                 e.preventDefault(); // Prevent form submission
                 onAddInstruction && onAddInstruction();
@@ -37,7 +37,7 @@ export const InstructionRowCreate: React.FC<InstructionRowCreateProps> = ({
     );
 
     const handleChange = useCallback(
-        (e: React.ChangeEvent<HTMLInputElement>) => {
+        (e: React.ChangeEvent<HTMLTextAreaElement>) => {
             setInstruction(e.target.value);
             onChange && onChange(e.target.value);
         },
@@ -56,7 +56,7 @@ export const InstructionRowCreate: React.FC<InstructionRowCreateProps> = ({
             className={className}
             onRemove={handleRemove}
         >
-            <BaseInput
+            <BaseTextarea
                 id={`instruction-${index}`}
                 name={`instruction-${index}`}
                 placeholder={index === 0 ? 'Předehřej troubu na 180°C' : ''}
