@@ -1,4 +1,4 @@
-import { verifySessionWithRedirect } from '@/server/utils';
+import { handleApiError } from '@/server/utils';
 import { uploadRecipeImage } from '@/server/services/google-api';
 import type { NextRequest } from 'next/server';
 import { ENV_CONFIG_PRIVATE } from '@/common/constants';
@@ -11,11 +11,13 @@ import { ENV_CONFIG_PRIVATE } from '@/common/constants';
  * @returns A JSON response with the uploaded file's object URL.
  */
 export async function POST(request: NextRequest) {
-    await verifySessionWithRedirect();
-
     const data = await request.json();
 
-    await uploadRecipeImage(data.fileName, data.bytes);
+    try {
+        await uploadRecipeImage(data.fileName, data.bytes);
+    } catch (error) {
+        return handleApiError(error);
+    }
 
     // Generate the public URL for the uploaded image
     const bucket = ENV_CONFIG_PRIVATE.GOOGLE_STORAGE_BUCKET_RECIPE_IMAGES;

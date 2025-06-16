@@ -1,7 +1,7 @@
 import type { NextRequest } from 'next/server';
 import { authService } from '@/server/services/auth/service';
 import { serialize } from 'cookie';
-import { handleApiError, verifyIsGuestWithRedirect } from '@/server/utils';
+import { handleApiError } from '@/server/utils';
 import { ENV_CONFIG_PUBLIC } from '@/common/constants/env';
 
 /**
@@ -20,8 +20,6 @@ import { ENV_CONFIG_PUBLIC } from '@/common/constants/env';
  * - 500: Internal Server Error, if there is another error during authentication.
  */
 export async function POST(request: NextRequest) {
-    await verifyIsGuestWithRedirect();
-
     const { email, password, keepLoggedIn } = await request.json();
 
     try {

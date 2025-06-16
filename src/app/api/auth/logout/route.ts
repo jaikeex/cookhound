@@ -1,5 +1,5 @@
 import { authService } from '@/server/services/auth/service';
-import { handleApiError, verifySessionWithRedirect } from '@/server/utils';
+import { handleApiError } from '@/server/utils';
 
 /**
  * Handles POST requests to `/auth/logout` to log out the current user.
@@ -13,8 +13,6 @@ import { handleApiError, verifySessionWithRedirect } from '@/server/utils';
  * - 500: Internal Server Error, if there is another error during logout.
  */
 export async function POST() {
-    await verifySessionWithRedirect();
-
     try {
         await authService.logout();
 

@@ -1,6 +1,6 @@
 import { userService } from '@/server/services';
 import type { NextRequest } from 'next/server';
-import { handleApiError, verifyIsGuest } from '@/server/utils';
+import { handleApiError } from '@/server/utils';
 
 /**
  * Handles GET requests to `/api/user` to fetch users.
@@ -26,15 +26,6 @@ export async function GET() {
  * - 500: Internal Server Error, if there is another error during user creation.
  */
 export async function POST(request: NextRequest) {
-    const isGuest = await verifyIsGuest();
-
-    if (!isGuest) {
-        return Response.json(
-            { message: 'auth.error.already-logged-in' },
-            { status: 403 }
-        );
-    }
-
     const body = await request.json();
 
     try {

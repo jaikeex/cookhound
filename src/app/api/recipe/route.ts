@@ -1,5 +1,7 @@
 import { recipeService } from '@/server/services/recipe/service';
-import { verifySessionWithRedirect } from '@/server/utils';
+import { handleApiError } from '@/server/utils';
+import { withRateLimit } from '@/server/utils/rate-limit/wrapper';
+import type { NextRequest } from 'next/server';
 
 /**
  * Handles POST requests to `/api/recipe` to create a new recipe.
@@ -9,12 +11,19 @@ import { verifySessionWithRedirect } from '@/server/utils';
  * @returns A JSON response indicating the result of the creation operation.
  * @todo Implement the logic to create a new recipe.
  */
-export async function POST(request: Request) {
-    await verifySessionWithRedirect();
-
+async function createRecipeHandler(request: NextRequest) {
     const payload = await request.json();
 
-    const recipe = await recipeService.createRecipe(payload);
+    try {
+        const recipe = await recipeService.createRecipe(payload);
 
-    return Response.json(recipe);
+        return Response.json(recipe);
+    } catch (error) {
+        return handleApiError(error);
+    }
 }
+
+export const POST = withRateLimit(createRecipeHandler, {
+    maxRequests: 20,
+    windowSizeInSeconds: 600
+});

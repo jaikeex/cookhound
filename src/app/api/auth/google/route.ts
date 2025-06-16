@@ -1,7 +1,7 @@
 import type { NextRequest } from 'next/server';
 import { authService } from '@/server/services/auth/service';
 import { serialize } from 'cookie';
-import { handleApiError, verifyIsGuestWithRedirect } from '@/server/utils';
+import { handleApiError } from '@/server/utils';
 
 /**
  * Handles POST requests to `/auth/google` to authenticate a user using Google OAuth.
@@ -19,9 +19,8 @@ import { handleApiError, verifyIsGuestWithRedirect } from '@/server/utils';
  * - 500: Internal Server Error, if there is an error during authentication.
  */
 export async function POST(request: NextRequest) {
-    await verifyIsGuestWithRedirect();
-
     const { code } = await request.json();
+
     try {
         const response = await authService.loginWithGoogleOauth({ code });
 
