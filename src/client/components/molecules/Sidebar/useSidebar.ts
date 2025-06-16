@@ -59,6 +59,10 @@ export const useSidebar = (config: SidebarConfig = {}) => {
 
     const isOpeningRef = useRef(false);
 
+    //? There must be a better way to work arount this...
+    //TODO: FIND A BETTER SOLUTION
+    const lastPathnameRef: React.RefObject<string | null> = useRef(null);
+
     const { isMobile } = useScreenSize();
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -125,11 +129,20 @@ export const useSidebar = (config: SidebarConfig = {}) => {
     // ------------------------------------------------------------------------
 
     const handleParamsChange = useCallback(() => {
-        if (searchParams.get(paramKey) && !isSidebarOpen) {
+        if (
+            // This should fire ONLY when the user navigates through the routes with the sidebar open.
+            // The pathname check ensures this, without it the handler would execute on every request,
+            // which, for some reason, also includes the user role verification check from the middleware.
+            //?I want the stuff the nextjs team is smoking...
+            searchParams.get(paramKey) &&
+            !isSidebarOpen &&
+            lastPathnameRef.current !== window.location.pathname
+        ) {
             // Remove the sidebar param from history
             // This prevents unwanted sidebar opening when navigating back from other pages.
             const currentUrl = new URL(window.location.href);
             currentUrl.searchParams.delete(paramKey);
+
             const cleanUrl = currentUrl.pathname + (currentUrl.search || '');
             router.replace(cleanUrl);
         } else if (!searchParams.get(paramKey) && isSidebarOpen) {
@@ -138,6 +151,14 @@ export const useSidebar = (config: SidebarConfig = {}) => {
             // (2) the user clicks the back/forward button with the sidebar open
             // In both cases, the sidebar is closed
             closeSidebar();
+        }
+
+        if (
+            typeof window !== 'undefined' &&
+            lastPathnameRef.current !== window.location.pathname
+        ) {
+            lastPathnameRef.current = window.location.pathname;
+            return;
         }
     }, [closeSidebar, isSidebarOpen, router, searchParams, paramKey]);
 
@@ -161,6 +182,10 @@ export const useSidebar = (config: SidebarConfig = {}) => {
         if (isOpeningRef.current) return;
 
         if (!searchParams.get(paramKey)) closeSidebar();
+
+        if (typeof window !== 'undefined') {
+            lastPathnameRef.current = window.location.pathname;
+        }
     }, [closeSidebar, searchParams, paramKey]);
 
     // Only set up pathname listener if enabled
