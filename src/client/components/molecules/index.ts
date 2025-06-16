@@ -4,7 +4,7 @@ export * from './IngredientRow';
 export * from './InstructionRow';
 export * from './Instructions';
 export * from './List';
-export * from './Navigation';
+export * from './Popup';
 export * from './Rating';
 export * from './RecipeInfo';
 export * from './Snackbar';

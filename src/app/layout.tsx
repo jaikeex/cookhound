@@ -4,7 +4,7 @@ import { Kalam, Open_Sans } from 'next/font/google';
 import '@/client/globals.css';
 import { LocaleProvider, AuthProvider, SnackbarProvider } from '@/client/store';
 import { ThemeProvider } from 'next-themes';
-import { BottomNavigation, Navbar, TopNavigation } from '@/client/components';
+import { BottomNavigation, TopNavigation } from '@/client/components';
 import { locales } from '@/client/locales';
 import classnames from 'classnames';
 // import { cookies, headers } from 'next/headers';
@@ -52,9 +52,7 @@ export default async function RootLayout({
                         <AuthProvider>
                             <SnackbarProvider>
                                 <div className="fixed top-0 h-screen overflow-y-auto page-background typography-base">
-                                    <Suspense
-                                        fallback={<Navbar avatarSrc={null} />}
-                                    >
+                                    <Suspense fallback={<TopNavigation />}>
                                         <TopNavigation />
                                     </Suspense>
                                     <div
