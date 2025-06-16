@@ -1,4 +1,8 @@
 import { recipeService } from '@/server/services/recipe/service';
+import type { NextRequest } from 'next/server';
+import { redirect } from 'next/navigation';
+import { HttpError } from '@/common/errors/HttpError';
+import { handleApiError } from '@/server/utils';
 
 /**
  * Handles GET requests to `/api/recipe/{id}` to fetch a specific recipe.
@@ -6,7 +10,7 @@ import { recipeService } from '@/server/services/recipe/service';
  * @returns A JSON response with the recipe data.
  * @todo Implement the logic to fetch a recipe by its ID.
  */
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
     const url = new URL(request.url);
     const id = url.pathname.split('/').pop();
 
@@ -17,11 +21,19 @@ export async function GET(request: Request) {
         );
     }
 
-    const recipe = await recipeService.getRecipeById(Number(id));
+    try {
+        const recipe = await recipeService.getRecipeById(Number(id));
 
-    if (!recipe) {
-        return Response.json({ error: 'Recipe not found' }, { status: 404 });
+        if (!recipe) {
+            return redirect('/not-found');
+        }
+
+        return Response.json(recipe);
+    } catch (error) {
+        if (error instanceof HttpError && error.status === 404) {
+            return redirect('/not-found');
+        }
+
+        return handleApiError(error);
     }
-
-    return Response.json(recipe);
 }

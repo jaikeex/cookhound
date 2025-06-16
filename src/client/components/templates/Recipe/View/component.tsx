@@ -1,17 +1,19 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { use, useEffect } from 'react';
 import { DesktopRecipeViewTemplate } from './Desktop';
 import { MobileRecipeViewTemplate } from './Mobile';
 import type { RecipeDTO } from '@/common/types';
 import { useIngredientSelectStore } from '@/client/store';
 
 export type RecipeViewProps = Readonly<{
-    recipe: RecipeDTO;
+    recipe: Promise<RecipeDTO>;
 }>;
 
 export const RecipeViewTemplate: React.FC<RecipeViewProps> = ({ recipe }) => {
     const { resetSelectedIngredients } = useIngredientSelectStore();
+
+    const recipeResolved = use(recipe);
 
     /**
      * Reset selected ingredients when recipe changes
@@ -23,9 +25,12 @@ export const RecipeViewTemplate: React.FC<RecipeViewProps> = ({ recipe }) => {
 
     return (
         <React.Fragment>
-            <MobileRecipeViewTemplate recipe={recipe} className={'md:hidden'} />
+            <MobileRecipeViewTemplate
+                recipe={recipeResolved}
+                className={'md:hidden'}
+            />
             <DesktopRecipeViewTemplate
-                recipe={recipe}
+                recipe={recipeResolved}
                 className={'hidden md:block'}
             />
         </React.Fragment>
