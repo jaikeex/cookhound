@@ -1,10 +1,8 @@
-import React, { Suspense } from 'react';
+import React from 'react';
 import apiClient from '@/client/request';
-import {
-    RecipeViewTemplate,
-    DesktopRecipeViewSkeleton,
-    MobileRecipeViewSkeleton
-} from '@/client/components';
+import { RecipeViewTemplate } from '@/client/components';
+import { cookies } from 'next/headers';
+import { JWT_COOKIE_NAME } from '@/common/constants';
 
 type RecipePageParams = {
     readonly params: Promise<
@@ -14,38 +12,21 @@ type RecipePageParams = {
     >;
 };
 
-type RecipeLoaderProps = Readonly<{
-    recipeId: string;
-}>;
-
-async function RecipeLoader({ recipeId }: RecipeLoaderProps) {
-    const recipe = await apiClient.recipe.getRecipeById(recipeId, {
-        revalidate: 3600
-    });
-
-    return <RecipeViewTemplate recipe={recipe} />;
-}
-
-function RecipeViewSkeleton() {
-    return (
-        <>
-            <div className="hidden md:block">
-                <DesktopRecipeViewSkeleton />
-            </div>
-            <div className="block md:hidden">
-                <MobileRecipeViewSkeleton />
-            </div>
-        </>
-    );
-}
-
 export default async function Page({ params }: RecipePageParams) {
     const paramsResolved = await params;
     const recipeId = paramsResolved.id;
 
-    return (
-        <Suspense fallback={<RecipeViewSkeleton />}>
-            <RecipeLoader recipeId={recipeId} />
-        </Suspense>
-    );
+    const cookieStore = await cookies();
+    const token = cookieStore.get(JWT_COOKIE_NAME);
+
+    const recipe = apiClient.recipe.getRecipeById(recipeId, {
+        revalidate: 3600,
+        ...(token && {
+            headers: {
+                Cookie: `${JWT_COOKIE_NAME}=${token?.value}`
+            }
+        })
+    });
+
+    return <RecipeViewTemplate recipe={recipe} />;
 }

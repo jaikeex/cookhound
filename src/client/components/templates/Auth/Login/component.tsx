@@ -20,7 +20,9 @@ import type { I18nMessage } from '@/client/locales';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
-export type LoginTemplateProps = NonNullable<unknown>;
+export type LoginTemplateProps = Readonly<{
+    callbackUrl?: string;
+}>;
 
 export const loginSchema: ObjectSchema<UserForLogin> = object({
     email: string()
@@ -30,7 +32,9 @@ export const loginSchema: ObjectSchema<UserForLogin> = object({
     keepLoggedIn: boolean().required('auth.error.keep-logged-in-required')
 });
 
-export const LoginTemplate: React.FC<LoginTemplateProps> = () => {
+export const LoginTemplate: React.FC<LoginTemplateProps> = ({
+    callbackUrl
+}) => {
     const formRef = React.useRef<HTMLFormElement>(null);
 
     const [formErrors, setFormErrors] = useState<LoginFormErrors>({});
@@ -50,9 +54,9 @@ export const LoginTemplate: React.FC<LoginTemplateProps> = () => {
 
             alert({ message: t('auth.success.login'), variant: 'success' });
             formRef.current?.reset();
-            router.push('/');
+            router.push(callbackUrl ?? '/');
         },
-        [alert, router, setUser, t]
+        [alert, callbackUrl, router, setUser, t]
     );
 
     // Custom hook to handle Google sign-in.

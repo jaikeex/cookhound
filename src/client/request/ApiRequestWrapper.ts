@@ -1,6 +1,5 @@
 import { RequestError } from '@/client/error';
 import { ENV_CONFIG_PUBLIC } from '@/common/constants';
-import { Logger } from '@/common/logger/console/logger';
 import { redirect } from 'next/navigation';
 
 /**
@@ -23,8 +22,6 @@ export type RequestConfig = {
     /** Optional custom headers for the request. */
     headers?: HeadersInit;
 };
-
-const logger = new Logger('ApiService');
 
 /**
  * A singleton service class which provides methods to perform HTTP requests using the fetch API.
@@ -142,8 +139,7 @@ class ApiRequestWrapper {
     ): Promise<R> {
         let data: any;
         const headers = new Headers({
-            'Content-Type': 'application/json',
-            ...config.headers
+            'Content-Type': 'application/json'
         }) as HeadersInit;
 
         const options: RequestInit = {
@@ -154,7 +150,10 @@ class ApiRequestWrapper {
         };
 
         if (config.next) {
-            options.next = config.next;
+            const { headers, ...next } = config.next;
+
+            options.next = next;
+            options.headers = headers;
         }
 
         if (config.data && (method === 'POST' || method === 'PUT')) {
@@ -192,7 +191,12 @@ class ApiRequestWrapper {
         }
 
         if (!response.ok && !isRedirect) {
-            logger.error('API %O', response.status, data);
+            console.log('API %O', response.status, data);
+
+            if (response.status === 429 && typeof window !== 'undefined') {
+                window.location.href = '/error/too-many-requests';
+            }
+
             throw RequestError.fromFetchError(response, data);
         }
 
