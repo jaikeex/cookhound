@@ -38,7 +38,7 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = () => {
                 position={'top'}
             >
                 <Link
-                    href={'/'}
+                    href={'/recipe/create'}
                     tabIndex={isLoggedin ? 0 : -1}
                     className={classnames(!isLoggedin && 'link-disabled')}
                 >

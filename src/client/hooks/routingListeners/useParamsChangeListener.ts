@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 
 type UseParamsChangeListenerArgs = {
     onChange?: () => void;
-    key?: string;
+    key: string;
 };
 
 type UseParamsChangeListenerType = (
@@ -15,7 +15,7 @@ export const useParamsChangeListener: UseParamsChangeListenerType = ({
     key
 }) => {
     const params = useSearchParams();
-    const tracker = key ? params.get(key) : params.toString();
+    const tracker = params.get(key);
 
     useEffect(() => {
         onChange && onChange();

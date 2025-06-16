@@ -7,6 +7,7 @@ export * from './List';
 export * from './Popup';
 export * from './Rating';
 export * from './RecipeInfo';
+export * from './Sidebar';
 export * from './Snackbar';
 export * from './Switch';
 export * from './Tabs';

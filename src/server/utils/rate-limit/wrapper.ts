@@ -48,8 +48,9 @@ export function withRateLimit(
         if (!result.allowed) {
             const response = options.onRateLimitExceeded
                 ? options.onRateLimitExceeded(req)
-                : NextResponse.redirect(
-                      new URL('/error/too-many-requests', req.url)
+                : NextResponse.json(
+                      { error: 'Too many requests' },
+                      { status: 429 }
                   );
 
             return response;
