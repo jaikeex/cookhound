@@ -1,4 +1,4 @@
-import { loadServiceAccount } from '@/server/gsa/gsaStore';
+import { loadServiceAccount } from './gsa/gsaStore';
 import { TokenManager } from './tokenManager';
 import type { ServiceAccount, ServiceAccountIdentifier } from './types';
 

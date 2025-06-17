@@ -1,4 +1,4 @@
-import type { ServiceAccount as GsaServiceAccount } from '@/server/gsa/gsaStore';
+import type { ServiceAccount as GsaServiceAccount } from './gsa/gsaStore';
 
 export type ServiceAccount = GsaServiceAccount;
 
