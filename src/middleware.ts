@@ -10,9 +10,9 @@ export async function middleware(request: NextRequest) {
     let response = NextResponse.next();
 
     try {
-        //?--------------------------------------------------------------
-        // All middleware code goes here. Modify the response as needed.
-        //?--------------------------------------------------------------
+        //?--------------------------------------------------------------?//
+        //  All middleware code goes here. Modify the response as needed. //
+        //?--------------------------------------------------------------?//
 
         /**
          * Add middleware steps in order. Every step must return either a NextResponse, null or
@@ -31,6 +31,15 @@ export async function middleware(request: NextRequest) {
     } catch (error) {
         if (error instanceof MiddlewareError && error?.response) {
             response = error.response;
+        } else {
+            /**
+             * Unexpected errors from the middleware steps functions are handled here.
+             * No special info needed here, just a generic error message will suffice.
+             */
+            response = NextResponse.json(
+                { message: 'Internal Server Error' },
+                { status: 500 }
+            );
         }
     }
 

@@ -53,6 +53,7 @@
     "app.general.anonymous": "Nejste přihlášeni",
     "app.general.check-inbox": "Pokud neobdržíte e-mail do několika málo minut, zkontrolujte prosím složku s nevyžádanou poštou. Pokud nenajdete e-mail ani tam, zkuste odeslat email znovu.",
     "app.general.dark-mode": "Tmavý režim",
+    "app.general.home": "Domů",
     "app.general.upload-image": "Klikněte nebo přetáhněte obrázek",
     "app.general.register-to-create-recipe": "Pouze registrovaní uživatelé mohou vytvářet recepty",
     "app.recipe.title": "Název receptu",

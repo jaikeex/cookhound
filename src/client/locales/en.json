@@ -53,6 +53,7 @@
     "app.general.anonymous": "You are not logged in",
     "app.general.check-inbox": "If you don't receive an email within a few minutes, please check your spam folder. If you still can't find the email, please try sending it again.",
     "app.general.dark-mode": "Dark mode",
+    "app.general.home": "Home",
     "app.general.upload-image": "Click to upload or drag and drop",
     "app.general.register-to-create-recipe": "Only registered users can create recipes",
     "app.recipe.title": "Recipe title",
