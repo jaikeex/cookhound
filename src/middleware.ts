@@ -19,19 +19,18 @@ export async function middleware(request: NextRequest) {
          * throw a MiddlewareError.
          *
          * The contract here is as follows:
-         *  (1) If the step function throws an instance of Middleware error with provided
-         *      callback function which returns a NextResponse, the middleware execution is
-         *      stopped immediately and the callback response is used.
+         *  (1) If the step function throws an instance of MiddlewareError with provided
+         *      response, the middleware execution is stopped immediately and the response is used.
          *  (2) If the step function returns a NextResponse, that response is saved, overwriting
          *      any previously saved response and will be used unless some other step function
          *      down the ladder overwrites it.
-         *  (3) If the function return null, the middleware continues without modifying the response.
+         *  (3) If the function returns null, the middleware continues without modifying the response.
          */
 
         response = (await verifyRouteAccess(request)) ?? response;
     } catch (error) {
-        if (error instanceof MiddlewareError && error?.callback) {
-            response = error.callback();
+        if (error instanceof MiddlewareError && error?.response) {
+            response = error.response;
         }
     }
 

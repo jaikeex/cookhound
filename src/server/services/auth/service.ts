@@ -8,7 +8,11 @@ import bcrypt from 'bcrypt';
 import { HttpError } from '@/common/errors/HttpError';
 import { createToken, verifyToken } from '@/server/utils/jwt';
 import { cookies } from 'next/headers';
-import { ENV_CONFIG_PRIVATE, ENV_CONFIG_PUBLIC } from '@/common/constants';
+import {
+    ENV_CONFIG_PRIVATE,
+    ENV_CONFIG_PUBLIC,
+    JWT_COOKIE_NAME
+} from '@/common/constants';
 import { userService } from '@/server/services/user/service';
 import db from '@/server/db/model';
 
@@ -88,7 +92,7 @@ class AuthService {
      */
     async getCurrentUser(): Promise<UserDTO> {
         const cookieStore = await cookies();
-        const token = cookieStore.get('jwt')?.value;
+        const token = cookieStore?.get(JWT_COOKIE_NAME)?.value;
 
         if (!token) {
             throw new HttpError('auth.error.unauthorized', 401);

@@ -1,6 +1,7 @@
 import { userService } from '@/server/services';
 import type { NextRequest } from 'next/server';
-import { handleApiError } from '@/server/utils';
+import { handleApiError, verifyIsGuest } from '@/server/utils';
+import { HttpError } from '@/common/errors/HttpError';
 
 /**
  * Handles GET requests to `/api/user` to fetch users.
@@ -26,9 +27,14 @@ export async function GET() {
  * - 500: Internal Server Error, if there is another error during user creation.
  */
 export async function POST(request: NextRequest) {
-    const body = await request.json();
-
     try {
+        const body = await request.json();
+
+        // Check if the user is already logged in.
+        if (!(await verifyIsGuest())) {
+            throw new HttpError('auth.error.user-already-logged-in', 400);
+        }
+
         const user = await userService.createUser(body);
         return Response.json({ user });
     } catch (error: any) {

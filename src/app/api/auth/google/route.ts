@@ -1,7 +1,8 @@
 import type { NextRequest } from 'next/server';
 import { authService } from '@/server/services/auth/service';
 import { serialize } from 'cookie';
-import { handleApiError } from '@/server/utils';
+import { handleApiError, verifyIsGuest } from '@/server/utils';
+import { HttpError } from '@/common/errors/HttpError';
 
 /**
  * Handles POST requests to `/auth/google` to authenticate a user using Google OAuth.
@@ -19,9 +20,14 @@ import { handleApiError } from '@/server/utils';
  * - 500: Internal Server Error, if there is an error during authentication.
  */
 export async function POST(request: NextRequest) {
-    const { code } = await request.json();
-
     try {
+        // Check if the user is already logged in.
+        if (!(await verifyIsGuest())) {
+            throw new HttpError('auth.error.user-already-logged-in', 400);
+        }
+
+        const { code } = await request.json();
+
         const response = await authService.loginWithGoogleOauth({ code });
 
         const cookie = serialize('jwt', response.token, {

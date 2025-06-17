@@ -9,7 +9,7 @@ import {
 import { MiddlewareError } from '@/server/error';
 
 /**
- ** These functions should be used on the client side and in the middleware.
+ ** These functions should only be used on the client side and in the middleware.
  **
  ** Using them on the server is inefficient and unnecessary, since the server can use all the
  ** necessary tools directly. The same can't be done in the middleware, since node.js packages
@@ -34,36 +34,39 @@ function getRouteConfig(pathname: string) {
 }
 
 function redirectToRoot() {
-    throw new MiddlewareError('Already logged in', () => {
-        return NextResponse.redirect(new URL('/', ENV_CONFIG_PUBLIC.ORIGIN));
-    });
+    throw new MiddlewareError(
+        'Already logged in',
+        NextResponse.redirect(new URL('/', ENV_CONFIG_PUBLIC.ORIGIN))
+    );
 }
 
 function redirectToRestricted() {
-    throw new MiddlewareError('Unauthorized', () => {
-        return NextResponse.redirect(
+    throw new MiddlewareError(
+        'Unauthorized',
+        NextResponse.redirect(
             new URL(`/auth/restricted`, ENV_CONFIG_PUBLIC.ORIGIN)
-        );
-    });
+        )
+    );
 }
 
 function redirectToRestrictedWithLogin(pathname: string) {
-    throw new MiddlewareError('Unauthorized', () => {
-        const params = new URLSearchParams();
-        params.set('anonymous', 'true');
-        params.set('target', pathname);
+    const params = new URLSearchParams();
+    params.set('anonymous', 'true');
+    params.set('target', pathname);
 
-        return NextResponse.redirect(
+    throw new MiddlewareError(
+        'Unauthorized',
+        NextResponse.redirect(
             new URL(
                 `/auth/restricted?${params.toString()}`,
                 ENV_CONFIG_PUBLIC.ORIGIN
             )
-        );
-    });
+        )
+    );
 }
 
 // ***************************************************************************************** //
-// ?                                  MIDDLEWARE FUNCTIONS                                 ? //
+// ?                                  MIDDLEWARE FUNCTION                                  ? //
 // ***************************************************************************************** //
 
 /**
@@ -72,16 +75,10 @@ function redirectToRestrictedWithLogin(pathname: string) {
  *!This is a middleware function. It should not be called from any other context.
  *
  * @param request - The request object.
- * @returns promise that resolves to a NextResponse object.
+ * @returns promise that resolves to a NextResponse object or null.
  *
- * @throws MiddlewareError (redirect to '/auth/login') if the user is not authorized to access the route.
- * @throws MiddlewareError if the user is not logged in and the route is protected.
- * @throws MiddlewareError if the user is logged in and the route is protected
- *                           but they don't have the required role.
- * @throws MiddlewareError if the user is logged in and the route is protected
- *                           and they have the required role.
- * @throws MiddlewareError if the user is logged in and the route is protected
- *                           and they have the required role.
+ * @throws MiddlewareError (redirect to '/auth/restricted') If some of the checks fail.
+ * @returns null if the checks pass.
  */
 export const verifyRouteAccess: MiddlewareStepFunction = async (request) => {
     const { pathname } = request.nextUrl;
@@ -107,7 +104,7 @@ export const verifyRouteAccess: MiddlewareStepFunction = async (request) => {
 
     // If the route is for guests only, let them in.
     if (!session && routeConfig.roles === null) {
-        return NextResponse.next();
+        return null;
     }
 
     let user: UserDTO;

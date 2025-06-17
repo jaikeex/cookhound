@@ -1,11 +1,11 @@
-import { NextResponse } from 'next/server';
+import type { NextResponse } from 'next/server';
 
 export class MiddlewareError extends Error {
-    callback: () => NextResponse;
+    response: NextResponse;
 
-    constructor(message: string, callback?: () => NextResponse) {
+    constructor(message: string, response: NextResponse) {
         super(message);
         this.name = 'MiddlewareError';
-        this.callback = callback ?? (() => NextResponse.next());
+        this.response = response;
     }
 }

@@ -6,8 +6,8 @@ import { UserRole } from '@/common/types';
 import db from '@/server/db/model';
 
 //!--------------------------------------------------------------------------------!//
-//*               THESE FUNCTIONS ARE CURRENTLY NOT USED ANYWHERE                  *//
-//*           THEY ARE KEPT HERE FOR REFERENCE AND POSSIBLE FUTURE USE             *//
+//*      ONLY verifySession() and verifyIsGuest() ARE CURRENTY IN ACTIVE USE       *//
+//*  THE REST IS KEPT HERE FOR REFERENCE AND LIKE WON'T BE NEEDED IN THE FUTURE    *//
 //!--------------------------------------------------------------------------------!//
 
 /**
@@ -66,8 +66,6 @@ export const verifySession = async (): Promise<boolean> => {
 
 export const verifyIsGuestWithRedirect = async (): Promise<boolean> => {
     const session = (await cookies()).get(JWT_COOKIE_NAME)?.value;
-
-    console.log('session', session);
 
     if (!session) {
         return true;

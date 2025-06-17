@@ -4,8 +4,6 @@ import { handleApiError } from '@/server/utils';
 /**
  * Handles POST requests to `/auth/logout` to log out the current user.
  *
- * ! This endpoint is restricted and only accessible to authenticated users.
- *
  * @returns A JSON response with a success message on success, or an error
  * response on failure.
  *

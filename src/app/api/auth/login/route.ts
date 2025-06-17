@@ -1,8 +1,9 @@
 import type { NextRequest } from 'next/server';
 import { authService } from '@/server/services/auth/service';
 import { serialize } from 'cookie';
-import { handleApiError } from '@/server/utils';
+import { handleApiError, verifyIsGuest } from '@/server/utils';
 import { ENV_CONFIG_PUBLIC } from '@/common/constants/env';
+import { HttpError } from '@/common/errors/HttpError';
 
 /**
  * Handles POST requests to `/auth/login` to authenticate a user with email and password.
@@ -20,9 +21,14 @@ import { ENV_CONFIG_PUBLIC } from '@/common/constants/env';
  * - 500: Internal Server Error, if there is another error during authentication.
  */
 export async function POST(request: NextRequest) {
-    const { email, password, keepLoggedIn } = await request.json();
-
     try {
+        const { email, password, keepLoggedIn } = await request.json();
+
+        // Check if the user is already logged in.
+        if (!(await verifyIsGuest())) {
+            throw new HttpError('auth.error.user-already-logged-in', 400);
+        }
+
         const response = await authService.login({
             email,
             password,
