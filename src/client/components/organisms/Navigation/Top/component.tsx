@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
     Avatar,
     ButtonBase,
@@ -13,7 +13,6 @@ import {
 } from '@/client/components';
 import Link from 'next/link';
 import { useAuth, useLocale } from '@/client/store';
-import { useSidebar } from '@/client/components/molecules/Sidebar/useSidebar';
 import { Sidebar } from '@/client/components/molecules/Sidebar';
 import { NavMenu } from './Menu';
 
@@ -23,15 +22,14 @@ export const TopNavigation: React.FC<TopNavigationProps> = () => {
     const { t } = useLocale();
     const { authResolved, user } = useAuth();
 
+    const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
+
     const isLoggedin = authResolved && !!user;
     const avatarSrc = user ? (user.avatarUrl ?? 'default') : 'anonymous';
 
-    const { contentRef, toggleSidebar, ...rest } = useSidebar({
-        paramKey: 'menu',
-        useMobileParams: true,
-        closeOnPathnameChange: true,
-        enableOutsideClick: true
-    });
+    const handleOpenSidebar = useCallback(() => setIsSidebarOpen(true), []);
+
+    const handleCloseSidebar = useCallback(() => setIsSidebarOpen(false), []);
 
     const handleSearchClick = useCallback(() => {}, []);
 
@@ -56,7 +54,7 @@ export const TopNavigation: React.FC<TopNavigationProps> = () => {
                 />
 
                 <button
-                    onClick={toggleSidebar}
+                    onClick={handleOpenSidebar}
                     className="flex items-center justify-center w-10 h-12"
                 >
                     <Avatar src={avatarSrc || 'anonymous'} size="md" />
@@ -126,8 +124,14 @@ export const TopNavigation: React.FC<TopNavigationProps> = () => {
             {/* ----------- MOBILE USER MENU ---------- */}
             {/* --------------------------------------- */}
 
-            <Sidebar {...rest} className="w-9/12 min-w-72">
-                <NavMenu ref={contentRef} user={user} />
+            <Sidebar
+                isOpen={isSidebarOpen}
+                onClose={handleCloseSidebar}
+                paramKey="menu"
+                position="right"
+                className="w-9/12 min-w-72"
+            >
+                <NavMenu user={user} />
             </Sidebar>
         </div>
     );

@@ -1,6 +1,10 @@
 import BellIcon from './bell.svg';
 import BookIcon from './book.svg';
 import CheckmarkIcon from './checkmark.svg';
+import ChevronDoubleUpIcon from './chevron-double-up.svg';
+import ChevronDoubleDownIcon from './chevron-double-down.svg';
+import ChevronDoubleLeftIcon from './chevron-double-left.svg';
+import ChevronDoubleRightIcon from './chevron-double-right.svg';
 import CloseIcon from './close.svg';
 import DragIcon from './drag.svg';
 import ErrorIcon from './error.svg';
@@ -20,6 +24,10 @@ export const basicSvg = {
     BellIcon,
     BookIcon,
     CheckmarkIcon,
+    ChevronDoubleUpIcon,
+    ChevronDoubleDownIcon,
+    ChevronDoubleLeftIcon,
+    ChevronDoubleRightIcon,
     CloseIcon,
     DragIcon,
     ErrorIcon,

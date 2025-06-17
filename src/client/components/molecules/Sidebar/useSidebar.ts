@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState, useRef, useLayoutEffect } from 'react';
+import { useCallback, useState, useRef, useEffect } from 'react';
 import {
     useOutsideClick,
     useParamsChangeListener,
@@ -51,13 +51,52 @@ export const useSidebar = (config: SidebarConfig = {}) => {
         useMobileParams = true
     } = config;
 
+    // ***************************************************************************************** //
+    // ?                                          STATE                                        ? //
+    // ***************************************************************************************** //
+
+    // ----------------------------------------------------------------------------------------- //
+    //                                       CORE STATE DATA                                     //
+    // ----------------------------------------------------------------------------------------- //
+
+    // Reflects the current open/closed state of the sidebar. This is the only absolute truth.
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+    // Styles that need to be added to their matching components in the caller component.
     const [backdropClass, setBackdropClass] = useState(backdropAnimations.show);
     const [containerClassName, setContainerClassName] = useState(
         getContainerClassName(sidebarAnimations, isSidebarOpen)
     );
 
+    /**
+     * These refs serve as a method to lock the sidebar toggle from being called multiple times
+     * while the opening/closing is in progress.
+     */
     const isOpeningRef = useRef(false);
+    const isClosingRef = useRef(false);
+
+    // ----------------------------------------------------------------------------------------- //
+    //                                            HANDLE                                         //
+    // ----------------------------------------------------------------------------------------- //
+
+    // This value is used by the sidebar handle to help sync the animation between it and the sidebar.
+    // Technically holds the same info as isSidebarOpen state, but this updates immediately when the
+    // toggling process begins.
+    const [isAnimatingOpen, setIsAnimatingOpen] = useState(false);
+    const [sidebarDimensions, setSidebarDimensions] = useState({
+        width: 480,
+        height: 200
+    });
+
+    const resizeObserverRef = useRef<ResizeObserver | null>(null);
+
+    // ----------------------------------------------------------------------------------------- //
+    //                                            ROUTING                                        //
+    // ----------------------------------------------------------------------------------------- //
+
+    /**
+     * These are values used for handling any url related activity.
+     */
 
     //? There must be a better way to work arount this...
     //TODO: FIND A BETTER SOLUTION
@@ -67,12 +106,26 @@ export const useSidebar = (config: SidebarConfig = {}) => {
     const router = useRouter();
     const searchParams = useSearchParams();
 
-    // ------------------------------------------------------------------------
-    // ----------------------- IsSidebarOpen STATE HANDLERS -------------------
-    // ------------------------------------------------------------------------
+    // ***************************************************************************************** //
+    // ?                                OPENING/CLOSING HANDLERS                               ? //
+    // ***************************************************************************************** //
 
-    const setIsSidebarOpenWithAnimation = useCallback(
+    /**
+     * These functions together handle the core logic of opening/closing the sidebar.
+     *
+     * They need to manage everything including the isSidebarOpen state, styles and animations.
+     * The process uses ref-based locking mechanism to prevent any conflicting invocations.
+     * (Should not be necessary when calling things correctly all the time but fuck me...)
+     *
+     ** Only the toggleSidebar() handler should be called directly to switch the sidebar state.
+     ** All other functions should be considered private to this 'section' for all intents and purposes
+     */
+
+    const toggleSidebarWithAnimation = useCallback(
         (open: boolean) => {
+            // Set animation state immediately for handle
+            setIsAnimatingOpen(open);
+
             // Timeout for the state change is needed to prevent flickering when closing the sidebar, since the animation
             // is not instant. The time is purposefully set to 10 ms less than the animation duration to ensure
             // the state change happens before the animation ends and starts the second time.
@@ -88,45 +141,79 @@ export const useSidebar = (config: SidebarConfig = {}) => {
         [isMobile, sidebarAnimations, backdropAnimations]
     );
 
-    const closeSidebar = useCallback(
-        () => setIsSidebarOpenWithAnimation(false),
-        [setIsSidebarOpenWithAnimation]
-    );
+    const closeSidebar = useCallback(() => {
+        isClosingRef.current = true;
+        toggleSidebarWithAnimation(false);
 
-    const openSidebar = useCallback(
-        () => setIsSidebarOpenWithAnimation(true),
-        [setIsSidebarOpenWithAnimation]
-    );
+        setTimeout(() => {
+            isClosingRef.current = false;
+        }, 200);
 
+        // If the sidebar was opened on mobile, go back to the previous page when it's closed
+        // The condition is needed to prevent the page from going back multiple times when the
+        // user clicks outside the sidebar multiple times
+        //
+        //? This unfortunately seems like the best place to put it. If called from the url
+        //? management functions then multiple cases would be left out...
+        //TODO: Can this be solved in some other way?
+        if (!useMobileParams || !searchParams.get(paramKey) || !isMobile)
+            return;
+
+        router.back();
+    }, [
+        toggleSidebarWithAnimation,
+        useMobileParams,
+        searchParams,
+        isMobile,
+        router,
+        paramKey
+    ]);
+
+    const openSidebar = useCallback(() => {
+        isOpeningRef.current = true;
+        toggleSidebarWithAnimation(true);
+        setTimeout(() => {
+            isOpeningRef.current = false;
+        }, 200);
+    }, [toggleSidebarWithAnimation]);
+
+    /**
+     * Toggles the state of the sidebar.
+     *
+     *!This is the ONLY function that should be used for switching the state inside this hook or exported.
+     */
     const toggleSidebar = useCallback(() => {
+        if (isOpeningRef.current || isClosingRef.current) return;
+
         if (isSidebarOpen) closeSidebar();
         else {
-            isOpeningRef.current = true;
-
             openSidebar();
 
             // On mobile screens, the sidebar is opened with a query parameter to facilitate the back/forward navigation
             if (useMobileParams && isMobile) {
-                router.push(`?${paramKey}=true`);
+                const params = new URLSearchParams(searchParams);
+                params.set(paramKey, 'true');
+                router.push(`?${params.toString()}`);
             }
-
-            setTimeout(() => {
-                isOpeningRef.current = false;
-            }, 100);
         }
     }, [
-        closeSidebar,
         isSidebarOpen,
-        isMobile,
+        closeSidebar,
         openSidebar,
-        router,
+        useMobileParams,
+        isMobile,
+        searchParams,
         paramKey,
-        useMobileParams
+        router
     ]);
 
-    // ------------------------------------------------------------------------
-    // -------------------- SEARCH PARAMS CHANGE LISTENER ---------------------
-    // ------------------------------------------------------------------------
+    // ***************************************************************************************** //
+    // ?                             PARAMS and PATHNAME LISTENERS                             ? //
+    // ***************************************************************************************** //
+
+    // ----------------------------------------------------------------------------------------- //
+    //                                            PARAMS                                         //
+    // ----------------------------------------------------------------------------------------- //
 
     const handleParamsChange = useCallback(() => {
         if (
@@ -150,7 +237,7 @@ export const useSidebar = (config: SidebarConfig = {}) => {
             // (1) the user opens a link from inside the sidebar
             // (2) the user clicks the back/forward button with the sidebar open
             // In both cases, the sidebar is closed
-            closeSidebar();
+            toggleSidebar();
         }
 
         if (
@@ -160,7 +247,7 @@ export const useSidebar = (config: SidebarConfig = {}) => {
             lastPathnameRef.current = window.location.pathname;
             return;
         }
-    }, [closeSidebar, isSidebarOpen, router, searchParams, paramKey]);
+    }, [searchParams, paramKey, isSidebarOpen, router, toggleSidebar]);
 
     // Only set up params listener if mobile params are enabled
     useParamsChangeListener({
@@ -168,9 +255,9 @@ export const useSidebar = (config: SidebarConfig = {}) => {
         onChange: useMobileParams ? handleParamsChange : undefined
     });
 
-    // ------------------------------------------------------------------------
-    // ----------------------- PATHNAME CHANGE LISTENER -----------------------
-    // ------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------- //
+    //                                           PATHNAME                                        //
+    // ----------------------------------------------------------------------------------------- //
 
     const handlePathnameChange = useCallback(() => {
         // Close the sidebar when the user navigates to a different page directly from the sidebar.
@@ -179,60 +266,81 @@ export const useSidebar = (config: SidebarConfig = {}) => {
         // On mobile screens this serves as redundancy.
 
         // Don't close if we're currently in the process of opening the sidebar
-        if (isOpeningRef.current) return;
+        if (isOpeningRef.current || isClosingRef.current) return;
 
-        if (!searchParams.get(paramKey)) closeSidebar();
+        if (!searchParams.get(paramKey) && isSidebarOpen) toggleSidebar();
 
         if (typeof window !== 'undefined') {
             lastPathnameRef.current = window.location.pathname;
         }
-    }, [closeSidebar, searchParams, paramKey]);
+    }, [searchParams, paramKey, isSidebarOpen, toggleSidebar]);
 
     // Only set up pathname listener if enabled
     usePathnameChangeListener({
         onChange: closeOnPathnameChange ? handlePathnameChange : undefined
     });
 
-    // ------------------------------------------------------------------------
-    // ----------------------- OUTSIDE CLICK LISTENER -------------------------
-    // ------------------------------------------------------------------------
-
-    const handleOutsideClick = useCallback(() => {
-        closeSidebar();
-
-        // If the sidebar was opened on mobile, go back to the previous page when it's closed
-        // The condition is needed to prevent the page from going back multiple times when the
-        // user clicks outside the sidebar multiple times
-        if (!useMobileParams || !searchParams.get(paramKey) || !isMobile)
-            return;
-        router.back();
-    }, [
-        closeSidebar,
-        isMobile,
-        router,
-        searchParams,
-        paramKey,
-        useMobileParams
-    ]);
-
-    useLayoutEffect(() => {
-        setContainerClassName(
-            getContainerClassName(sidebarAnimations, isSidebarOpen)
-        );
-    }, [isSidebarOpen, sidebarAnimations]);
+    // ***************************************************************************************** //
+    // ?                                 OUTSIDE CLICK LISTENER                                ? //
+    // ***************************************************************************************** //
 
     const contentRef = useOutsideClick<HTMLDivElement>(
-        enableOutsideClick ? handleOutsideClick : () => {}
+        enableOutsideClick ? toggleSidebar : () => {}
     );
+
+    // ***************************************************************************************** //
+    // ?                               SIDEBAR DIMENSION TRACKING                              ? //
+    // ***************************************************************************************** //
+
+    const handleResize: ResizeObserverCallback = useCallback((entries) => {
+        for (const entry of entries) {
+            const { width, height } = entry.contentRect;
+            setSidebarDimensions({
+                // plus padding
+                width: width + 64,
+                height: height + 128
+            });
+        }
+    }, []);
+
+    //? This might be a good candidate for abstracting into a hook.
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            resizeObserverRef.current = new ResizeObserver(handleResize);
+        }
+
+        return () => {
+            if (resizeObserverRef.current) {
+                resizeObserverRef.current.disconnect();
+            }
+        };
+    }, [handleResize]);
+
+    useEffect(() => {
+        const element = contentRef.current;
+        if (element && resizeObserverRef.current) {
+            resizeObserverRef.current.observe(element);
+
+            return () => {
+                if (resizeObserverRef.current && element) {
+                    resizeObserverRef.current.unobserve(element);
+                }
+            };
+        }
+    }, [contentRef, isSidebarOpen]);
+
+    // ***************************************************************************************** //
+    // ?                                        RETURN                                         ? //
+    // ***************************************************************************************** //
 
     return {
         isSidebarOpen,
+        isAnimatingOpen,
         containerClassName,
         backdropClass,
         contentRef,
         toggleSidebar,
-        openSidebar,
-        closeSidebar
+        sidebarDimensions
     };
 };
 
