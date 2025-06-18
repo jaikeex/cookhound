@@ -19,7 +19,7 @@ export const RestrictedTemplate: React.FC<RestrictedTemplateProps> = ({
     return (
         <div className="flex flex-col items-center min-h-screen pt-10 text-center">
             <Typography variant="heading-lg" className="mb-4">
-                You are not authorized to access this page.
+                {t('app.error.restricted')}
             </Typography>
 
             {anonymous ? (
@@ -28,8 +28,7 @@ export const RestrictedTemplate: React.FC<RestrictedTemplateProps> = ({
                         variant="body"
                         className="mb-6 text-gray-700 dark:text-gray-300"
                     >
-                        This page is for registered users only. Please login to
-                        continue.
+                        {t('app.error.restricted.description')}
                     </Typography>
                     <LoginTemplate callbackUrl={target} />
                 </>
@@ -39,8 +38,7 @@ export const RestrictedTemplate: React.FC<RestrictedTemplateProps> = ({
                         variant="body"
                         className="mb-6 text-gray-700 dark:text-gray-300"
                     >
-                        Please contact the administrator if you believe this is
-                        an error.
+                        {t('app.error.restricted.contact-admin')}
                     </Typography>
                     <Link href={'/'} className="mx-auto">
                         <ButtonBase className="mx-auto w-52" color="primary">

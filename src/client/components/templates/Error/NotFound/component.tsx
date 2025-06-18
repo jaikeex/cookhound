@@ -13,13 +13,13 @@ export const NotFoundTemplate: React.FC<NotFoundTemplateProps> = () => {
     return (
         <div className="flex flex-col items-center min-h-screen pt-10 text-center">
             <Typography variant="heading-lg" className="mb-4">
-                Page not found
+                {t('app.error.not-found')}
             </Typography>
             <Typography
                 variant="body"
                 className="mb-6 text-gray-700 dark:text-gray-300"
             >
-                The content you are looking for does not exist.
+                {t('app.error.not-found.description')}
             </Typography>
             <Link href={'/'} className="mx-auto">
                 <ButtonBase className="mx-auto w-52" color="primary">

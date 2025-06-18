@@ -15,13 +15,13 @@ export const TooManyRequestsTemplate: React.FC<
     return (
         <div className="flex flex-col items-center min-h-screen pt-10 text-center">
             <Typography variant="heading-lg" className="mb-4">
-                Too Many Requests
+                {t('app.error.too-many-requests')}
             </Typography>
             <Typography
                 variant="body"
                 className="mb-6 text-gray-700 dark:text-gray-300"
             >
-                You are doing this too often. Please try again later.
+                {t('app.error.too-many-requests.description')}
             </Typography>
             <Link href={'/'} className="mx-auto">
                 <ButtonBase className="mx-auto w-52" color="primary">

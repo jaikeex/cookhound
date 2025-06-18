@@ -1,11 +1,13 @@
 'use client';
 
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import apiClient from '@/client/request';
 import { ButtonWithCooldown, Typography } from '@/client/components';
+import { useLocale } from '@/client/store';
 
 export const VerifyEmailTemplate: React.FC = () => {
-    const [error, setError] = React.useState<string | null>(null);
+    const [error, setError] = useState<string | null>(null);
+    const { t } = useLocale();
 
     const resendVerificationEmail = useCallback(async () => {
         const email = new URLSearchParams(window.location.search).get('email');
@@ -20,22 +22,15 @@ export const VerifyEmailTemplate: React.FC = () => {
 
     return (
         <div className="w-full max-w-md mx-auto text-center space-y-8 flex items-center flex-col">
-            <Typography>
-                Thank you for registering! We&apos;ve sent a verification email
-                to the address you provided. Please check your email and click
-                on the verification link to activate your account.
-            </Typography>
+            <Typography>{t('auth.register.success.title')}</Typography>
 
-            <Typography>
-                If you haven&apos;t received the email, please check your spam
-                folder. You can also click the button below to resend the email.
-            </Typography>
+            <Typography>{t('auth.register.success.description')}</Typography>
 
             <ButtonWithCooldown
                 cooldown={60000}
                 onClick={resendVerificationEmail}
             >
-                Resend Email
+                {t('app.general.resend-email')}
             </ButtonWithCooldown>
 
             {error && <p>{error}</p>}
