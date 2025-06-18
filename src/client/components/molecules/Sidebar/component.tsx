@@ -10,9 +10,10 @@ type SidebarProps = Readonly<{
     className?: string;
     closeOnPathnameChange?: boolean;
     enableOutsideClick?: boolean;
-    isOpen: boolean;
+    hidden?: boolean;
+    isOpen?: boolean;
     label?: string;
-    onClose: () => void;
+    onClose?: () => void;
     paramKey?: string;
     position?: 'left' | 'right' | 'top' | 'bottom';
     useMobileParams?: boolean;
@@ -32,6 +33,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     className,
     closeOnPathnameChange = true,
     enableOutsideClick = true,
+    hidden = false,
     isOpen,
     label,
     onClose,
@@ -68,7 +70,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         if (!isSidebarOpen && onClose) onClose();
     }, [isSidebarOpen, onClose]);
 
-    return (
+    return hidden ? null : (
         <React.Fragment>
             {withHandle ? (
                 <SidebarHandle
@@ -77,6 +79,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     position={position}
                     sidebarDimensions={sidebarDimensions}
                     label={label}
+                    className={hidden ? 'hidden' : ''}
                 />
             ) : null}
             {isSidebarOpen ? (

@@ -3,6 +3,7 @@
 import React, { useMemo } from 'react';
 import classNames from 'classnames';
 import { Icon, Typography } from '@/client/components/atoms';
+import { useCheckScrollExistence } from '@/client/hooks';
 
 type SidebarHandleProps = Readonly<{
     className?: string;
@@ -29,13 +30,23 @@ export const SidebarHandle: React.FC<SidebarHandleProps> = ({
     sidebarDimensions,
     label = 'SIDEBAR'
 }) => {
+    const {
+        doesScrollbarExist,
+        scrollbarWidth,
+        topNavbarHeight,
+        bottomNavbarHeight
+    } = useCheckScrollExistence();
+
     const styles = useMemo(() => {
         switch (position) {
             case 'right':
                 return {
                     right: '0px',
                     top: '50%',
-                    marginRight: '20px',
+                    marginRight:
+                        doesScrollbarExist && !isOpen
+                            ? scrollbarWidth + 20
+                            : 20,
                     transformOrigin: 'right center',
                     transition: 'transform 0.3s ease-in-out',
                     transform: isOpen
@@ -46,7 +57,10 @@ export const SidebarHandle: React.FC<SidebarHandleProps> = ({
                 return {
                     left: '0px',
                     top: '50%',
-                    marginLeft: '20px',
+                    marginLeft:
+                        doesScrollbarExist && !isOpen
+                            ? scrollbarWidth + 20
+                            : 20,
                     transformOrigin: 'left center',
                     transition: 'transform 0.3s ease-in-out',
                     transform: isOpen
@@ -55,9 +69,9 @@ export const SidebarHandle: React.FC<SidebarHandleProps> = ({
                 };
             case 'top':
                 return {
-                    top: '0px',
+                    top: isOpen ? 0 : topNavbarHeight,
                     left: '50%',
-                    marginTop: '20px',
+                    marginTop: 20,
                     transformOrigin: 'center top',
                     transition: 'transform 0.3s ease-in-out',
                     transform: isOpen
@@ -66,9 +80,9 @@ export const SidebarHandle: React.FC<SidebarHandleProps> = ({
                 };
             case 'bottom':
                 return {
-                    bottom: '0px',
+                    bottom: isOpen ? 0 : bottomNavbarHeight,
                     left: '50%',
-                    marginBottom: '20px',
+                    marginBottom: 20,
                     transformOrigin: 'center bottom',
                     transition: 'transform 0.3s ease-in-out',
                     transform: isOpen
@@ -76,12 +90,21 @@ export const SidebarHandle: React.FC<SidebarHandleProps> = ({
                         : 'translateX(-50%) translateY(0px)'
                 };
         }
-    }, [isOpen, sidebarDimensions, position]);
+    }, [
+        position,
+        doesScrollbarExist,
+        isOpen,
+        scrollbarWidth,
+        sidebarDimensions.width,
+        sidebarDimensions.height,
+        topNavbarHeight,
+        bottomNavbarHeight
+    ]);
 
     return (
         <div
             className={classNames(
-                ' w-0 h-0 z-50 transition-all duration-300 ease-in-out fixed cursor-pointer',
+                ' w-0 h-0 z-40 transition-all duration-300 ease-in-out fixed cursor-pointer',
                 'flex items-center justify-center',
                 className
             )}
