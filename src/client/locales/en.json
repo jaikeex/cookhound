@@ -73,5 +73,6 @@
     "app.error.invalid-image-format": "Please upload a valid image file",
     "app.error.image-size-too-large": "Image is too large. Please upload an image that is less than {{maxSize}}MB",
     "app.error.image-dimensions-too-large": "Image dimensions are too large. Please upload an image that is less than {{maxWidth}}x{{maxHeight}} px",
-    "app.error.image-upload-failed": "Failed to upload image"
+    "app.error.image-upload-failed": "Failed to upload image",
+    "recipe.error.not-found": "Recipe not found"
 }

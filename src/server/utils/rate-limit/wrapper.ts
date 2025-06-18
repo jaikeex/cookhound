@@ -94,7 +94,10 @@ function getAppRouterClientIdentifier(req: NextRequest): string {
     }
 
     if (ip === 'unknown') {
-        throw new Error('Could not determine client IP address');
+        //TODO: I don't really know what happens here, since the error thrown here
+        //TODO: would not be caught by the handler, and it is not straightforward
+        //TODO: to test this...
+        throw new Error('app.error.default');
     }
 
     return `${ip.trim()}:${path}`;

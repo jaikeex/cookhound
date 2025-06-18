@@ -60,7 +60,7 @@ class GoogleApiService {
         for (const field of requiredFields) {
             if (!serviceAccount[field as keyof ServiceAccount]) {
                 throw new Error(
-                    `Missing required service account field: ${field}`
+                    `Missing required google service account field: ${field}`
                 );
             }
         }
@@ -79,7 +79,7 @@ class GoogleApiService {
         const manager = this.tokenManagers[service];
         if (!manager) {
             throw new Error(
-                `Service account ${service} not initialized or configured.`
+                `Google service account ${service} not initialized or configured.`
             );
         }
         return manager.getAccessToken();

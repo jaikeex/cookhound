@@ -115,7 +115,7 @@ export class TokenManager {
             }
         }
 
-        throw new Error('Failed to fetch access token');
+        throw new Error('Failed to fetch google api access token');
     }
 
     private async makeTokenRequest(jwt: string): Promise<Response> {
@@ -132,7 +132,9 @@ export class TokenManager {
 
         if (!response.ok) {
             const errorText = await response.text();
-            throw new Error(`Failed to fetch access token: ${errorText}`);
+            throw new Error(
+                `Failed to fetch google api access token: ${errorText}`
+            );
         }
 
         return response;

@@ -14,11 +14,11 @@ class RecipeService {
         const recipe = await db.recipe.getOneById(id);
 
         if (!recipe) {
-            throw new ServerError('Recipe not found', 404);
+            throw new ServerError('recipe.error.not-found', 404);
         }
 
         if (!recipe.id || !recipe.authorId || !recipe.title) {
-            throw new ServerError('Recipe not found', 404);
+            throw new ServerError('recipe.error.not-found', 404);
         }
 
         const recipeDTO: RecipeDTO = {

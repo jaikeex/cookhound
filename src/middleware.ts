@@ -35,6 +35,7 @@ export async function middleware(request: NextRequest) {
             /**
              * Unexpected errors from the middleware steps functions are handled here.
              * No special info needed here, just a generic error message will suffice.
+             * Also, no translation necessary.
              */
             response = NextResponse.json(
                 { message: 'Internal Server Error' },

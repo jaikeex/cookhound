@@ -8,16 +8,24 @@ import type { NextRequest } from 'next/server';
  * @returns A JSON response indicating whether the revalidation was successful.
  */
 export async function GET(request: NextRequest) {
-    const path = request.nextUrl.searchParams.get('path');
+    try {
+        const path = request.nextUrl.searchParams.get('path');
 
-    if (path) {
-        revalidatePath(path);
-        return Response.json({ revalidated: true, now: Date.now() });
+        if (path) {
+            revalidatePath(path);
+            return Response.json({ revalidated: true, now: Date.now() });
+        }
+
+        return Response.json({
+            revalidated: false,
+            now: Date.now(),
+            message: 'Missing path to revalidate'
+        });
+    } catch (error) {
+        return Response.json({
+            revalidated: false,
+            now: Date.now(),
+            message: 'Failed to revalidate path'
+        });
     }
-
-    return Response.json({
-        revalidated: false,
-        now: Date.now(),
-        message: 'Missing path to revalidate'
-    });
 }

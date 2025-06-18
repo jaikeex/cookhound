@@ -7,7 +7,7 @@ export const revalidateRouteCache = async (path: string) => {
     const response = await fetch(`/api/revalidate?path=${path}`);
 
     if (!response.ok) {
-        throw new Error('Failed to revalidate route cache');
+        console.error('Failed to revalidate route cache');
     }
 
     return response.json();
