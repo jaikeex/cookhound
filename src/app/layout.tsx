@@ -51,13 +51,17 @@ export default async function RootLayout({
                     >
                         <AuthProvider>
                             <SnackbarProvider>
-                                <div className="fixed top-0 h-screen overflow-y-auto page-background typography-base">
+                                <div
+                                    id="main-page"
+                                    className="fixed top-0 flex flex-col h-[100dvh] overflow-y-auto page-background typography-base"
+                                >
                                     <Suspense fallback={<TopNavigation />}>
                                         <TopNavigation />
                                     </Suspense>
                                     <div
+                                        id="main-content"
                                         className={classnames(
-                                            'pt-4 px-4 pb-24 md:pb-12 md:pt-12',
+                                            'pt-4 px-4 pb-16 md:pt-12 flex-1',
                                             'relative'
                                         )}
                                     >

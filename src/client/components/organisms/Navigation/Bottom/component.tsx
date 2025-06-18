@@ -16,8 +16,9 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = () => {
 
     return (
         <div
+            id="bottom-navbar"
             className={classnames(
-                `block md:hidden fixed bottom-0 right-0 left-0 h-14 px-2 py-4 bg-[#f0fdf4] dark:bg-[#021812]`,
+                `block md:hidden sticky bottom-0 left-0 h-14 px-2 py-4 bg-[#f0fdf4] dark:bg-[#021812]`,
                 `flex [&>*]:w-full items-center justify-between border-t border-gray-300 dark:border-gray-800`
             )}
         >
