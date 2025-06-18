@@ -1,5 +1,5 @@
 import { userService } from '@/server/services';
-import { handleApiError } from '@/server/utils';
+import { handleServerError } from '@/server/utils';
 import type { NextRequest } from 'next/server';
 
 /**
@@ -35,7 +35,7 @@ export async function PUT(request: NextRequest) {
     try {
         await userService.verifyEmail(token);
     } catch (error: any) {
-        return handleApiError(error);
+        return handleServerError(error);
     }
 
     return Response.json({ message: 'Email verified successfully' });

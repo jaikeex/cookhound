@@ -7,7 +7,7 @@ import {
 import bcrypt from 'bcrypt';
 import { v4 as uuid } from 'uuid';
 import { mailService } from '@/server/services';
-import { HttpError } from '@/common/errors/HttpError';
+import { ServerError } from '@/server/error';
 import { type UserForGoogleCreate, type UserForLocalCreate } from './types';
 import { createUserDTO } from './utils';
 import db from '@/server/db/model';
@@ -23,14 +23,14 @@ class UserService {
      *
      * @param payload - The data for creating a new user, including email, password, and username.
      * @returns A promise that resolves to the newly created user object.
-     * @throws {HttpError} Throws an error with status 400 if required fields are missing.
-     * @throws {HttpError} Throws an error with status 409 if email or username is already taken.
+     * @throws {ServerError} Throws an error with status 400 if required fields are missing.
+     * @throws {ServerError} Throws an error with status 409 if email or username is already taken.
      */
     async createUser(payload: UserForCreatePayload): Promise<UserDTO> {
         const { email, password, username } = payload;
 
         if (!email || !password || !username) {
-            throw new HttpError(
+            throw new ServerError(
                 'auth.error.email-password-username-required',
                 400
             );
@@ -47,11 +47,11 @@ class UserService {
         };
 
         if (!availability.email) {
-            throw new HttpError('auth.error.email-already-taken', 409);
+            throw new ServerError('auth.error.email-already-taken', 409);
         }
 
         if (!availability.username) {
-            throw new HttpError('auth.error.username-already-taken', 409);
+            throw new ServerError('auth.error.username-already-taken', 409);
         }
 
         const salt = await bcrypt.genSalt(10);
@@ -87,7 +87,7 @@ class UserService {
      *
      * @param payload - The data from Google, including email, username, and avatar URL.
      * @returns A promise that resolves to the newly created user object.
-     * @throws {HttpError} Throws an error if a user with the same email already exists.
+     * @throws {ServerError} Throws an error if a user with the same email already exists.
      */
     async createUserFromGoogle(
         payload: UserForGoogleCreatePayload
@@ -97,7 +97,7 @@ class UserService {
         const existingUser = await db.user.getOneByEmail(email);
 
         if (existingUser) {
-            throw new HttpError('auth.error.user-already-exists', 400);
+            throw new ServerError('auth.error.user-already-exists', 400);
         }
 
         const userForCreate: UserForGoogleCreate = {
@@ -121,23 +121,23 @@ class UserService {
      * Verifies a user's email address using a verification token.
      *
      * @param token - The email verification token.
-     * @throws {HttpError} Throws an error with status 400 if the token is missing.
-     * @throws {HttpError} Throws an error with status 404 if the user is not found.
-     * @throws {HttpError} Throws an error with status 403 if the email is already verified.
+     * @throws {ServerError} Throws an error with status 400 if the token is missing.
+     * @throws {ServerError} Throws an error with status 404 if the user is not found.
+     * @throws {ServerError} Throws an error with status 403 if the email is already verified.
      */
     async verifyEmail(token: string): Promise<void> {
         if (!token) {
-            throw new HttpError('auth.error.missing-token', 400);
+            throw new ServerError('auth.error.missing-token', 400);
         }
 
         const user = await db.user.getOneByEmailVerificationToken(token);
 
         if (!user) {
-            throw new HttpError('auth.error.user-not-found', 404);
+            throw new ServerError('auth.error.user-not-found', 404);
         }
 
         if (user.emailVerified) {
-            throw new HttpError('auth.error.email-already-verified', 403);
+            throw new ServerError('auth.error.email-already-verified', 403);
         }
 
         await db.user.updateOneById(user.id, {
@@ -151,21 +151,21 @@ class UserService {
      * It generates a new token and sends it to the user's email.
      *
      * @param email - The email address of the user.
-     * @throws {HttpError} Throws an error if the email is missing, user not found, or email is already verified.
+     * @throws {ServerError} Throws an error if the email is missing, user not found, or email is already verified.
      */
     async resendVerificationEmail(email: string): Promise<void> {
         if (!email) {
-            throw new HttpError('auth.error.email-required', 400);
+            throw new ServerError('auth.error.email-required', 400);
         }
 
         const user = await db.user.getOneByEmail(email);
 
         if (!user) {
-            throw new HttpError('auth.error.user-not-found', 404);
+            throw new ServerError('auth.error.user-not-found', 404);
         }
 
         if (user.emailVerified) {
-            throw new HttpError('auth.error.email-already-verified', 400);
+            throw new ServerError('auth.error.email-already-verified', 400);
         }
 
         const verificationToken = uuid();

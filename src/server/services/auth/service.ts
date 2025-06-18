@@ -5,7 +5,7 @@ import type {
     AuthCodePayload
 } from '@/common/types';
 import bcrypt from 'bcrypt';
-import { HttpError } from '@/common/errors/HttpError';
+import { ServerError } from '@/server/error';
 import { createToken, verifyToken } from '@/server/utils/jwt';
 import { cookies } from 'next/headers';
 import {
@@ -28,29 +28,29 @@ class AuthService {
      *
      * @param payload - The user's login credentials.
      * @returns A promise that resolves to an object containing the JWT and user data.
-     * @throws {HttpError} Throws an error with status 400 if email or password are not provided.
-     * @throws {HttpError} Throws an error with status 401 for invalid credentials.
-     * @throws {HttpError} Throws an error with status 403 if the user's email is not verified.
+     * @throws {ServerError} Throws an error with status 400 if email or password are not provided.
+     * @throws {ServerError} Throws an error with status 401 for invalid credentials.
+     * @throws {ServerError} Throws an error with status 403 if the user's email is not verified.
      */
     async login(payload: UserForLogin): Promise<AuthResponse> {
         const { email, password } = payload;
 
         if (!email) {
-            throw new HttpError('auth.error.email-required', 400);
+            throw new ServerError('auth.error.email-required', 400);
         }
 
         if (!password) {
-            throw new HttpError('auth.error.password-required', 400);
+            throw new ServerError('auth.error.password-required', 400);
         }
 
         const user = await db.user.getOneByEmail(email);
 
         if (!user || !user.passwordHash) {
-            throw new HttpError('auth.error.invalid-credentials', 401);
+            throw new ServerError('auth.error.invalid-credentials', 401);
         }
 
         if (!user.emailVerified) {
-            throw new HttpError('auth.error.email-not-verified', 403);
+            throw new ServerError('auth.error.email-not-verified', 403);
         }
 
         const isPasswordValid = await bcrypt.compare(
@@ -59,7 +59,7 @@ class AuthService {
         );
 
         if (!isPasswordValid) {
-            throw new HttpError('auth.error.invalid-credentials', 401);
+            throw new ServerError('auth.error.invalid-credentials', 401);
         }
 
         await db.user.updateOneById(user.id, { lastLogin: new Date() });
@@ -87,22 +87,22 @@ class AuthService {
      * Retrieves the currently authenticated user based on the JWT cookie.
      *
      * @returns A promise that resolves to the authenticated user's data.
-     * @throws {HttpError} Throws an error with status 401 if the user is not authenticated.
-     * @throws {HttpError} Throws an error with status 404 if the user is not found.
+     * @throws {ServerError} Throws an error with status 401 if the user is not authenticated.
+     * @throws {ServerError} Throws an error with status 404 if the user is not found.
      */
     async getCurrentUser(): Promise<UserDTO> {
         const cookieStore = await cookies();
         const token = cookieStore?.get(JWT_COOKIE_NAME)?.value;
 
         if (!token) {
-            throw new HttpError('auth.error.unauthorized', 401);
+            throw new ServerError('auth.error.unauthorized', 401);
         }
 
         const decoded = verifyToken(token);
         const user = await db.user.getOneById(Number(decoded.id));
 
         if (!user) {
-            throw new HttpError('auth.error.user-not-found', 404);
+            throw new ServerError('auth.error.user-not-found', 404);
         }
 
         return {
@@ -121,7 +121,7 @@ class AuthService {
      * Logs out the currently authenticated user by deleting the JWT cookie.
      *
      * @returns void.
-     * @throws {HttpError} Throws an error with status 500 if there is an error.
+     * @throws {ServerError} Throws an error with status 500 if there is an error.
      */
     async logout(): Promise<void> {
         const cookieStore = await cookies();
@@ -136,9 +136,9 @@ class AuthService {
      *
      * @param payload - The payload containing the Google OAuth authorization code.
      * @returns A promise that resolves to an object containing the JWT and user data.
-     * @throws {HttpError} Throws an error with status 400 if the Google OAuth code is missing.
-     * @throws {HttpError} Throws an error with status 401 if the access token is missing.
-     * @throws {HttpError} Throws an error with status 401 if the user info is missing.
+     * @throws {ServerError} Throws an error with status 400 if the Google OAuth code is missing.
+     * @throws {ServerError} Throws an error with status 401 if the access token is missing.
+     * @throws {ServerError} Throws an error with status 401 if the user info is missing.
      */
     async loginWithGoogleOauth(
         payload: AuthCodePayload
@@ -146,7 +146,7 @@ class AuthService {
         const { code } = payload;
 
         if (!code) {
-            throw new HttpError('auth.error.google-oauth-code-required', 400);
+            throw new ServerError('auth.error.google-oauth-code-required', 400);
         }
 
         const accessTokenParams = new URLSearchParams({
@@ -171,7 +171,7 @@ class AuthService {
         );
 
         if (!accessTokenResponse.ok) {
-            throw new HttpError('auth.error.failed-to-get-access-token', 401);
+            throw new ServerError('auth.error.failed-to-get-access-token', 401);
         }
 
         const accessTokenData = await accessTokenResponse.json();
@@ -187,7 +187,7 @@ class AuthService {
         );
 
         if (!userInfoResponse.ok) {
-            throw new HttpError('auth.error.failed-to-get-user-info', 401);
+            throw new ServerError('auth.error.failed-to-get-user-info', 401);
         }
 
         const userInfoData: UserFromGoogle = await userInfoResponse.json();

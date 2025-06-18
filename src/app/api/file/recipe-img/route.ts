@@ -1,9 +1,9 @@
-import { handleApiError, verifySession } from '@/server/utils';
+import { handleServerError, verifySession } from '@/server/utils';
 import { googleService } from '@/server/services/google-api/wrappers';
 import type { NextRequest } from 'next/server';
 import { ENV_CONFIG_PRIVATE } from '@/common/constants';
 import { withRateLimit } from '@/server/utils/rate-limit';
-import { HttpError } from '@/common/errors/HttpError';
+import { ServerError } from '@/server/error';
 
 /**
  * Handles POST requests to `/api/file/recipe-img` to upload a recipe image.
@@ -18,7 +18,7 @@ async function postHandler(request: NextRequest) {
 
         // Check if the user is authenticated.
         if (!(await verifySession())) {
-            throw new HttpError('auth.error.unauthorized', 401);
+            throw new ServerError('auth.error.unauthorized', 401);
         }
 
         await googleService.uploadRecipeImage(data.fileName, data.bytes);
@@ -29,7 +29,7 @@ async function postHandler(request: NextRequest) {
 
         return Response.json({ objectUrl });
     } catch (error) {
-        return handleApiError(error);
+        return handleServerError(error);
     }
 }
 

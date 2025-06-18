@@ -1,8 +1,8 @@
 import { recipeService } from '@/server/services/recipe/service';
 import type { NextRequest } from 'next/server';
 import { redirect } from 'next/navigation';
-import { HttpError } from '@/common/errors/HttpError';
-import { handleApiError } from '@/server/utils';
+import { ServerError } from '@/server/error';
+import { handleServerError } from '@/server/utils';
 
 /**
  * Handles GET requests to `/api/recipe/{id}` to fetch a specific recipe.
@@ -30,10 +30,10 @@ export async function GET(request: NextRequest) {
 
         return Response.json(recipe);
     } catch (error) {
-        if (error instanceof HttpError && error.status === 404) {
+        if (error instanceof ServerError && error.status === 404) {
             return redirect('/not-found');
         }
 
-        return handleApiError(error);
+        return handleServerError(error);
     }
 }

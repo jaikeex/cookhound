@@ -1,5 +1,5 @@
 import { authService } from '@/server/services/auth/service';
-import { handleApiError } from '@/server/utils';
+import { handleServerError } from '@/server/utils';
 
 /**
  * Handles GET requests to `/api/auth/current` to fetch the current user.
@@ -17,6 +17,6 @@ export async function GET() {
 
         return Response.json(user);
     } catch (error: any) {
-        return handleApiError(error);
+        return handleServerError(error);
     }
 }

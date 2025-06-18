@@ -1,5 +1,5 @@
 import { authService } from '@/server/services/auth/service';
-import { handleApiError } from '@/server/utils';
+import { handleServerError } from '@/server/utils';
 
 /**
  * Handles POST requests to `/auth/logout` to log out the current user.
@@ -16,6 +16,6 @@ export async function POST() {
 
         return Response.json({ message: 'Logged out successfully' });
     } catch (error: any) {
-        return handleApiError(error);
+        return handleServerError(error);
     }
 }

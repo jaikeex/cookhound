@@ -1,8 +1,8 @@
-import { HttpError } from '@/common/errors/HttpError';
 import { recipeService } from '@/server/services/recipe/service';
-import { handleApiError, verifySession } from '@/server/utils';
+import { handleServerError, verifySession } from '@/server/utils';
 import { withRateLimit } from '@/server/utils/rate-limit/wrapper';
 import type { NextRequest } from 'next/server';
+import { ServerError } from '@/server/error';
 
 /**
  * Handles POST requests to `/api/recipe` to create a new recipe.
@@ -17,14 +17,14 @@ async function createRecipeHandler(request: NextRequest) {
         const payload = await request.json();
 
         if (!(await verifySession())) {
-            throw new HttpError('auth.error.unauthorized', 401);
+            throw new ServerError('auth.error.unauthorized', 401);
         }
 
         const recipe = await recipeService.createRecipe(payload);
 
         return Response.json(recipe);
     } catch (error) {
-        return handleApiError(error);
+        return handleServerError(error);
     }
 }
 

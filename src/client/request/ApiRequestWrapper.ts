@@ -138,6 +138,11 @@ class ApiRequestWrapper {
         method: string
     ): Promise<R> {
         let data: any;
+
+        //?--------------------------------------------------------------?//
+        //                       REQUEST CONSTRUCTION                     //
+        //?--------------------------------------------------------------?//
+
         const headers = new Headers({
             'Content-Type': 'application/json'
         }) as HeadersInit;
@@ -167,37 +172,51 @@ class ApiRequestWrapper {
             );
         }
 
-        const response = await fetch(url.toString(), options);
+        //?--------------------------------------------------------------?//
+        //                        RESPONSE HANDLING                       //
+        //?--------------------------------------------------------------?//
 
-        const isRedirect = response.status === 307 || response.status === 302;
-
-        /**
-         * Redirects need to be handled manually on the server side. I blame the
-         * Next.js team for this.
-         */
-        if (isRedirect && typeof window === 'undefined') {
-            const redirectUrl = response.headers.get('location');
-            if (redirectUrl) {
-                const url = new URL(redirectUrl, this.API_URL);
-                const redirectPath = url.pathname + url.search;
-                redirect(redirectPath);
-            }
-        }
+        let response: Response | null = null;
 
         try {
-            data = await response.json();
-        } catch (err) {
-            data = null;
-        }
+            response = await fetch(url.toString(), options);
 
-        if (!response.ok && !isRedirect) {
-            console.log('API %O', response.status, data);
+            const isRedirect =
+                response.status === 307 || response.status === 302;
 
-            if (response.status === 429 && typeof window !== 'undefined') {
-                window.location.href = '/error/too-many-requests';
+            /**
+             * Redirects need to be handled manually on the server side. I blame the
+             * Next.js team for this.
+             *
+             * For clarification, the api client is NOT bound to the client side, it is called
+             * from the middleware as well in order to fetch stuff. But if done so, the redirects are fucked.
+             */
+            if (isRedirect && typeof window === 'undefined') {
+                const redirectUrl = response.headers.get('location');
+                if (redirectUrl) {
+                    const url = new URL(redirectUrl, this.API_URL);
+                    const redirectPath = url.pathname + url.search;
+                    redirect(redirectPath);
+                }
             }
 
-            throw RequestError.fromFetchError(response, data);
+            try {
+                data = await response.json();
+            } catch (err) {
+                data = null;
+            }
+
+            if (!response.ok && !isRedirect) {
+                console.log('API %O', response.status, data);
+
+                if (response.status === 429 && typeof window !== 'undefined') {
+                    window.location.href = '/error/too-many-requests';
+                }
+
+                throw RequestError.fromFetchError(data, response);
+            }
+        } catch {
+            throw RequestError.fromFetchError(data, response);
         }
 
         return data;

@@ -1,7 +1,7 @@
 import { userService } from '@/server/services';
 import type { NextRequest } from 'next/server';
-import { handleApiError, verifyIsGuest } from '@/server/utils';
-import { HttpError } from '@/common/errors/HttpError';
+import { handleServerError, verifyIsGuest } from '@/server/utils';
+import { ServerError } from '@/server/error';
 
 /**
  * Handles GET requests to `/api/user` to fetch users.
@@ -32,13 +32,13 @@ export async function POST(request: NextRequest) {
 
         // Check if the user is already logged in.
         if (!(await verifyIsGuest())) {
-            throw new HttpError('auth.error.user-already-logged-in', 400);
+            throw new ServerError('auth.error.user-already-logged-in', 400);
         }
 
         const user = await userService.createUser(body);
         return Response.json({ user });
     } catch (error: any) {
-        return handleApiError(error);
+        return handleServerError(error);
     }
 }
 

@@ -1,21 +1,15 @@
-import { HttpError } from '@/common/errors/HttpError';
-
 export class RequestError extends Error {
     constructor(
-        public status: number,
-        public message: string
+        public message: string,
+        public status: number
     ) {
         super(message);
     }
 
-    static fromFetchError(response: Response, error: any) {
-        if (error instanceof HttpError) {
-            return new RequestError(error.status, error.message);
-        }
-
+    static fromFetchError(error: any, response: Response | null) {
         return new RequestError(
-            response.status,
-            error?.message || response?.statusText || 'Something went wrong...'
+            error?.message || response?.statusText || 'app.error.default',
+            response?.status || 500
         );
     }
 }

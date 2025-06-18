@@ -7,18 +7,18 @@ import type { RecipeForCreate } from './types';
 import { authService } from '@/server/services/';
 import db from '@/server/db/model';
 import type { Locale } from '@/client/locales';
-import { HttpError } from '@/common/errors/HttpError';
+import { ServerError } from '@/server/error';
 
 class RecipeService {
     async getRecipeById(id: number): Promise<RecipeDTO> {
         const recipe = await db.recipe.getOneById(id);
 
         if (!recipe) {
-            throw new HttpError('Recipe not found', 404);
+            throw new ServerError('Recipe not found', 404);
         }
 
         if (!recipe.id || !recipe.authorId || !recipe.title) {
-            throw new HttpError('Recipe not found', 404);
+            throw new ServerError('Recipe not found', 404);
         }
 
         const recipeDTO: RecipeDTO = {

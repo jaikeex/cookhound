@@ -69,6 +69,7 @@
     "app.recipe.error.title-required": "Title is required",
     "app.recipe.error.ingredients-required": "Ingredients are required",
     "app.recipe.error.instructions-required": "Instructions are required",
+    "app.error.default": "Something went wrong...",
     "app.error.invalid-image-format": "Please upload a valid image file",
     "app.error.image-size-too-large": "Image is too large. Please upload an image that is less than {{maxSize}}MB",
     "app.error.image-dimensions-too-large": "Image dimensions are too large. Please upload an image that is less than {{maxWidth}}x{{maxHeight}} px",

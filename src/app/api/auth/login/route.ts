@@ -1,9 +1,9 @@
 import type { NextRequest } from 'next/server';
 import { authService } from '@/server/services/auth/service';
 import { serialize } from 'cookie';
-import { handleApiError, verifyIsGuest } from '@/server/utils';
+import { handleServerError, verifyIsGuest } from '@/server/utils';
 import { ENV_CONFIG_PUBLIC } from '@/common/constants/env';
-import { HttpError } from '@/common/errors/HttpError';
+import { ServerError } from '@/server/error';
 
 /**
  * Handles POST requests to `/auth/login` to authenticate a user with email and password.
@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
 
         // Check if the user is already logged in.
         if (!(await verifyIsGuest())) {
-            throw new HttpError('auth.error.user-already-logged-in', 400);
+            throw new ServerError('auth.error.user-already-logged-in', 400);
         }
 
         const response = await authService.login({
@@ -52,6 +52,6 @@ export async function POST(request: NextRequest) {
             }
         );
     } catch (error: any) {
-        return handleApiError(error);
+        return handleServerError(error);
     }
 }

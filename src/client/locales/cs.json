@@ -69,6 +69,7 @@
     "app.recipe.error.title-required": "Název receptu je povinný",
     "app.recipe.error.ingredients-required": "Ingredience jsou povinné",
     "app.recipe.error.instructions-required": "Postup je povinný",
+    "app.error.default": "Něco se pokazilo...",
     "app.error.invalid-image-format": "Soubor není obrázek",
     "app.error.image-size-too-large": "Obrázek je příliš velký. Maximální povolená velikost je {{maxSize}} MB.",
     "app.error.image-dimensions-too-large": "Obrázek je příliš velký. Maximální povolené rozměry jsou {{maxWidth}}x{{maxHeight}} px.",
