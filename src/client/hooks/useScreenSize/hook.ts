@@ -1,27 +1,26 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { BREAKPOINTS } from '@/common/constants';
+import { useEventListener } from '@/client/hooks';
 
 export const useScreenSize = () => {
     const [isMobile, setIsMobile] = useState(false);
     const [isTablet, setIsTablet] = useState(false);
     const [isDesktop, setIsDesktop] = useState(false);
 
-    useEffect(() => {
-        const handleResize = () => {
-            const width = window.innerWidth;
-            setIsMobile(width < 768);
-            setIsTablet(width >= 768 && width < 1280);
-            setIsDesktop(width >= 1280);
-        };
-
-        handleResize();
-        window.addEventListener('resize', handleResize);
-
-        return () => {
-            window.removeEventListener('resize', handleResize);
-        };
+    const handleResize = useCallback(() => {
+        const width = window.innerWidth;
+        setIsMobile(width < BREAKPOINTS.tablet);
+        setIsTablet(width >= BREAKPOINTS.tablet && width < BREAKPOINTS.desktop);
+        setIsDesktop(width >= BREAKPOINTS.desktop);
     }, []);
+
+    useEventListener('resize', handleResize);
+
+    useEffect(() => {
+        handleResize();
+    }, [handleResize]);
 
     return { isMobile, isTablet, isDesktop };
 };
