@@ -15,6 +15,7 @@ const AUTO_DISMISS = 4000;
 
 type SnackbarContextType = {
     alert: (a: AlertPayload) => void;
+    clearAlerts: () => void;
 };
 
 const SnackbarContext = createContext({} as SnackbarContextType);
@@ -60,14 +61,14 @@ export const SnackbarProvider: React.FC<SnackbarProviderProps> = ({
         }
     }, [activeAlertIds, activeAlerts]);
 
-    const alert = (alert: AlertPayload) => {
+    const alert = useCallback((alert: AlertPayload) => {
         const newAlert = {
             ...alert,
             id: makeId(5)
         };
 
         setActiveAlerts((alerts) => [newAlert, ...alerts]);
-    };
+    }, []);
 
     const removeAlert = useCallback(
         (id: string) => () => {
@@ -76,7 +77,11 @@ export const SnackbarProvider: React.FC<SnackbarProviderProps> = ({
         []
     );
 
-    const value = useMemo(() => ({ alert }), []);
+    const clearAlerts = useCallback(() => {
+        setActiveAlerts([]);
+    }, []);
+
+    const value = useMemo(() => ({ alert, clearAlerts }), [alert, clearAlerts]);
 
     return (
         <SnackbarContext.Provider value={value}>
