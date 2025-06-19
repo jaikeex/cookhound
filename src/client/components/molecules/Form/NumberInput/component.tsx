@@ -1,14 +1,14 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { BaseInput, InputError, InputLabel } from '@/client/components';
 import type { FormInputProps } from '@/client/components/molecules/Form/types';
 import classNames from 'classnames';
 
-export type TextInputProps = Readonly<{
-    placeholder?: string;
+export type NumberInputProps = Readonly<{
+    allowDecimals?: boolean;
 }> &
     Omit<FormInputProps, 'type'>;
 
-export const TextInput: React.FC<TextInputProps> = ({
+export const NumberInput: React.FC<NumberInputProps> = ({
     className,
     disabled,
     error,
@@ -17,22 +17,35 @@ export const TextInput: React.FC<TextInputProps> = ({
     name,
     onChange,
     onKeyDown,
-    placeholder
+    allowDecimals = false
 }) => {
+    const handleChange = useCallback(
+        (e: React.ChangeEvent<HTMLInputElement>) => {
+            if (!allowDecimals) {
+                e.target.value = Math.round(
+                    Number(e.target.value.replace(/[^0-9]/g, ''))
+                ).toString();
+            }
+
+            onChange && onChange(e);
+        },
+        [allowDecimals, onChange]
+    );
+
     return (
         <div className={classNames('relative w-full', className)}>
             <InputLabel htmlFor={id} text={label} disabled={disabled} />
             <BaseInput
-                type={'text'}
-                placeholder={placeholder}
+                type={'number'}
                 className={className}
                 id={id}
                 name={name}
-                onChange={onChange}
+                onChange={handleChange}
                 onKeyDown={onKeyDown}
                 disabled={disabled}
                 autoComplete={name}
                 min={0}
+                step={allowDecimals ? '0.01' : '1'}
             />
             {error ? <InputError message={error} /> : null}
         </div>
