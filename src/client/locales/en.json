@@ -77,6 +77,8 @@
     "app.recipe.error.ingredients-required": "Ingredients are required",
     "app.recipe.error.instructions-required": "Instructions are required",
     "app.recipe.create-preview": "Preview",
+    "app.form.processing-image": "Processing image, please wait...",
+    "app.form.image-processed": "Image uploaded successfully!",
     "app.error.default": "Something went wrong...",
     "app.error.not-found": "Page not found",
     "app.error.not-found.description": "The content you are looking for does not exist.",

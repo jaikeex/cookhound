@@ -2,7 +2,7 @@
 
 import React, { useCallback, useState } from 'react';
 import classnames from 'classnames';
-import { convertImgToWebP } from '@/client/utils';
+import { convertImgToWebP, verifyImgSize } from '@/client/utils';
 import { Icon } from '@/client/components';
 import { useLocale, useSnackbar } from '@/client/store';
 import Image from 'next/image';
@@ -21,16 +21,16 @@ const INPUT_ID = 'dropzone-file';
 
 export const ImageInput: React.FC<ImageInputProps> = ({
     inputHeight = 96,
-    maxHeight = 1440,
-    maxSize = 5 * 1024 * 1024, // 5MB
-    maxWidth = 2560,
+    maxHeight = 1920,
+    maxSize = 2 * 1024 * 1024,
+    maxWidth = 1920,
     name,
     onUpload,
     showPreview = false
 }) => {
     const [isDragging, setIsDragging] = useState(false);
-    const [previewUrl, setPreviewUrl] = useState<string | null>(null); // New state for preview URL
-    const { alert } = useSnackbar();
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+    const { alert, clearAlerts } = useSnackbar();
     const { t } = useLocale();
 
     /**
@@ -59,30 +59,63 @@ export const ImageInput: React.FC<ImageInputProps> = ({
             }
 
             try {
-                await verifyImgSize(file, maxWidth, maxHeight, maxSize);
+                const { needsResize } = await verifyImgSize(file);
+
+                if (needsResize) {
+                    alert({
+                        message: t('app.form.processing-image'),
+                        variant: 'info'
+                    });
+                }
 
                 const isWebP = file.type === 'image/webp';
-                const webpFile = isWebP
-                    ? file
-                    : await convertImgToWebP(file, 0.8);
+                const processedFile =
+                    isWebP && !needsResize
+                        ? file
+                        : await convertImgToWebP(
+                              file,
+                              1,
+                              maxWidth,
+                              maxHeight,
+                              maxSize
+                          );
 
-                if (webpFile) {
-                    setInputUrl(webpFile);
-                    onUpload && onUpload(webpFile);
+                if (processedFile) {
+                    await verifyImgSize(
+                        processedFile,
+                        maxWidth,
+                        maxHeight,
+                        maxSize,
+                        true
+                    );
 
-                    // Set the preview URL if showing preview is enabled
+                    setInputUrl(processedFile);
+                    onUpload && onUpload(processedFile);
+
                     if (showPreview) {
-                        const imageUrl = URL.createObjectURL(webpFile);
+                        const imageUrl = URL.createObjectURL(processedFile);
                         setPreviewUrl(imageUrl);
+                    }
+
+                    if (needsResize) {
+                        clearAlerts();
+                        alert({
+                            message: t('app.form.image-processed'),
+                            variant: 'success'
+                        });
                     }
                 }
             } catch (error: any) {
                 alert({
-                    message: t(error.message, {
-                        maxSize: maxSize / 1024 / 1024,
-                        maxWidth,
-                        maxHeight
-                    }),
+                    message: t(
+                        error.message,
+                        {
+                            maxSize: maxSize / 1024 / 1024,
+                            maxWidth,
+                            maxHeight
+                        },
+                        'app.error.default'
+                    ),
                     variant: 'error'
                 });
             }
@@ -93,6 +126,7 @@ export const ImageInput: React.FC<ImageInputProps> = ({
             maxWidth,
             maxHeight,
             maxSize,
+            clearAlerts,
             setInputUrl,
             onUpload,
             showPreview
@@ -184,6 +218,7 @@ export const ImageInput: React.FC<ImageInputProps> = ({
                 <input
                     id={INPUT_ID}
                     type="file"
+                    accept="image/*"
                     name={name}
                     className="hidden"
                     onChange={handleManualUpload}

@@ -1,22 +1,24 @@
 /**
- * Converts an image file (JPG, PNG, etc.) to WebP format using the Canvas API.
+ * Converts an image file to WebP format with smart resizing capabilities.
+ * This function intelligently resizes images that exceed maximum dimensions while
+ * maintaining aspect ratio, then converts to WebP format for optimal web delivery.
  *
- * This function reads the provided image file, renders it to a hidden HTML canvas,
- * and then converts the image data to WebP format. The conversion quality can be
- * adjusted via the `quality` parameter, which controls the compression level.
+ *~ Written by sonnet.
  *
- * @param {File} file - The image file to be converted. Must be of type image (e.g., JPG, PNG, etc.).
- * @param {number} [quality=0.8] - The quality of the output WebP image. A number between 0 and 1, where 1 is the best
- *                                 quality and 0 is the most compressed.
+ * @param {File} file - The image file to be converted. Must be of type image.
+ * @param {number} [quality=0.8] - The quality of the output WebP image (0-1).
+ * @param {number} [maxWidth=1920] - Maximum width for the output image.
+ * @param {number} [maxHeight=1920] - Maximum height for the output image.
+ * @param {number} [maxFileSize=2097152] - Maximum file size in bytes (default 2MB).
  *
- * @returns {Promise<File | null>} - A promise that resolves to the converted WebP file if successful,
- *                                   or `null` if conversion fails.
- *
- * @throws Error - Will throw an error if the file is not a valid image or if the conversion fails.
+ * @returns {Promise<File | null>} - The converted and optimized WebP file.
  */
 export const convertImgToWebP = async (
     file: File,
-    quality: number = 0.8
+    quality: number = 0.8,
+    maxWidth: number = 1920,
+    maxHeight: number = 1920,
+    maxFileSize: number = 2 * 1024 * 1024 // 2MB
 ): Promise<File | null> => {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -29,27 +31,38 @@ export const convertImgToWebP = async (
                 const canvas = document.createElement('canvas');
                 const ctx = canvas.getContext('2d');
 
-                canvas.width = image.width;
-                canvas.height = image.height;
-                ctx?.drawImage(image, 0, 0);
+                if (!ctx) {
+                    reject(new Error('app.error.default'));
+                    return;
+                }
 
-                canvas.toBlob(
-                    (blob) => {
-                        if (blob) {
-                            const webpFile = new File(
-                                [blob],
-                                file.name.replace(/\.\w+$/, '.webp'),
-                                {
-                                    type: 'image/webp'
-                                }
-                            );
-                            resolve(webpFile);
-                        } else {
-                            reject(new Error('app.error.image-upload-failed'));
-                        }
-                    },
-                    'image/webp',
-                    quality
+                // Calculate optimal dimensions while maintaining aspect ratio
+                const { width: newWidth, height: newHeight } =
+                    calculateOptimalDimensions(
+                        image.width,
+                        image.height,
+                        maxWidth,
+                        maxHeight
+                    );
+
+                canvas.width = newWidth;
+                canvas.height = newHeight;
+
+                // Use high-quality image rendering
+                ctx.imageSmoothingEnabled = true;
+                ctx.imageSmoothingQuality = 'high';
+
+                // Draw the resized image
+                ctx.drawImage(image, 0, 0, newWidth, newHeight);
+
+                // Convert to WebP with initial quality
+                convertWithQualityOptimization(
+                    canvas,
+                    file.name.replace(/\.\w+$/, '.webp'),
+                    quality,
+                    maxFileSize,
+                    resolve,
+                    reject
                 );
             };
 
@@ -64,4 +77,93 @@ export const convertImgToWebP = async (
 
         reader.readAsDataURL(file);
     });
+};
+
+/**
+ * Calculates optimal dimensions for an image while maintaining aspect ratio.
+ */
+const calculateOptimalDimensions = (
+    originalWidth: number,
+    originalHeight: number,
+    maxWidth: number,
+    maxHeight: number
+): { width: number; height: number } => {
+    const aspectRatio = originalWidth / originalHeight;
+
+    let newWidth = originalWidth;
+    let newHeight = originalHeight;
+
+    // Only resize if the image exceeds the maximum dimensions
+    if (originalWidth > maxWidth || originalHeight > maxHeight) {
+        if (originalWidth > originalHeight) {
+            // Landscape orientation
+            newWidth = Math.min(maxWidth, originalWidth);
+            newHeight = newWidth / aspectRatio;
+        } else {
+            // Portrait orientation
+            newHeight = Math.min(maxHeight, originalHeight);
+            newWidth = newHeight * aspectRatio;
+        }
+
+        // Ensure both dimensions are within limits
+        if (newWidth > maxWidth) {
+            newWidth = maxWidth;
+            newHeight = newWidth / aspectRatio;
+        }
+        if (newHeight > maxHeight) {
+            newHeight = maxHeight;
+            newWidth = newHeight * aspectRatio;
+        }
+    }
+
+    return {
+        width: Math.round(newWidth),
+        height: Math.round(newHeight)
+    };
+};
+
+/**
+ * Converts canvas to WebP with quality optimization to meet file size requirements.
+ */
+const convertWithQualityOptimization = (
+    canvas: HTMLCanvasElement,
+    fileName: string,
+    initialQuality: number,
+    maxFileSize: number,
+    resolve: (file: File) => void,
+    reject: (error: Error) => void
+) => {
+    let currentQuality = initialQuality;
+    const minQuality = 0.3; // Don't go below 30% quality
+    const qualityStep = 0.1;
+
+    const attemptConversion = () => {
+        canvas.toBlob(
+            (blob) => {
+                if (!blob) {
+                    reject(new Error('app.error.image-upload-failed'));
+                    return;
+                }
+
+                // If file size is acceptable or we've reached minimum quality, use it
+                if (blob.size <= maxFileSize || currentQuality <= minQuality) {
+                    const webpFile = new File([blob], fileName, {
+                        type: 'image/webp'
+                    });
+                    resolve(webpFile);
+                } else {
+                    // Reduce quality and try again
+                    currentQuality = Math.max(
+                        minQuality,
+                        currentQuality - qualityStep
+                    );
+                    attemptConversion();
+                }
+            },
+            'image/webp',
+            currentQuality
+        );
+    };
+
+    attemptConversion();
 };

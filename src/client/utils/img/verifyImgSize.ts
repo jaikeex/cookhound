@@ -1,44 +1,27 @@
 /**
- * Verifies that the dimensions of an uploaded image file do not exceed the specified maximum width and height
- * and that the file size does not exceed the specified maximum size.
- * The function accepts a `File` object, creates a temporary URL,
- * and checks the image dimensions and size once it loads.
+ * Verifies that an image file meets input requirements and provides information about the image.
+ * This function is more permissive with input files to allow high-resolution phone photos,
+ * but still enforces reasonable limits to prevent abuse.
+ *
+ *~ Written by sonnet.
  *
  * @param {File} file - The image file to verify. Must be of type `image/*`.
- * @param {number} maxWidth - The maximum allowed width of the image in pixels.
- * @param {number} maxHeight - The maximum allowed height of the image in pixels.
- * @param maxSize - The maximum allowed size of the image in bytes.
+ * @param {number} maxInputWidth - The maximum allowed input width (should be generous for phone photos).
+ * @param {number} maxInputHeight - The maximum allowed input height (should be generous for phone photos).
+ * @param {number} maxInputSize - The maximum allowed input file size in bytes.
+ * @param {boolean} isOutputFile - Whether this is verifying an output file (stricter limits).
  *
- * @returns {Promise<void>} A promise that resolves if the image dimensions and size are within the allowed limits,
- * or rejects with an error if the dimensions exceed the specified width or height, if the file is not a valid image,
- * or if the file size exceeds the specified maximum size.
+ * @returns {Promise<{width: number, height: number, needsResize: boolean}>} Image info and whether it needs resizing.
  *
- * @throws {Error} Throws an error if the file is not a valid image.
- * @throws {Error} Throws an error if the image dimensions exceed the allowed width or height.
- * @throws {Error} Throws an error if the image size exceeds the allowed maximum size.
- *
- * @example
- * const fileInput = document.querySelector('input[type="file"]');
- * const maxWidth = 1920;
- * const maxHeight = 1080;
- * const maxSize = 5 * 1024 * 1024; // 5MB
- *
- * fileInput.addEventListener('change', async (event) => {
- *   const file = event.target.files[0];
- *   try {
- *     await verifyImgSize(file, maxWidth, maxHeight, maxSize);
- *     console.log('Image properties are within the allowed limits.');
- *   } catch (error) {
- *     console.error(error.message);
- *   }
- * });
+ * @throws {Error} Various errors for different validation failures.
  */
 export const verifyImgSize = (
     file: File,
-    maxWidth: number,
-    maxHeight: number,
-    maxSize: number
-): Promise<void> => {
+    maxInputWidth: number = 6000, // Allow high-res phone photos (up to 6K width)
+    maxInputHeight: number = 6000, // Allow high-res phone photos (up to 6K height)
+    maxInputSize: number = 15 * 1024 * 1024, // 15MB for input files
+    isOutputFile: boolean = false
+): Promise<{ width: number; height: number; needsResize: boolean }> => {
     return new Promise((resolve, reject) => {
         const image = new Image();
         const objectUrl = URL.createObjectURL(file);
@@ -47,13 +30,49 @@ export const verifyImgSize = (
             const { width, height } = image;
             URL.revokeObjectURL(objectUrl); // Clean up the object URL
 
-            if (width > maxWidth || height > maxHeight) {
-                reject(new Error('app.error.image-dimensions-too-large'));
-            } else if (file.size > maxSize) {
-                reject(new Error('app.error.image-size-too-large'));
+            // For input files, be more permissive but still have reasonable limits
+            if (!isOutputFile) {
+                // Check for unreasonably large dimensions (likely not a real photo)
+                if (width > maxInputWidth || height > maxInputHeight) {
+                    reject(
+                        new Error('app.error.image-dimensions-too-large-input')
+                    );
+                    return;
+                }
+
+                // Check for unreasonably large file size
+                if (file.size > maxInputSize) {
+                    reject(new Error('app.error.image-size-too-large-input'));
+                    return;
+                }
+
+                // Determine if image needs resizing (more than 1920px in any dimension)
+                const needsResize = width > 1920 || height > 1920;
+
+                resolve({ width, height, needsResize });
             } else {
-                resolve();
+                // For output files, be strict
+                const maxOutputWidth = 1920;
+                const maxOutputHeight = 1920;
+                const maxOutputSize = 2 * 1024 * 1024; // 2MB
+
+                if (width > maxOutputWidth || height > maxOutputHeight) {
+                    reject(new Error('app.error.image-dimensions-too-large'));
+                    return;
+                }
+
+                if (file.size > maxOutputSize) {
+                    reject(new Error('app.error.image-size-too-large'));
+                    return;
+                }
+
+                resolve({ width, height, needsResize: false });
             }
+        };
+
+        image.onerror = () => {
+            URL.revokeObjectURL(objectUrl);
+            reject(new Error('app.error.invalid-image-format'));
         };
 
         image.src = objectUrl;

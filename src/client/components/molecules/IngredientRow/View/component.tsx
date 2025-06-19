@@ -70,8 +70,6 @@ export const IngredientRowView: React.FC<IngredientRowViewProps> = ({
                     color={'secondary'}
                     checked={checked}
                     size={'sm'}
-                    // eslint-disable-next-line @typescript-eslint/no-empty-function
-                    // eslint-disable-next-line react/jsx-no-bind
                     onChange={handleCheckboxClick}
                 />
             ) : null}
@@ -79,7 +77,7 @@ export const IngredientRowView: React.FC<IngredientRowViewProps> = ({
             {/* ---------------------------------------------- */}
 
             <div
-                className={`flex items-center ${checked ? '[&>p]:text-gray-500' : ''} justify-between w-full`}
+                className={`flex items-center ${checked ? '[&>p]:text-gray-300 [&>p]:dark:text-gray-600' : ''} justify-between w-full`}
             >
                 <Typography variant={typographyVariant}>
                     {ingredient.name}
