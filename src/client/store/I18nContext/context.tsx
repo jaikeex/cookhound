@@ -19,7 +19,8 @@ type LocaleContextType = {
     messages: Record<string, string>;
     t: (
         key: I18nMessage | undefined,
-        params?: Record<string, string | number | boolean>
+        params?: Record<string, string | number | boolean>,
+        fallback?: string
     ) => string;
 };
 
@@ -51,11 +52,12 @@ export const LocaleProvider: React.FC<LocaleProviderProps> = ({
     const t = useCallback(
         (
             key: I18nMessage | undefined,
-            params?: Record<string, string | number | boolean>
+            params?: Record<string, string | number | boolean>,
+            fallback?: string
         ) => {
             if (!key) return '';
 
-            if (params) {
+            if (messages[key] && params) {
                 return Object.keys(params).reduce(
                     (acc, param) =>
                         acc.replace(
@@ -66,7 +68,15 @@ export const LocaleProvider: React.FC<LocaleProviderProps> = ({
                 );
             }
 
-            return messages[key] || key;
+            if (messages[key]) {
+                return messages[key];
+            }
+
+            if (fallback) {
+                return messages[fallback as keyof Messages] || fallback;
+            }
+
+            return key;
         },
         [messages]
     );
