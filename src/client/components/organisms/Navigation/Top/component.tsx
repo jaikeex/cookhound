@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useState } from 'react';
+import React, { Suspense, useCallback, useState } from 'react';
 import {
     Avatar,
     ButtonBase,
@@ -67,7 +67,7 @@ export const TopNavigation: React.FC<TopNavigationProps> = () => {
             {/* --------------------------------------- */}
             {/* ---------- DESKTOP RIGHT SIDE --------- */}
             {/* --------------------------------------- */}
-            <div className="items-center hidden gap-3 md:flex ">
+            <div className="items-center hidden gap-3 md:flex">
                 <React.Fragment>
                     <Tooltip
                         text={t('app.general.register-to-create-recipe')}
@@ -127,15 +127,17 @@ export const TopNavigation: React.FC<TopNavigationProps> = () => {
             {/* ----------- MOBILE USER MENU ---------- */}
             {/* --------------------------------------- */}
 
-            <Sidebar
-                isOpen={isSidebarOpen}
-                onClose={handleCloseSidebar}
-                paramKey="menu"
-                position="right"
-                className="w-9/12 min-w-72"
-            >
-                <NavMenu user={user} />
-            </Sidebar>
+            <Suspense fallback={null}>
+                <Sidebar
+                    isOpen={isSidebarOpen}
+                    onClose={handleCloseSidebar}
+                    paramKey="menu"
+                    position="right"
+                    className="w-9/12 min-w-72"
+                >
+                    <NavMenu user={user} />
+                </Sidebar>
+            </Suspense>
         </div>
     );
 };

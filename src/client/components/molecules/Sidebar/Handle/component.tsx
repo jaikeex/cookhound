@@ -104,8 +104,9 @@ export const SidebarHandle: React.FC<SidebarHandleProps> = ({
     return (
         <div
             className={classNames(
-                ' w-0 h-0 z-40 transition-all duration-300 ease-in-out fixed cursor-pointer',
+                ' w-0 h-0 transition-all duration-300 ease-in-out fixed cursor-pointer',
                 'flex items-center justify-center',
+                isOpen ? 'z-30' : 'z-10',
                 className
             )}
             style={styles}
@@ -116,8 +117,8 @@ export const SidebarHandle: React.FC<SidebarHandleProps> = ({
                 className={classNames(
                     'px-4 py-1 h-10 flex items-center justify-center transition-all duration-100',
                     isOpen
-                        ? 'bg-sheet-200 hover:bg-sheet-300 active:bg-sheet-400 dark:bg-sheet-800 dark:hover:bg-sheet-700 dark:active:bg-sheet-600'
-                        : 'bg-sky-200 hover:bg-sky-300 active:bg-sky-400 dark:bg-sky-900 dark:hover:bg-sky-800 dark:active:bg-sky-700',
+                        ? 'bg-sheet-200 hover:bg-sheet-300 dark:bg-sheet-800 dark:hover:bg-sheet-700'
+                        : 'bg-sky-200 hover:bg-sky-300 dark:bg-sky-900 dark:hover:bg-sky-800',
                     position === 'top' ? 'rounded-b-lg' : 'rounded-t-lg',
                     position === 'left' && 'rotate-90',
                     position === 'right' && '-rotate-90'

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo, useEffect, useState } from 'react';
 import { useTheme } from 'next-themes';
 import type { IconButtonProps, SwitchProps } from '@/client/components';
 import { IconButton, Switch } from '@/client/components';
@@ -9,20 +9,56 @@ import { useLocale } from '@/client/store';
 type ThemeSwitcherIconProps = Omit<IconButtonProps, 'icon' | 'onClick'>;
 
 export const ThemeSwitcherIcon: React.FC<ThemeSwitcherIconProps> = (props) => {
-    const { theme, setTheme } = useTheme();
+    const { theme, setTheme, resolvedTheme } = useTheme();
+    const [mounted, setMounted] = useState(false);
+
+    // Ensure component is mounted before rendering theme-dependent content
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     const toggleTheme = useCallback(() => {
         setTheme(theme === 'light' ? 'dark' : 'light');
     }, [theme, setTheme]);
 
-    return (
-        <IconButton
-            icon={theme === 'light' ? 'moon' : 'sun'}
-            onClick={toggleTheme}
-            className="text-gray-800 rounded dark:text-gray-200"
-            {...props}
-        />
+    /**
+     * The following "memoization workaraound" is done because if the icon name is passed as a prop
+     * to the Icon component dynamically it throws a hydration error...
+     *
+     * DO NOT DO THIS:
+     *
+     * <IconButton
+     *     icon={theme === 'light' ? 'moon' : 'sun'}
+     *     onClick={toggleTheme}
+     *     className="text-gray-800 rounded dark:text-gray-200"
+     *     {...props}
+     * >
+     */
+
+    const iconProps = useMemo(
+        () => ({
+            onClick: toggleTheme,
+            className: 'text-gray-800 rounded dark:text-gray-200',
+            ...props
+        }),
+        [toggleTheme, props]
     );
+
+    // Use resolvedTheme which is only available after hydration
+    const currentTheme = mounted ? resolvedTheme || 'light' : 'light';
+
+    const icon = useMemo(() => {
+        switch (currentTheme) {
+            case 'light':
+                return <IconButton icon="moon" {...iconProps} />;
+            case 'dark':
+                return <IconButton icon="sun" {...iconProps} />;
+            default:
+                return <IconButton icon="moon" {...iconProps} />;
+        }
+    }, [currentTheme, iconProps]);
+
+    return icon;
 };
 
 type ThemeSwitcherProps = Omit<
@@ -31,16 +67,25 @@ type ThemeSwitcherProps = Omit<
 >;
 
 export const ThemeSwitcher: React.FC<ThemeSwitcherProps> = (props) => {
-    const { theme, setTheme } = useTheme();
+    const { theme, setTheme, resolvedTheme } = useTheme();
     const { t } = useLocale();
+    const [mounted, setMounted] = useState(false);
+
+    // Ensure component is mounted before rendering theme-dependent content
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     const toggleTheme = useCallback(() => {
         setTheme(theme === 'light' ? 'dark' : 'light');
     }, [theme, setTheme]);
 
+    // Use resolvedTheme which is only available after hydration
+    const currentTheme = mounted ? resolvedTheme || 'light' : 'light';
+
     return (
         <Switch
-            checked={theme === 'dark'}
+            checked={currentTheme === 'dark'}
             labelLeft={t('app.general.dark-mode')}
             onChange={toggleTheme}
             {...props}

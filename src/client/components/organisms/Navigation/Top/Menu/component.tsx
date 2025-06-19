@@ -1,6 +1,6 @@
 'use client';
 
-import React, { forwardRef } from 'react';
+import React from 'react';
 import { AnonymousMenuContent } from './Anonymous';
 import { LoggedInMenuContent } from './LoggedIn';
 import type { UserDTO } from '@/common/types';
@@ -11,9 +11,7 @@ type NavMenuProps = Readonly<{
     user: UserDTO | null;
 }>;
 
-export const NavMenu: React.ForwardRefExoticComponent<
-    React.PropsWithoutRef<NavMenuProps> & React.RefAttributes<HTMLDivElement>
-> = forwardRef<HTMLDivElement, NavMenuProps>(({ className, user }, ref) => {
+export const NavMenu: React.FC<NavMenuProps> = ({ className, ref, user }) => {
     const isLoggedin = !!user;
 
     return (
@@ -25,4 +23,4 @@ export const NavMenu: React.ForwardRefExoticComponent<
             )}
         </div>
     );
-});
+};

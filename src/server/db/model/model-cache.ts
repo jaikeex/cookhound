@@ -2,11 +2,6 @@ import { redisClient } from '@/server/db/redis';
 import { ENV_CONFIG_PRIVATE } from '@/common/constants';
 
 /**
- * Convert date strings back to Date objects for cached user data
- * This is needed because JSON.parse doesn't automatically convert date strings to Date objects
- */
-
-/**
  * Generic cache wrapper for Prisma queries
  * @param key - Unique cache key
  * @param fetchFn - Function that returns the data to cache
@@ -19,10 +14,8 @@ export async function cachePrismaQuery<T>(
 ): Promise<T> {
     const now = new Date();
 
-    // Try to get data from cache
     const cachedData = await redisClient.get<T>(key);
 
-    // If cache hit, return the cached data
     if (cachedData !== null) {
         console.log(`Cache hit for key: ${key}`);
         const time = new Date().getTime() - now.getTime();
@@ -30,15 +23,13 @@ export async function cachePrismaQuery<T>(
         return cachedData;
     }
 
-    // If cache miss, fetch data from database
     console.log(`Cache miss for key: ${key}`);
     const data = await fetchFn();
 
-    // Store in cache
     await redisClient.set(key, data, ttl);
 
     const time = new Date().getTime() - now.getTime();
-    console.log(`Time taken to fetch data: ${time}ms`);
+    console.log(`Time taken to fetch data from cache: ${time}ms`);
 
     return data;
 }
@@ -66,8 +57,10 @@ export async function invalidateCacheByPattern(pattern: string): Promise<void> {
 }
 
 /**
- * Ultimate cache invalidation solution - automatically invalidates cache for any model
- * based on changed fields. This approach requires no manual maintenance.
+ * ULTIMATE cache invalidation solution - automatically invalidates cache for any model
+ * based on changed fields. This approach SHOULD require no manual maintenance...
+ * Until it breaks...
+ *
  * @param modelName - Name of the Prisma model
  * @param changedData - Object containing the fields that changed
  * @param originalData - Original data before changes (optional, for more precise invalidation)
@@ -106,7 +99,8 @@ export async function invalidateModelCache(
 }
 
 /**
- * Generate a cache key for a Prisma query
+ * Generates a key for a Prisma query cache entry.
+ *
  * @param modelName - Name of the Prisma model
  * @param operation - Operation type (findUnique, findMany, etc.)
  * @param params - Query parameters

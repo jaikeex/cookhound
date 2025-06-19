@@ -50,7 +50,9 @@ export const InstructionRowCreate: React.FC<InstructionRowCreateProps> = ({
     );
 
     useEffect(() => {
-        onChange && onChange(instruction);
+        if (instruction) {
+            onChange && onChange(instruction);
+        }
         // This is intentional, only run this effect when the index changes
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [index]);

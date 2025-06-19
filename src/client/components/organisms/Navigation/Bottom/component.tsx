@@ -23,14 +23,18 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = () => {
             )}
         >
             <Link href={'/'}>
-                <Icon name="home" label="Home" />
+                <Icon name="home" label={t('app.general.home')} />
             </Link>
             <Link
                 href={'/'}
                 tabIndex={isLoggedin ? 0 : -1}
                 className={classnames(!isLoggedin && 'link-disabled')}
             >
-                <Icon name="book" label="Cookbooks" disabled={!isLoggedin} />
+                <Icon
+                    name="book"
+                    label={t('app.general.cookbooks')}
+                    disabled={!isLoggedin}
+                />
             </Link>
 
             <Tooltip
@@ -43,7 +47,11 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = () => {
                     tabIndex={isLoggedin ? 0 : -1}
                     className={classnames(!isLoggedin && 'link-disabled')}
                 >
-                    <Icon name="plus" label="Create" disabled={!isLoggedin} />
+                    <Icon
+                        name="plus"
+                        label={t('app.recipe.create-short')}
+                        disabled={!isLoggedin}
+                    />
                 </Link>
             </Tooltip>
 
@@ -53,8 +61,8 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = () => {
                 className={classnames(!isLoggedin && 'link-disabled')}
             >
                 <Icon
-                    name="bell"
-                    label="Notifications"
+                    name="shoppingList"
+                    label={t('app.general.shopping-list')}
                     disabled={!isLoggedin}
                 />
             </Link>

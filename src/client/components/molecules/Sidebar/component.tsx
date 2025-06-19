@@ -85,12 +85,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {isSidebarOpen ? (
                 <React.Fragment>
                     <div
-                        className={`fixed h-screen w-screen inset-0 bg-black bg-opacity-75 z-20 ${backdropClass}`}
+                        className={classNames(
+                            'fixed inset-0 z-20 w-screen h-screen bg-black bg-opacity-75',
+                            backdropClass
+                        )}
                     />
                     <div
                         ref={contentRef}
                         className={classNames(
                             'z-50 px-8 py-16 sheet shadow-[-4px_4px_15px_0_rgba(0,0,0,0.3)]',
+                            'overflow-auto',
                             containerClassName,
                             className
                         )}

@@ -1,3 +1,5 @@
+'use client';
+
 import { useLayoutEffect, useMemo, useState } from 'react';
 
 /**

@@ -82,7 +82,9 @@ export const IngredientRowCreate: React.FC<IngredientRowCreateProps> = ({
     );
 
     useEffect(() => {
-        onChange && onChange(ingredient);
+        if (ingredient.name || ingredient.quantity) {
+            onChange && onChange(ingredient);
+        }
         // This is intentional, only run this effect when the index changes
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [index]);

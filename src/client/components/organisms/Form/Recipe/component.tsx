@@ -88,7 +88,7 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({
     );
 
     return (
-        <div className={`space-y-4 px-4 md:px-8 ${className}`}>
+        <div className={`px-4 space-y-4 md:px-8 ${className}`}>
             <ImageInput
                 onUpload={handleImageChange}
                 name={'recipe-image'}
@@ -104,7 +104,9 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({
                 error={t(errors?.title)}
             />
 
-            <div className={'grid grid-cols-2 gap-4'}>
+            <Divider className="md:hidden" />
+
+            <div className={'flex flex-col gap-4 md:grid md:grid-cols-2'}>
                 <TextInput
                     className={'mt-auto'}
                     id={'recipe-portionSize'}

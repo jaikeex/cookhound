@@ -17,16 +17,21 @@ import { useLocale } from '@/client/store';
 export type DesktopRecipeViewProps = Readonly<{
     className?: string;
     recipe: RecipeDTO;
+    ref?: React.RefObject<HTMLDivElement> | null;
 }>;
 
 export const DesktopRecipeViewTemplate: React.FC<DesktopRecipeViewProps> = ({
     className,
-    recipe
+    recipe,
+    ref
 }) => {
     const { t } = useLocale();
 
     return (
-        <div className={`max-w-screen-md px-4 mx-auto ${className}`}>
+        <div
+            className={`max-w-screen-md 3xl:max-w-screen-lg px-4 mx-auto ${className}`}
+            ref={ref}
+        >
             <div className={'space-y-4'}>
                 <div className={'flex justify-between gap-12'}>
                     <div
