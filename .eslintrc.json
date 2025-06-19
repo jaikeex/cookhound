@@ -33,7 +33,7 @@
         "**/src/stories/**/*"
     ],
     "rules": {
-        //* Typescript specific rules
+        //~ Typescript specific rules
         "@typescript-eslint/semi": ["error", "always"],
         "@typescript-eslint/no-explicit-any": "off",
         "@typescript-eslint/member-delimiter-style": [
@@ -61,9 +61,9 @@
                 "prefer": "type-imports"
             }
         ],
-        //* Next.js specific rules
+        //~ Next.js specific rules
         "@next/next/no-img-element": "off",
-        //* React specific rules
+        //~ React specific rules
         "react/display-name": "off",
         "react/jsx-indent-props": "off",
         "react/jsx-no-bind": ["error"],
@@ -83,7 +83,7 @@
             }
         ],
         "react/jsx-closing-bracket-location": [2, "tag-aligned"],
-        //* General rules
+        //~ General rules
         "prefer-const": "error",
         "no-restricted-imports": [
             "error",

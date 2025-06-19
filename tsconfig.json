@@ -31,5 +31,5 @@
         ".next/types/**/*.ts",
         "next.config.mjs"
     ],
-    "exclude": ["node_modules", "./src/stories/**", "./scripts"]
+    "exclude": ["node_modules", "./src/stories/**", "./scripts", "./docs"]
 }

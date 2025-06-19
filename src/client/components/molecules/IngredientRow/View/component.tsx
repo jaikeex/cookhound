@@ -5,8 +5,9 @@ import type { Ingredient } from '@/common/types';
 import type { TypographyVariant } from '@/client/components';
 import { Checkbox, Typography } from '@/client/components';
 
-// ---------------------------------- config ----------------------------------
-//                                    region
+//~---------------------------------------------------------------------------------------------~//
+//$                                           OPTIONS                                           $//
+//~---------------------------------------------------------------------------------------------~//
 
 const classConfig = {
     typography: {
@@ -14,9 +15,9 @@ const classConfig = {
         'mobile': 'body'
     }
 };
-
-//                                  endregion
-// ----------------------------------------------------------------------------
+//~---------------------------------------------------------------------------------------------~//
+//$                                          COMPONENT                                          $//
+//~---------------------------------------------------------------------------------------------~//
 
 export type IngredientRowViewProps = Readonly<{
     ingredient: Ingredient;
@@ -59,7 +60,7 @@ export const IngredientRowView: React.FC<IngredientRowViewProps> = ({
     }, [selected]);
 
     return (
-        <div className={`flex items-center `} onClick={handleRowClick}>
+        <div className={`flex items-center`} onClick={handleRowClick}>
             {/* DESKTOP view has the checkbox on the left side */}
             {/* ---------------------------------------------- */}
 

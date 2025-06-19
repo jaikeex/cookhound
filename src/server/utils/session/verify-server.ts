@@ -5,17 +5,21 @@ import { redirect } from 'next/navigation';
 import { UserRole } from '@/common/types';
 import db from '@/server/db/model';
 
-//!--------------------------------------------------------------------------------!//
-//*      ONLY verifySession() and verifyIsGuest() ARE CURRENTY IN ACTIVE USE       *//
-//*  THE REST IS KEPT HERE FOR REFERENCE AND LIKE WON'T BE NEEDED IN THE FUTURE    *//
-//!--------------------------------------------------------------------------------!//
-
+//§—————————————————————————————————————————————————————————————————————————————————————————————§//
+//§                                      UNUSED FUNCTIONS                                       §//
 /**
- ** These functions should be used on the server side only.
- **
- ** None of these will work on the client OR in the middleware.
- ** You have been warned...
+ *# Only verifySession() and verifyIsGuest() are currently in active use. The reset is kept
+ *# here for reference and likely won't be needed in the future.
  */
+//§—————————————————————————————————————————————————————————————————————————————————————————————§//
+//§                                        SERVER ONLY                                          §//
+/**
+ *# These functions should be used on the server side only.
+ *#
+ *# None of these will work on the client OR in the middleware.
+ *# You have been warned...
+ */
+//§—————————————————————————————————————————————————————————————————————————————————————————————§//
 
 type VerifyOptions = {
     role?: UserRole[];

@@ -1,8 +1,9 @@
 import React from 'react';
 import classnames from 'classnames';
 
-// ------------------------------- class config -------------------------------
-//                                    region
+//~---------------------------------------------------------------------------------------------~//
+//$                                           OPTIONS                                           $//
+//~---------------------------------------------------------------------------------------------~//
 
 const classConfig = {
     variant: {
@@ -25,9 +26,6 @@ const classConfig = {
     }
 };
 
-//                                  endregion
-// ----------------------------------------------------------------------------
-
 export type TypographyVariant =
     | 'heading-xl'
     | 'heading-lg'
@@ -38,6 +36,10 @@ export type TypographyVariant =
     | 'body-sm'
     | 'label'
     | 'error';
+
+//~---------------------------------------------------------------------------------------------~//
+//$                                          COMPONENT                                          $//
+//~---------------------------------------------------------------------------------------------~//
 
 type TypographyOwnProps<E extends React.ElementType> = Readonly<{
     align?: 'left' | 'center' | 'right' | 'justify';

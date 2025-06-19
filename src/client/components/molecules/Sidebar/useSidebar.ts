@@ -51,13 +51,13 @@ export const useSidebar = (config: SidebarConfig = {}) => {
         useMobileParams = true
     } = config;
 
-    // ***************************************************************************************** //
-    // ?                                          STATE                                        ? //
-    // ***************************************************************************************** //
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+    //$                                         OPTIONS                                         $//
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 
-    // ----------------------------------------------------------------------------------------- //
-    //                                       CORE STATE DATA                                     //
-    // ----------------------------------------------------------------------------------------- //
+    ///=========================================================================================///
+    ///                                      CORE STATE DATA                                    ///
+    ///=========================================================================================///
 
     // Reflects the current open/closed state of the sidebar. This is the only absolute truth.
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -75,9 +75,9 @@ export const useSidebar = (config: SidebarConfig = {}) => {
     const isOpeningRef = useRef(false);
     const isClosingRef = useRef(false);
 
-    // ----------------------------------------------------------------------------------------- //
-    //                                            HANDLE                                         //
-    // ----------------------------------------------------------------------------------------- //
+    ///=========================================================================================///
+    ///                                           HANDLE                                        ///
+    ///=========================================================================================///
 
     // This value is used by the sidebar handle to help sync the animation between it and the sidebar.
     // Technically holds the same info as isSidebarOpen state, but this updates immediately when the
@@ -90,9 +90,9 @@ export const useSidebar = (config: SidebarConfig = {}) => {
 
     const resizeObserverRef = useRef<ResizeObserver | null>(null);
 
-    // ----------------------------------------------------------------------------------------- //
-    //                                            ROUTING                                        //
-    // ----------------------------------------------------------------------------------------- //
+    ///=========================================================================================///
+    ///                                           ROUTING                                       ///
+    ///=========================================================================================///
 
     /**
      * These are values used for handling any url related activity.
@@ -106,20 +106,24 @@ export const useSidebar = (config: SidebarConfig = {}) => {
     const router = useRouter();
     const searchParams = useSearchParams();
 
-    // ***************************************************************************************** //
-    // ?                                OPENING/CLOSING HANDLERS                               ? //
-    // ***************************************************************************************** //
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+    //$                                 OPENING/CLOSING HANDLERS                                $//
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 
+    //?—————————————————————————————————————————————————————————————————————————————————————————?//
+    //?                                     -> IMPORTANT <-                                      //
     /**
-     * These functions together handle the core logic of opening/closing the sidebar.
-     *
-     * They need to manage everything including the isSidebarOpen state, styles and animations.
-     * The process uses ref-based locking mechanism to prevent any conflicting invocations.
-     * (Should not be necessary when calling things correctly all the time but fuck me...)
-     *
-     ** Only the toggleSidebar() handler should be called directly to switch the sidebar state.
-     ** All other functions should be considered private to this 'section' for all intents and purposes
+     *# These functions together handle the core logic of opening/closing the sidebar.
+     *#
+     *# They need to manage everything including the isSidebarOpen state, styles and animations.
+     *# The process uses ref-based locking mechanism to prevent any conflicting invocations.
+     *# (Should not be necessary when calling things correctly all the time but fuck me...)
+     *#
+     *~ Only the toggleSidebar() handler should be called directly to switch the sidebar state.
+     *~ All other functions should be considered private to this 'section'
+     *~ for all intents and purposes
      */
+    //?—————————————————————————————————————————————————————————————————————————————————————————?//
 
     const toggleSidebarWithAnimation = useCallback(
         (open: boolean) => {
@@ -149,13 +153,19 @@ export const useSidebar = (config: SidebarConfig = {}) => {
             isClosingRef.current = false;
         }, 200);
 
-        // If the sidebar was opened on mobile, go back to the previous page when it's closed
-        // The condition is needed to prevent the page from going back multiple times when the
-        // user clicks outside the sidebar multiple times
-        //
-        //? This unfortunately seems like the best place to put it. If called from the url
-        //? management functions then multiple cases would be left out...
-        //TODO: Can this be solved in some other way?
+        //?—————————————————————————————————————————————————————————————————————————————————————?//
+        //?                                   MOBILE PARAMS                                     ?//
+        /**
+         *# If the sidebar was opened on mobile, go back to the previous page when it's closed
+         *# The condition is needed to prevent the page from going back multiple times when the
+         *# user clicks outside the sidebar multiple times.
+         *#
+         *?  This unfortunately seems like the best place to put it. If called from the url
+         *?  management functions then multiple cases would be left out...
+         *TODO: Can this be solved in some other way?
+         */
+        //?—————————————————————————————————————————————————————————————————————————————————————?//
+
         if (!useMobileParams || !searchParams.get(paramKey) || !isMobile)
             return;
 
@@ -207,13 +217,13 @@ export const useSidebar = (config: SidebarConfig = {}) => {
         router
     ]);
 
-    // ***************************************************************************************** //
-    // ?                             PARAMS and PATHNAME LISTENERS                             ? //
-    // ***************************************************************************************** //
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+    //$                              PARAMS and PATHNAME LISTENERS                              $//
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 
-    // ----------------------------------------------------------------------------------------- //
-    //                                            PARAMS                                         //
-    // ----------------------------------------------------------------------------------------- //
+    ///=========================================================================================///
+    ///                                           PARAMS                                        ///
+    ///=========================================================================================///
 
     const handleParamsChange = useCallback(() => {
         if (
@@ -255,15 +265,20 @@ export const useSidebar = (config: SidebarConfig = {}) => {
         onChange: useMobileParams ? handleParamsChange : undefined
     });
 
-    // ----------------------------------------------------------------------------------------- //
-    //                                           PATHNAME                                        //
-    // ----------------------------------------------------------------------------------------- //
+    ///=========================================================================================///
+    ///                                          PATHNAME                                       ///
+    ///=========================================================================================///
 
     const handlePathnameChange = useCallback(() => {
-        // Close the sidebar when the user navigates to a different page directly from the sidebar.
-        // This mainly applies to desktop screens, where the query parameter is not used, and so the
-        // params change listener does not fire.
-        // On mobile screens this serves as redundancy.
+        //———————————————————————————————————————————————————————————————————————————————————————//
+        //                                 CLOSE ON PATH CHANGE                                  //
+        /**
+         * Close the sidebar when the user navigates to a different page directly from the sidebar.
+         * This mainly applies to desktop screens, where the query parameter is not used, and so the
+         * params change listener does not fire.
+         * On mobile screens this serves as redundancy.
+         */
+        //———————————————————————————————————————————————————————————————————————————————————————//
 
         // Don't close if we're currently in the process of opening the sidebar
         if (isOpeningRef.current || isClosingRef.current) return;
@@ -280,17 +295,17 @@ export const useSidebar = (config: SidebarConfig = {}) => {
         onChange: closeOnPathnameChange ? handlePathnameChange : undefined
     });
 
-    // ***************************************************************************************** //
-    // ?                                 OUTSIDE CLICK LISTENER                                ? //
-    // ***************************************************************************************** //
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+    //$                                  OUTSIDE CLICK LISTENER                                 $//
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 
     const contentRef = useOutsideClick<HTMLDivElement>(
         enableOutsideClick ? toggleSidebar : () => {}
     );
 
-    // ***************************************************************************************** //
-    // ?                               SIDEBAR DIMENSION TRACKING                              ? //
-    // ***************************************************************************************** //
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+    //$                                SIDEBAR DIMENSION TRACKING                               $//
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 
     const handleResize: ResizeObserverCallback = useCallback((entries) => {
         for (const entry of entries) {
@@ -329,9 +344,9 @@ export const useSidebar = (config: SidebarConfig = {}) => {
         }
     }, [contentRef, isSidebarOpen]);
 
-    // ***************************************************************************************** //
-    // ?                                        RETURN                                         ? //
-    // ***************************************************************************************** //
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+    //$                                         RETURN                                          $//
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 
     return {
         isSidebarOpen,
