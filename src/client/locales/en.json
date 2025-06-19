@@ -73,6 +73,7 @@
     "app.recipe.create": "Create recipe",
     "app.recipe.create-short": "Create",
     "app.recipe.create-success": "Recipe created successfully",
+    "app.recipe.unsaved-changes-warning": "You have unsaved changes. Are you sure you want to leave this page?",
     "app.recipe.error.title-required": "Title is required",
     "app.recipe.error.ingredients-required": "Ingredients are required",
     "app.recipe.error.instructions-required": "Instructions are required",

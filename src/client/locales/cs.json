@@ -73,6 +73,7 @@
     "app.recipe.create": "Vytvořit recept",
     "app.recipe.create-short": "Vytvořit",
     "app.recipe.create-success": "Recept byl úspěšně vytvořen",
+    "app.recipe.unsaved-changes-warning": "Máte neuložené změny. Opravdu chcete opustit tuto stránku?",
     "app.recipe.error.title-required": "Název receptu je povinný",
     "app.recipe.error.ingredients-required": "Ingredience jsou povinné",
     "app.recipe.error.instructions-required": "Postup je povinný",
