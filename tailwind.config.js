@@ -78,7 +78,8 @@ module.exports = {
             'md': '768px',
             'lg': '1024px',
             'xl': '1140px',
-            '2xl': '1536px'
+            '2xl': '1536px',
+            '3xl': '2000px'
         },
         colors: {
             ...colors,

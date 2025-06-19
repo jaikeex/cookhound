@@ -29,7 +29,7 @@ export const Tabs: React.FC<TabsProps> = ({
     const tabWidth = 100 / tabs.length;
 
     const handleTabChange = useCallback(
-        (index: number) => {
+        (index: number) => () => {
             setCurrentTab(index);
             onTabChange && onTabChange(index);
         },
@@ -46,8 +46,7 @@ export const Tabs: React.FC<TabsProps> = ({
             >
                 {tabs.map((tab, index) => (
                     <TabButton
-                        // eslint-disable-next-line react/jsx-no-bind
-                        onClick={() => handleTabChange(index)}
+                        onClick={handleTabChange(index)}
                         key={index}
                         active={currentTab === index}
                         tabWidth={tabWidth}

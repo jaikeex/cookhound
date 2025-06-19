@@ -44,7 +44,12 @@ export default async function RootLayout({
     return (
         <html lang="en" suppressHydrationWarning>
             <body className={`${kalam.variable} ${openSans.variable}`}>
-                <ThemeProvider attribute="class">
+                <ThemeProvider
+                    attribute="class"
+                    defaultTheme="light"
+                    enableSystem={false}
+                    disableTransitionOnChange
+                >
                     <LocaleProvider
                         defaultMessages={messages}
                         defaultLocale={locale}
@@ -55,13 +60,13 @@ export default async function RootLayout({
                                     id="main-page"
                                     className="fixed top-0 flex flex-col h-[100dvh] overflow-y-auto page-background typography-base"
                                 >
-                                    <Suspense fallback={<TopNavigation />}>
+                                    <Suspense fallback={null}>
                                         <TopNavigation />
                                     </Suspense>
                                     <div
                                         id="main-content"
                                         className={classnames(
-                                            'pt-4 px-4 pb-16 md:pt-12 flex-1',
+                                            'flex-1 px-2 pt-4 pb-16 md:px-4 md:pt-12',
                                             'relative'
                                         )}
                                     >

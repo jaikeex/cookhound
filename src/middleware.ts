@@ -1,5 +1,4 @@
 import { NextResponse, type NextRequest } from 'next/server';
-import { PROTECTED_ROUTES_LIST } from '@/common/constants';
 import { MiddlewareError } from '@/server/error';
 
 // This needs to be imported explicitly from the verify-client.ts file. NOT the barrel file.
@@ -48,5 +47,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-    matcher: PROTECTED_ROUTES_LIST
+    matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)']
 };

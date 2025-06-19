@@ -2,7 +2,7 @@
 
 import React, { useCallback, useState } from 'react';
 import classnames from 'classnames';
-import { convertImgToWebP, verifyImgSize } from '@/client/utils';
+import { convertImgToWebP } from '@/client/utils';
 import { Icon } from '@/client/components';
 import { useLocale, useSnackbar } from '@/client/store';
 import Image from 'next/image';
@@ -50,7 +50,7 @@ export const ImageInput: React.FC<ImageInputProps> = ({
 
     const handleFileUpload = useCallback(
         async (file: File) => {
-            if (!file.type.startsWith('image/')) {
+            if (!file?.type || !file.type.startsWith('image/')) {
                 alert({
                     message: t('app.error.invalid-image-format'),
                     variant: 'error'
@@ -139,7 +139,7 @@ export const ImageInput: React.FC<ImageInputProps> = ({
                 htmlFor={INPUT_ID}
                 className={classnames(
                     `flex flex-col items-center justify-center w-full border-2`,
-                    `border-gray-300 border-dashed rounded-lg cursor-pointer relative`,
+                    `relative border-gray-300 border-dashed rounded-lg cursor-pointer`,
                     `transition-colors duration-200 ease-in-out`,
                     `bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600`,
                     isDragging ? 'bg-gray-200 dark:bg-gray-600' : '',
@@ -155,11 +155,11 @@ export const ImageInput: React.FC<ImageInputProps> = ({
                         height={1440}
                         src={previewUrl}
                         alt="Preview"
-                        className="w-full h-full object-cover rounded-lg absolute top-0 left-0 z-0"
+                        className="absolute top-0 left-0 z-0 object-cover w-full h-full rounded-lg"
                     />
                 )}
 
-                <div className="flex flex-col items-center justify-center pt-5 pb-6 z-10">
+                <div className="z-10 flex flex-col items-center justify-center pt-5 pb-6">
                     <Icon
                         name="upload"
                         size={24}
@@ -167,11 +167,11 @@ export const ImageInput: React.FC<ImageInputProps> = ({
                     />
 
                     {isDragging ? (
-                        <p className="mt-2 mb-1 text-sm text-gray-500 dark:text-gray-400 font-semibold">
+                        <p className="mt-2 mb-1 text-sm font-semibold text-gray-500 dark:text-gray-400">
                             Drop here
                         </p>
                     ) : (
-                        <p className="mt-2 mb-1 text-sm text-gray-500 dark:text-gray-400 font-semibold">
+                        <p className="mt-2 mb-1 text-sm font-semibold text-gray-500 dark:text-gray-400">
                             {t('app.general.upload-image')}
                         </p>
                     )}

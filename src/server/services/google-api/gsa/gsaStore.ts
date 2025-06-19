@@ -1,6 +1,7 @@
-import path from 'path';
-import fs from 'fs/promises';
-import { ENV_CONFIG_PRIVATE } from '@/common/constants';
+/**
+ * This folder is not included in git. Be sure to copy it manually.
+ */
+import accounts from './accounts';
 
 export type ServiceAccount = {
     type: string;
@@ -15,18 +16,13 @@ export type ServiceAccount = {
     client_x509_cert_url: string;
 };
 
-const gsaPath = Object.freeze({
-    GOOGLE_LOGGING_WRITE_CREDENTIALS:
-        ENV_CONFIG_PRIVATE.GOOGLE_LOGGING_WRITE_CREDENTIALS,
-    GOOGLE_STORAGE_CREDENTIALS: ENV_CONFIG_PRIVATE.GOOGLE_STORAGE_CREDENTIALS
+const gsaMap = Object.freeze({
+    GOOGLE_LOGGING_WRITE_CREDENTIALS: accounts.logging,
+    GOOGLE_STORAGE_CREDENTIALS: accounts.storage
 });
 
 export const loadServiceAccount = async (
-    id: keyof typeof gsaPath
+    id: keyof typeof gsaMap
 ): Promise<ServiceAccount> => {
-    const serviceAccount = await fs.readFile(
-        path.join(process.cwd(), gsaPath[id])
-    );
-
-    return JSON.parse(serviceAccount.toString());
+    return gsaMap[id];
 };

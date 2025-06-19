@@ -1,6 +1,10 @@
 import { NotFoundTemplate } from '@/client/components';
-import React from 'react';
+import React, { Suspense } from 'react';
 
 export default function NotFoundPage() {
-    return <NotFoundTemplate />;
+    return (
+        <Suspense fallback={null}>
+            <NotFoundTemplate />
+        </Suspense>
+    );
 }

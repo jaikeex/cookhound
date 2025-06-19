@@ -61,6 +61,8 @@
                 "prefer": "type-imports"
             }
         ],
+        //* Next.js specific rules
+        "@next/next/no-img-element": "off",
         //* React specific rules
         "react/display-name": "off",
         "react/jsx-indent-props": "off",

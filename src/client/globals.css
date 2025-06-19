@@ -3,8 +3,12 @@
 @tailwind utilities;
 
 @layer components {
-    .page-background {
+    /* .page-background {
         @apply h-screen inset-0 z-[-1] bg-gradient-to-b from-[#d1fae5] to-[#f0fdf4] dark:from-[#030712] dark:to-[#021812];
+    } */
+
+    .page-background {
+        @apply h-screen inset-0 z-[-1] bg-[#f0fdf4] dark:bg-[#030712];
     }
 
     .base-button {
