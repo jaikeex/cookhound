@@ -4,8 +4,9 @@
     "private": true,
     "scripts": {
         "dev": "next dev",
-        "build": "next build",
-        "start": "next start",
+        "build": "next build && npm run copy-static",
+        "copy-static": "node scripts/copy-standalone.js",
+        "start": "node .next/standalone/server.js",
         "prepare": "husky",
         "test": "vitest run",
         "lint": "prettier --write . && eslint . --fix",
