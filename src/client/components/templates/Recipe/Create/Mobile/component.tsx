@@ -68,7 +68,7 @@ export const MobileRecipeCreate: React.FC<MobileRecipeCreateProps> = ({
                              * Might not even be necessary given it only happens on pc while viewing baby screen.
                              */
                             //TODO: Do this better.
-                            'fixed left-0 w-[calc(100dvw-17px)] h-20 bottom-12',
+                            'fixed left-0 w-[calc(100dvw-15px)] h-20 bottom-12',
                             'bg-gradient-to-t from-[#f0fdf4] via-[#f0fdf4] via-80% to-transparent',
                             'dark:from-[#030712] dark:via-[#030712] dark:via-80% dark:to-transparent'
                         )}
@@ -79,7 +79,10 @@ export const MobileRecipeCreate: React.FC<MobileRecipeCreateProps> = ({
                         position="bottom"
                         className="h-[calc(100vh-12rem)] dark:bg-[#030712] bg-[#d1fae5]"
                     >
-                        <MobileRecipeViewTemplate recipe={recipeObject} />
+                        <MobileRecipeViewTemplate
+                            recipe={recipeObject}
+                            isPreview={true}
+                        />
                     </Sidebar>
                 </React.Fragment>
             ) : null}

@@ -16,12 +16,14 @@ import { useLocale } from '@/client/store';
 
 export type DesktopRecipeViewProps = Readonly<{
     className?: string;
+    isPreview?: boolean;
     recipe: RecipeDTO;
     ref?: React.RefObject<HTMLDivElement> | null;
 }>;
 
 export const DesktopRecipeViewTemplate: React.FC<DesktopRecipeViewProps> = ({
     className,
+    isPreview,
     recipe,
     ref
 }) => {
@@ -29,14 +31,14 @@ export const DesktopRecipeViewTemplate: React.FC<DesktopRecipeViewProps> = ({
 
     return (
         <div
-            className={`max-w-screen-md 3xl:max-w-screen-lg px-4 mx-auto ${className}`}
+            className={`max-w-screen-md px-4 mx-auto 3xl:max-w-screen-lg ${className}`}
             ref={ref}
         >
             <div className={'space-y-4'}>
                 <div className={'flex justify-between gap-12'}>
                     <div
                         className={
-                            'flex flex-col justify-between items-start w-full'
+                            'flex flex-col items-start justify-between w-full'
                         }
                     >
                         <div className={'flex flex-col w-full gap-2'}>
@@ -44,6 +46,7 @@ export const DesktopRecipeViewTemplate: React.FC<DesktopRecipeViewProps> = ({
                                 {recipe.title}
                             </Typography>
                             <Rating
+                                disabled={isPreview}
                                 rating={recipe.rating}
                                 fill={'gold'}
                                 iconSize={22}
@@ -62,7 +65,7 @@ export const DesktopRecipeViewTemplate: React.FC<DesktopRecipeViewProps> = ({
                             src={recipe.imageUrl}
                             alt={recipe.title}
                             className={
-                                'w-full max-w-80 h-48 object-cover rounded-md'
+                                'object-cover w-full h-48 rounded-md max-w-80'
                             }
                             width={320}
                             height={192}
@@ -70,7 +73,7 @@ export const DesktopRecipeViewTemplate: React.FC<DesktopRecipeViewProps> = ({
                             blurDataURL={generateImgPlaceholder(80, 80, 80)}
                         />
                     ) : (
-                        <div className={'w-full max-w-80 h-48 rounded-md'} />
+                        <div className={'w-full h-48 rounded-md max-w-80'} />
                     )}
                 </div>
 
@@ -98,7 +101,7 @@ export const DesktopRecipeViewTemplate: React.FC<DesktopRecipeViewProps> = ({
                         {recipe.notes ? (
                             <React.Fragment>
                                 <Divider dashed={true} className={'!mt-8'} />
-                                <div className={'space-y-2 w-full'}>
+                                <div className={'w-full space-y-2'}>
                                     <Typography variant={'heading-sm'}>
                                         {t('app.recipe.notes')}
                                     </Typography>

@@ -7,9 +7,11 @@ import {
     generateStars,
     getRatingFromStars
 } from '@/client/components/molecules/Rating/utils';
+import classNames from 'classnames';
 
 export type RatingProps = Readonly<{
     className?: string;
+    disabled?: boolean;
     fill?: 'gold' | 'silver' | 'bronze';
     iconSize?: number;
     onClick?: (rating: number) => void;
@@ -20,6 +22,7 @@ export const MAX_RATING = 5;
 
 export const Rating: React.FC<RatingProps> = ({
     className,
+    disabled,
     fill = 'gold',
     iconSize = 24,
     onClick,
@@ -56,9 +59,13 @@ export const Rating: React.FC<RatingProps> = ({
     return (
         <div className={className}>
             <div
-                className={'flex items-center gap-2 max-w-fit'}
+                className={classNames(
+                    'flex items-center gap-2 max-w-fit',
+                    disabled &&
+                        'cursor-not-allowed pointer-events-none opacity-50'
+                )}
                 onMouseLeave={handleMouseLeave}
-                onClick={handleClick}
+                onClick={disabled ? undefined : handleClick}
             >
                 {stars.map((star, index) => (
                     <Star

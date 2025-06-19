@@ -5,6 +5,7 @@ import classNames from 'classnames';
 
 export type NumberInputProps = Readonly<{
     allowDecimals?: boolean;
+    max?: number;
 }> &
     Omit<FormInputProps, 'type'>;
 
@@ -17,7 +18,8 @@ export const NumberInput: React.FC<NumberInputProps> = ({
     name,
     onChange,
     onKeyDown,
-    allowDecimals = false
+    allowDecimals = false,
+    max
 }) => {
     const handleChange = useCallback(
         (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -44,8 +46,9 @@ export const NumberInput: React.FC<NumberInputProps> = ({
                 onKeyDown={onKeyDown}
                 disabled={disabled}
                 autoComplete={name}
-                min={0}
                 step={allowDecimals ? '0.01' : '1'}
+                min={0}
+                max={max}
             />
             {error ? <InputError message={error} /> : null}
         </div>

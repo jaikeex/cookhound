@@ -21,7 +21,7 @@ export const TabButton: React.FC<TabButtonProps> = ({
         <button
             onClick={onClick}
             className={classnames(
-                `cursor-pointer px-4 py-1.5 rounded-sm z-10 whitespace-nowrap`,
+                `z-10 px-4 py-2 rounded-sm cursor-pointer whitespace-nowrap`,
                 className
             )}
             style={{

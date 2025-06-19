@@ -14,14 +14,17 @@ import {
 import Image from 'next/image';
 import { generateImgPlaceholder } from '@/client/utils';
 import { useLocale } from '@/client/store';
+import classNames from 'classnames';
 
 export type MobileRecipeViewProps = Readonly<{
     className?: string;
+    isPreview?: boolean;
     recipe: RecipeDTO;
 }>;
 
 export const MobileRecipeViewTemplate: React.FC<MobileRecipeViewProps> = ({
     className,
+    isPreview = false,
     recipe
 }) => {
     const { t } = useLocale();
@@ -50,7 +53,7 @@ export const MobileRecipeViewTemplate: React.FC<MobileRecipeViewProps> = ({
                     {recipe.notes ? (
                         <React.Fragment>
                             <Divider dashed={true} className={'!mt-8'} />
-                            <div className={'space-y-2 w-full'}>
+                            <div className={'w-full space-y-2'}>
                                 <Typography variant={'heading-sm'}>
                                     {t('app.recipe.notes')}
                                 </Typography>
@@ -72,7 +75,7 @@ export const MobileRecipeViewTemplate: React.FC<MobileRecipeViewProps> = ({
                     <Image
                         src={recipe.imageUrl}
                         alt={recipe.title}
-                        className={'w-full h-48 object-cover rounded-md'}
+                        className={'object-cover w-full h-48 rounded-md'}
                         width={500}
                         height={192}
                         placeholder={'blur'}
@@ -84,21 +87,27 @@ export const MobileRecipeViewTemplate: React.FC<MobileRecipeViewProps> = ({
                     {recipe.title}
                 </Typography>
 
-                <div className={'flex items-center gap-4'}>
+                <div
+                    className={classNames(
+                        'flex items-center justify-center',
+                        (recipe?.portionSize || recipe?.time) &&
+                            'gap-4 justify-between'
+                    )}
+                >
                     <RecipeInfo
                         recipe={recipe}
                         verbose={false}
                         typographyVariant={'body'}
                     />
                     <Rating
+                        disabled={isPreview}
                         rating={recipe.rating}
                         fill={'gold'}
-                        className={'ml-auto'}
                         iconSize={22}
                     />
                 </div>
                 <Divider />
-                <Tabs tabs={tabs} />
+                <Tabs tabs={tabs} buttonRowClassName={'sticky top-14 z-10'} />
             </div>
         </div>
     );

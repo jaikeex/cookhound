@@ -1,7 +1,6 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import type { RecipeFormErrors } from '@/client/components';
 import type {
     RecipeForCreatePayload,
@@ -17,10 +16,15 @@ import {
     validateFormData
 } from '@/client/utils';
 import { useCreateRecipeStore } from '@/client/store/app-store/useCreateRecipeStore';
+import { useUnsavedChangesWarning } from '@/client/hooks';
 import type { I18nMessage } from '@/client/locales';
 import type { RecipeForCreateFormData } from './types';
 import type { ObjectSchema } from 'yup';
 import { array, number, object, string } from 'yup';
+
+//~---------------------------------------------------------------------------------------------~//
+//$                                           SCHEMA                                            $//
+//~---------------------------------------------------------------------------------------------~//
 
 export const createRecipeSchema: ObjectSchema<RecipeForCreateFormData> = object(
     {
@@ -45,10 +49,13 @@ export const createRecipeSchema: ObjectSchema<RecipeForCreateFormData> = object(
     }
 );
 
+//~---------------------------------------------------------------------------------------------~//
+//$                                            HOOK                                             $//
+//~---------------------------------------------------------------------------------------------~//
+
 export const useCreateRecipe = () => {
     const { locale } = useLocale();
     const { alert } = useSnackbar();
-    const { push } = useRouter();
     const { t } = useLocale();
 
     const [changedFields, setChangedFields] = useState<string[]>([]);
@@ -57,6 +64,12 @@ export const useCreateRecipe = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const { recipeObject, setRecipeObject, updateRecipeObject } =
         useCreateRecipeStore();
+
+    const hasUnsavedChanges = changedFields.length > 0 && !isSubmitting;
+    const { allowNavigation, safePush } = useUnsavedChangesWarning({
+        hasUnsavedChanges,
+        message: t('app.recipe.unsaved-changes-warning')
+    });
 
     const handleSubmit = useCallback(
         async (event: React.FormEvent<HTMLFormElement>) => {
@@ -110,9 +123,11 @@ export const useCreateRecipe = () => {
                 });
 
                 if (createdRecipe) {
-                    // Only reset the form on successful submission
+                    // Allow navigation and reset the form on successful submission
+                    allowNavigation();
                     formElement.reset();
-                    push(`/recipe/${createdRecipe.id}`);
+                    setChangedFields([]);
+                    safePush(`/recipe/${createdRecipe.id}`);
                 }
             } catch (error: any) {
                 setFormErrors({ server: 'auth.error.default' });
@@ -120,7 +135,7 @@ export const useCreateRecipe = () => {
                 setIsSubmitting(false);
             }
         },
-        [alert, isSubmitting, locale, push, t]
+        [alert, allowNavigation, isSubmitting, locale, safePush, t]
     );
 
     const handleFormChange = useCallback(
@@ -160,6 +175,10 @@ export const useCreateRecipe = () => {
         handleFormChange
     };
 };
+
+//~---------------------------------------------------------------------------------------------~//
+//$                                          FUNCTIONS                                          $//
+//~---------------------------------------------------------------------------------------------~//
 
 const createRecipePlaceholder = (
     t: (key: I18nMessage) => string

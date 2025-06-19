@@ -5,12 +5,20 @@ import classnames from 'classnames';
 
 export type BaseInputProps = Readonly<{
     className?: string;
+    ref?: React.RefObject<HTMLInputElement> | null;
 }> &
-    React.InputHTMLAttributes<HTMLInputElement>;
+    Omit<React.InputHTMLAttributes<HTMLInputElement>, 'ref'>;
 
 export const BaseInput: React.FC<BaseInputProps> = ({
     className,
+    ref,
     ...props
 }) => {
-    return <input {...props} className={classnames('base-input', className)} />;
+    return (
+        <input
+            ref={ref}
+            {...props}
+            className={classnames('base-input', className)}
+        />
+    );
 };

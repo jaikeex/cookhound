@@ -36,7 +36,7 @@ export const TopNavigation: React.FC<TopNavigationProps> = () => {
     return (
         <div
             id="top-navbar"
-            className="h-12 md:h-14 w-full flex items-center justify-between p-4 sticky top-0 z-20 bg-[#d1fae5] dark:bg-[#030712]"
+            className="h-14 w-full flex items-center justify-between p-4 sticky top-0 z-20 bg-[#d1fae5] dark:bg-[#030712]"
         >
             <Link
                 href={'/'}

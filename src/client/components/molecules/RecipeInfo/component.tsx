@@ -20,7 +20,7 @@ export const RecipeInfo: React.FC<RecipeInfoProps> = ({
     const { t } = useLocale();
 
     return (
-        <div className={'flex items-center gap-8'}>
+        <div className={'flex items-center gap-6'}>
             {recipe.portionSize ? (
                 <div className={'flex items-center gap-2'}>
                     <Icon name={'servings'} size={24} />

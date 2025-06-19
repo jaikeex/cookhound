@@ -12,9 +12,10 @@ export type TabContent = {
 
 export type TabsProps = Readonly<{
     activeTab?: number;
+    buttonRowClassName?: string;
+    className?: string;
     onTabChange?: (tabIndex: number) => void;
     tabs: TabContent[];
-    className?: string;
 }> &
     React.PropsWithChildren;
 
@@ -22,6 +23,7 @@ export const Tabs: React.FC<TabsProps> = ({
     activeTab = 0,
     onTabChange,
     tabs,
+    buttonRowClassName,
     className
 }) => {
     const [currentTab, setCurrentTab] = useState<number>(activeTab);
@@ -37,11 +39,12 @@ export const Tabs: React.FC<TabsProps> = ({
     );
 
     return (
-        <div className={className}>
+        <div className={classNames(className)}>
             <div
                 className={classNames(
-                    'flex flex-row items-center rounded-md w-full relative',
-                    'bg-gray-200 dark:bg-gray-800'
+                    'relative flex flex-row items-center w-full rounded-md',
+                    'bg-gray-200 dark:bg-gray-800',
+                    buttonRowClassName
                 )}
             >
                 {tabs.map((tab, index) => (
@@ -57,9 +60,9 @@ export const Tabs: React.FC<TabsProps> = ({
                 {/* highlighter which moves to the active tab position */}
                 <div
                     className={classnames(
-                        'h-full bg-blue-600 opacity-20 w-1/3 absolute rounded-md',
+                        'absolute w-1/3 h-full bg-blue-600 rounded-md opacity-20',
                         `transition-transform duration-200 ease-in-out`,
-                        'top-0 pointer-events-none z-0'
+                        'top-0 z-0 pointer-events-none'
                     )}
                     style={{
                         width: `${tabWidth}%`,
@@ -67,7 +70,7 @@ export const Tabs: React.FC<TabsProps> = ({
                     }}
                 />
             </div>
-            <div className={'mt-3 px-2'}>{tabs[currentTab].content}</div>
+            <div className={'px-2 mt-3'}>{tabs[currentTab].content}</div>
         </div>
     );
 };

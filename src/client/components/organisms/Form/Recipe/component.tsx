@@ -7,6 +7,7 @@ import {
     IngredientsListCreate,
     InputError,
     InstructionsListCreate,
+    NumberInput,
     Submit,
     Textarea,
     TextInput,
@@ -54,9 +55,14 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({
 
     const handleInputChange = useCallback(
         (name: string) => (e: React.ChangeEvent) => {
+            let value: string | number = (e.target as HTMLInputElement).value;
+
+            if (name === 'portionSize' || name === 'time') {
+                value = Number(value) || 0;
+            }
+
             if (onChange) {
-                const value = (e.target as HTMLInputElement).value;
-                onChange(name, value);
+                onChange && onChange(name, value);
             }
         },
         [onChange]
@@ -107,20 +113,22 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({
             <Divider className="md:hidden" />
 
             <div className={'flex flex-col gap-4 md:grid md:grid-cols-2'}>
-                <TextInput
+                <NumberInput
                     className={'mt-auto'}
                     id={'recipe-portionSize'}
                     label={t('app.recipe.servings')}
                     name={'portionSize'}
-                    type={'number'}
+                    max={100}
+                    allowDecimals={false}
                     onChange={handleInputChange('portionSize')}
                     onKeyDown={handleInputKeyPress('recipe-time')}
                 />
-                <TextInput
+                <NumberInput
                     id={'recipe-time'}
                     label={t('app.recipe.preparation-time')}
                     name={'time'}
-                    type={'number'}
+                    max={9999}
+                    allowDecimals={false}
                     onChange={handleInputChange('time')}
                     onKeyDown={handleInputKeyPress('ingredient-quantity-0')}
                 />

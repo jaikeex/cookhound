@@ -59,6 +59,7 @@ export const DesktopRecipeCreate: React.FC<DesktopRecipeCreateProps> = ({
                     <>
                         <DesktopRecipeViewTemplate
                             recipe={recipeObject}
+                            isPreview={true}
                             className="hidden xl:block"
                         />
                     </>
