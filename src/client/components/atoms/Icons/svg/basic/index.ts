@@ -1,5 +1,6 @@
 import BellIcon from './bell.svg';
 import BookIcon from './book.svg';
+import CartIcon from './cart.svg';
 import CheckmarkIcon from './checkmark.svg';
 import ChevronDoubleUpIcon from './chevron-double-up.svg';
 import ChevronDoubleDownIcon from './chevron-double-down.svg';
@@ -13,6 +14,7 @@ import HomeIcon from './home.svg';
 import InfoIcon from './info.svg';
 import MoonIcon from './moon.svg';
 import PlusIcon from './plus.svg';
+import ShoppingListIcon from './shopping-list.svg';
 import SearchIcon from './search.svg';
 import StarIcon from './star.svg';
 import StarFullIcon from './star-full.svg';
@@ -23,6 +25,7 @@ import UploadIcon from './upload.svg';
 export const basicSvg = {
     BellIcon,
     BookIcon,
+    CartIcon,
     CheckmarkIcon,
     ChevronDoubleUpIcon,
     ChevronDoubleDownIcon,
@@ -37,6 +40,7 @@ export const basicSvg = {
     MoonIcon,
     PlusIcon,
     SearchIcon,
+    ShoppingListIcon,
     StarIcon,
     StarFullIcon,
     StarHalfIcon,

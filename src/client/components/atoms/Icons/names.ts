@@ -3,6 +3,7 @@ import { iconsSvg } from './svg';
 export const icons = {
     bell: iconsSvg.BellIcon,
     book: iconsSvg.BookIcon,
+    cart: iconsSvg.CartIcon,
     checkmark: iconsSvg.CheckmarkIcon,
     chevronDoubleUp: iconsSvg.ChevronDoubleUpIcon,
     chevronDoubleDown: iconsSvg.ChevronDoubleDownIcon,
@@ -19,6 +20,7 @@ export const icons = {
     plus: iconsSvg.PlusIcon,
     servings: iconsSvg.ServingsIcon,
     search: iconsSvg.SearchIcon,
+    shoppingList: iconsSvg.ShoppingListIcon,
     star: iconsSvg.StarIcon,
     starFull: iconsSvg.StarFullIcon,
     starHalf: iconsSvg.StarHalfIcon,
