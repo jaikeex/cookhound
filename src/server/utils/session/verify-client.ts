@@ -10,17 +10,17 @@ import { MiddlewareError } from '@/server/error';
 
 //§—————————————————————————————————————————————————————————————————————————————————————————————§//
 //§                                         CLIENT ONLY                                         §//
-/**
- *§ These functions should only be used on the client side and in the middleware.
- *#
- *# Using them on the server is inefficient and unnecessary, since the server can use all the
- *# necessary tools directly. The same can't be done in the middleware, since node.js packages
- *# can't be imported for some reason. The jwt verification must use node:crypto, so that path
- *# is closed.
- *#
- *? NOTE to me: Apparently the support fore node in next middleware is now in the canary
- *? stage of development. (2025-06-16)
- */
+///
+//# These functions should only be used on the client side and in the middleware.
+//#
+//# Using them on the server is inefficient and unnecessary, since the server can use all the
+//# necessary tools directly. The same can't be done in the middleware, since node.js packages
+//# can't be imported for some reason. The jwt verification must use node:crypto, so that path
+//# is closed.
+//#
+//? NOTE to me: Apparently the support fore node in next middleware is now in the canary
+//? stage of development. (2025-06-16)
+///
 //§—————————————————————————————————————————————————————————————————————————————————————————————§//
 
 //~=============================================================================================~//

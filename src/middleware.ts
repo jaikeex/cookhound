@@ -11,18 +11,18 @@ export async function middleware(request: NextRequest) {
     try {
         //?—————————————————————————————————————————————————————————————————————————————————————————?//
         //?                     MOST MIDDLEWARE CODE SHOULD BE CALLED FROM HERE                     ?//
-        /**
-         *# Add middleware steps in order. Every step must return either a NextResponse, null or
-         *# throw a MiddlewareError.
-         *#
-         *# The contract here is as follows:
-         *#  (1) If the step function throws an instance of MiddlewareError with provided
-         *#      response, the middleware execution is stopped immediately and the response is used.
-         *#  (2) If the step function returns a NextResponse, that response is saved, overwriting
-         *#      any previously saved response and will be used unless some other step function
-         *#      down the ladder overwrites it.
-         *#  (3) If the function returns null, the middleware continues without modifying the response.
-         */
+        ///
+        //# Add middleware steps in order. Every step must return either a NextResponse, null or
+        //# throw a MiddlewareError.
+        //#
+        //# The contract here is as follows:
+        //#  (1) If the step function throws an instance of MiddlewareError with provided
+        //#      response, the middleware execution is stopped immediately and the response is used.
+        //#  (2) If the step function returns a NextResponse, that response is saved, overwriting
+        //#      any previously saved response and will be used unless some other step function
+        //#      down the ladder overwrites it.
+        //#  (3) If the function returns null, the middleware continues without modifying the response.
+        ///
         //?—————————————————————————————————————————————————————————————————————————————————————————?//
 
         response = (await verifyRouteAccess(request)) ?? response;

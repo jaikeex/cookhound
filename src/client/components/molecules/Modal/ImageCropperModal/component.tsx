@@ -50,14 +50,14 @@ export const ImageCropperModal: React.FC<ImageCropperModalProps> = ({
 
             //?—————————————————————————————————————————————————————————————————————————————————?//
             //?                               INITIAL CROP SIZE                                 ?//
-            /**
-             *# These calculations provide the correct widht, height and position for the
-             *# initial cropper rectange. The aspect ratio of 16/9 is defined throughout the app
-             *# so do not change it here without a plan.
-             *# Changing the size only requires the initialCroppedPercentage value to be set
-             *# as a percentage of the image width to be included inside the initial crop.
-             *# The position will be set to the middle of the image.
-             */
+            ///
+            //# These calculations provide the correct widht, height and position for the
+            //# initial cropper rectange. The aspect ratio of 16/9 is defined throughout the app
+            //# so do not change it here without a plan.
+            //# Changing the size only requires the initialCroppedPercentage value to be set
+            //# as a percentage of the image width to be included inside the initial crop.
+            //# The position will be set to the middle of the image.
+            ///
             //?—————————————————————————————————————————————————————————————————————————————————?//
 
             const initialCroppedPercentage = 0.8;

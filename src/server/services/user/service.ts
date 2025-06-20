@@ -17,6 +17,14 @@ import db from '@/server/db/model';
  * It handles user creation, email verification, and other user-centric operations.
  */
 class UserService {
+    //~-----------------------------------------------------------------------------------------~//
+    //$                                         CREATE                                          $//
+    //~-----------------------------------------------------------------------------------------~//
+
+    //|-----------------------------------------------------------------------------------------|//
+    //?                                         MANUAL                                          ?//
+    //|-----------------------------------------------------------------------------------------|//
+
     /**
      * Creates a new user with local authentication (email and password).
      * It hashes the password, generates a verification token, and sends a verification email.
@@ -82,6 +90,10 @@ class UserService {
         return userResponse;
     }
 
+    //|-----------------------------------------------------------------------------------------|//
+    //?                                         GOOGLE                                          ?//
+    //|-----------------------------------------------------------------------------------------|//
+
     /**
      * Creates a new user from a Google OAuth sign-in.
      *
@@ -117,6 +129,10 @@ class UserService {
         return userResponse;
     }
 
+    //~-----------------------------------------------------------------------------------------~//
+    //$                                       VERIFY EMAIL                                      $//
+    //~-----------------------------------------------------------------------------------------~//
+
     /**
      * Verifies a user's email address using a verification token.
      *
@@ -145,6 +161,10 @@ class UserService {
             emailVerificationToken: null
         });
     }
+
+    //~-----------------------------------------------------------------------------------------~//
+    //$                                 SEND VERIFICATION EMAIL                                 $//
+    //~-----------------------------------------------------------------------------------------~//
 
     /**
      * Resends an email verification link to a user.

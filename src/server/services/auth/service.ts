@@ -21,6 +21,14 @@ import db from '@/server/db/model';
  * This includes user login, logout, session management, and OAuth.
  */
 class AuthService {
+    //~-----------------------------------------------------------------------------------------~//
+    //$                                          LOGIN                                          $//
+    //~-----------------------------------------------------------------------------------------~//
+
+    //|-----------------------------------------------------------------------------------------|//
+    //?                                         MANUAL                                          ?//
+    //|-----------------------------------------------------------------------------------------|//
+
     /**
      * Authenticates a user with their email and password.
      * It validates credentials, and on success, updates the last login time
@@ -83,55 +91,9 @@ class AuthService {
         return { token, user: userResponse };
     }
 
-    /**
-     * Retrieves the currently authenticated user based on the JWT cookie.
-     *
-     * @returns A promise that resolves to the authenticated user's data.
-     * @throws {ServerError} Throws an error with status 401 if the user is not authenticated.
-     * @throws {ServerError} Throws an error with status 404 if the user is not found.
-     */
-    async getCurrentUser(): Promise<UserDTO> {
-        const cookieStore = await cookies();
-        const token = cookieStore?.get(JWT_COOKIE_NAME)?.value;
-
-        if (!token) {
-            throw new ServerError('auth.error.unauthorized', 401);
-        }
-
-        const decoded = verifyToken(token);
-        const user = await db.user.getOneById(Number(decoded.id));
-
-        if (!user) {
-            throw new ServerError('auth.error.user-not-found', 404);
-        }
-
-        if (!user.emailVerified) {
-            throw new ServerError('auth.error.email-not-verified', 403);
-        }
-
-        return {
-            id: user.id,
-            email: user.email,
-            username: user.username,
-            avatarUrl: user.avatarUrl,
-            createdAt: user.createdAt.toISOString(),
-            role: user.role as UserRole,
-            status: user.status as Status,
-            lastLogin: user.lastLogin?.toISOString() || null
-        };
-    }
-
-    /**
-     * Logs out the currently authenticated user by deleting the JWT cookie.
-     *
-     * @returns void.
-     * @throws {ServerError} Throws an error with status 500 if there is an error.
-     */
-    async logout(): Promise<void> {
-        const cookieStore = await cookies();
-        cookieStore.delete('jwt');
-        return;
-    }
+    //|-----------------------------------------------------------------------------------------|//
+    //?                                         GOOGLE                                          ?//
+    //|-----------------------------------------------------------------------------------------|//
 
     /**
      * Authenticates a user using a Google OAuth authorization code.
@@ -224,6 +186,64 @@ class AuthService {
         });
 
         return { token, user };
+    }
+
+    //~-----------------------------------------------------------------------------------------~//
+    //$                                         LOGOUT                                          $//
+    //~-----------------------------------------------------------------------------------------~//
+
+    /**
+     * Logs out the currently authenticated user by deleting the JWT cookie.
+     *
+     * @returns void.
+     * @throws {ServerError} Throws an error with status 500 if there is an error.
+     */
+    async logout(): Promise<void> {
+        const cookieStore = await cookies();
+        cookieStore.delete('jwt');
+        return;
+    }
+
+    //~-----------------------------------------------------------------------------------------~//
+    //$                                       GET CURRENT                                       $//
+    //~-----------------------------------------------------------------------------------------~//
+
+    /**
+     * Retrieves the currently authenticated user based on the JWT cookie.
+     *
+     * @returns A promise that resolves to the authenticated user's data.
+     * @throws {ServerError} Throws an error with status 401 if the user is not authenticated.
+     * @throws {ServerError} Throws an error with status 404 if the user is not found.
+     */
+    async getCurrentUser(): Promise<UserDTO> {
+        const cookieStore = await cookies();
+        const token = cookieStore?.get(JWT_COOKIE_NAME)?.value;
+
+        if (!token) {
+            throw new ServerError('auth.error.unauthorized', 401);
+        }
+
+        const decoded = verifyToken(token);
+        const user = await db.user.getOneById(Number(decoded.id));
+
+        if (!user) {
+            throw new ServerError('auth.error.user-not-found', 404);
+        }
+
+        if (!user.emailVerified) {
+            throw new ServerError('auth.error.email-not-verified', 403);
+        }
+
+        return {
+            id: user.id,
+            email: user.email,
+            username: user.username,
+            avatarUrl: user.avatarUrl,
+            createdAt: user.createdAt.toISOString(),
+            role: user.role as UserRole,
+            status: user.status as Status,
+            lastLogin: user.lastLogin?.toISOString() || null
+        };
     }
 }
 

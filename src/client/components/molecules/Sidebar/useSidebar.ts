@@ -112,17 +112,17 @@ export const useSidebar = (config: SidebarConfig = {}) => {
 
     //?—————————————————————————————————————————————————————————————————————————————————————————?//
     //?                                     -> IMPORTANT <-                                      //
-    /**
-     *# These functions together handle the core logic of opening/closing the sidebar.
-     *#
-     *# They need to manage everything including the isSidebarOpen state, styles and animations.
-     *# The process uses ref-based locking mechanism to prevent any conflicting invocations.
-     *# (Should not be necessary when calling things correctly all the time but fuck me...)
-     *#
-     *~ Only the toggleSidebar() handler should be called directly to switch the sidebar state.
-     *~ All other functions should be considered private to this 'section'
-     *~ for all intents and purposes
-     */
+    ///
+    //# These functions together handle the core logic of opening/closing the sidebar.
+    //#
+    //# They need to manage everything including the isSidebarOpen state, styles and animations.
+    //# The process uses ref-based locking mechanism to prevent any conflicting invocations.
+    //# (Should not be necessary when calling things correctly all the time but fuck me...)
+    //#
+    //~ Only the toggleSidebar() handler should be called directly to switch the sidebar state.
+    //~ All other functions should be considered private to this 'section'
+    //~ for all intents and purposes
+    ///
     //?—————————————————————————————————————————————————————————————————————————————————————————?//
 
     const toggleSidebarWithAnimation = useCallback(
@@ -155,15 +155,15 @@ export const useSidebar = (config: SidebarConfig = {}) => {
 
         //?—————————————————————————————————————————————————————————————————————————————————————?//
         //?                                   MOBILE PARAMS                                     ?//
-        /**
-         *# If the sidebar was opened on mobile, go back to the previous page when it's closed
-         *# The condition is needed to prevent the page from going back multiple times when the
-         *# user clicks outside the sidebar multiple times.
-         *#
-         *?  This unfortunately seems like the best place to put it. If called from the url
-         *?  management functions then multiple cases would be left out...
-         *TODO: Can this be solved in some other way?
-         */
+        ///
+        //# If the sidebar was opened on mobile, go back to the previous page when it's closed
+        //# The condition is needed to prevent the page from going back multiple times when the
+        //# user clicks outside the sidebar multiple times.
+        //#
+        //?  This unfortunately seems like the best place to put it. If called from the url
+        //?  management functions then multiple cases would be left out...
+        //TODO: Can this be solved in some other way?
+        ///
         //?—————————————————————————————————————————————————————————————————————————————————————?//
 
         if (!useMobileParams || !searchParams.get(paramKey) || !isMobile)
@@ -272,12 +272,12 @@ export const useSidebar = (config: SidebarConfig = {}) => {
     const handlePathnameChange = useCallback(() => {
         //———————————————————————————————————————————————————————————————————————————————————————//
         //                                 CLOSE ON PATH CHANGE                                  //
-        /**
-         * Close the sidebar when the user navigates to a different page directly from the sidebar.
-         * This mainly applies to desktop screens, where the query parameter is not used, and so the
-         * params change listener does not fire.
-         * On mobile screens this serves as redundancy.
-         */
+        //
+        // Close the sidebar when the user navigates to a different page directly from the sidebar.
+        // This mainly applies to desktop screens, where the query parameter is not used, and so the
+        // params change listener does not fire.
+        // On mobile screens this serves as redundancy.
+        //
         //———————————————————————————————————————————————————————————————————————————————————————//
 
         // Don't close if we're currently in the process of opening the sidebar

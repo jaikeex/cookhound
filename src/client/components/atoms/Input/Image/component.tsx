@@ -104,11 +104,11 @@ export const ImageInput: React.FC<ImageInputProps> = ({
                 if (processedFile) {
                     //———————————————————————————————————————————————————————————————————————————————//
                     //                              SECOND VERIFY CALL                               //
-                    /**
-                     * Image size is checked here for the second time on purpose.
-                     * The overhead is non-existent and it gives the app another chance to reject
-                     * broken image that for some reason passed through the conversion uncaught.
-                     */
+                    //
+                    // Image size is checked here for the second time on purpose.
+                    // The overhead is non-existent and it gives the app another chance to reject
+                    // broken image that for some reason passed through the conversion uncaught.
+                    //
                     //———————————————————————————————————————————————————————————————————————————————//
 
                     await verifyImgSize(
@@ -180,11 +180,11 @@ export const ImageInput: React.FC<ImageInputProps> = ({
 
             //|—————————————————————————————————————————————————————————————————————————————————|//
             //                                   NO CALLBACK                                     //
-            /**
-             * Creating these handlers right here is the most elegant solution i think. Doing
-             * on upper level would require shitty signatures and hofs, but eslint does not
-             * understand anything about that so just disable it here.
-             */
+            //
+            // Creating these handlers right here is the most elegant solution i think. Doing
+            // on upper level would require shitty signatures and hofs, but eslint does not
+            // understand anything about that so just disable it here.
+            //
             //|—————————————————————————————————————————————————————————————————————————————————|//
 
             return (

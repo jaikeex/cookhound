@@ -23,15 +23,15 @@ export const useUnsavedChangesWarning = ({
     useEffect(() => {
         //§—————————————————————————————————————————————————————————————————————————————————————§//
         //§                                       WARNING                                       §//
-        /**
-         *# Setting negative value here is NOT allowed, as it would enable the calling
-         *# component to possibly manipulate the state through shitty implementation.
-         *# If, for example, the hasUnsavedChanges argument would be based on formData placeholder
-         *# object or some inputs would be excluded from the check, the user could be fucked.
-         *#
-         *# This does not prevent every unwanted passes and is still heavily dependent on
-         *# the hook being used right, but is the safest/simplest method i was able to find.
-         */
+        ///
+        //# Setting negative value here is NOT allowed, as it would enable the calling
+        //# component to possibly manipulate the state through shitty implementation.
+        //# If, for example, the hasUnsavedChanges argument would be based on formData placeholder
+        //# object or some inputs would be excluded from the check, the user could be fucked.
+        //#
+        //# This does not prevent every unwanted passes and is still heavily dependent on
+        //# the hook being used right, but is the safest/simplest method i was able to find.
+        ///
         //§—————————————————————————————————————————————————————————————————————————————————————§//
 
         if (hasUnsavedChanges) hasUnsavedChangesRef.current = hasUnsavedChanges;
@@ -43,17 +43,17 @@ export const useUnsavedChangesWarning = ({
 
     //?—————————————————————————————————————————————————————————————————————————————————————————?//
     //?                                   EXTERNAL NAVIGATION                                   ?//
-    /**
-     *# This handles 'external' navigation events through the 'beforeunload' event listener.
-     *#
-     *§ This *DOES NOT* prevent back and forward browser navigation if the destination is also
-     *§ on cookhound. This is true on mobile and desktop, at least in chrome.
-     *? On that note, catching internal back/forward navigation sounds easy on docs and paper,
-     *? but i was not able to make it work and could not be bothered to try harder.
-     *? If I come here wanting to try in the future, this seems like a good start:
-     *? https://github.com/vercel/next.js/discussions/49532
-     *? https://github.com/vercel/next.js/discussions/75454
-     */
+    ///
+    //# This handles 'external' navigation events through the 'beforeunload' event listener.
+    //#
+    //§ This *DOES NOT* prevent back and forward browser navigation if the destination is also
+    //§ on cookhound. This is true on mobile and desktop, at least in chrome.
+    //? On that note, catching internal back/forward navigation sounds easy on docs and paper,
+    //? but i was not able to make it work and could not be bothered to try harder.
+    //? If I come here wanting to try in the future, this seems like a good start:
+    //? https://github.com/vercel/next.js/discussions/49532
+    //? https://github.com/vercel/next.js/discussions/75454
+    ///
     //?—————————————————————————————————————————————————————————————————————————————————————————?//
 
     const handleBeforeUnload = useCallback(
@@ -149,9 +149,9 @@ export const useUnsavedChangesWarning = ({
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
     //$                               LISTEN TO PATHNAME CHANGES                                $//
-    /**
-     *# Reset the navigation ref to false when the navigation is finished.
-     */
+    ///
+    //# Reset the navigation ref to false when the navigation is finished.
+    ///
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 
     const handleInternalNavigation = useCallback(() => {
@@ -179,14 +179,14 @@ export const useUnsavedChangesWarning = ({
     const allowNavigation = useCallback(() => {
         //?—————————————————————————————————————————————————————————————————————————————————————?//
         //?                                   IMPORTANT INFO                                    ?//
-        /**
-         *# This is the intended way of enabling the following safe router methods.
-         *#
-         *# Updating unsavedChanges manually to false from outside is prevented because it
-         *# would basically have the same effect, but calling this function signals to the hook
-         *# that the calling form has done all operations with the data it needed to do and is
-         *# ready to loose them by allowing the user to navigate elsewhere.
-         */
+        ///
+        //# This is the intended way of enabling the following safe router methods.
+        //#
+        //# Updating unsavedChanges manually to false from outside is prevented because it
+        //# would basically have the same effect, but calling this function signals to the hook
+        //# that the calling form has done all operations with the data it needed to do and is
+        //# ready to loose them by allowing the user to navigate elsewhere.
+        ///
         //?—————————————————————————————————————————————————————————————————————————————————————?//
 
         isNavigatingRef.current = true;
