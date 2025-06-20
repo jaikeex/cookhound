@@ -8,8 +8,13 @@ import { authService } from '@/server/services/';
 import db from '@/server/db/model';
 import type { Locale } from '@/client/locales';
 import { ServerError } from '@/server/error';
+import type { Rating } from '@prisma/client';
 
 class RecipeService {
+    //~-----------------------------------------------------------------------------------------~//
+    //$                                        GET BY ID                                        $//
+    //~-----------------------------------------------------------------------------------------~//
+
     async getRecipeById(id: number): Promise<RecipeDTO> {
         const recipe = await db.recipe.getOneById(id);
 
@@ -39,6 +44,10 @@ class RecipeService {
         return recipeDTO;
     }
 
+    //~-----------------------------------------------------------------------------------------~//
+    //$                                         CREATE                                          $//
+    //~-----------------------------------------------------------------------------------------~//
+
     async createRecipe(payload: RecipeForCreatePayload): Promise<RecipeDTO> {
         const author = await authService.getCurrentUser();
 
@@ -53,19 +62,57 @@ class RecipeService {
         };
 
         const recipe = await db.recipe.createOne({
-            recipe: {
-                ...recipeforCreate,
-                author: {
-                    connect: {
-                        id: author.id
-                    }
-                }
-            },
+            recipe: recipeforCreate,
+            authorId: author.id,
             instructions: payload.instructions,
             ingredients: payload.ingredients
         });
 
         return this.getRecipeById(recipe.id);
+    }
+
+    //~-----------------------------------------------------------------------------------------~//
+    //$                                         RATING                                          $//
+    //~-----------------------------------------------------------------------------------------~//
+
+    async rateRecipe(recipeId: number, rating: number): Promise<void> {
+        if (rating < 1 || rating > 5) {
+            throw new ServerError('app.error.bad-request', 400);
+        }
+
+        const author = await authService.getCurrentUser();
+
+        const recipe = await this.getRecipeById(recipeId);
+
+        if (!recipe) {
+            throw new ServerError('recipe.error.not-found', 404);
+        }
+
+        const existingRating: Rating | null =
+            await db.rating.getOneByUserIdAndRecipeId(author.id, recipeId);
+
+        if (existingRating) {
+            await db.rating.updateOne(author.id, recipeId, {
+                rating
+            });
+        } else {
+            await db.rating.createOne(author.id, recipeId, {
+                rating
+            });
+        }
+
+        const allRatings = await db.rating.getAllByRecipeId(recipeId);
+
+        const sumOfRatings = allRatings.reduce(
+            (acc, rating) => acc + Number(rating.rating),
+            0
+        );
+
+        const averageRating = sumOfRatings / allRatings.length;
+
+        await db.recipe.updateOneById(recipeId, {
+            rating: averageRating
+        });
     }
 }
 

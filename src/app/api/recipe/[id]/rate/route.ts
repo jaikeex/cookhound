@@ -1,0 +1,49 @@
+import type { NextRequest } from 'next/server';
+import { recipeService } from '@/server/services/recipe/service';
+import { handleServerError, verifySession } from '@/server/utils';
+import { withRateLimit } from '@/server/utils/rate-limit/wrapper';
+import { ServerError } from '@/server/error';
+
+/**
+ * Handles POST requests to `/api/recipe/{id}/rate` to rate a recipe.
+ *
+ * ! This endpoint is restricted and only accessible to authenticated users.
+ *
+ * @returns A JSON response with the recipe data.
+ *
+ * - 200: Success, with recipe data.
+ * - 400: Bad Request, if the recipe ID is not a number.
+ * - 401: Unauthorized, if the user is not authenticated.
+ * - 429: Too Many Requests, if the user has exceeded the rate limit.
+ * - 500: Internal Server Error, if there is another error during the rating process.
+ */
+async function rateRecipeHandler(request: NextRequest) {
+    try {
+        const id = request.nextUrl.pathname.split('/').at(-2);
+        const payload = await request.json();
+
+        if (!(await verifySession())) {
+            throw new ServerError('auth.error.unauthorized', 401);
+        }
+
+        if (
+            !id ||
+            isNaN(Number(id)) ||
+            !payload?.rating ||
+            isNaN(Number(payload.rating))
+        ) {
+            throw new ServerError('app.error.bad-request', 400);
+        }
+
+        await recipeService.rateRecipe(Number(id), payload.rating);
+
+        return Response.json({ message: 'Recipe rated successfully' });
+    } catch (error) {
+        return handleServerError(error);
+    }
+}
+
+export const POST = withRateLimit(rateRecipeHandler, {
+    maxRequests: 10,
+    windowSizeInSeconds: 60
+});

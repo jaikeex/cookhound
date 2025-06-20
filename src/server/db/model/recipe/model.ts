@@ -1,6 +1,7 @@
 import {
     cachePrismaQuery,
-    generateCacheKey
+    generateCacheKey,
+    invalidateModelCache
 } from '@/server/db/model/model-cache';
 import prisma from '@/server/db/prisma';
 import type { Prisma, Recipe } from '@prisma/client';
@@ -25,7 +26,7 @@ class RecipeModel {
             ttl
         );
 
-        return recipe[0];
+        return recipe[0] ?? null;
     }
 
     //~=========================================================================================~//
@@ -33,13 +34,24 @@ class RecipeModel {
     //~=========================================================================================~//
 
     async createOne(data: {
-        recipe: Omit<Prisma.RecipeCreateInput, 'instructions' | 'ingredients'>;
+        recipe: Omit<
+            Prisma.RecipeCreateInput,
+            'instructions' | 'ingredients' | 'author'
+        >;
+        authorId: number;
         instructions: string[];
         ingredients: { name: string; quantity: string | null }[];
     }): Promise<Recipe> {
         return await prisma.$transaction(async (tx) => {
             const recipe = await tx.recipe.create({
-                data: data.recipe
+                data: {
+                    ...data.recipe,
+                    author: {
+                        connect: {
+                            id: data.authorId
+                        }
+                    }
+                }
             });
 
             // Create instructions
@@ -101,9 +113,30 @@ class RecipeModel {
         });
     }
 
+    async updateOneById(
+        id: number,
+        data: Prisma.RecipeUpdateInput
+    ): Promise<Recipe> {
+        const recipe = await prisma.recipe.update({
+            where: { id },
+            data
+        });
+
+        await this.invalidateRecipeCache(recipe);
+
+        return recipe;
+    }
+
     //~=========================================================================================~//
     //$                                      PRIVATE METHODS                                    $//
     //~=========================================================================================~//
+
+    private async invalidateRecipeCache(
+        changed: Partial<Recipe>,
+        original?: Partial<Recipe>
+    ) {
+        await invalidateModelCache('recipe', changed, original ?? undefined);
+    }
 }
 
 const recipeModel = new RecipeModel();
