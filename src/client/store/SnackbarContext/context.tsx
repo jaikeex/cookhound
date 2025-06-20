@@ -8,8 +8,9 @@ import React, {
     useMemo,
     useState
 } from 'react';
-import type { SnackbarVariant } from '@/client/components';
 import { Snackbar } from '@/client/components';
+import type { AlertPayload } from '@/client/types';
+import ReactDOM from 'react-dom';
 
 const AUTO_DISMISS = 4000;
 
@@ -31,11 +32,6 @@ export const useSnackbar = () => {
 };
 
 type SnackbarProviderProps = React.PropsWithChildren<NonNullable<unknown>>;
-
-type AlertPayload = {
-    message: string;
-    variant: SnackbarVariant;
-};
 
 type Alert = AlertPayload & {
     id: string;
@@ -86,14 +82,18 @@ export const SnackbarProvider: React.FC<SnackbarProviderProps> = ({
     return (
         <SnackbarContext.Provider value={value}>
             {children}
-            {activeAlerts.map((alertObj) => (
-                <Snackbar
-                    key={alertObj.id}
-                    variant={alertObj.variant}
-                    message={alertObj.message}
-                    onClose={removeAlert(alertObj.id)}
-                />
-            ))}
+            {typeof window !== 'undefined' &&
+                activeAlerts.map((alertObj) =>
+                    ReactDOM.createPortal(
+                        <Snackbar
+                            key={alertObj.id}
+                            variant={alertObj.variant}
+                            message={alertObj.message}
+                            onClose={removeAlert(alertObj.id)}
+                        />,
+                        document.body
+                    )
+                )}
         </SnackbarContext.Provider>
     );
 };

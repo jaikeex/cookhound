@@ -19,13 +19,21 @@ import classNames from 'classnames';
 
 type ModalRenderer = (close: () => void) => React.ReactNode;
 
+type ModalOptions = Readonly<{
+    hideCloseButton?: boolean;
+}>;
+
 interface Modal {
     id: string;
     renderer: ModalRenderer;
+    options?: ModalOptions;
 }
 
 interface ModalContextType {
-    openModal: (content: React.ReactNode | ModalRenderer) => string;
+    openModal: (
+        content: React.ReactNode | ModalRenderer,
+        options?: ModalOptions
+    ) => string;
     closeModal: (id: string) => void;
     closeAll: () => void;
 }
@@ -56,7 +64,7 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
     const closeAll = useCallback(() => setModals([]), []);
 
     const openModal = useCallback(
-        (content: React.ReactNode | ModalRenderer) => {
+        (content: React.ReactNode | ModalRenderer, options?: ModalOptions) => {
             const id = makeId(6);
 
             const renderer: ModalRenderer =
@@ -64,7 +72,7 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
                     ? (close) => (content as ModalRenderer)(close)
                     : () => content;
 
-            setModals((current) => [...current, { id, renderer }]);
+            setModals((current) => [...current, { id, renderer, options }]);
 
             return id;
         },
@@ -87,8 +95,12 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
             {typeof window !== 'undefined' &&
                 ReactDOM.createPortal(
                     <AnimatePresence initial={false}>
-                        {modals.map(({ id, renderer }) => (
-                            <ModalWrapper key={id} onClose={handleClose(id)}>
+                        {modals.map(({ id, renderer, options }) => (
+                            <ModalWrapper
+                                key={id}
+                                onClose={handleClose(id)}
+                                {...options}
+                            >
                                 {renderer(handleClose(id))}
                             </ModalWrapper>
                         ))}
@@ -106,7 +118,8 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
 type ModalWrapperProps = Readonly<{
     onClose: () => void;
 }> &
-    React.PropsWithChildren<NonNullable<unknown>>;
+    React.PropsWithChildren<NonNullable<unknown>> &
+    ModalOptions;
 
 const backdropVariants = {
     hidden: { opacity: 0 },
@@ -120,7 +133,11 @@ const modalVariants = {
     exit: { opacity: 0, scale: 0.95, transition: { duration: 0.3 } }
 };
 
-const ModalWrapper: React.FC<ModalWrapperProps> = ({ children, onClose }) => {
+const ModalWrapper: React.FC<ModalWrapperProps> = ({
+    children,
+    onClose,
+    hideCloseButton
+}) => {
     return (
         <motion.div
             className="fixed inset-0 z-[1000] flex items-center justify-center"
@@ -139,17 +156,19 @@ const ModalWrapper: React.FC<ModalWrapperProps> = ({ children, onClose }) => {
             <motion.div
                 variants={modalVariants}
                 className={classNames(
-                    'relative z-10 overflow-y-auto rounded-md p-8',
+                    'relative z-10 overflow-y-auto rounded-md py-8 px-10',
                     'max-h-[95dvh] max-w-[95dvw] md:max-h-[80dvh] md:max-w-[80dvw] ',
                     'bg-teal-50 dark:bg-[#222233]'
                 )}
             >
-                <IconButton
-                    onClick={onClose}
-                    icon="close"
-                    size={24}
-                    className={classnames('absolute top-4 right-4')}
-                />
+                {hideCloseButton ? null : (
+                    <IconButton
+                        onClick={onClose}
+                        icon="close"
+                        size={24}
+                        className={classnames('absolute top-4 right-4')}
+                    />
+                )}
                 {children}
             </motion.div>
         </motion.div>

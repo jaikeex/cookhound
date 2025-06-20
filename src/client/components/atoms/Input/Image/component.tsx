@@ -3,12 +3,12 @@
 import React, { useCallback, useState } from 'react';
 import classnames from 'classnames';
 import { convertImgToWebP, verifyImgSize } from '@/client/utils';
-import { Icon } from '@/client/components';
-import { useLocale, useSnackbar } from '@/client/store';
+import { Icon, ImageCropperModal } from '@/client/components';
+import { useLocale, useSnackbar, useModal } from '@/client/store';
 import Image from 'next/image';
 
 type ImageInputProps = Readonly<{
-    inputHeight?: number;
+    className?: string;
     maxHeight?: number;
     maxSize?: number;
     maxWidth?: number;
@@ -20,7 +20,7 @@ type ImageInputProps = Readonly<{
 const INPUT_ID = 'dropzone-file';
 
 export const ImageInput: React.FC<ImageInputProps> = ({
-    inputHeight = 96,
+    className,
     maxHeight = 1920,
     maxSize = 2 * 1024 * 1024,
     maxWidth = 1920,
@@ -28,10 +28,27 @@ export const ImageInput: React.FC<ImageInputProps> = ({
     onUpload,
     showPreview = false
 }) => {
+    //|-----------------------------------------------------------------------------------------|//
+    //?                                          STATE                                          ?//
+    //|-----------------------------------------------------------------------------------------|//
+
     const [isDragging, setIsDragging] = useState(false);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const { alert, clearAlerts } = useSnackbar();
     const { t } = useLocale();
+    const { openModal } = useModal();
+
+    const handleDragOver = useCallback(
+        (event: React.DragEvent<HTMLLabelElement>) => {
+            event.preventDefault();
+            setIsDragging(true);
+        },
+        []
+    );
+
+    const handleDragLeave = useCallback(() => {
+        setIsDragging(false);
+    }, []);
 
     /**
      * Set the input URL with the file
@@ -48,9 +65,13 @@ export const ImageInput: React.FC<ImageInputProps> = ({
         inputElement.files = container.files;
     }, []);
 
+    //|-----------------------------------------------------------------------------------------|//
+    //?                                      HANDLE UPLOAD                                      ?//
+    //|-----------------------------------------------------------------------------------------|//
+
     const handleFileUpload = useCallback(
-        async (file: File) => {
-            if (!file?.type || !file.type.startsWith('image/')) {
+        async (file: File | undefined) => {
+            if (!file || !file.type || !file.type.startsWith('image/')) {
                 alert({
                     message: t('app.error.invalid-image-format'),
                     variant: 'error'
@@ -81,6 +102,15 @@ export const ImageInput: React.FC<ImageInputProps> = ({
                           );
 
                 if (processedFile) {
+                    //———————————————————————————————————————————————————————————————————————————————//
+                    //                              SECOND VERIFY CALL                               //
+                    /**
+                     * Image size is checked here for the second time on purpose.
+                     * The overhead is non-existent and it gives the app another chance to reject
+                     * broken image that for some reason passed through the conversion uncaught.
+                     */
+                    //———————————————————————————————————————————————————————————————————————————————//
+
                     await verifyImgSize(
                         processedFile,
                         maxWidth,
@@ -89,11 +119,13 @@ export const ImageInput: React.FC<ImageInputProps> = ({
                         true
                     );
 
+                    // DO NOT FORGET THIS LINE
                     setInputUrl(processedFile);
                     onUpload && onUpload(processedFile);
 
                     if (showPreview) {
                         const imageUrl = URL.createObjectURL(processedFile);
+                        console.log('imageUrl', imageUrl);
                         setPreviewUrl(imageUrl);
                     }
 
@@ -133,25 +165,70 @@ export const ImageInput: React.FC<ImageInputProps> = ({
         ]
     );
 
-    const handleDragOver = useCallback(
-        (event: React.DragEvent<HTMLLabelElement>) => {
-            event.preventDefault();
-            setIsDragging(true);
+    //|-----------------------------------------------------------------------------------------|//
+    //?                                      CROPPER MODAL                                      ?//
+    //|-----------------------------------------------------------------------------------------|//
+
+    const getModalContent = useCallback(
+        (file: File) => (close: () => void) => {
+            const handleComplete = (cropped: File) => {
+                close();
+                handleFileUpload(cropped);
+            };
+
+            const handleCancel = () => close();
+
+            //|—————————————————————————————————————————————————————————————————————————————————|//
+            //                                   NO CALLBACK                                     //
+            /**
+             * Creating these handlers right here is the most elegant solution i think. Doing
+             * on upper level would require shitty signatures and hofs, but eslint does not
+             * understand anything about that so just disable it here.
+             */
+            //|—————————————————————————————————————————————————————————————————————————————————|//
+
+            return (
+                <ImageCropperModal
+                    file={file}
+                    // eslint-disable-next-line react/jsx-no-bind
+                    onCancel={handleCancel}
+                    // eslint-disable-next-line react/jsx-no-bind
+                    onComplete={handleComplete}
+                    close={close}
+                />
+            );
         },
-        []
+        [handleFileUpload]
     );
 
-    const handleDragLeave = useCallback(() => {
-        setIsDragging(false);
-    }, []);
+    const openCropperModal = useCallback(
+        (file: File) => {
+            if (!file?.type || !file.type.startsWith('image/')) {
+                alert({
+                    message: t('app.error.invalid-image-format'),
+                    variant: 'error'
+                });
+                return;
+            }
+
+            const modalOptions = { hideCloseButton: true };
+
+            openModal(getModalContent(file), modalOptions);
+        },
+        [openModal, getModalContent, alert, t]
+    );
+
+    //|-----------------------------------------------------------------------------------------|//
+    //?                                        TRIGGERS                                         ?//
+    //|-----------------------------------------------------------------------------------------|//
 
     const handleManualUpload = useCallback(
         (e: React.ChangeEvent<HTMLInputElement>) => {
             if (e.target.files) {
-                handleFileUpload(e.target.files[0]);
+                openCropperModal(e.target.files[0]);
             }
         },
-        [handleFileUpload]
+        [openCropperModal]
     );
 
     const handleDrop = useCallback(
@@ -161,23 +238,32 @@ export const ImageInput: React.FC<ImageInputProps> = ({
             const file = event.dataTransfer.files[0];
 
             if (file) {
-                handleFileUpload(file);
+                openCropperModal(file);
             }
         },
-        [handleFileUpload]
+        [openCropperModal]
     );
 
+    //|-----------------------------------------------------------------------------------------|//
+    //?                                           JSX                                           ?//
+    //|-----------------------------------------------------------------------------------------|//
+
     return (
-        <div className="flex flex-col items-center justify-center w-full">
+        <div
+            className={classnames(
+                'flex flex-col items-center justify-center flex-grow w-full h-full',
+                className
+            )}
+        >
             <label
                 htmlFor={INPUT_ID}
                 className={classnames(
-                    `flex flex-col items-center justify-center w-full border-2`,
+                    `flex flex-col items-center justify-center border-2`,
                     `relative border-gray-300 border-dashed rounded-lg cursor-pointer`,
                     `transition-colors duration-200 ease-in-out`,
                     `bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600`,
-                    isDragging ? 'bg-gray-200 dark:bg-gray-600' : '',
-                    `h-[${inputHeight}px]`
+                    `w-full max-w-[480px] xl:max-w-full aspect-[16/9] flex-grow`,
+                    isDragging && 'bg-gray-200 dark:bg-gray-600'
                 )}
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}

@@ -21,6 +21,7 @@ import {
     validateFormData
 } from '@/client/utils';
 import type { I18nMessage } from '@/client/locales';
+import type { AlertPayload } from '@/client/types';
 import type {
     RecipeForCreatePayload,
     Ingredient,
@@ -133,7 +134,7 @@ export const RecipeCreate: React.FC<RecipeCreateProps> = () => {
                 // If here, the data should be valid
                 setFormErrors({});
 
-                const imageUrl = await uploadImage(data);
+                const imageUrl = await uploadImage(data, alert, t);
                 if (imageUrl) {
                     formData.imageUrl = imageUrl;
                 }
@@ -332,7 +333,11 @@ const createRecipePlaceholder = (
     authorId: 0
 });
 
-async function uploadImage(data: FormData): Promise<string | null> {
+async function uploadImage(
+    data: FormData,
+    alert: (a: AlertPayload) => void,
+    t: (key: I18nMessage) => string
+): Promise<string | null> {
     let image_url: string | null = null;
 
     try {
@@ -348,6 +353,11 @@ async function uploadImage(data: FormData): Promise<string | null> {
             image_url = response.objectUrl;
         }
     } catch (error) {
+        alert({
+            message: t('app.error.image-upload-failed'),
+            variant: 'error'
+        });
+
         /**
          * Do nothing here. If the upload fails, the recipe can still be created, and the user can
          * edit the image in later. Failing the submission risks the user losing their work.

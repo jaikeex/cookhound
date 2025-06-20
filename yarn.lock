@@ -5686,6 +5686,7 @@ __metadata:
     prisma: "npm:^6.5.0"
     react: "npm:^19.1.0"
     react-dom: "npm:^19.1.0"
+    react-image-crop: "npm:^11.0.10"
     redis: "npm:^5.5.6"
     tailwindcss: "npm:^3.4.17"
     tsx: "npm:^4.19.3"
@@ -9738,6 +9739,15 @@ __metadata:
   peerDependencies:
     react: ^19.1.0
   checksum: 10c0/3e26e89bb6c67c9a6aa86cb888c7a7f8258f2e347a6d2a15299c17eb16e04c19194e3452bc3255bd34000a61e45e2cb51e46292392340432f133e5a5d2dfb5fc
+  languageName: node
+  linkType: hard
+
+"react-image-crop@npm:^11.0.10":
+  version: 11.0.10
+  resolution: "react-image-crop@npm:11.0.10"
+  peerDependencies:
+    react: ">=16.13.1"
+  checksum: 10c0/2c2c7066c3a51838fc074a4a125ee2063170e01c26e3b1c8fc8b66155cf7ef576b5747089b4f365ce9dd2728794c39f57643b37eb78116e9db3f4b6299d3f682
   languageName: node
   linkType: hard
 
