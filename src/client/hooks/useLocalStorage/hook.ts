@@ -17,29 +17,23 @@ type UseLocalStorageOptions<T> = {
     deserializer?: (value: string) => T;
     /** Whether to sync state across browser tabs. Defaults to true. */
     syncAcrossTabs?: boolean;
+    /** Callback function called when an error occurs. */
+    onError?: (error: Error) => void;
 };
 
 type UseLocalStorageReturn<T> = {
-    /** The current value stored in localStorage. */
     value: T;
-    /** Function to update the localStorage value. */
     setValue: Dispatch<SetStateAction<T>>;
-    /** Function to remove the value from localStorage. */
     removeValue: () => void;
-    /** Whether there was an error reading/writing to localStorage. */
-    error: Error | null;
 };
 
 /**
  * Custom React hook for managing values in the browser's localStorage.
  * Automatically syncs state across components and browser tabs.
  *
- * I shamelessly copied this from my job, then made it better, but did not tell them.
+ *~If the user does not provide an onError callback inside the options, all errors will be rethrown.
  *
- * @example
- * ```tsx
- * const { value, setValue, removeValue, error } = useLocalStorage('theme', 'light');
- * ```
+ * I shamelessly copied this from my job, then made it better, but did not tell them.
  *
  * @template T - The type of the value to be stored in localStorage.
  * @param {string} key - The key under which the value will be stored in localStorage.
@@ -51,7 +45,6 @@ type UseLocalStorageReturn<T> = {
 export const useLocalStorage = <T>(
     key: string,
     initialValue: T,
-    onError: (error: Error) => void,
     options: UseLocalStorageOptions<T> = {}
 ): UseLocalStorageReturn<T> => {
     //~-----------------------------------------------------------------------------------------~//
@@ -59,27 +52,31 @@ export const useLocalStorage = <T>(
     //~-----------------------------------------------------------------------------------------~//
 
     const {
+        onError,
         serializer = JSON.stringify,
         deserializer = JSON.parse,
         syncAcrossTabs = true
     } = options;
 
-    const [error, setError] = useState<Error | null>(null);
     const [isHydrated, setIsHydrated] = useState(false);
     const isFirstRender = useRef(true);
 
     /**
      * Do everything needed when something fails. Everything that can fail inside this hook
      * should call this function when it does.
-     *
-     *?Not sure if this should rethrow the error or not, left it disabled as telling the user
-     *?there was an error saving something invisible might not be the best idea.
      */
     const handleError = useCallback(
         (err: any) => {
             const error = err instanceof Error ? err : new Error(String(err));
-            setError(error);
-            onError?.(error);
+
+            /**
+             * Handle the error if the user has provided a callback. Fuck them otherwise.
+             */
+            if (onError) {
+                onError(error);
+            } else {
+                throw error;
+            }
         },
         [onError]
     );
@@ -144,8 +141,6 @@ export const useLocalStorage = <T>(
 
                 setStoredValue(newValue);
 
-                setError(null);
-
                 // The save is complete, tell all other callers to update.
                 window.dispatchEvent(
                     new CustomEvent('local-storage-change', {
@@ -173,7 +168,6 @@ export const useLocalStorage = <T>(
             // Do NOT set this as null or undefined. Subscribers should be able to rely on getting
             // the default value back.
             setStoredValue(initialValue);
-            setError(null);
 
             // The delete is complete, tell all other callers to update.
             window.dispatchEvent(
@@ -235,7 +229,6 @@ export const useLocalStorage = <T>(
     return {
         value: returnValue,
         setValue,
-        removeValue,
-        error
+        removeValue
     };
 };
