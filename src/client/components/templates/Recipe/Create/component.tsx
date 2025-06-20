@@ -16,7 +16,7 @@ import { useSnackbar, useLocale, useCreateRecipeStore } from '@/client/store';
 import apiClient from '@/client/request';
 import {
     fileToByteArray,
-    generateRandomId,
+    generateUuid,
     lowerCaseFirstLetter,
     validateFormData
 } from '@/client/utils';
@@ -347,7 +347,7 @@ async function uploadImage(
             const imageBytes = await fileToByteArray(imageFile);
             const response = await apiClient.file.uploadRecipeImage({
                 bytes: imageBytes,
-                fileName: `recipe-image-${generateRandomId()}`
+                fileName: `recipe-image-${generateUuid()}`
             });
 
             image_url = response.objectUrl;

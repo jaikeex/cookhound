@@ -12,6 +12,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import classnames from 'classnames';
 import { IconButton } from '@/client/components';
 import classNames from 'classnames';
+import { generateRandomId } from '@/client/utils';
 
 //~=============================================================================================~//
 //$                                            TYPES                                            $//
@@ -65,7 +66,7 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
 
     const openModal = useCallback(
         (content: React.ReactNode | ModalRenderer, options?: ModalOptions) => {
-            const id = makeId(6);
+            const id = generateRandomId(6);
 
             const renderer: ModalRenderer =
                 typeof content === 'function'
@@ -173,20 +174,4 @@ const ModalWrapper: React.FC<ModalWrapperProps> = ({
             </motion.div>
         </motion.div>
     );
-};
-
-//~=============================================================================================~//
-//$                                           UTILS                                             $//
-//~=============================================================================================~//
-
-const makeId = (length: number) => {
-    let result = '';
-    const characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
-    const charactersLength = characters.length;
-    for (let i = 0; i < length; i++) {
-        result += characters.charAt(
-            Math.floor(Math.random() * charactersLength)
-        );
-    }
-    return result;
 };

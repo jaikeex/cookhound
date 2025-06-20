@@ -76,7 +76,7 @@ class RecipeService {
     //~-----------------------------------------------------------------------------------------~//
 
     async rateRecipe(recipeId: number, rating: number): Promise<void> {
-        if (rating < 1 || rating > 5) {
+        if (rating < 0 || rating > 5) {
             throw new ServerError('app.error.bad-request', 400);
         }
 

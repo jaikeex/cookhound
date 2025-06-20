@@ -11,6 +11,7 @@ import React, {
 import { Snackbar } from '@/client/components';
 import type { AlertPayload } from '@/client/types';
 import ReactDOM from 'react-dom';
+import { generateRandomId } from '@/client/utils';
 
 const AUTO_DISMISS = 4000;
 
@@ -60,7 +61,7 @@ export const SnackbarProvider: React.FC<SnackbarProviderProps> = ({
     const alert = useCallback((alert: AlertPayload) => {
         const newAlert = {
             ...alert,
-            id: makeId(5)
+            id: generateRandomId(5)
         };
 
         setActiveAlerts((alerts) => [newAlert, ...alerts]);
@@ -96,18 +97,4 @@ export const SnackbarProvider: React.FC<SnackbarProviderProps> = ({
                 )}
         </SnackbarContext.Provider>
     );
-};
-
-export const makeId = (length: number) => {
-    let result = '';
-    const characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
-    const charactersLength = characters.length;
-    let counter = 0;
-    while (counter < length) {
-        result += characters.charAt(
-            Math.floor(Math.random() * charactersLength)
-        );
-        counter += 1;
-    }
-    return result;
 };
