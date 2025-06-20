@@ -23,8 +23,8 @@ export const IconButton: React.FC<IconButtonProps> = ({
     return (
         <button
             className={classnames(
-                'min-h-7 min-w-7 flex items-center justify-center rounded hover:bg-gray-200',
-                'dark:hover:bg-gray-800 transition-colors',
+                'min-h-7 min-w-7 flex items-center justify-center rounded hover:bg-stone-200',
+                'dark:hover:bg-stone-700 transition-colors',
                 disabled && 'opacity-50 cursor-not-allowed pointer-events-none',
                 className
             )}

@@ -14,19 +14,20 @@ const classConfig = {
             bgColor:
                 'bg-primary-400 hover:bg-primary-500 dark:bg-primary-600 dark:hover:bg-primary-500 shadow-md',
             color: 'text-black dark:text-gray-200',
-            outline: 'focus:ring-2 focus:ring-primary-400 md:focus:ring-0'
+            outline: 'border border-primary-400'
         },
         secondary: {
             bgColor:
                 'bg-secondary-400 hover:bg-secondary-500 dark:bg-secondary-800 dark:hover:bg-secondary-600 shadow-md',
             color: 'text-black dark:text-gray-200',
-            outline: 'focus:ring-2 focus:ring-primary-400 md:focus:ring-0'
+            outline: 'border border-secondary-400'
         },
         subtle: {
             bgColor:
                 'bg-transparent hover:bg-gray-200 dark:hover:bg-gray-700 disabled:bg-transparent',
             color: 'text-black dark:text-gray-200',
-            outline: 'focus:ring-2 focus:ring-primary-400 md:focus:ring-0'
+            outline:
+                'border border-gray-200 focus:outline-none dark:border-gray-700'
         }
     },
     sizes: {
@@ -58,6 +59,7 @@ const classConfig = {
 export type BaseButtonProps = Readonly<{
     color?: 'primary' | 'secondary' | 'subtle';
     icon?: IconName;
+    outlined?: boolean;
     size?: 'sm' | 'md' | 'lg';
     textClassName?: string;
     textVariant?: TypographyVariant;
@@ -71,6 +73,7 @@ export const ButtonBase: React.FC<BaseButtonProps> = ({
     className,
     color = 'primary',
     icon,
+    outlined = false,
     onClick,
     size = 'md',
     textClassName,
@@ -88,9 +91,9 @@ export const ButtonBase: React.FC<BaseButtonProps> = ({
                 'base-button',
                 classConfig.colors[color].bgColor,
                 classConfig.colors[color].color,
-                classConfig.colors[color].outline,
+                outlined && classConfig.colors[color].outline,
                 classConfig.sizes[size].dimensions,
-                uppercase ? 'uppercase' : '',
+                uppercase && 'uppercase',
                 className
             )}
         >

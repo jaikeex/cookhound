@@ -2,7 +2,12 @@ import React, { Suspense } from 'react';
 import type { Metadata } from 'next';
 import { Kalam, Open_Sans } from 'next/font/google';
 import '@/client/globals.css';
-import { LocaleProvider, AuthProvider, SnackbarProvider } from '@/client/store';
+import {
+    LocaleProvider,
+    AuthProvider,
+    SnackbarProvider,
+    ModalProvider
+} from '@/client/store';
 import { ThemeProvider } from 'next-themes';
 import { BottomNavigation, TopNavigation } from '@/client/components';
 import { locales } from '@/client/locales';
@@ -56,24 +61,26 @@ export default async function RootLayout({
                     >
                         <AuthProvider>
                             <SnackbarProvider>
-                                <div
-                                    id="main-page"
-                                    className="fixed top-0 flex flex-col h-[100dvh] overflow-y-auto page-background typography-base"
-                                >
-                                    <Suspense fallback={null}>
-                                        <TopNavigation />
-                                    </Suspense>
+                                <ModalProvider>
                                     <div
-                                        id="main-content"
-                                        className={classnames(
-                                            'flex-1 px-2 pt-4 pb-16 md:px-4 md:pt-12',
-                                            'relative'
-                                        )}
+                                        id="main-page"
+                                        className="fixed top-0 flex flex-col h-[100dvh] overflow-y-auto page-background typography-base"
                                     >
-                                        {children}
+                                        <Suspense fallback={null}>
+                                            <TopNavigation />
+                                        </Suspense>
+                                        <div
+                                            id="main-content"
+                                            className={classnames(
+                                                'flex-1 px-2 pt-4 pb-16 md:px-4 md:pt-12',
+                                                'relative'
+                                            )}
+                                        >
+                                            {children}
+                                        </div>
+                                        <BottomNavigation />
                                     </div>
-                                    <BottomNavigation />
-                                </div>
+                                </ModalProvider>
                             </SnackbarProvider>
                         </AuthProvider>
                     </LocaleProvider>
