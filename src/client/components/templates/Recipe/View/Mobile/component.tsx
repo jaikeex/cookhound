@@ -75,7 +75,9 @@ export const MobileRecipeViewTemplate: React.FC<MobileRecipeViewProps> = ({
                     <Image
                         src={recipe.imageUrl}
                         alt={recipe.title}
-                        className={'object-cover w-full h-48 rounded-md'}
+                        className={
+                            'object-cover w-full mx-auto rounded-md max-w-[480px] xl:max-w-full aspect-[16/9]'
+                        }
                         width={320}
                         height={192}
                         placeholder={'blur'}

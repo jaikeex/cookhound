@@ -92,5 +92,6 @@
     "app.error.image-size-too-large": "Obrázek je příliš velký. Maximální povolená velikost je {{maxSize}} MB.",
     "app.error.image-dimensions-too-large": "Obrázek je příliš velký. Maximální povolené rozměry jsou {{maxWidth}}x{{maxHeight}} px.",
     "app.error.image-upload-failed": "Nahrání obrázku selhalo",
+    "app.error.bad-request": "Tuto akci nelze provést",
     "recipe.error.not-found": "Recept nebyl nalezen"
 }

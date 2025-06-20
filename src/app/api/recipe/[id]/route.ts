@@ -8,20 +8,20 @@ import { handleServerError } from '@/server/utils';
  * Handles GET requests to `/api/recipe/{id}` to fetch a specific recipe.
  *
  * @returns A JSON response with the recipe data.
- * @todo Implement the logic to fetch a recipe by its ID.
+ *
+ * - 200: Success, with recipe data.
+ * - 400: Bad Request, if the recipe ID is not a number.
+ * - 404: Not Found, if the recipe is not found.
+ * - 500: Internal Server Error, if there is another error during the fetching process.
  */
 export async function GET(request: NextRequest) {
-    const url = new URL(request.url);
-    const id = url.pathname.split('/').pop();
-
-    if (!id || isNaN(Number(id))) {
-        return Response.json(
-            { error: 'Recipe ID is required and must be a number' },
-            { status: 400 }
-        );
-    }
-
     try {
+        const id = request.nextUrl.pathname.split('/').pop();
+
+        if (!id || isNaN(Number(id))) {
+            throw new ServerError('app.error.bad-request', 400);
+        }
+
         const recipe = await recipeService.getRecipeById(Number(id));
 
         if (!recipe) {

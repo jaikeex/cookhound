@@ -129,26 +129,23 @@ class UserModel {
     //$                                         MUTATIONS                                       $//
     //~=========================================================================================~//
 
+    async createOne(data: Prisma.UserCreateInput): Promise<User> {
+        const user = await prisma.user.create({ data });
+        return user;
+    }
+
     async updateOneById(
         id: number,
         data: Prisma.UserUpdateInput
     ): Promise<User | null> {
-        // Get original user data for precise cache invalidation
-        const originalUser = await prisma.user.findUnique({ where: { id } });
-
         const user = await prisma.user.update({
             where: { id },
             data
         });
 
-        await this.invalidateUserCache(user, originalUser);
+        await this.invalidateUserCache(user);
 
         return this.reviveUserDates(user);
-    }
-
-    async createOne(data: Prisma.UserCreateInput): Promise<User> {
-        const user = await prisma.user.create({ data });
-        return user;
     }
 
     //~=========================================================================================~//
@@ -160,7 +157,10 @@ class UserModel {
      * This automatically handles all current and future cache keys without manual maintenance
      * @param user - User object with id, email, and username
      */
-    private async invalidateUserCache(changed: User, original: User | null) {
+    private async invalidateUserCache(
+        changed: Partial<User>,
+        original?: Partial<User>
+    ) {
         await invalidateModelCache('user', changed, original ?? undefined);
     }
 

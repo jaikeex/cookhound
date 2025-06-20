@@ -10,7 +10,10 @@ import { ServerError } from '@/server/error';
  * ! This endpoint is restricted and only accessible to authenticated users.
  *
  * @returns A JSON response indicating the result of the creation operation.
- * @todo Implement the logic to create a new recipe.
+ *
+ * - 200: Success, with recipe data.
+ * - 401: Unauthorized, if the user is not authenticated.
+ * - 500: Internal Server Error, if there is another error during the creation process.
  */
 async function createRecipeHandler(request: NextRequest) {
     try {

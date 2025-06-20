@@ -105,6 +105,10 @@ class AuthService {
             throw new ServerError('auth.error.user-not-found', 404);
         }
 
+        if (!user.emailVerified) {
+            throw new ServerError('auth.error.email-not-verified', 403);
+        }
+
         return {
             id: user.id,
             email: user.email,
