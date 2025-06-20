@@ -13,6 +13,7 @@ import {
 import Image from 'next/image';
 import { generateImgPlaceholder } from '@/client/utils';
 import { useLocale } from '@/client/store';
+import { useDisplayRecipe } from '@/client/components/templates/Recipe/View/useDisplayRecipe';
 
 export type DesktopRecipeViewProps = Readonly<{
     className?: string;
@@ -28,6 +29,8 @@ export const DesktopRecipeViewTemplate: React.FC<DesktopRecipeViewProps> = ({
     ref
 }) => {
     const { t } = useLocale();
+
+    const { rateRecipe } = useDisplayRecipe(recipe);
 
     return (
         <div
@@ -46,10 +49,12 @@ export const DesktopRecipeViewTemplate: React.FC<DesktopRecipeViewProps> = ({
                                 {recipe.title}
                             </Typography>
                             <Rating
+                                onClick={rateRecipe}
                                 disabled={isPreview}
                                 rating={recipe.rating}
                                 fill={'gold'}
                                 iconSize={22}
+                                cooldown={60000}
                             />
                         </div>
 

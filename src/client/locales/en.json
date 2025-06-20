@@ -78,6 +78,7 @@
     "app.recipe.error.ingredients-required": "Ingredients are required",
     "app.recipe.error.instructions-required": "Instructions are required",
     "app.recipe.create-preview": "Preview",
+    "app.recipe.rated": "Recipe rated successfully",
     "app.form.processing-image": "Processing image, please wait...",
     "app.form.image-processed": "Image processed successfully!",
     "app.error.default": "Something went wrong...",

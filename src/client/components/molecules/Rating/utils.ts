@@ -1,5 +1,11 @@
 import { MAX_RATING, StarState } from '@/client/components';
 
+const VALUE_MAP = {
+    [StarState.FULL]: 1,
+    [StarState.HALF]: 0.5,
+    [StarState.EMPTY]: 0
+};
+
 /**
  * Generates an array of StarState based on the rating
  *
@@ -44,4 +50,4 @@ export const generateStars = (rating: number): Array<StarState> => {
  * @returns The rating
  */
 export const getRatingFromStars = (stars: StarState[]): number =>
-    stars.filter((star) => star !== 'empty').length;
+    stars.reduce((acc, star) => acc + VALUE_MAP[star], 0);

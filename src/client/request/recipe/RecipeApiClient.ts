@@ -38,6 +38,25 @@ class RecipeApiClient {
             next
         });
     }
+
+    /**
+     * Rates a recipe by calling `POST /api/recipe/{id}/rate`.
+     *
+     * @param id - The ID of the recipe to rate.
+     * @param rating - The rating to give to the recipe.
+     * @param next - Optional Next.js fetch request configuration.
+     */
+    async rateRecipe(
+        id: string,
+        rating: number,
+        next?: NextFetchRequestConfig
+    ) {
+        return await apiRequestWrapper.post({
+            url: `/recipe/${id}/rate`,
+            data: { rating },
+            next
+        });
+    }
 }
 
 export const recipeApiClient = new RecipeApiClient();

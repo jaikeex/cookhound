@@ -15,6 +15,7 @@ import Image from 'next/image';
 import { generateImgPlaceholder } from '@/client/utils';
 import { useLocale } from '@/client/store';
 import classNames from 'classnames';
+import { useDisplayRecipe } from '@/client/components/templates/Recipe/View/useDisplayRecipe';
 
 export type MobileRecipeViewProps = Readonly<{
     className?: string;
@@ -28,6 +29,8 @@ export const MobileRecipeViewTemplate: React.FC<MobileRecipeViewProps> = ({
     recipe
 }) => {
     const { t } = useLocale();
+
+    const { rateRecipe } = useDisplayRecipe(recipe);
 
     const tabs = [
         {
@@ -102,10 +105,12 @@ export const MobileRecipeViewTemplate: React.FC<MobileRecipeViewProps> = ({
                         typographyVariant={'body'}
                     />
                     <Rating
+                        onClick={rateRecipe}
                         disabled={isPreview}
                         rating={recipe.rating}
                         fill={'gold'}
                         iconSize={22}
+                        cooldown={60000}
                     />
                 </div>
                 <Divider />

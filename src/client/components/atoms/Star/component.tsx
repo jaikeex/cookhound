@@ -5,6 +5,7 @@ import { Icon } from '@/client/components';
 import classnames from 'classnames';
 
 export type StarProps = Readonly<{
+    disabled?: boolean;
     fill?: 'gold' | 'silver' | 'bronze';
     iconSize?: number;
     highlight?: boolean;
@@ -33,6 +34,7 @@ const config = {
 };
 
 export const Star: React.FC<StarProps> = ({
+    disabled = false,
     fill = 'gold',
     highlight = false,
     iconSize = 32,
@@ -70,7 +72,8 @@ export const Star: React.FC<StarProps> = ({
                 config.fill[fill],
                 highlight && 'scale-105',
                 pulse && 'animate-rating-pulse',
-                'cursor-pointer transition-all duration-200'
+                'transition-all duration-200',
+                disabled ? 'cursor-not-allowed' : 'cursor-pointer'
             )}
         />
     );
