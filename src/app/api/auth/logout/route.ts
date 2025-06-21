@@ -1,5 +1,8 @@
+import { logRequest, logResponse, RequestContext } from '@/server/logger';
 import { authService } from '@/server/services/auth/service';
 import { handleServerError } from '@/server/utils';
+
+//|=============================================================================================|//
 
 /**
  * Handles POST requests to `/auth/logout` to log out the current user.
@@ -10,12 +13,21 @@ import { handleServerError } from '@/server/utils';
  * - 200: Success, with a success message.
  * - 500: Internal Server Error, if there is another error during logout.
  */
-export async function POST() {
-    try {
-        await authService.logout();
+export async function POST(request: Request) {
+    return RequestContext.run(request, async () => {
+        try {
+            logRequest(request);
 
-        return Response.json({ message: 'Logged out successfully' });
-    } catch (error: any) {
-        return handleServerError(error);
-    }
+            await authService.logout();
+
+            const response = Response.json({
+                message: 'Logged out successfully'
+            });
+
+            logResponse(response);
+            return response;
+        } catch (error: any) {
+            return handleServerError(error);
+        }
+    });
 }

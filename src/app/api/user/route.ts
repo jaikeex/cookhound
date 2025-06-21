@@ -2,6 +2,9 @@ import { userService } from '@/server/services';
 import type { NextRequest } from 'next/server';
 import { handleServerError, verifyIsGuest } from '@/server/utils';
 import { ServerError } from '@/server/error';
+import { logRequest, logResponse, RequestContext } from '@/server/logger';
+
+//|=============================================================================================|//
 
 /**
  * Handles GET requests to `/api/user` to fetch users.
@@ -27,19 +30,27 @@ export async function GET() {
  * - 500: Internal Server Error, if there is another error during user creation.
  */
 export async function POST(request: NextRequest) {
-    try {
-        const body = await request.json();
+    return RequestContext.run(request, async () => {
+        try {
+            logRequest(request);
 
-        // Check if the user is already logged in.
-        if (!(await verifyIsGuest())) {
-            throw new ServerError('auth.error.user-already-logged-in', 400);
+            const body = await request.json();
+
+            // Check if the user is already logged in.
+            if (!(await verifyIsGuest())) {
+                throw new ServerError('auth.error.user-already-logged-in', 400);
+            }
+
+            const user = await userService.createUser(body);
+
+            const response = Response.json({ user });
+
+            logResponse(response);
+            return response;
+        } catch (error: any) {
+            return handleServerError(error);
         }
-
-        const user = await userService.createUser(body);
-        return Response.json({ user });
-    } catch (error: any) {
-        return handleServerError(error);
-    }
+    });
 }
 
 /**

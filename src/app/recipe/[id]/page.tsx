@@ -23,7 +23,7 @@ export default async function Page({ params }: RecipePageParams) {
         revalidate: 3600,
         ...(token && {
             headers: {
-                Cookie: `${JWT_COOKIE_NAME}=${token?.value}`
+                Cookie: `${JWT_COOKIE_NAME}=${token.value}`
             }
         })
     });

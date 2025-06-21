@@ -3,6 +3,9 @@ import { recipeService } from '@/server/services/recipe/service';
 import { handleServerError, verifySession } from '@/server/utils';
 import { withRateLimit } from '@/server/utils/rate-limit/wrapper';
 import { ServerError } from '@/server/error';
+import { logRequest, logResponse, RequestContext } from '@/server/logger';
+
+//|=============================================================================================|//
 
 /**
  * Handles POST requests to `/api/recipe/{id}/rate` to rate a recipe.
@@ -18,29 +21,38 @@ import { ServerError } from '@/server/error';
  * - 500: Internal Server Error, if there is another error during the rating process.
  */
 async function rateRecipeHandler(request: NextRequest) {
-    try {
-        const id = request.nextUrl.pathname.split('/').at(-2);
-        const payload = await request.json();
+    return RequestContext.run(request, async () => {
+        try {
+            logRequest(request);
 
-        if (!(await verifySession())) {
-            throw new ServerError('auth.error.unauthorized', 401);
+            const id = request.nextUrl.pathname.split('/').at(-2);
+            const payload = await request.json();
+
+            if (!(await verifySession())) {
+                throw new ServerError('auth.error.unauthorized', 401);
+            }
+
+            if (
+                !id ||
+                isNaN(Number(id)) ||
+                !payload?.rating ||
+                isNaN(Number(payload.rating))
+            ) {
+                throw new ServerError('app.error.bad-request', 400);
+            }
+
+            await recipeService.rateRecipe(Number(id), payload.rating);
+
+            const response = Response.json({
+                message: 'Recipe rated successfully'
+            });
+
+            logResponse(response);
+            return response;
+        } catch (error) {
+            return handleServerError(error);
         }
-
-        if (
-            !id ||
-            isNaN(Number(id)) ||
-            !payload?.rating ||
-            isNaN(Number(payload.rating))
-        ) {
-            throw new ServerError('app.error.bad-request', 400);
-        }
-
-        await recipeService.rateRecipe(Number(id), payload.rating);
-
-        return Response.json({ message: 'Recipe rated successfully' });
-    } catch (error) {
-        return handleServerError(error);
-    }
+    });
 }
 
 export const POST = withRateLimit(rateRecipeHandler, {

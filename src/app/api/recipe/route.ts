@@ -3,6 +3,9 @@ import { handleServerError, verifySession } from '@/server/utils';
 import { withRateLimit } from '@/server/utils/rate-limit/wrapper';
 import type { NextRequest } from 'next/server';
 import { ServerError } from '@/server/error';
+import { logRequest, logResponse, RequestContext } from '@/server/logger';
+
+//|=============================================================================================|//
 
 /**
  * Handles POST requests to `/api/recipe` to create a new recipe.
@@ -16,19 +19,26 @@ import { ServerError } from '@/server/error';
  * - 500: Internal Server Error, if there is another error during the creation process.
  */
 async function createRecipeHandler(request: NextRequest) {
-    try {
-        const payload = await request.json();
+    return RequestContext.run(request, async () => {
+        try {
+            logRequest(request);
 
-        if (!(await verifySession())) {
-            throw new ServerError('auth.error.unauthorized', 401);
+            const payload = await request.json();
+
+            if (!(await verifySession())) {
+                throw new ServerError('auth.error.unauthorized', 401);
+            }
+
+            const recipe = await recipeService.createRecipe(payload);
+
+            const response = Response.json(recipe);
+
+            logResponse(response);
+            return response;
+        } catch (error) {
+            return handleServerError(error);
         }
-
-        const recipe = await recipeService.createRecipe(payload);
-
-        return Response.json(recipe);
-    } catch (error) {
-        return handleServerError(error);
-    }
+    });
 }
 
 export const POST = withRateLimit(createRecipeHandler, {

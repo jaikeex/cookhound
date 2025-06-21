@@ -1,6 +1,6 @@
 import { RequestError } from '@/client/error';
 import { ENV_CONFIG_PUBLIC } from '@/common/constants';
-import { redirect } from 'next/navigation';
+import { notFound } from 'next/navigation';
 
 /**
  * A type alias for a URL string that must start with a forward slash.
@@ -12,15 +12,15 @@ type UrlString = `/${string}`;
  */
 export type RequestConfig = {
     /** The URL of the API endpoint. */
-    url: UrlString;
+    url?: UrlString;
     /** The data to be sent in the request body. */
     data?: any;
     /** The URL parameters to be appended to the URL. */
     params?: any;
-    /** Optional Next.js fetch request configuration. */
-    next?: NextFetchRequestConfig;
     /** Optional custom headers for the request. */
     headers?: HeadersInit;
+    /** Optional revalidation time for the request. */
+    revalidate?: number;
 };
 
 /**
@@ -137,6 +137,10 @@ class ApiRequestWrapper {
         config: RequestConfig,
         method: string
     ): Promise<R> {
+        if (!config.url) {
+            throw new Error('URL is required');
+        }
+
         let data: any;
 
         //?--------------------------------------------------------------?//
@@ -150,14 +154,19 @@ class ApiRequestWrapper {
         const options: RequestInit = {
             method,
             headers,
-            credentials: 'include',
-            redirect: 'manual'
+            credentials: 'include'
         };
 
-        if (config.next) {
-            const { headers, ...next } = config.next;
+        if (config.revalidate) {
+            options.next = { revalidate: config.revalidate };
+        }
 
-            options.next = next;
+        if (config.headers) {
+            Object.entries(config.headers).forEach(([key, value]) => {
+                if (typeof value === 'string') {
+                    (headers as Headers).set(key, value);
+                }
+            });
             options.headers = headers;
         }
 
@@ -181,41 +190,30 @@ class ApiRequestWrapper {
         try {
             response = await fetch(url.toString(), options);
 
-            const isRedirect =
-                response.status === 307 || response.status === 302;
-
-            /**
-             * Redirects need to be handled manually on the server side. I blame the
-             * Next.js team for this.
-             *
-             * For clarification, the api client is NOT bound to the client side, it is called
-             * from the middleware as well in order to fetch stuff. But if done so, the redirects are fucked.
-             */
-            if (isRedirect && typeof window === 'undefined') {
-                const redirectUrl = response.headers.get('location');
-                if (redirectUrl) {
-                    const url = new URL(redirectUrl, this.API_URL);
-                    const redirectPath = url.pathname + url.search;
-                    redirect(redirectPath);
-                }
-            }
-
             try {
                 data = await response.json();
             } catch (err) {
                 data = null;
             }
 
-            if (!response.ok && !isRedirect) {
-                console.log('API %O', response.status, data);
-
+            if (!response.ok) {
+                // Handle 429 Too Many Requests on client side
                 if (response.status === 429 && typeof window !== 'undefined') {
                     window.location.href = '/error/too-many-requests';
                 }
 
+                // Handle 404 Not Found on server side (server components)
+                if (response.status === 404 && typeof window === 'undefined') {
+                    notFound();
+                }
+
                 throw RequestError.fromFetchError(data, response);
             }
-        } catch {
+        } catch (error) {
+            // Re-throw notFound() calls and other Next.js redirects
+            if (error && typeof error === 'object' && 'digest' in error) {
+                throw error;
+            }
             throw RequestError.fromFetchError(data, response);
         }
 

@@ -1,4 +1,9 @@
-import { apiRequestWrapper } from '@/client/request/ApiRequestWrapper';
+import type {
+    RequestConfig
+} from '@/client/request/ApiRequestWrapper';
+import {
+    apiRequestWrapper
+} from '@/client/request/ApiRequestWrapper';
 import type { RecipeDTO, RecipeForCreatePayload } from '@/common/types';
 
 /**
@@ -9,33 +14,33 @@ class RecipeApiClient {
      * Gets a recipe by its ID by calling `GET /api/recipe/{id}`.
      *
      * @param id - The ID of the recipe to retrieve.
-     * @param next - Optional Next.js fetch request configuration.
+     * @param config - Optional fetch request configuration.
      * @returns A promise that resolves to the recipe.
      * @throws {Error} Throws an error if the request fails.
      */
     async getRecipeById(
         id: string,
-        next?: NextFetchRequestConfig
+        config?: RequestConfig
     ): Promise<RecipeDTO> {
-        return await apiRequestWrapper.get({ url: `/recipe/${id}`, next });
+        return await apiRequestWrapper.get({ url: `/recipe/${id}`, ...config });
     }
 
     /**
      * Creates a new recipe by calling `POST /api/recipe`.
      *
      * @param recipe - The recipe data for creation.
-     * @param next - Optional Next.js fetch request configuration.
+     * @param config - Optional fetch request configuration.
      * @returns A promise that resolves to the created recipe.
      * @throws {Error} Throws an error if the request fails.
      */
     async createRecipe(
         recipe: RecipeForCreatePayload,
-        next?: NextFetchRequestConfig
+        config?: RequestConfig
     ): Promise<RecipeDTO> {
         return await apiRequestWrapper.post({
             url: '/recipe',
             data: recipe,
-            next
+            ...config
         });
     }
 
@@ -44,17 +49,13 @@ class RecipeApiClient {
      *
      * @param id - The ID of the recipe to rate.
      * @param rating - The rating to give to the recipe.
-     * @param next - Optional Next.js fetch request configuration.
+     * @param config - Optional fetch request configuration.
      */
-    async rateRecipe(
-        id: string,
-        rating: number,
-        next?: NextFetchRequestConfig
-    ) {
+    async rateRecipe(id: string, rating: number, config?: RequestConfig) {
         return await apiRequestWrapper.post({
             url: `/recipe/${id}/rate`,
             data: { rating },
-            next
+            ...config
         });
     }
 }

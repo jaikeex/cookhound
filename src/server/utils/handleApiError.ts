@@ -1,4 +1,7 @@
 import { ServerError } from '@/server/error/server';
+import { Logger, logResponse } from '@/server/logger';
+
+const log = Logger.getInstance('api');
 
 /**
  * Performs all necessary operations in order to return an error to the client that
@@ -11,10 +14,13 @@ import { ServerError } from '@/server/error/server';
  */
 export function handleServerError(error: any) {
     if (error instanceof ServerError) {
-        return Response.json(
+        const response = Response.json(
             { message: error.message },
             { status: error.status }
         );
+
+        logResponse(response);
+        return response;
     }
 
     /**
@@ -22,5 +28,6 @@ export function handleServerError(error: any) {
      * Do not send the error details to the client, instead log/sentry them
      * in order to be ignored for ages and finally never fixed.
      */
+    log.error('unchecked server error', error);
     return Response.json({ message: 'app.error.default' }, { status: 500 });
 }

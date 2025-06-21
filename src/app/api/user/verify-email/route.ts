@@ -1,6 +1,10 @@
+import { ServerError } from '@/server/error/server';
+import { logRequest, logResponse, RequestContext } from '@/server/logger';
 import { userService } from '@/server/services';
 import { handleServerError } from '@/server/utils';
 import type { NextRequest } from 'next/server';
+
+//|=============================================================================================|//
 
 /**
  * Handles POST requests to `/api/user/verify-email` to resend a verification email.
@@ -26,17 +30,26 @@ export async function POST() {
  * - 500: Internal Server Error, if there is another error during email verification.
  */
 export async function PUT(request: NextRequest) {
-    const token = request.nextUrl.searchParams.get('token');
+    return RequestContext.run(request, async () => {
+        try {
+            logRequest(request);
 
-    if (!token) {
-        return Response.json({ message: 'Token is required' }, { status: 400 });
-    }
+            const token = request.nextUrl.searchParams.get('token');
 
-    try {
-        await userService.verifyEmail(token);
-    } catch (error: any) {
-        return handleServerError(error);
-    }
+            if (!token) {
+                throw new ServerError('app.error.bad-request', 400);
+            }
 
-    return Response.json({ message: 'Email verified successfully' });
+            await userService.verifyEmail(token);
+
+            const response = Response.json({
+                message: 'Email verified successfully'
+            });
+
+            logResponse(response);
+            return response;
+        } catch (error: any) {
+            return handleServerError(error);
+        }
+    });
 }

@@ -1,5 +1,8 @@
+import { logRequest, logResponse, RequestContext } from '@/server/logger';
 import { authService } from '@/server/services/auth/service';
 import { handleServerError } from '@/server/utils';
+
+//|=============================================================================================|//
 
 /**
  * Handles GET requests to `/api/auth/current` to fetch the current user.
@@ -11,12 +14,18 @@ import { handleServerError } from '@/server/utils';
  * - 401: Unauthorized, if JWT is missing or invalid.
  * - 404: Not Found, if user from JWT does not exist.
  */
-export async function GET() {
-    try {
-        const user = await authService.getCurrentUser();
+export async function GET(request: Request) {
+    return RequestContext.run(request, async () => {
+        try {
+            logRequest(request);
 
-        return Response.json(user);
-    } catch (error: any) {
-        return handleServerError(error);
-    }
+            const user = await authService.getCurrentUser();
+            const response = Response.json(user);
+
+            logResponse(response);
+            return response;
+        } catch (error: any) {
+            return handleServerError(error);
+        }
+    });
 }

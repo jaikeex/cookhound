@@ -4,6 +4,9 @@ import { serialize } from 'cookie';
 import { handleServerError, verifyIsGuest } from '@/server/utils';
 import { ENV_CONFIG_PUBLIC } from '@/common/constants/env';
 import { ServerError } from '@/server/error';
+import { logRequest, logResponse, RequestContext } from '@/server/logger';
+
+//|=============================================================================================|//
 
 /**
  * Handles POST requests to `/auth/login` to authenticate a user with email and password.
@@ -21,37 +24,44 @@ import { ServerError } from '@/server/error';
  * - 500: Internal Server Error, if there is another error during authentication.
  */
 export async function POST(request: NextRequest) {
-    try {
-        const { email, password, keepLoggedIn } = await request.json();
+    return RequestContext.run(request, async () => {
+        try {
+            logRequest(request);
 
-        // Check if the user is already logged in.
-        if (!(await verifyIsGuest())) {
-            throw new ServerError('auth.error.user-already-logged-in', 400);
-        }
+            const { email, password, keepLoggedIn } = await request.json();
 
-        const response = await authService.login({
-            email,
-            password,
-            keepLoggedIn
-        });
-
-        const cookie = serialize('jwt', response.token, {
-            httpOnly: true,
-            secure: ENV_CONFIG_PUBLIC.ENV !== 'development',
-            sameSite: 'strict',
-            maxAge: keepLoggedIn ? 60 * 60 * 24 * 30 : undefined,
-            path: '/'
-        });
-
-        return Response.json(
-            { ...response.user },
-            {
-                headers: {
-                    'Set-Cookie': cookie
-                }
+            // Check if the user is already logged in.
+            if (!(await verifyIsGuest())) {
+                throw new ServerError('auth.error.user-already-logged-in', 400);
             }
-        );
-    } catch (error: any) {
-        return handleServerError(error);
-    }
+
+            const user = await authService.login({
+                email,
+                password,
+                keepLoggedIn
+            });
+
+            const cookie = serialize('jwt', user.token, {
+                httpOnly: true,
+                secure: ENV_CONFIG_PUBLIC.ENV !== 'development',
+                sameSite: 'strict',
+                maxAge: keepLoggedIn ? 60 * 60 * 24 * 30 : undefined,
+                path: '/'
+            });
+
+            const response = Response.json(
+                { ...user.user },
+                {
+                    headers: {
+                        'Set-Cookie': cookie
+                    }
+                }
+            );
+
+            logResponse(response);
+            return response;
+        } catch (error: any) {
+            return handleServerError(error);
+        }
+    });
 }

@@ -8,6 +8,7 @@ import type { Logger as WinstonLogger, transport } from 'winston';
 import { GoogleCloudLoggingTransport } from './transports';
 import { ENV_CONFIG_PRIVATE, ENV_CONFIG_PUBLIC } from '@/common/constants';
 import { LOG_LEVELS } from './types';
+import { REQUEST_ID_FIELD_NAME, RequestContext } from './request-context';
 
 //Directory where log files will be stored. Can be overridden through the `LOG_DIR` env variable.
 const LOG_DIR =
@@ -182,8 +183,16 @@ export class Logger {
     ): void {
         try {
             // Winston requires the primary log message to be a string.
-            const serialisedMessage = this.serialise(message, additional);
-            this.logger.log(level, serialisedMessage);
+            let finalMessage = '';
+
+            finalMessage = this.serialise(message, additional);
+
+            const requestId = RequestContext.get(REQUEST_ID_FIELD_NAME);
+            const ip = RequestContext.get('ip');
+
+            finalMessage = `${requestId ? `[${requestId}]` : ''} ${ip ? `[${ip}]` : ''} ${finalMessage}`;
+
+            this.logger.log(level, finalMessage);
         } catch {
             /**
              * Do nothing here. Failure to log an entry should never result in the app crashing

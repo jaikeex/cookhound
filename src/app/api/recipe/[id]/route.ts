@@ -1,8 +1,10 @@
 import { recipeService } from '@/server/services/recipe/service';
 import type { NextRequest } from 'next/server';
-import { redirect } from 'next/navigation';
 import { ServerError } from '@/server/error';
 import { handleServerError } from '@/server/utils';
+import { logRequest, logResponse, RequestContext } from '@/server/logger';
+
+//|=============================================================================================|//
 
 /**
  * Handles GET requests to `/api/recipe/{id}` to fetch a specific recipe.
@@ -15,25 +17,28 @@ import { handleServerError } from '@/server/utils';
  * - 500: Internal Server Error, if there is another error during the fetching process.
  */
 export async function GET(request: NextRequest) {
-    try {
-        const id = request.nextUrl.pathname.split('/').pop();
+    return RequestContext.run(request, async () => {
+        try {
+            logRequest(request);
 
-        if (!id || isNaN(Number(id))) {
-            throw new ServerError('app.error.bad-request', 400);
+            const id = request.nextUrl.pathname.split('/').pop();
+
+            if (!id || isNaN(Number(id))) {
+                throw new ServerError('app.error.bad-request', 400);
+            }
+
+            const recipe = await recipeService.getRecipeById(Number(id));
+
+            if (!recipe) {
+                throw new ServerError('app.error.not-found', 404);
+            }
+
+            const response = Response.json(recipe);
+
+            logResponse(response);
+            return response;
+        } catch (error) {
+            return handleServerError(error);
         }
-
-        const recipe = await recipeService.getRecipeById(Number(id));
-
-        if (!recipe) {
-            return redirect('/not-found');
-        }
-
-        return Response.json(recipe);
-    } catch (error) {
-        if (error instanceof ServerError && error.status === 404) {
-            return redirect('/not-found');
-        }
-
-        return handleServerError(error);
-    }
+    });
 }
