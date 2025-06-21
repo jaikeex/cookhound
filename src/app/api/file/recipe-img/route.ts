@@ -1,5 +1,5 @@
 import { handleServerError, verifySession } from '@/server/utils';
-import { googleService } from '@/server/services/google-api/wrappers';
+import { googleService } from '@/server/google-api';
 import type { NextRequest } from 'next/server';
 import { ENV_CONFIG_PRIVATE } from '@/common/constants';
 import { withRateLimit } from '@/server/utils/rate-limit';

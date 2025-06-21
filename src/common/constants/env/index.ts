@@ -43,6 +43,7 @@ export const ENV_CONFIG_PRIVATE = createConfig(
         REDIS_PASSWORD: process.env.REDIS_PASSWORD,
         GOOGLE_SMTP_USERNAME: process.env.GOOGLE_SMTP_USERNAME,
         GOOGLE_SMTP_PASSWORD: process.env.GOOGLE_SMTP_PASSWORD,
+        LOG_DIR: process.env.LOG_DIR,
         JWT_SECRET: process.env.JWT_SECRET,
         JWT_TOKEN_DURATION_DAYS: process.env.JWT_TOKEN_DURATION_DAYS,
         JWT_ISSUER: process.env.JWT_ISSUER,
