@@ -11,6 +11,7 @@ import { ServerError } from '@/server/error';
 import type { Rating } from '@prisma/client';
 import { Logger } from '@/server/logger';
 import { RequestContext } from '@/server/utils/reqwest/context';
+import { randomUUID } from 'crypto';
 
 //|=============================================================================================|//
 
@@ -31,18 +32,23 @@ class RecipeService {
             throw new ServerError('recipe.error.not-found', 404);
         }
 
-        if (!recipe.id || !recipe.authorId || !recipe.title) {
+        if (
+            !recipe.id ||
+            !recipe.authorId ||
+            !recipe.title ||
+            !recipe.displayId
+        ) {
             log.warn('getRecipeById - recipe missing required fields', { id });
             throw new ServerError('recipe.error.not-found', 404);
         }
 
         const recipeDTO: RecipeDTO = {
             id: recipe.id,
+            displayId: recipe.displayId,
             title: recipe.title,
             authorId: recipe.authorId,
             language: recipe.language as Locale,
             time: recipe.time,
-            difficulty: recipe.difficulty || 'easy',
             portionSize: recipe.portionSize,
             notes: recipe.notes,
             imageUrl: recipe.imageUrl || '',
@@ -52,6 +58,52 @@ class RecipeService {
         };
 
         log.trace('getRecipeById - success', { id });
+
+        return recipeDTO;
+    }
+
+    //~-----------------------------------------------------------------------------------------~//
+    //$                                    GET BY DISPLAY ID                                    $//
+    //~-----------------------------------------------------------------------------------------~//
+
+    async getRecipeByDisplayId(displayId: string): Promise<RecipeDTO> {
+        log.trace('getRecipeByDisplayId - attempt', { displayId });
+
+        const recipe = await db.recipe.getOneByDisplayId(displayId);
+
+        if (!recipe) {
+            log.info('getRecipeByDisplayId - recipe not found', { displayId });
+            throw new ServerError('recipe.error.not-found', 404);
+        }
+
+        if (
+            !recipe.id ||
+            !recipe.authorId ||
+            !recipe.title ||
+            !recipe.displayId
+        ) {
+            log.warn('getRecipeByDisplayId - recipe missing required fields', {
+                displayId
+            });
+            throw new ServerError('recipe.error.not-found', 404);
+        }
+
+        log.trace('getRecipeByDisplayId - success', { displayId });
+
+        const recipeDTO: RecipeDTO = {
+            id: recipe.id,
+            displayId: recipe.displayId,
+            title: recipe.title,
+            authorId: recipe.authorId,
+            language: recipe.language as Locale,
+            time: recipe.time,
+            portionSize: recipe.portionSize,
+            notes: recipe.notes,
+            imageUrl: recipe.imageUrl || '',
+            rating: recipe.rating ? Number(recipe.rating) : null,
+            ingredients: recipe.ingredients as Ingredient[],
+            instructions: recipe.instructions as string[]
+        };
 
         return recipeDTO;
     }
@@ -70,12 +122,14 @@ class RecipeService {
             authorId = (await authService.getCurrentUser()).id;
         }
 
+        const displayId = randomUUID();
+
         const recipeforCreate: RecipeForCreate = {
+            displayId,
             title: payload.title,
             language: payload.language,
             notes: payload.notes,
             time: payload.time,
-            difficulty: payload.difficulty,
             portionSize: payload.portionSize,
             imageUrl: payload.imageUrl
         };

@@ -1,9 +1,5 @@
-import type {
-    RequestConfig
-} from '@/client/request/ApiRequestWrapper';
-import {
-    apiRequestWrapper
-} from '@/client/request/ApiRequestWrapper';
+import type { RequestConfig } from '@/client/request/ApiRequestWrapper';
+import { apiRequestWrapper } from '@/client/request/ApiRequestWrapper';
 import type { RecipeDTO, RecipeForCreatePayload } from '@/common/types';
 
 /**
@@ -11,7 +7,26 @@ import type { RecipeDTO, RecipeForCreatePayload } from '@/common/types';
  */
 class RecipeApiClient {
     /**
-     * Gets a recipe by its ID by calling `GET /api/recipe/{id}`.
+     * Gets a recipe by its display ID by calling `GET /api/recipe/display/{displayId}`.
+     *
+     * @param id - The ID of the recipe to retrieve.
+     * @param config - Optional fetch request configuration.
+     * @returns A promise that resolves to the recipe.
+     * @throws {Error} Throws an error if the request fails.
+     */
+    async getRecipeByDisplayId(
+        displayId: string,
+        config?: RequestConfig
+    ): Promise<RecipeDTO> {
+        return await apiRequestWrapper.get({
+            url: `/recipe/display/${displayId}`,
+            ...config
+        });
+    }
+
+    /**
+     * Gets a recipe by its ID by calling `GET /api/recipe/id/{id}`.
+     * This is the internal ID of the recipe, not the display ID.
      *
      * @param id - The ID of the recipe to retrieve.
      * @param config - Optional fetch request configuration.
@@ -22,7 +37,10 @@ class RecipeApiClient {
         id: string,
         config?: RequestConfig
     ): Promise<RecipeDTO> {
-        return await apiRequestWrapper.get({ url: `/recipe/${id}`, ...config });
+        return await apiRequestWrapper.get({
+            url: `/recipe/id/${id}`,
+            ...config
+        });
     }
 
     /**

@@ -258,7 +258,8 @@ class AuthService {
                 id: userId
             });
 
-            throw new ServerError('auth.error.user-not-found', 404);
+            deleteSession();
+            throw new ServerError('auth.error.user-not-found', 401);
         }
 
         if (!user.emailVerified) {
@@ -266,7 +267,8 @@ class AuthService {
                 id: userId
             });
 
-            throw new ServerError('auth.error.email-not-verified', 403);
+            deleteSession();
+            throw new ServerError('auth.error.email-not-verified', 401);
         }
 
         log.trace('getCurrentUser - success', {

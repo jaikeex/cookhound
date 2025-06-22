@@ -28,6 +28,9 @@ export function handleServerError(error: any) {
      * Do not send the error details to the client, instead log/sentry them
      * in order to be ignored for ages and finally never fixed.
      */
-    log.error('unchecked server error', error);
+    log.error('unchecked server error', {
+        message: error.message,
+        stack: error.stack
+    });
     return Response.json({ message: 'app.error.default' }, { status: 500 });
 }

@@ -1,7 +1,7 @@
 datasource db {
   url               = env("DATABASE_URL")
-  provider          = "mysql"
   shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+  provider          = "mysql"
 }
 
 generator client {
@@ -30,6 +30,7 @@ model User {
   // Relations
   recipes                   Recipe[]
   ratings                   Rating[]
+  shoppingList              ShoppingListIngredient[]
 
   // Indexes
   @@index([username])
@@ -42,12 +43,12 @@ model User {
  
 model Recipe {
   id           Int       @id @default(autoincrement())
+  displayId    String    @unique @db.Char(36)
   authorId     Int       @db.Int
   language     String    @db.VarChar(2)
   title        String    @db.VarChar(255)
   notes        String?   @db.Text
   time         Int?
-  difficulty   String?   @db.VarChar(50)
   portionSize  Int?      @db.Int
   imageUrl     String?   @db.VarChar(255)
   rating       Decimal?  @db.Decimal(2, 1)
@@ -59,18 +60,16 @@ model Recipe {
   instructions Instruction[]
   ingredients  RecipeIngredient[]
   ratings      Rating[]
-
+  shoppingList ShoppingListIngredient[]
+  
   // Indexes
   @@index([authorId])
+  @@index([displayId])
   @@index([language])
   @@index([title])
-  @@index([difficulty])
   @@index([rating])
   @@index([time])
   @@index([createdAt])
-  @@index([difficulty, rating, time], name: "idx_recipes_difficulty_rating_time")
-  @@index([difficulty, rating], name: "idx_recipes_difficulty_rating")
-  @@index([difficulty, time], name: "idx_recipes_difficulty_time")
   @@index([rating, time], name: "idx_recipes_rating_time")
   @@map("recipes")
 }
@@ -97,6 +96,7 @@ model Ingredient {
 
   // Relations
   recipes  RecipeIngredient[]
+  shoppingLists ShoppingListIngredient[]
 
   // Indexes
   @@index([language])
@@ -126,11 +126,31 @@ model RecipeIngredient {
   recipe     Recipe     @relation(fields: [recipeId], references: [id])
   ingredient Ingredient @relation(fields: [ingredientId], references: [id])
 
+
   // Composite primary key
   @@id([recipeId, ingredientId])
   @@index([recipeId])
   @@index([ingredientId])
   @@map("recipes_ingredients")
+}
+
+model ShoppingListIngredient {
+  userId          Int     @db.Int
+  recipeId        Int     @db.Int
+  ingredientId    Int     @db.Int
+  quantity        String? @db.VarChar(256)
+  ingredientOrder Int     @db.Int
+
+  // Relations
+  user       User       @relation(fields: [userId], references: [id])
+  recipe     Recipe     @relation(fields: [recipeId], references: [id])
+  ingredient Ingredient @relation(fields: [ingredientId], references: [id])
+
+  // Composite primary key
+  @@id([userId, ingredientId])
+  @@index([userId])
+  @@index([ingredientId])
+  @@map("shopping_list_ingredients")
 }
 
 model Rating {

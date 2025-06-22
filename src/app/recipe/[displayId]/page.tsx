@@ -7,19 +7,19 @@ import { JWT_COOKIE_NAME } from '@/common/constants';
 type RecipePageParams = {
     readonly params: Promise<
         Readonly<{
-            id: string;
+            displayId: string;
         }>
     >;
 };
 
 export default async function Page({ params }: RecipePageParams) {
     const paramsResolved = await params;
-    const recipeId = paramsResolved.id;
+    const recipeDisplayId = paramsResolved.displayId;
 
     const cookieStore = await cookies();
     const token = cookieStore.get(JWT_COOKIE_NAME);
 
-    const recipe = apiClient.recipe.getRecipeById(recipeId, {
+    const recipe = apiClient.recipe.getRecipeByDisplayId(recipeDisplayId, {
         revalidate: 3600,
         ...(token && {
             headers: {

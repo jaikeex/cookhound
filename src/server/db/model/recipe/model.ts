@@ -7,6 +7,7 @@ import prisma from '@/server/db/prisma';
 import { Logger } from '@/server/logger';
 import type { Prisma, Recipe } from '@prisma/client';
 import { getRecipeById } from '@prisma/client/sql';
+import { getRecipeByDisplayId } from '@prisma/client/sql';
 
 //|=============================================================================================|//
 
@@ -32,6 +33,30 @@ class RecipeModel {
             async () => {
                 log.trace('Fetching recipe from db by id', { id });
                 return prisma.$queryRawTyped(getRecipeById(id));
+            },
+            ttl
+        );
+
+        return recipe[0] ?? null;
+    }
+
+    async getOneByDisplayId(
+        displayId: string,
+        ttl?: number
+    ): Promise<getRecipeById.Result | null> {
+        const cacheKey = generateCacheKey('recipe', 'findUnique', {
+            where: { displayId }
+        });
+
+        log.trace('Getting recipe by display id', { displayId });
+
+        const recipe = await cachePrismaQuery(
+            cacheKey,
+            async () => {
+                log.trace('Fetching recipe from db by display id', {
+                    displayId
+                });
+                return prisma.$queryRawTyped(getRecipeByDisplayId(displayId));
             },
             ttl
         );

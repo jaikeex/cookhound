@@ -207,7 +207,6 @@ export class MailClient {
             this.socket.setEncoding('utf-8');
             this.socket.once('connect', () => {
                 this.socket.removeListener('error', reject);
-                console.log('Successfully connected to the SMTP server.');
                 resolve();
             });
             this.socket.once('error', reject);
@@ -236,7 +235,6 @@ export class MailClient {
                 },
                 () => {
                     this.socket.setEncoding('utf-8');
-                    console.log('TLS connection established.');
                     resolve();
                 }
             );

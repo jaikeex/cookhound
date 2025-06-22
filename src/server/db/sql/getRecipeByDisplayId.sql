@@ -35,4 +35,4 @@ SELECT
 FROM
     recipes r
 WHERE
-    r.id = ?;
+    r.displayId = ?;

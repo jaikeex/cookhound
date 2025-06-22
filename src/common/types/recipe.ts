@@ -2,11 +2,11 @@ import type { Locale } from '@/client/locales';
 
 export type RecipeDTO = {
     id: number;
+    displayId: string;
     title: string;
     authorId: number;
     language: Locale;
     time: number | null;
-    difficulty: string;
     portionSize: number | null;
     ingredients: Ingredient[];
     instructions: string[];
@@ -27,7 +27,6 @@ export type RecipeForCreatePayload = {
     instructions: string[];
     notes: string | null;
     time: number | null;
-    difficulty: string;
     portionSize: number | null;
     imageUrl: string | null;
     ingredients: IngredientForCreate[];
