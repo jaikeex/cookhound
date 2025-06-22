@@ -1,8 +1,11 @@
 import { AuthType, Status, UserRole } from '@/common/types';
-import {
-    type UserDTO,
-    type UserForCreatePayload,
-    type UserForGoogleCreatePayload
+import type {
+    ShoppingListByRecipeIdDTO,
+    ShoppingListIngredientDTO,
+    ShoppingListIngredientPayload,
+    UserDTO,
+    UserForCreatePayload,
+    UserForGoogleCreatePayload
 } from '@/common/types';
 import bcrypt from 'bcrypt';
 import { v4 as uuid } from 'uuid';
@@ -12,6 +15,7 @@ import { type UserForGoogleCreate, type UserForLocalCreate } from './types';
 import { createUserDTO } from './utils';
 import db from '@/server/db/model';
 import { Logger } from '@/server/logger';
+import { RequestContext } from '@/server/utils/reqwest/context';
 
 //|=============================================================================================|//
 
@@ -150,6 +154,200 @@ class UserService {
         const userResponse: UserDTO = createUserDTO(user);
 
         return userResponse;
+    }
+
+    //~-----------------------------------------------------------------------------------------~//
+    //$                                       GET SHOPPING LIST                                  $//
+    //~-----------------------------------------------------------------------------------------~//
+
+    async getShoppingList(): Promise<ShoppingListByRecipeIdDTO[]> {
+        log.trace('getShoppingList - attempt');
+
+        const userId = RequestContext.getUserId();
+
+        if (!userId) {
+            log.warn('getShoppingList - user not found');
+            throw new ServerError('auth.error.unauthorized', 401);
+        }
+
+        const shoppingList = await db.shoppingList.getShoppingList(userId);
+
+        const recipeIdList = shoppingList.map((item) => item.recipeId);
+        const uniqueRecipeIdList = [...new Set(recipeIdList)];
+
+        const shoppingListByRecipeId: ShoppingListByRecipeIdDTO[] = [];
+
+        for (const recipeId of uniqueRecipeIdList) {
+            const recipe = await db.recipe.getOneById(recipeId);
+
+            if (!recipe || !recipe.displayId || !recipe.title) {
+                log.warn('getShoppingList - recipe not found', { recipeId });
+                throw new ServerError('app.error.bad-request', 400);
+            }
+
+            const ingredients = shoppingList.filter(
+                (item) => item.recipeId === recipeId
+            );
+
+            const recipeDTO = {
+                displayId: recipe.displayId,
+                title: recipe.title
+            };
+
+            shoppingListByRecipeId.push({
+                recipe: recipeDTO,
+                ingredients
+            });
+        }
+
+        log.trace('getShoppingList - success');
+
+        return shoppingListByRecipeId;
+    }
+
+    //~-----------------------------------------------------------------------------------------~//
+    //$                                     CREATE SHOPPING LIST                                $//
+    //~-----------------------------------------------------------------------------------------~//
+
+    async createShoppingList(
+        recipeId: number,
+        ingredients: ShoppingListIngredientPayload[]
+    ): Promise<ShoppingListIngredientDTO[]> {
+        log.trace('createShoppingList - attempt', { recipeId, ingredients });
+
+        if (
+            !recipeId ||
+            !Array.isArray(ingredients) ||
+            ingredients.length === 0
+        ) {
+            log.warn('createShoppingList - missing required fields', {
+                recipeId,
+                ingredients
+            });
+
+            throw new ServerError('app.error.bad-request', 400);
+        }
+
+        const userId = RequestContext.getUserId();
+
+        if (!userId) {
+            log.warn('createShoppingList - user not found');
+            throw new ServerError('auth.error.unauthorized', 401);
+        }
+
+        for (const i of ingredients) {
+            const ingredient = await db.ingredient.getOneById(i.id);
+
+            if (!ingredient) {
+                log.warn('createShoppingList - ingredient not found', {
+                    ingredientId: i.id
+                });
+
+                throw new ServerError('app.error.bad-request', 400);
+            }
+        }
+
+        const shoppingListIngredients =
+            await db.shoppingList.createShoppingList(
+                userId,
+                recipeId,
+                ingredients
+            );
+
+        log.trace('createShoppingList - success', {
+            recipeId,
+            ingredients
+        });
+
+        return shoppingListIngredients;
+    }
+
+    //~-----------------------------------------------------------------------------------------~//
+    //$                                 UPDATE SHOPPING LIST ORDER                              $//
+    //~-----------------------------------------------------------------------------------------~//
+
+    async updateShoppingListOrder(
+        recipeId: number,
+        updates: ShoppingListIngredientPayload[]
+    ): Promise<ShoppingListIngredientDTO[]> {
+        log.trace('updateShoppingListOrder - attempt', { updates });
+
+        if (!Array.isArray(updates) || updates.length === 0) {
+            log.warn('updateShoppingListOrder - missing required fields', {
+                updates
+            });
+
+            throw new ServerError('app.error.bad-request', 400);
+        }
+
+        if (!recipeId) {
+            log.warn('updateShoppingListOrder - missing required fields', {
+                recipeId
+            });
+
+            throw new ServerError('app.error.bad-request', 400);
+        }
+
+        const userId = RequestContext.getUserId();
+
+        if (!userId) {
+            log.warn('updateShoppingListOrder - user not found');
+            throw new ServerError('auth.error.unauthorized', 401);
+        }
+
+        const currentShoppingList =
+            await db.shoppingList.getShoppingList(userId);
+
+        if (currentShoppingList.length !== updates.length) {
+            log.warn('updateShoppingListOrder - mismatched length');
+
+            throw new ServerError('app.error.bad-request', 400);
+        }
+
+        const newIds = updates.map((i) => i.id);
+        const currentIds = currentShoppingList.map((i) => i.id);
+
+        const contentMatches =
+            newIds.every((id) => currentIds.includes(id)) &&
+            currentIds.every((id) => newIds.includes(id));
+
+        if (!contentMatches) {
+            log.warn('updateShoppingListOrder - mismatched content');
+            throw new ServerError('app.error.bad-request', 400);
+        }
+
+        await db.shoppingList.deleteShoppingList(userId, recipeId);
+
+        const updatedShoppingList = await db.shoppingList.createShoppingList(
+            userId,
+            recipeId,
+            updates
+        );
+
+        log.trace('updateShoppingListOrder - success', { updates });
+
+        return updatedShoppingList;
+    }
+
+    //~-----------------------------------------------------------------------------------------~//
+    //$                                     DELETE SHOPPING LIST                                $//
+    //~-----------------------------------------------------------------------------------------~//
+
+    async deleteShoppingList(recipeId: number): Promise<void> {
+        log.trace('deleteShoppingList - attempt', { recipeId });
+
+        const userId = RequestContext.getUserId();
+
+        if (!userId) {
+            log.warn('deleteShoppingList - user not found');
+            throw new ServerError('auth.error.unauthorized', 401);
+        }
+
+        await db.shoppingList.deleteShoppingList(userId, recipeId);
+
+        log.trace('deleteShoppingList - success');
+
+        return;
     }
 
     //~-----------------------------------------------------------------------------------------~//

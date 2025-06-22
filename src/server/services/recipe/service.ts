@@ -4,7 +4,6 @@ import type {
     RecipeForCreatePayload
 } from '@/common/types';
 import type { RecipeForCreate } from './types';
-import { authService } from '@/server/services/';
 import db from '@/server/db/model';
 import type { Locale } from '@/client/locales';
 import { ServerError } from '@/server/error';
@@ -115,11 +114,11 @@ class RecipeService {
     async createRecipe(payload: RecipeForCreatePayload): Promise<RecipeDTO> {
         log.trace('createRecipe - attempt', { payload });
 
-        let authorId = RequestContext.getUserId();
+        const authorId = RequestContext.getUserId();
 
         if (!authorId) {
-            log.warn('createRecipe - user not set in request context');
-            authorId = (await authService.getCurrentUser()).id;
+            log.warn('createRecipe - anonymous call');
+            throw new ServerError('auth.error.unauthorized', 401);
         }
 
         const displayId = randomUUID();
@@ -141,7 +140,7 @@ class RecipeService {
             ingredients: payload.ingredients
         });
 
-        log.notice('createRecipe - success', { payload });
+        log.notice('createRecipe - success', { recipe });
 
         return this.getRecipeById(recipe.id);
     }
@@ -157,11 +156,11 @@ class RecipeService {
             throw new ServerError('app.error.bad-request', 400);
         }
 
-        let authorId = RequestContext.getUserId();
+        const authorId = RequestContext.getUserId();
 
         if (!authorId) {
-            log.warn('createRecipe - user not set in request context');
-            authorId = (await authService.getCurrentUser()).id;
+            log.warn('rateRecipe - anonymous call');
+            throw new ServerError('auth.error.unauthorized', 401);
         }
 
         const recipe = await this.getRecipeById(recipeId);

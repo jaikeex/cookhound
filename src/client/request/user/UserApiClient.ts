@@ -3,6 +3,9 @@ import { apiRequestWrapper } from '@/client/request/ApiRequestWrapper';
 import type {
     ResetPasswordEmailPayload,
     ResetPasswordPayload,
+    ShoppingListByRecipeIdDTO,
+    ShoppingListIngredientPayload,
+    ShoppingListPayload,
     UserForCreatePayload
 } from '@/common/types';
 
@@ -28,6 +31,79 @@ class UserApiClient {
         config?: RequestConfig
     ): Promise<void> {
         await apiRequestWrapper.post({ url: '/user', data, ...config });
+    }
+
+    /**
+     * Gets the shopping list by calling `GET /api/user/shopping-list`.
+     *
+     * @param config - Optional fetch request configuration.
+     * @returns A promise that resolves when the shopping list is fetched.
+     * @throws {Error} Throws an error if the request fails.
+     */
+    async getShoppingList(
+        config?: RequestConfig
+    ): Promise<ShoppingListByRecipeIdDTO[]> {
+        return await apiRequestWrapper.get({
+            url: '/user/shopping-list',
+            ...config
+        });
+    }
+
+    /**
+     * Creates a new shopping list by calling `POST /api/user/shopping-list`.
+     *
+     * @param data - The shopping list data to create.
+     * @param config - Optional fetch request configuration.
+     * @returns A promise that resolves when the shopping list is created.
+     * @throws {Error} Throws an error if the request fails.
+     */
+    async createShoppingList(
+        data: ShoppingListPayload,
+        config?: RequestConfig
+    ): Promise<void> {
+        await apiRequestWrapper.post({
+            url: '/user/shopping-list',
+            data,
+            ...config
+        });
+    }
+
+    /**
+     * Updates the shopping list order by calling `PUT /api/user/shopping-list`.
+     *
+     * @param data - The shopping list data to update.
+     * @param config - Optional fetch request configuration.
+     * @returns A promise that resolves when the shopping list order is updated.
+     * @throws {Error} Throws an error if the request fails.
+     */
+    async updateShoppingListOrder(
+        data: ShoppingListIngredientPayload,
+        config?: RequestConfig
+    ): Promise<void> {
+        await apiRequestWrapper.put({
+            url: '/user/shopping-list',
+            data,
+            ...config
+        });
+    }
+
+    /**
+     * Deletes a shopping list by calling `DELETE /api/user/shopping-list`.
+     *
+     * @param data - The shopping list data to delete.
+     * @param config - Optional fetch request configuration.
+     * @returns A promise that resolves when the shopping list is deleted.
+     * @throws {Error} Throws an error if the request fails.
+     */
+    async deleteShoppingList(
+        data: ShoppingListPayload,
+        config?: RequestConfig
+    ): Promise<void> {
+        await apiRequestWrapper.delete({
+            url: '/user/shopping-list',
+            data,
+            ...config
+        });
     }
 
     /**

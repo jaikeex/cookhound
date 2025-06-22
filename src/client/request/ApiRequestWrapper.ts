@@ -107,6 +107,26 @@ class ApiRequestWrapper {
     }
 
     /**
+     * Performs a PATCH request.
+     *
+     * @template R - The type of the data to be returned in the response.
+     * @param {RequestConfig} config - Configuration object including the URL, any data to be sent, and URL parameters.
+     * @returns {Promise<R>} The body of the response as a promise.
+     * @throws {RequestError} Throws a RequestError if the request fails.
+     *
+     * @example
+     *  const response = await apiService.patch<User>({
+     *    url: '/user',
+     *    data: {
+     *      username: 'test',
+     *    }
+     *  });
+     */
+    async patch<R>(config: RequestConfig): Promise<R> {
+        return this.request<R>(config, 'PATCH');
+    }
+
+    /**
      * Performs a DELETE request.
      *
      * @template R - The type of the data to be returned in the response.

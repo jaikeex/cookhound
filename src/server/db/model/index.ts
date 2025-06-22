@@ -1,11 +1,15 @@
-import userModel from './user/userModel';
-import recipeModel from './recipe/model';
+import ingredientModel from './ingredient/model';
 import ratingModel from './rating/model';
+import recipeModel from './recipe/model';
+import shoppingListModel from './shopping-list/model';
+import userModel from './user/userModel';
 
 const dbModel = {
-    user: userModel,
+    ingredient: ingredientModel,
+    rating: ratingModel,
     recipe: recipeModel,
-    rating: ratingModel
+    shoppingList: shoppingListModel,
+    user: userModel
 };
 
 export default dbModel;

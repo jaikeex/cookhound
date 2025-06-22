@@ -1,0 +1,64 @@
+import type { Ingredient } from '@prisma/client';
+import prisma from '@/server/db/prisma';
+import { Logger } from '@/server/logger';
+import {
+    cachePrismaQuery,
+    generateCacheKey
+} from '@/server/db/model/model-cache';
+
+//|=============================================================================================|//
+
+const log = Logger.getInstance('ingredient-model');
+
+class IngredientModel {
+    //~=========================================================================================~//
+    //$                                          QUERIES                                        $//
+    //~=========================================================================================~//
+
+    async getOneById(id: number, ttl?: number): Promise<Ingredient | null> {
+        log.trace('Getting ingredient by id', { id });
+
+        const cacheKey = generateCacheKey('ingredient', 'findUnique', {
+            where: { id }
+        });
+
+        const ingredient = await cachePrismaQuery(
+            cacheKey,
+            async () => {
+                log.trace('Fetching ingredient from db by id', { id });
+                return prisma.ingredient.findUnique({ where: { id } });
+            },
+            ttl
+        );
+
+        return ingredient;
+    }
+
+    async getOneByName(
+        name: string,
+        language: string,
+        ttl?: number
+    ): Promise<Ingredient | null> {
+        log.trace('Getting ingredient by name', { name });
+
+        const cacheKey = generateCacheKey('ingredient', 'findUnique', {
+            where: { name, language }
+        });
+
+        const ingredient = await cachePrismaQuery(
+            cacheKey,
+            async () => {
+                log.trace('Fetching ingredient from db by name', { name });
+                return prisma.ingredient.findFirst({
+                    where: { name, language }
+                });
+            },
+            ttl
+        );
+
+        return ingredient;
+    }
+}
+
+const ingredientModel = new IngredientModel();
+export default ingredientModel;

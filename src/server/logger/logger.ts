@@ -29,7 +29,7 @@ const myTimestampFormat = format.timestamp({
 
 const myMessageFormat = format.printf((info) => {
     const level = info.level.toUpperCase().padEnd(7, ' ');
-    const context = (info.context as string).padEnd(15, ' ');
+    const context = (info.context as string).padEnd(20, ' ');
 
     return `${info.timestamp} - ${level} - ${context} - ${info.message}`;
 });
@@ -191,9 +191,14 @@ export class Logger {
             finalMessage = this.serialise(message, additional);
 
             const requestId = RequestContext.getRequestId();
-            const ip = RequestContext.getIp();
+            const userId = RequestContext.getUserId();
 
-            finalMessage = `${requestId ? `[${requestId}]` : ''} ${ip ? `[${ip}]` : ''} ${finalMessage}`;
+            const requestIdMessagePart = requestId ? `[${requestId}]` : '[]';
+            const userIdMessagePart = userId
+                ? `[user id: ${userId}]`
+                : '[anonymous]';
+
+            finalMessage = `${requestIdMessagePart} ${userIdMessagePart.padEnd(14, ' ')} ${finalMessage}`;
 
             this.logger.log(level, finalMessage);
         } catch {

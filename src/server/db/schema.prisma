@@ -92,11 +92,14 @@ model Instruction {
 model Ingredient {
   id       Int    @id @default(autoincrement())
   language String @db.VarChar(2)
-  name     String @unique @db.VarChar(50)
+  name     String @db.VarChar(50)
 
   // Relations
   recipes  RecipeIngredient[]
   shoppingLists ShoppingListIngredient[]
+
+  // Unique constraint
+  @@unique([language, name], name: "unique_ingredient_language_name")
 
   // Indexes
   @@index([language])
@@ -139,6 +142,7 @@ model ShoppingListIngredient {
   recipeId        Int     @db.Int
   ingredientId    Int     @db.Int
   quantity        String? @db.VarChar(256)
+  marked          Boolean @default(false)
   ingredientOrder Int     @db.Int
 
   // Relations
@@ -147,7 +151,8 @@ model ShoppingListIngredient {
   ingredient Ingredient @relation(fields: [ingredientId], references: [id])
 
   // Composite primary key
-  @@id([userId, ingredientId])
+  @@id([userId, ingredientId, recipeId])
+  @@index([userId, recipeId])
   @@index([userId])
   @@index([ingredientId])
   @@map("shopping_list_ingredients")

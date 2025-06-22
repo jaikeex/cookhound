@@ -79,7 +79,8 @@ class RecipeModel {
     }): Promise<Recipe> {
         log.trace('Creating recipe', {
             title: data.recipe.title,
-            authorId: data.authorId
+            authorId: data.authorId,
+            language: data.recipe.language
         });
 
         return await prisma.$transaction(async (tx) => {
