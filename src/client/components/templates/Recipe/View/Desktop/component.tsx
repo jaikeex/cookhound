@@ -3,6 +3,7 @@
 import React from 'react';
 import type { RecipeDTO } from '@/common/types/recipe';
 import {
+    ButtonBase,
     Divider,
     IngredientsListView,
     InstructionsView,
@@ -95,16 +96,25 @@ export const DesktopRecipeViewTemplate: React.FC<DesktopRecipeViewProps> = ({
                 <Divider />
 
                 <div className={'flex gap-12'}>
-                    <div className={'space-y-2 w-[35%]'}>
+                    <div className={'w-[35%]'}>
                         <Typography variant={'heading-sm'}>
                             {t('app.recipe.ingredients')}
                         </Typography>
                         <IngredientsListView
                             key={`${recipe.id}-ingredients-list-view-desktop`}
                             ingredients={recipe.ingredients}
-                            className={'pt-2'}
+                            className={'mt-4'}
                             variant={'desktop'}
                         />
+
+                        <ButtonBase color="secondary" className={'w-full mt-8'}>
+                            <Typography
+                                variant={'body'}
+                                className={'text-center'}
+                            >
+                                {t('app.recipe.create-shopping-list')}
+                            </Typography>
+                        </ButtonBase>
                     </div>
 
                     <div className={'space-y-2 w-[65%]'}>

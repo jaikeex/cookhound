@@ -73,6 +73,7 @@
     "app.recipe.preparation-time": "Preparation time (in minutes)",
     "app.recipe.add-ingredient": "Add ingredient",
     "app.recipe.add-instruction": "Add instruction",
+    "app.recipe.create-shopping-list": "Create shopping list",
     "app.recipe.create": "Create recipe",
     "app.recipe.create-short": "Create",
     "app.recipe.create-success": "Recipe created successfully",

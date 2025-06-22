@@ -3,7 +3,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import type { Ingredient } from '@/common/types';
 import type { TypographyVariant } from '@/client/components';
-import { Checkbox, Typography } from '@/client/components';
+import { Typography } from '@/client/components';
 
 //~---------------------------------------------------------------------------------------------~//
 //$                                           OPTIONS                                           $//
@@ -41,14 +41,8 @@ export const IngredientRowView: React.FC<IngredientRowViewProps> = ({
     const [checked, setChecked] = useState<boolean>(selected || false);
 
     const handleRowClick = useCallback(() => {
-        if (variant === 'desktop') return;
         setChecked((prev) => !prev);
-    }, [variant]);
-
-    const handleCheckboxClick = useCallback(() => {
-        if (variant === 'mobile') return;
-        setChecked((prev) => !prev);
-    }, [variant]);
+    }, []);
 
     useEffect(
         () => (checked ? onSelected?.(ingredient) : onDeselected?.(ingredient)),
@@ -60,22 +54,10 @@ export const IngredientRowView: React.FC<IngredientRowViewProps> = ({
     }, [selected]);
 
     return (
-        <div className={`flex items-center`} onClick={handleRowClick}>
-            {/* DESKTOP view has the checkbox on the left side */}
-            {/* ---------------------------------------------- */}
-
-            {variant === 'desktop' ? (
-                <Checkbox
-                    className={`mr-4`}
-                    color={'secondary'}
-                    checked={checked}
-                    size={'sm'}
-                    onChange={handleCheckboxClick}
-                />
-            ) : null}
-
-            {/* ---------------------------------------------- */}
-
+        <div
+            className={`flex items-center cursor-pointer`}
+            onClick={handleRowClick}
+        >
             <div
                 className={`flex items-center ${checked ? '[&>p]:text-gray-300 [&>p]:dark:text-gray-600' : ''} justify-between w-full`}
             >
@@ -93,20 +75,6 @@ export const IngredientRowView: React.FC<IngredientRowViewProps> = ({
                     </React.Fragment>
                 ) : null}
             </div>
-            {/* MOBILE view has the checkbox on the right side */}
-            {/* ---------------------------------------------- */}
-            {variant === 'mobile' ? (
-                <Checkbox
-                    className={`ml-3`}
-                    color={'secondary'}
-                    checked={checked}
-                    // eslint-disable-next-line @typescript-eslint/no-empty-function
-                    // eslint-disable-next-line react/jsx-no-bind
-                    onChange={handleCheckboxClick}
-                />
-            ) : null}
-
-            {/* ---------------------------------------------- */}
         </div>
     );
 };

@@ -3,6 +3,7 @@
 import React from 'react';
 import type { RecipeDTO } from '@/common/types/recipe';
 import {
+    ButtonBase,
     Divider,
     IngredientsListView,
     InstructionsView,
@@ -38,12 +39,20 @@ export const MobileRecipeViewTemplate: React.FC<MobileRecipeViewProps> = ({
         {
             title: t('app.recipe.ingredients'),
             content: (
-                <IngredientsListView
-                    key={`${recipe.id}-ingredients-list-view-mobile`}
-                    ingredients={recipe.ingredients}
-                    className={'pt-4'}
-                    variant={'mobile'}
-                />
+                <React.Fragment>
+                    <IngredientsListView
+                        key={`${recipe.id}-ingredients-list-view-mobile`}
+                        ingredients={recipe.ingredients}
+                        className={'pt-4'}
+                        variant={'mobile'}
+                    />
+
+                    <ButtonBase color="secondary" className={'w-full mt-8'}>
+                        <Typography variant={'body'} className={'text-center'}>
+                            {t('app.recipe.create-shopping-list')}
+                        </Typography>
+                    </ButtonBase>
+                </React.Fragment>
             )
         },
         {

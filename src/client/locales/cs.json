@@ -73,6 +73,7 @@
     "app.recipe.preparation-time": "Čas přípravy (v minutách)",
     "app.recipe.add-ingredient": "Přidat ingredienci",
     "app.recipe.add-instruction": "Přidat krok",
+    "app.recipe.create-shopping-list": "Vytvořit nákupní seznam",
     "app.recipe.create": "Vytvořit recept",
     "app.recipe.create-short": "Vytvořit",
     "app.recipe.create-success": "Recept byl úspěšně vytvořen",
