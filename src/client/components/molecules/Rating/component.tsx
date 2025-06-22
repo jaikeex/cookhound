@@ -143,6 +143,7 @@ export const Rating: React.FC<RatingProps> = ({
                 text={`You can rate this recipe again in ${
                     remainingTime ? Math.round(remainingTime / 1000) : 0
                 } seconds`}
+                className={'w-36 max-w-36'}
                 visible={isOnCooldown && isTooltipVisible}
                 targetRef={ref}
             />

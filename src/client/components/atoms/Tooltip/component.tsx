@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useCallback, useState, useEffect, useRef } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import classnames from 'classnames';
 import { Typography } from '@/client/components';
+import { useOutsideClick } from '@/client/hooks';
 
 type TooltipProps = Readonly<{
     className?: string;
@@ -33,11 +34,25 @@ export const Tooltip: React.FC<TooltipProps> = ({
     targetRef
 }) => {
     const [isVisible, setIsVisible] = useState(false);
-    const internalRef = useRef<HTMLDivElement>(null);
     const [targetRect, setTargetRect] = useState<DOMRect | null>(null);
+    const [isTouchDevice, setIsTouchDevice] = useState(false);
 
     // Use controlled visibility if provided, otherwise use internal state
     const shouldShow = visible !== undefined ? visible : isVisible;
+
+    // Detect if touch device
+    useEffect(() => {
+        setIsTouchDevice(
+            'ontouchstart' in window || navigator.maxTouchPoints > 0
+        );
+    }, []);
+
+    // Handle click outside for touch devices
+    const outsideClickRef = useOutsideClick<HTMLDivElement>(() => {
+        if (isTouchDevice && visible === undefined) {
+            setIsVisible(false);
+        }
+    });
 
     // Track target element position when using targetRef
     useEffect(() => {
@@ -59,16 +74,32 @@ export const Tooltip: React.FC<TooltipProps> = ({
     }, [targetRef, visible]);
 
     const handleMouseEnter = useCallback(() => {
-        if (visible === undefined) {
+        if (visible === undefined && !isTouchDevice) {
             setIsVisible(true);
         }
-    }, [visible]);
+    }, [visible, isTouchDevice]);
 
     const handleMouseLeave = useCallback(() => {
-        if (visible === undefined) {
+        if (visible === undefined && !isTouchDevice) {
             setIsVisible(false);
         }
-    }, [visible]);
+    }, [visible, isTouchDevice]);
+
+    const handleTouchStart = useCallback(() => {
+        if (visible === undefined && isTouchDevice) {
+            setIsVisible(true);
+        }
+    }, [visible, isTouchDevice]);
+
+    const handleClick = useCallback(
+        (e: React.MouseEvent) => {
+            if (isTouchDevice) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+        },
+        [isTouchDevice]
+    );
 
     // When using targetRef with controlled visibility, render tooltip with absolute positioning
     if (targetRef && visible !== undefined) {
@@ -129,23 +160,21 @@ export const Tooltip: React.FC<TooltipProps> = ({
     // Default behavior with children (backward compatibility)
     return (
         <div
-            ref={internalRef}
+            ref={outsideClickRef}
             className={`relative ${className} group`}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
+            onTouchStart={handleTouchStart}
+            onClick={handleClick}
         >
             {children}
             <div
                 className={classnames(
-                    'absolute hidden bg-gray-300 dark:bg-gray-800 text-xs rounded py-2 px-2 z-10',
+                    'absolute bg-gray-300 dark:bg-gray-800 text-xs rounded py-2 px-2 z-10',
                     'transition-all duration-200 ease-in-out w-max max-w-64',
-                    shouldShow ? 'opacity-100' : 'opacity-0',
+                    shouldShow ? 'opacity-100 block' : 'opacity-0 hidden',
                     classConfig.position[position ?? 'bottom'],
-                    disabled
-                        ? ''
-                        : visible !== undefined
-                          ? 'block'
-                          : 'group-hover:block'
+                    disabled ? 'hidden' : visible !== undefined ? 'block' : ''
                 )}
             >
                 <Typography align={'center'} variant={'body-sm'}>

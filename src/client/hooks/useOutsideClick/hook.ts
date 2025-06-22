@@ -15,6 +15,7 @@ export const useOutsideClick = <T extends HTMLElement>(
     );
 
     useEventListener('mouseup', handleClickOutside, undefined, false);
+    useEventListener('touchend', handleClickOutside, undefined, false);
 
     return ref;
 };
