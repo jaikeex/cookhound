@@ -28,6 +28,7 @@ export type UserForLogin = {
 };
 
 export enum UserRole {
+    Guest = 'guest',
     User = 'user',
     Admin = 'admin'
 }

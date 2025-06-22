@@ -1,6 +1,7 @@
-import { logRequest, logResponse, RequestContext } from '@/server/logger';
+import { logRequest, logResponse } from '@/server/logger';
 import { authService } from '@/server/services/auth/service';
-import { handleServerError } from '@/server/utils';
+import { RequestContext } from '@/server/utils/reqwest/context';
+import { handleServerError } from '@/server/utils/reqwest';
 
 //|=============================================================================================|//
 

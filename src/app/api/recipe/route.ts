@@ -1,9 +1,11 @@
 import { recipeService } from '@/server/services/recipe/service';
-import { handleServerError, verifySession } from '@/server/utils';
+import { handleServerError } from '@/server/utils/reqwest';
 import { withRateLimit } from '@/server/utils/rate-limit/wrapper';
 import type { NextRequest } from 'next/server';
 import { ServerError } from '@/server/error';
-import { logRequest, logResponse, RequestContext } from '@/server/logger';
+import { logRequest, logResponse } from '@/server/logger';
+import { RequestContext } from '@/server/utils/reqwest/context';
+import { UserRole } from '@/common/types';
 
 //|=============================================================================================|//
 
@@ -23,11 +25,11 @@ async function createRecipeHandler(request: NextRequest) {
         try {
             logRequest(request);
 
-            const payload = await request.json();
-
-            if (!(await verifySession())) {
+            if (RequestContext.getUserRole() === UserRole.Guest) {
                 throw new ServerError('auth.error.unauthorized', 401);
             }
+
+            const payload = await request.json();
 
             const recipe = await recipeService.createRecipe(payload);
 

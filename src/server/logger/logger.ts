@@ -8,7 +8,7 @@ import type { Logger as WinstonLogger, transport } from 'winston';
 import { GoogleCloudLoggingTransport } from './transports';
 import { ENV_CONFIG_PRIVATE, ENV_CONFIG_PUBLIC } from '@/common/constants';
 import { LOG_LEVELS } from './types';
-import { REQUEST_ID_FIELD_NAME, RequestContext } from './request-context';
+import { RequestContext } from '@/server/utils/reqwest/context';
 
 //Directory where log files will be stored. Can be overridden through the `LOG_DIR` env variable.
 const LOG_DIR =
@@ -26,10 +26,13 @@ if (!fs.existsSync(LOG_DIR)) {
 const myTimestampFormat = format.timestamp({
     format: 'YYYY-MM-DD HH:mm:ss,SSS'
 });
-const myMessageFormat = format.printf(
-    (info) =>
-        `${info.timestamp} - ${info.context} - ${info.level.toUpperCase()} - ${info.message}`
-);
+
+const myMessageFormat = format.printf((info) => {
+    const level = info.level.toUpperCase().padEnd(7, ' ');
+    const context = (info.context as string).padEnd(15, ' ');
+
+    return `${info.timestamp} - ${level} - ${context} - ${info.message}`;
+});
 
 /**
  * Winston logger instance that all contextual loggers will inherit from.
@@ -94,7 +97,7 @@ export class Logger {
     }
 
     //|-----------------------------------------------------------------------------------------|//
-    //?                                            SETUP                                        ?//
+    //?                                        INSTANCE GETTER                                  ?//
     //|-----------------------------------------------------------------------------------------|//
 
     /**
@@ -187,8 +190,8 @@ export class Logger {
 
             finalMessage = this.serialise(message, additional);
 
-            const requestId = RequestContext.get(REQUEST_ID_FIELD_NAME);
-            const ip = RequestContext.get('ip');
+            const requestId = RequestContext.getRequestId();
+            const ip = RequestContext.getIp();
 
             finalMessage = `${requestId ? `[${requestId}]` : ''} ${ip ? `[${ip}]` : ''} ${finalMessage}`;
 

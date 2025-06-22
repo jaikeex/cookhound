@@ -1,10 +1,12 @@
-import { handleServerError, verifySession } from '@/server/utils';
+import { handleServerError } from '@/server/utils/reqwest';
 import { googleService } from '@/server/google-api';
 import type { NextRequest } from 'next/server';
 import { ENV_CONFIG_PRIVATE } from '@/common/constants';
 import { withRateLimit } from '@/server/utils/rate-limit';
 import { ServerError } from '@/server/error';
-import { logResponse, RequestContext } from '@/server/logger';
+import { logRequest, logResponse } from '@/server/logger';
+import { RequestContext } from '@/server/utils/reqwest/context';
+import { UserRole } from '@/common/types';
 
 //|=============================================================================================|//
 
@@ -18,10 +20,12 @@ import { logResponse, RequestContext } from '@/server/logger';
 async function postHandler(request: NextRequest) {
     return RequestContext.run(request, async () => {
         try {
+            logRequest(request);
+
             const data = await request.json();
 
             // Check if the user is authenticated.
-            if (!(await verifySession())) {
+            if (RequestContext.getUserRole() === UserRole.Guest) {
                 throw new ServerError('auth.error.unauthorized', 401);
             }
 

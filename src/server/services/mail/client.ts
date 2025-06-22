@@ -1,6 +1,15 @@
 import { ENV_CONFIG_PRIVATE } from '@/common/constants/env';
+import { Logger } from '@/server/logger';
 import net from 'net';
 import tls from 'tls';
+
+//|=============================================================================================|//
+
+const log = Logger.getInstance('mail-client');
+
+//~=============================================================================================~//
+//$                                            TYPES                                            $//
+//~=============================================================================================~//
 
 /**
  * Defines the structure for a mail address, containing the sender's or
@@ -22,6 +31,10 @@ interface MailOptions {
     html: string;
 }
 
+//~=============================================================================================~//
+//$                                            CLASS                                            $//
+//~=============================================================================================~//
+
 /**
  * A service for sending emails using Google's SMTP server without any
  * third-party libraries. It handles the entire SMTP conversation, including
@@ -39,12 +52,17 @@ export class MailClient {
             !ENV_CONFIG_PRIVATE.GOOGLE_SMTP_USERNAME ||
             !ENV_CONFIG_PRIVATE.GOOGLE_SMTP_PASSWORD
         ) {
+            log.error('SMTP credentials are not configured.');
             throw new Error('SMTP credentials are not configured.');
         }
 
         this.user = ENV_CONFIG_PRIVATE.GOOGLE_SMTP_USERNAME;
         this.pass = ENV_CONFIG_PRIVATE.GOOGLE_SMTP_PASSWORD;
     }
+
+    //|-----------------------------------------------------------------------------------------|//
+    //?                                     PUBLIC SEND API                                     ?//
+    //|-----------------------------------------------------------------------------------------|//
 
     /**
      * Sends an email by establishing a connection to the SMTP server,
@@ -64,7 +82,7 @@ export class MailClient {
             await this.sendEmail(options);
             await this.quit();
         } catch (error) {
-            console.error('Failed to send email:', error);
+            log.error('Failed to send email:', error);
             throw error; // Rethrow to be handled by the caller
         } finally {
             if (this.socket) {
@@ -73,25 +91,23 @@ export class MailClient {
         }
     }
 
+    //|-----------------------------------------------------------------------------------------|//
+    //?                                   PRIVATE SEND METHODS                                  ?//
+    //|-----------------------------------------------------------------------------------------|//
+
     /**
-     * Establishes a raw socket connection to the SMTP server.
+     * Sends the email data to the server.
      *
+     * @param options - The email options.
      * @internal
      */
-    private connect(): Promise<void> {
-        return new Promise((resolve, reject) => {
-            this.socket = net.createConnection({
-                port: this.smtpPort,
-                host: this.smtpHost
-            });
-            this.socket.setEncoding('utf-8');
-            this.socket.once('connect', () => {
-                this.socket.removeListener('error', reject);
-                console.log('Successfully connected to the SMTP server.');
-                resolve();
-            });
-            this.socket.once('error', reject);
-        });
+    private async sendEmail(options: MailOptions): Promise<void> {
+        await this.sendAndVerify(`MAIL FROM:<${options.from.address}>`, 250);
+        await this.sendAndVerify(`RCPT TO:<${options.to.address}>`, 250);
+        await this.sendAndVerify('DATA', 354);
+
+        const emailData = this.buildEmail(options);
+        await this.sendAndVerify(emailData + '\r\n.', 250);
     }
 
     /**
@@ -139,11 +155,63 @@ export class MailClient {
         const response = await this.readResponse();
         const responseCode = parseInt(response.substring(0, 3), 10);
         if (responseCode !== expectedCode) {
+            log.error('Unexpected SMTP response.', {
+                command,
+                expectedCode,
+                responseCode,
+                response
+            });
+
             throw new Error(
                 `Unexpected SMTP response. Expected ${expectedCode}, got ${responseCode}: ${response}`
             );
         }
         return response;
+    }
+
+    /**
+     * Builds the raw email string from the mail options.
+     *
+     * @param options - The email options.
+     * @returns The raw email string.
+     * @internal
+     */
+    private buildEmail(options: MailOptions): string {
+        const from = `"${options.from.name}" <${options.from.address}>`;
+        const to = `"${options.to.name}" <${options.to.address}>`;
+
+        let email = `From: ${from}\r\n`;
+        email += `To: ${to}\r\n`;
+        email += `Subject: ${options.subject}\r\n`;
+        email += 'Content-Type: text/html; charset=utf-8\r\n\r\n';
+        email += options.html;
+
+        return email;
+    }
+
+    //|-----------------------------------------------------------------------------------------|//
+    //?                                       CONNECTION                                        ?//
+    //|-----------------------------------------------------------------------------------------|//
+
+    /**
+     * Establishes a raw socket connection to the SMTP server.
+     *
+     * @internal
+     */
+    private connect(): Promise<void> {
+        return new Promise((resolve, reject) => {
+            this.socket = net.createConnection({
+                port: this.smtpPort,
+                host: this.smtpHost
+            });
+            this.socket.setEncoding('utf-8');
+            this.socket.once('connect', () => {
+                this.socket.removeListener('error', reject);
+                console.log('Successfully connected to the SMTP server.');
+                resolve();
+            });
+            this.socket.once('error', reject);
+        });
     }
 
     /**
@@ -195,43 +263,6 @@ export class MailClient {
         if (parseInt(response.substring(0, 3), 10) !== 235) {
             throw new Error('SMTP authentication failed.');
         }
-        console.log('Authentication successful.');
-    }
-
-    /**
-     * Builds the raw email string from the mail options.
-     *
-     * @param options - The email options.
-     * @returns The raw email string.
-     * @internal
-     */
-    private buildEmail(options: MailOptions): string {
-        const from = `"${options.from.name}" <${options.from.address}>`;
-        const to = `"${options.to.name}" <${options.to.address}>`;
-
-        let email = `From: ${from}\r\n`;
-        email += `To: ${to}\r\n`;
-        email += `Subject: ${options.subject}\r\n`;
-        email += 'Content-Type: text/html; charset=utf-8\r\n\r\n';
-        email += options.html;
-
-        return email;
-    }
-
-    /**
-     * Sends the email data to the server.
-     *
-     * @param options - The email options.
-     * @internal
-     */
-    private async sendEmail(options: MailOptions): Promise<void> {
-        await this.sendAndVerify(`MAIL FROM:<${options.from.address}>`, 250);
-        await this.sendAndVerify(`RCPT TO:<${options.to.address}>`, 250);
-        await this.sendAndVerify('DATA', 354);
-
-        const emailData = this.buildEmail(options);
-        await this.sendAndVerify(emailData + '\r\n.', 250);
-        console.log('Email sent successfully.');
     }
 
     /**
@@ -243,7 +274,7 @@ export class MailClient {
         try {
             await this.sendAndVerify('QUIT', 221);
         } catch (error) {
-            console.warn('Error during QUIT, but ignoring:', error);
+            log.warn('Error during QUIT', error);
         }
     }
 }

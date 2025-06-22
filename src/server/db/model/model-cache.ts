@@ -1,5 +1,10 @@
 import { redisClient } from '@/server/db/redis';
 import { ENV_CONFIG_PRIVATE } from '@/common/constants';
+import { Logger } from '@/server/logger';
+
+//|=============================================================================================|//
+
+const log = Logger.getInstance('model-cache');
 
 /**
  * Generic cache wrapper for Prisma queries
@@ -17,19 +22,16 @@ export async function cachePrismaQuery<T>(
     const cachedData = await redisClient.get<T>(key);
 
     if (cachedData !== null) {
-        console.log(`Cache hit for key: ${key}`);
+        log.trace(`Cache hit for key: ${key}`);
         const time = new Date().getTime() - now.getTime();
-        console.log(`Time taken to fetch data: ${time}ms`);
+        log.trace(`Time to fetch data from cache for key: ${key}: ${time}ms`);
         return cachedData;
     }
 
-    console.log(`Cache miss for key: ${key}`);
+    log.trace(`Cache miss for key: ${key}`);
     const data = await fetchFn();
 
     await redisClient.set(key, data, ttl);
-
-    const time = new Date().getTime() - now.getTime();
-    console.log(`Time taken to fetch data from cache: ${time}ms`);
 
     return data;
 }
@@ -50,7 +52,8 @@ export async function invalidateCacheByPattern(pattern: string): Promise<void> {
     const keys = await redisClient.keys(pattern);
     if (keys.length > 0) {
         await Promise.all(keys.map((key) => redisClient.del(key)));
-        console.log(
+
+        log.trace(
             `Invalidated ${keys.length} cache entries matching pattern: ${pattern}`
         );
     }

@@ -4,8 +4,13 @@ import {
     invalidateModelCache
 } from '@/server/db/model/model-cache';
 import prisma from '@/server/db/prisma';
+import { Logger } from '@/server/logger';
 import type { Prisma, Recipe } from '@prisma/client';
 import { getRecipeById } from '@prisma/client/sql';
+
+//|=============================================================================================|//
+
+const log = Logger.getInstance('recipe-model');
 
 class RecipeModel {
     //~=========================================================================================~//
@@ -20,9 +25,14 @@ class RecipeModel {
             where: { id }
         });
 
+        log.trace('Getting recipe by id', { id });
+
         const recipe = await cachePrismaQuery(
             cacheKey,
-            () => prisma.$queryRawTyped(getRecipeById(id)),
+            async () => {
+                log.trace('Fetching recipe from db by id', { id });
+                return prisma.$queryRawTyped(getRecipeById(id));
+            },
             ttl
         );
 
@@ -42,7 +52,17 @@ class RecipeModel {
         instructions: string[];
         ingredients: { name: string; quantity: string | null }[];
     }): Promise<Recipe> {
+        log.trace('Creating recipe', {
+            title: data.recipe.title,
+            authorId: data.authorId
+        });
+
         return await prisma.$transaction(async (tx) => {
+            log.trace('Creating recipe object', {
+                title: data.recipe.title,
+                authorId: data.authorId
+            });
+
             const recipe = await tx.recipe.create({
                 data: {
                     ...data.recipe,
@@ -54,7 +74,8 @@ class RecipeModel {
                 }
             });
 
-            // Create instructions
+            log.trace('Creating instructions', { recipeId: recipe.id });
+
             if (data.instructions.length > 0) {
                 await tx.instruction.createMany({
                     data: data.instructions.map((text, index) => ({
@@ -65,7 +86,8 @@ class RecipeModel {
                 });
             }
 
-            // Create ingredients
+            log.trace('Creating ingredients', { recipeId: recipe.id });
+
             if (data.ingredients.length > 0) {
                 for (let i = 0; i < data.ingredients.length; i++) {
                     const ingredientData = data.ingredients[i];
@@ -99,6 +121,8 @@ class RecipeModel {
                 }
             }
 
+            log.trace('Recipe successfully created', { recipeId: recipe.id });
+
             return (await tx.recipe.findUnique({
                 where: { id: recipe.id },
                 include: {
@@ -117,6 +141,8 @@ class RecipeModel {
         id: number,
         data: Prisma.RecipeUpdateInput
     ): Promise<Recipe> {
+        log.trace('Updating recipe by id', { id });
+
         const recipe = await prisma.recipe.update({
             where: { id },
             data

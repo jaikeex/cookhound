@@ -1,8 +1,10 @@
 import { userService } from '@/server/services';
 import type { NextRequest } from 'next/server';
-import { handleServerError, verifyIsGuest } from '@/server/utils';
+import { handleServerError } from '@/server/utils/reqwest';
 import { ServerError } from '@/server/error';
-import { logRequest, logResponse, RequestContext } from '@/server/logger';
+import { logRequest, logResponse } from '@/server/logger';
+import { RequestContext } from '@/server/utils/reqwest/context';
+import { UserRole } from '@/common/types';
 
 //|=============================================================================================|//
 
@@ -37,7 +39,7 @@ export async function POST(request: NextRequest) {
             const body = await request.json();
 
             // Check if the user is already logged in.
-            if (!(await verifyIsGuest())) {
+            if (RequestContext.getUserRole() !== UserRole.Guest) {
                 throw new ServerError('auth.error.user-already-logged-in', 400);
             }
 

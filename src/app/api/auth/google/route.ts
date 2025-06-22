@@ -1,9 +1,11 @@
 import type { NextRequest } from 'next/server';
 import { authService } from '@/server/services/auth/service';
 import { serialize } from 'cookie';
-import { handleServerError, verifyIsGuest } from '@/server/utils';
+import { handleServerError } from '@/server/utils/reqwest';
 import { ServerError } from '@/server/error';
-import { logRequest, logResponse, RequestContext } from '@/server/logger';
+import { logRequest, logResponse } from '@/server/logger';
+import { RequestContext } from '@/server/utils/reqwest/context';
+import { UserRole } from '@/common/types';
 
 //|=============================================================================================|//
 
@@ -28,13 +30,13 @@ export async function POST(request: NextRequest) {
             logRequest(request);
 
             // Check if the user is already logged in.
-            if (!(await verifyIsGuest())) {
+            if (RequestContext.getUserRole() !== UserRole.Guest) {
                 throw new ServerError('auth.error.user-already-logged-in', 400);
             }
 
             const { code } = await request.json();
 
-            const user = await authService.loginWithGoogleOauth({ code });
+            const user = await authService.loginWithGoogle({ code });
 
             const cookie = serialize('jwt', user.token, {
                 httpOnly: true,

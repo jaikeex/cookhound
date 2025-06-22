@@ -1,5 +1,10 @@
 import type { Prisma, Rating } from '@prisma/client';
 import prisma from '@/server/db/prisma';
+import { Logger } from '@/server/logger';
+
+//|=============================================================================================|//
+
+const log = Logger.getInstance('rating-model');
 
 class RatingModel {
     //~=========================================================================================~//
@@ -22,6 +27,11 @@ class RatingModel {
         userId: number,
         recipeId: number
     ): Promise<Rating | null> {
+        log.trace('Getting rating for user and recipe', {
+            userId,
+            recipeId
+        });
+
         return prisma.rating.findUnique({
             where: {
                 unique_recipe_user: {
@@ -33,6 +43,8 @@ class RatingModel {
     }
 
     async getAllByRecipeId(recipeId: number): Promise<Rating[]> {
+        log.trace('Getting all ratings for recipe', { recipeId });
+
         return prisma.rating.findMany({
             where: { recipeId }
         });
@@ -47,6 +59,12 @@ class RatingModel {
         recipeId: number,
         data: Omit<Prisma.RatingCreateInput, 'user' | 'recipe'>
     ): Promise<Rating> {
+        log.trace('Creating rating', {
+            userId,
+            recipeId,
+            rating: data.rating
+        });
+
         const rating = await prisma.rating.create({
             data: {
                 ...data,
@@ -71,6 +89,8 @@ class RatingModel {
         recipeId: number,
         data: Omit<Prisma.RatingUpdateInput, 'user' | 'recipe'>
     ): Promise<Rating> {
+        log.trace('Updating rating', { userId, recipeId, rating: data.rating });
+
         const rating = await prisma.rating.update({
             where: {
                 unique_recipe_user: {

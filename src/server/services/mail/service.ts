@@ -1,6 +1,11 @@
 import { mailClient } from './client';
 import { emailVerificationTemplate } from './templates/email-verification';
 import { ENV_CONFIG_PUBLIC } from '@/common/constants';
+import { Logger } from '@/server/logger';
+
+//|=============================================================================================|//
+
+const log = Logger.getInstance('mail-service');
 
 /**
  * Service class for sending emails.
@@ -19,6 +24,8 @@ class MailService {
         username: string,
         token: string
     ) {
+        log.trace('attempting to send verification email', { email, username });
+
         const verificationLink = `${ENV_CONFIG_PUBLIC.ORIGIN}/auth/callback/verify-email?token=${token}`;
         const html = emailVerificationTemplate(username, verificationLink);
 
@@ -34,6 +41,10 @@ class MailService {
             subject: 'Welcome to CookHound!',
             html
         });
+
+        log.notice('verification email sent', { email, username });
+
+        return;
     }
 }
 

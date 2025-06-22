@@ -3,6 +3,8 @@ import { NextResponse } from 'next/server';
 import { SlidingWindowRateLimit } from './limiters/SlidingWindow';
 import type { RateLimitConfig, RateLimiter, RateLimitResult } from './types';
 
+//|=============================================================================================|//
+
 enum RateLimitAlgorithm {
     SLIDING_WINDOW = 'sliding-window'
 }

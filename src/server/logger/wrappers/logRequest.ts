@@ -1,8 +1,5 @@
 import { Logger } from '@/server/logger/logger';
-import {
-    REQUEST_PATH_FIELD_NAME,
-    RequestContext
-} from '@/server/logger/request-context';
+import { RequestContext } from '@/server/utils/reqwest/context';
 
 //|=============================================================================================|//
 
@@ -15,9 +12,10 @@ const log = Logger.getInstance('api');
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function logRequest(req: Request) {
     try {
-        const requestPath = RequestContext.get(REQUEST_PATH_FIELD_NAME);
+        const requestPath = RequestContext.getRequestPath();
+        const requestMethod = RequestContext.getRequestMethod();
 
-        log.info(`Incoming request: '${requestPath}'`);
+        log.info(`Incoming request: ${requestMethod} '${requestPath}'`);
     } catch {
         // Do nothing
     }
@@ -33,10 +31,14 @@ export async function logRequest(req: Request) {
  */
 export async function logResponse(res: Response) {
     try {
-        const requestPath = RequestContext.get(REQUEST_PATH_FIELD_NAME);
+        const requestPath = RequestContext.getRequestPath();
+        const requestMethod = RequestContext.getRequestMethod();
+
         const status = res.status;
 
-        log.info(`Request complete for '${requestPath}'; status: ${status}`);
+        log.info(
+            `Request complete: ${requestMethod} '${requestPath}'; status: ${status}`
+        );
     } catch (err) {
         console.log(err);
         // Do nothing

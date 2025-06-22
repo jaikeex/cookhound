@@ -4,7 +4,12 @@ import {
     invalidateModelCache
 } from '@/server/db/model/model-cache';
 import prisma from '@/server/db/prisma';
+import { Logger } from '@/server/logger';
 import type { Prisma, User } from '@prisma/client';
+
+//|=============================================================================================|//
+
+const log = Logger.getInstance('user-model');
 
 class UserModel {
     //~=========================================================================================~//
@@ -21,9 +26,14 @@ class UserModel {
             where: { email }
         });
 
+        log.trace('Getting user by email', { email });
+
         const user = await cachePrismaQuery(
             cacheKey,
-            () => prisma.user.findUnique({ where: { email } }),
+            async () => {
+                log.trace('Fetching user from db by email', { email });
+                return prisma.user.findUnique({ where: { email } });
+            },
             ttl
         );
 
@@ -40,9 +50,15 @@ class UserModel {
             where: { id }
         });
 
+        log.trace('Getting user by id', { id });
+
         const user = await cachePrismaQuery(
             cacheKey,
-            () => prisma.user.findUnique({ where: { id } }),
+            async () => {
+                log.trace('Fetching user from db by id', { id });
+
+                return prisma.user.findUnique({ where: { id } });
+            },
             ttl
         );
 
@@ -62,9 +78,15 @@ class UserModel {
             where: { username }
         });
 
+        log.trace('Getting user by username', { username });
+
         const user = await cachePrismaQuery(
             cacheKey,
-            () => prisma.user.findUnique({ where: { username } }),
+            async () => {
+                log.trace('Fetching user from db by username', { username });
+
+                return prisma.user.findUnique({ where: { username } });
+            },
             ttl
         );
 
@@ -86,14 +108,20 @@ class UserModel {
             where: { OR: [{ email }, { username }] }
         });
 
+        log.trace('Getting user by email or username', { email, username });
+
         const user = await cachePrismaQuery(
             cacheKey,
-            () =>
-                prisma.user.findFirst({
-                    where: {
-                        OR: [{ email }, { username }]
-                    }
-                }),
+            async () => {
+                log.trace('Fetching user from db by email or username', {
+                    email,
+                    username
+                });
+
+                return prisma.user.findFirst({
+                    where: { OR: [{ email }, { username }] }
+                });
+            },
             ttl
         );
 
@@ -113,12 +141,17 @@ class UserModel {
             where: { emailVerificationToken: token }
         });
 
+        log.trace('Getting user by email verification token');
+
         const user = await cachePrismaQuery(
             cacheKey,
-            () =>
-                prisma.user.findFirst({
+            async () => {
+                log.trace('Fetching user from db by email verification token');
+
+                return prisma.user.findFirst({
                     where: { emailVerificationToken: token }
-                }),
+                });
+            },
             ttl
         );
 
@@ -130,6 +163,11 @@ class UserModel {
     //~=========================================================================================~//
 
     async createOne(data: Prisma.UserCreateInput): Promise<User> {
+        log.trace('Creating user', {
+            email: data.email,
+            username: data.username
+        });
+
         const user = await prisma.user.create({ data });
         return user;
     }
@@ -138,6 +176,8 @@ class UserModel {
         id: number,
         data: Prisma.UserUpdateInput
     ): Promise<User | null> {
+        log.trace('Updating user by id', { id });
+
         const user = await prisma.user.update({
             where: { id },
             data

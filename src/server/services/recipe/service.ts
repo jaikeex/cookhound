@@ -9,6 +9,12 @@ import db from '@/server/db/model';
 import type { Locale } from '@/client/locales';
 import { ServerError } from '@/server/error';
 import type { Rating } from '@prisma/client';
+import { Logger } from '@/server/logger';
+import { RequestContext } from '@/server/utils/reqwest/context';
+
+//|=============================================================================================|//
+
+const log = Logger.getInstance('recipe-service');
 
 class RecipeService {
     //~-----------------------------------------------------------------------------------------~//
@@ -16,13 +22,17 @@ class RecipeService {
     //~-----------------------------------------------------------------------------------------~//
 
     async getRecipeById(id: number): Promise<RecipeDTO> {
+        log.trace('getRecipeById - attempt', { id });
+
         const recipe = await db.recipe.getOneById(id);
 
         if (!recipe) {
+            log.info('getRecipeById - recipe not found', { id });
             throw new ServerError('recipe.error.not-found', 404);
         }
 
         if (!recipe.id || !recipe.authorId || !recipe.title) {
+            log.warn('getRecipeById - recipe missing required fields', { id });
             throw new ServerError('recipe.error.not-found', 404);
         }
 
@@ -41,6 +51,8 @@ class RecipeService {
             instructions: recipe.instructions as string[]
         };
 
+        log.trace('getRecipeById - success', { id });
+
         return recipeDTO;
     }
 
@@ -49,7 +61,14 @@ class RecipeService {
     //~-----------------------------------------------------------------------------------------~//
 
     async createRecipe(payload: RecipeForCreatePayload): Promise<RecipeDTO> {
-        const author = await authService.getCurrentUser();
+        log.trace('createRecipe - attempt', { payload });
+
+        let authorId = RequestContext.getUserId();
+
+        if (!authorId) {
+            log.warn('createRecipe - user not set in request context');
+            authorId = (await authService.getCurrentUser()).id;
+        }
 
         const recipeforCreate: RecipeForCreate = {
             title: payload.title,
@@ -63,10 +82,12 @@ class RecipeService {
 
         const recipe = await db.recipe.createOne({
             recipe: recipeforCreate,
-            authorId: author.id,
+            authorId: authorId,
             instructions: payload.instructions,
             ingredients: payload.ingredients
         });
+
+        log.notice('createRecipe - success', { payload });
 
         return this.getRecipeById(recipe.id);
     }
@@ -76,6 +97,8 @@ class RecipeService {
     //~-----------------------------------------------------------------------------------------~//
 
     async rateRecipe(recipeId: number, rating: number): Promise<void> {
+        log.trace('rateRecipe - attempt', { recipeId, rating });
+
         if (rating < 0 || rating > 5) {
             throw new ServerError('app.error.bad-request', 400);
         }
@@ -85,11 +108,14 @@ class RecipeService {
         const recipe = await this.getRecipeById(recipeId);
 
         if (!recipe) {
+            log.warn('rateRecipe - recipe not found', { recipeId });
             throw new ServerError('recipe.error.not-found', 404);
         }
 
         const existingRating: Rating | null =
             await db.rating.getOneByUserIdAndRecipeId(author.id, recipeId);
+
+        log.trace('rateRecipe - existing rating', { existingRating });
 
         if (existingRating) {
             await db.rating.updateOne(author.id, recipeId, {
@@ -110,9 +136,13 @@ class RecipeService {
 
         const averageRating = sumOfRatings / allRatings.length;
 
+        log.trace('rateRecipe - new average rating', { averageRating });
+
         await db.recipe.updateOneById(recipeId, {
             rating: averageRating
         });
+
+        log.trace('rateRecipe - success', { recipeId, rating });
     }
 }
 

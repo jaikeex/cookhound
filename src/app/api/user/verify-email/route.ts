@@ -1,7 +1,8 @@
 import { ServerError } from '@/server/error/server';
-import { logRequest, logResponse, RequestContext } from '@/server/logger';
+import { logRequest, logResponse } from '@/server/logger';
 import { userService } from '@/server/services';
-import { handleServerError } from '@/server/utils';
+import { RequestContext } from '@/server/utils/reqwest/context';
+import { handleServerError } from '@/server/utils/reqwest';
 import type { NextRequest } from 'next/server';
 
 //|=============================================================================================|//

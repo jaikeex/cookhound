@@ -6,15 +6,17 @@ import type {
 } from '@/common/types';
 import bcrypt from 'bcrypt';
 import { ServerError } from '@/server/error';
-import { createToken, verifyToken } from '@/server/utils/jwt';
-import { cookies } from 'next/headers';
-import {
-    ENV_CONFIG_PRIVATE,
-    ENV_CONFIG_PUBLIC,
-    JWT_COOKIE_NAME
-} from '@/common/constants';
+import { createToken } from '@/server/utils/session/jwt';
+import { ENV_CONFIG_PRIVATE, ENV_CONFIG_PUBLIC } from '@/common/constants';
 import { userService } from '@/server/services/user/service';
 import db from '@/server/db/model';
+import { Logger } from '@/server/logger';
+import { deleteSession } from '@/server/utils/session';
+import { RequestContext } from '@/server/utils/reqwest/context';
+
+//|=============================================================================================|//
+
+const log = Logger.getInstance('auth-service');
 
 /**
  * Service class for handling authentication-related logic.
@@ -43,21 +45,27 @@ class AuthService {
     async login(payload: UserForLogin): Promise<AuthResponse> {
         const { email, password } = payload;
 
+        log.trace('login attempt', { email });
+
         if (!email) {
+            log.info('login - email required', { email });
             throw new ServerError('auth.error.email-required', 400);
         }
 
         if (!password) {
+            log.info('login - password required', { password });
             throw new ServerError('auth.error.password-required', 400);
         }
 
         const user = await db.user.getOneByEmail(email);
 
         if (!user || !user.passwordHash) {
+            log.info('login - user not found', { email });
             throw new ServerError('auth.error.invalid-credentials', 401);
         }
 
         if (!user.emailVerified) {
+            log.info('login - email not verified', { email });
             throw new ServerError('auth.error.email-not-verified', 403);
         }
 
@@ -67,6 +75,7 @@ class AuthService {
         );
 
         if (!isPasswordValid) {
+            log.info('login - invalid password', { email });
             throw new ServerError('auth.error.invalid-credentials', 401);
         }
 
@@ -76,6 +85,8 @@ class AuthService {
             id: user.id.toString(),
             role: user.role as UserRole
         });
+
+        log.trace('login - success', { email });
 
         const userResponse: UserDTO = {
             id: user.id,
@@ -106,12 +117,13 @@ class AuthService {
      * @throws {ServerError} Throws an error with status 401 if the access token is missing.
      * @throws {ServerError} Throws an error with status 401 if the user info is missing.
      */
-    async loginWithGoogleOauth(
-        payload: AuthCodePayload
-    ): Promise<AuthResponse> {
+    async loginWithGoogle(payload: AuthCodePayload): Promise<AuthResponse> {
         const { code } = payload;
 
+        log.trace('loginWithGoogle attempt');
+
         if (!code) {
+            log.warn('loginWithGoogle - code required');
             throw new ServerError('auth.error.google-oauth-code-required', 400);
         }
 
@@ -137,6 +149,7 @@ class AuthService {
         );
 
         if (!accessTokenResponse.ok) {
+            log.warn('loginWithGoogle - failed to get access token');
             throw new ServerError('auth.error.failed-to-get-access-token', 401);
         }
 
@@ -153,6 +166,7 @@ class AuthService {
         );
 
         if (!userInfoResponse.ok) {
+            log.warn('loginWithGoogle - failed to get user info');
             throw new ServerError('auth.error.failed-to-get-user-info', 401);
         }
 
@@ -162,6 +176,10 @@ class AuthService {
         let user: UserDTO;
 
         if (dbUser) {
+            log.trace('loginWithGoogle - user found', {
+                email: userInfoData.email
+            });
+
             user = {
                 id: dbUser.id,
                 email: dbUser.email,
@@ -173,6 +191,10 @@ class AuthService {
                 lastLogin: dbUser.lastLogin?.toISOString() ?? null
             };
         } else {
+            log.info('loginWithGoogle - creating new user', {
+                email: userInfoData.email
+            });
+
             user = await userService.createUserFromGoogle({
                 email: userInfoData.email,
                 username: userInfoData.name,
@@ -183,6 +205,10 @@ class AuthService {
         const token = createToken({
             id: user.id.toString(),
             role: user.role
+        });
+
+        log.trace('loginWithGoogle - success', {
+            email: userInfoData.email
         });
 
         return { token, user };
@@ -199,8 +225,10 @@ class AuthService {
      * @throws {ServerError} Throws an error with status 500 if there is an error.
      */
     async logout(): Promise<void> {
-        const cookieStore = await cookies();
-        cookieStore.delete('jwt');
+        log.trace('logout attempt');
+        deleteSession();
+        log.trace('logout - success');
+
         return;
     }
 
@@ -216,23 +244,34 @@ class AuthService {
      * @throws {ServerError} Throws an error with status 404 if the user is not found.
      */
     async getCurrentUser(): Promise<UserDTO> {
-        const cookieStore = await cookies();
-        const token = cookieStore?.get(JWT_COOKIE_NAME)?.value;
+        const userId = RequestContext.getUserId();
 
-        if (!token) {
+        if (!userId) {
+            log.trace('getCurrentUser - no token found');
             throw new ServerError('auth.error.unauthorized', 401);
         }
 
-        const decoded = verifyToken(token);
-        const user = await db.user.getOneById(Number(decoded.id));
+        const user = await db.user.getOneById(Number(userId));
 
         if (!user) {
+            log.warn('getCurrentUser - user not found', {
+                id: userId
+            });
+
             throw new ServerError('auth.error.user-not-found', 404);
         }
 
         if (!user.emailVerified) {
+            log.trace('getCurrentUser - email not verified', {
+                id: userId
+            });
+
             throw new ServerError('auth.error.email-not-verified', 403);
         }
+
+        log.trace('getCurrentUser - success', {
+            id: userId
+        });
 
         return {
             id: user.id,
