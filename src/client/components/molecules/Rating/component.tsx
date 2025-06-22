@@ -44,14 +44,14 @@ export const Rating: React.FC<RatingProps> = ({
     const handleMouseMove = useCallback(
         (index: number) => (isInLeftHalf: boolean) => {
             // Don't update stars on hover during cooldown
-            if (isOnCooldown) return;
+            if (isOnCooldown || disabled) return;
 
             const hoverRating = index + (isInLeftHalf ? 0.5 : 1);
 
             setIsHovered(true);
             setStars(generateStars(hoverRating));
         },
-        [isOnCooldown]
+        [isOnCooldown, disabled]
     );
 
     const handleMouseEnter = useCallback(() => {

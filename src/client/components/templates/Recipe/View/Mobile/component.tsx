@@ -9,11 +9,12 @@ import {
     Rating,
     RecipeInfo,
     Tabs,
+    Tooltip,
     Typography
 } from '@/client/components';
 import Image from 'next/image';
 import { generateImgPlaceholder } from '@/client/utils';
-import { useLocale } from '@/client/store';
+import { useAuth, useLocale } from '@/client/store';
 import classNames from 'classnames';
 import { useDisplayRecipe } from '@/client/components/templates/Recipe/View/useDisplayRecipe';
 
@@ -29,6 +30,7 @@ export const MobileRecipeViewTemplate: React.FC<MobileRecipeViewProps> = ({
     recipe
 }) => {
     const { t } = useLocale();
+    const { user } = useAuth();
 
     const { rateRecipe } = useDisplayRecipe(recipe);
 
@@ -104,14 +106,21 @@ export const MobileRecipeViewTemplate: React.FC<MobileRecipeViewProps> = ({
                         verbose={false}
                         typographyVariant={'body'}
                     />
-                    <Rating
-                        onClick={rateRecipe}
-                        disabled={isPreview}
-                        rating={recipe.rating}
-                        fill={'gold'}
-                        iconSize={22}
-                        cooldown={60000}
-                    />
+
+                    <Tooltip
+                        position={'top'}
+                        text={t('app.general.anonymous')}
+                        disabled={isPreview || !!user}
+                    >
+                        <Rating
+                            onClick={rateRecipe}
+                            disabled={isPreview || !user}
+                            rating={recipe.rating}
+                            fill={'gold'}
+                            iconSize={22}
+                            cooldown={60000}
+                        />
+                    </Tooltip>
                 </div>
                 <Divider />
                 <Tabs tabs={tabs} buttonRowClassName={'sticky top-14 z-10'} />

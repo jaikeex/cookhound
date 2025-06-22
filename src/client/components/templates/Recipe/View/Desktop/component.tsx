@@ -8,11 +8,12 @@ import {
     InstructionsView,
     Rating,
     RecipeInfo,
+    Tooltip,
     Typography
 } from '@/client/components';
 import Image from 'next/image';
 import { generateImgPlaceholder } from '@/client/utils';
-import { useLocale } from '@/client/store';
+import { useAuth, useLocale } from '@/client/store';
 import { useDisplayRecipe } from '@/client/components/templates/Recipe/View/useDisplayRecipe';
 
 export type DesktopRecipeViewProps = Readonly<{
@@ -29,6 +30,7 @@ export const DesktopRecipeViewTemplate: React.FC<DesktopRecipeViewProps> = ({
     ref
 }) => {
     const { t } = useLocale();
+    const { user } = useAuth();
 
     const { rateRecipe } = useDisplayRecipe(recipe);
 
@@ -48,14 +50,22 @@ export const DesktopRecipeViewTemplate: React.FC<DesktopRecipeViewProps> = ({
                             <Typography variant={'heading-xl'}>
                                 {recipe.title}
                             </Typography>
-                            <Rating
-                                onClick={rateRecipe}
-                                disabled={isPreview}
-                                rating={recipe.rating}
-                                fill={'gold'}
-                                iconSize={22}
-                                cooldown={60000}
-                            />
+
+                            <Tooltip
+                                position={'bottom'}
+                                text={t('app.general.anonymous')}
+                                disabled={isPreview || !!user}
+                                className={'w-fit'}
+                            >
+                                <Rating
+                                    onClick={rateRecipe}
+                                    disabled={isPreview || !user}
+                                    rating={recipe.rating}
+                                    fill={'gold'}
+                                    iconSize={22}
+                                    cooldown={60000}
+                                />
+                            </Tooltip>
                         </div>
 
                         <RecipeInfo
