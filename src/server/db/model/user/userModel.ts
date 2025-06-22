@@ -158,6 +158,31 @@ class UserModel {
         return this.reviveUserDates(user);
     }
 
+    async getOneByPasswordResetToken(
+        token: string,
+        ttl?: number
+    ): Promise<User | null> {
+        const cacheKey = generateCacheKey('user', 'findFirst', {
+            where: { passwordResetToken: token }
+        });
+
+        log.trace('Getting user by password reset token');
+
+        const user = await cachePrismaQuery(
+            cacheKey,
+            async () => {
+                log.trace('Fetching user from db by password reset token');
+
+                return prisma.user.findFirst({
+                    where: { passwordResetToken: token }
+                });
+            },
+            ttl
+        );
+
+        return this.reviveUserDates(user);
+    }
+
     //~=========================================================================================~//
     //$                                         MUTATIONS                                       $//
     //~=========================================================================================~//

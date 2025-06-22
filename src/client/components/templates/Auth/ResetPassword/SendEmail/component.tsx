@@ -77,7 +77,7 @@ export const SendResetPasswordEmailTemplate: React.FC = () => {
 
             try {
                 setFormErrors({});
-                await apiClient.auth.sendResetPasswordEmail(formData);
+                await apiClient.user.sendResetPasswordEmail(formData);
                 formRef.current?.reset();
                 disableForm();
                 setSubmitted(true);

@@ -103,7 +103,12 @@ class RecipeService {
             throw new ServerError('app.error.bad-request', 400);
         }
 
-        const author = await authService.getCurrentUser();
+        let authorId = RequestContext.getUserId();
+
+        if (!authorId) {
+            log.warn('createRecipe - user not set in request context');
+            authorId = (await authService.getCurrentUser()).id;
+        }
 
         const recipe = await this.getRecipeById(recipeId);
 
@@ -113,16 +118,16 @@ class RecipeService {
         }
 
         const existingRating: Rating | null =
-            await db.rating.getOneByUserIdAndRecipeId(author.id, recipeId);
+            await db.rating.getOneByUserIdAndRecipeId(authorId, recipeId);
 
         log.trace('rateRecipe - existing rating', { existingRating });
 
         if (existingRating) {
-            await db.rating.updateOne(author.id, recipeId, {
+            await db.rating.updateOne(authorId, recipeId, {
                 rating
             });
         } else {
-            await db.rating.createOne(author.id, recipeId, {
+            await db.rating.createOne(authorId, recipeId, {
                 rating
             });
         }

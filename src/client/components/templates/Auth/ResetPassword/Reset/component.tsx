@@ -95,7 +95,7 @@ export const ResetPasswordTemplate: React.FC = () => {
                     token
                 };
 
-                await apiClient.auth.resetPassword(payload);
+                await apiClient.user.resetPassword(payload);
                 formRef.current?.reset();
                 disableForm();
                 setSubmitted(true);

@@ -1,10 +1,10 @@
+import type { RequestConfig } from '@/client/request/ApiRequestWrapper';
+import { apiRequestWrapper } from '@/client/request/ApiRequestWrapper';
 import type {
-    RequestConfig
-} from '@/client/request/ApiRequestWrapper';
-import {
-    apiRequestWrapper
-} from '@/client/request/ApiRequestWrapper';
-import type { UserForCreatePayload } from '@/common/types';
+    ResetPasswordEmailPayload,
+    ResetPasswordPayload,
+    UserForCreatePayload
+} from '@/common/types';
 
 /**
  * Service for user-related operations.
@@ -68,6 +68,46 @@ class UserApiClient {
         await apiRequestWrapper.post({
             url: '/user/verify-email',
             data: { email },
+            ...config
+        });
+    }
+
+    /**
+     * Sends a password reset email to the user by calling `POST /user/password-reset`.
+     *
+     * @param data - The email address to send the password reset email to.
+     * @param config - The fetch request configuration.
+     *
+     * @returns {Promise<void>} A promise that resolves when the email is sent.
+     * @throws {Error} Throws an error if the request fails.
+     */
+    async sendResetPasswordEmail(
+        data: ResetPasswordEmailPayload,
+        config?: RequestConfig
+    ): Promise<void> {
+        await apiRequestWrapper.post({
+            url: '/user/password-reset',
+            data,
+            ...config
+        });
+    }
+
+    /**
+     * Resets a user's password by calling `PUT /user/password-reset`.
+     *
+     * @param data - The new password and the password reset token.
+     * @param config - The fetch request configuration.
+     *
+     * @returns {Promise<void>} A promise that resolves when the password is reset.
+     * @throws {Error} Throws an error if the request fails.
+     */
+    async resetPassword(
+        data: ResetPasswordPayload,
+        config?: RequestConfig
+    ): Promise<void> {
+        await apiRequestWrapper.put({
+            url: '/user/password-reset',
+            data,
             ...config
         });
     }

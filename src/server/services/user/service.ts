@@ -68,12 +68,12 @@ class UserService {
         };
 
         if (!availability.email) {
-            log.info('createUser - email already taken', { email });
+            log.trace('createUser - email already taken', { email });
             throw new ServerError('auth.error.email-already-taken', 409);
         }
 
         if (!availability.username) {
-            log.info('createUser - username already taken', { username });
+            log.trace('createUser - username already taken', { username });
             throw new ServerError('auth.error.username-already-taken', 409);
         }
 
@@ -244,6 +244,134 @@ class UserService {
         );
 
         log.trace('resendVerificationEmail - success', { email });
+
+        return;
+    }
+
+    //~-----------------------------------------------------------------------------------------~//
+    //$                                SEND PASSWORD RESET EMAIL                                $//
+    //~-----------------------------------------------------------------------------------------~//
+
+    /**
+     * Sends a password reset email to a user.
+     * It generates a new token and sends it to the user's email.
+     *
+     * @param email - The email address of the user.
+     * @throws {ServerError} Throws an error if the email is missing, not verified or the user is not found.
+     */
+    async sendPasswordResetEmail(email: string): Promise<void> {
+        log.trace('sendPasswordResetEmail - attempt', { email });
+
+        if (!email) {
+            log.warn('sendPasswordResetEmail - missing email', { email });
+            throw new ServerError('auth.error.email-required', 400);
+        }
+
+        const user = await db.user.getOneByEmail(email);
+
+        if (!user) {
+            log.info('sendPasswordResetEmail - user not found', { email });
+            throw new ServerError('auth.error.user-not-found', 404);
+        }
+
+        if (!user.emailVerified) {
+            log.warn('sendPasswordResetEmail - email not verified', { email });
+            throw new ServerError('auth.error.email-not-verified', 400);
+        }
+
+        if (user.authType === AuthType.Google) {
+            log.info(
+                'sendPasswordResetEmail - tried for user with google auth',
+                { email }
+            );
+            throw new ServerError('auth.error.google-auth-not-supported', 400);
+        }
+
+        const passwordResetToken = uuid();
+        const passwordResetTokenExpires = new Date(
+            Date.now() + 1000 * 60 * 60 * 24 // 24 hours
+        );
+
+        await db.user.updateOneById(user.id, {
+            passwordResetToken,
+            passwordResetTokenExpires
+        });
+
+        await mailService.sendPasswordReset(
+            user.email,
+            user.username,
+            passwordResetToken
+        );
+
+        log.trace('sendPasswordResetEmail - success', { email });
+
+        return;
+    }
+
+    //~-----------------------------------------------------------------------------------------~//
+    //$                                     RESET PASSWORD                                      $//
+    //~-----------------------------------------------------------------------------------------~//
+
+    /**
+     * Resets a user's password using a password reset token.
+     *
+     * @param token - The password reset token.
+     * @param password - The new password.
+     */
+
+    async resetPassword(token: string, password: string): Promise<void> {
+        log.trace('resetPassword - attempt');
+
+        if (!token || !password) {
+            log.warn('resetPassword - missing token or password');
+            throw new ServerError('app.error.bad-request', 400);
+        }
+
+        const user = await db.user.getOneByPasswordResetToken(token);
+
+        if (!user) {
+            log.warn('resetPassword - user not found');
+            throw new ServerError('auth.error.user-not-found', 404);
+        }
+
+        if (user.authType === AuthType.Google) {
+            log.info('resetPassword - tried for user with google auth');
+            throw new ServerError('auth.error.google-auth-not-supported', 400);
+        }
+
+        if (
+            user.passwordResetTokenExpires &&
+            user.passwordResetTokenExpires < new Date()
+        ) {
+            log.trace('resetPassword - token expired');
+            throw new ServerError(
+                'auth.error.password-reset-token-expired',
+                400
+            );
+        }
+
+        if (
+            user?.lastPasswordReset &&
+            user.lastPasswordReset > new Date(Date.now() - 1000 * 60 * 60 * 24)
+        ) {
+            log.warn('resetPassword - password changed too recently');
+            throw new ServerError(
+                'auth.error.password-changed-too-recently',
+                400
+            );
+        }
+
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+
+        await db.user.updateOneById(user.id, {
+            passwordHash: hashedPassword,
+            passwordResetToken: null,
+            passwordResetTokenExpires: null,
+            lastPasswordReset: new Date()
+        });
+
+        log.notice('resetPassword - success');
 
         return;
     }
