@@ -12,6 +12,7 @@ export type StarProps = Readonly<{
     onMouseMove?: (isInLeftHalf: boolean) => void;
     pulse?: boolean;
     state: 'full' | 'half' | 'empty';
+    className?: string;
 }>;
 
 export enum StarState {
@@ -40,7 +41,8 @@ export const Star: React.FC<StarProps> = ({
     iconSize = 32,
     onMouseMove,
     pulse,
-    state
+    state,
+    className
 }) => {
     const ref = useRef<HTMLDivElement>(null);
 
@@ -73,7 +75,8 @@ export const Star: React.FC<StarProps> = ({
                 highlight && 'scale-105',
                 pulse && 'animate-rating-pulse',
                 'transition-all duration-200',
-                disabled ? 'cursor-not-allowed' : 'cursor-pointer'
+                disabled ? 'cursor-default' : 'cursor-pointer',
+                className
             )}
         />
     );

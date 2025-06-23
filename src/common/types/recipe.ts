@@ -13,6 +13,18 @@ export type RecipeDTO = {
     notes: string | null;
     imageUrl: string;
     rating: number | null;
+    timesRated: number;
+};
+
+export type RecipeForDisplayDTO = {
+    id: number;
+    displayId: string;
+    title: string;
+    imageUrl: string;
+    rating: number | null;
+    timesRated: number;
+    time: number | null;
+    portionSize: number | null;
 };
 
 export type Ingredient = {

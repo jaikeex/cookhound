@@ -1,9 +1,14 @@
-import React from 'react';
+import { FrontPageTemplate } from '@/client/components/templates/FrontPage';
+import { FrontPageSkeleton } from '@/client/components/templates/FrontPage/skeleton';
+import apiClient from '@/client/request';
+import React, { Suspense } from 'react';
 
 export default function Home() {
+    const recipesForDisplay = apiClient.recipe.getRecipeList(1, 12);
+
     return (
-        <div>
-            <br />
-        </div>
+        <Suspense fallback={<FrontPageSkeleton />}>
+            <FrontPageTemplate recipes={recipesForDisplay} />
+        </Suspense>
     );
 }

@@ -27,13 +27,17 @@ SELECT
     ) AS ingredients,
     (
         SELECT JSON_ARRAYAGG(
-            i.text
+            instr.text
         )
-        FROM instructions i
-        WHERE i.recipeId = r.id
-        ORDER BY i.step
+        FROM instructions instr
+        WHERE instr.recipeId = r.id
+        ORDER BY instr.step
     ) AS instructions
 FROM
     recipes r
 WHERE
-    r.id = ?;
+    r.timesRated >= ?
+ORDER BY
+    r.rating DESC,
+    r.createdAt DESC
+LIMIT ? OFFSET ?; 

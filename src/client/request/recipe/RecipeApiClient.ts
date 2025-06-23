@@ -1,6 +1,10 @@
 import type { RequestConfig } from '@/client/request/ApiRequestWrapper';
 import { apiRequestWrapper } from '@/client/request/ApiRequestWrapper';
-import type { RecipeDTO, RecipeForCreatePayload } from '@/common/types';
+import type {
+    RecipeDTO,
+    RecipeForCreatePayload,
+    RecipeForDisplayDTO
+} from '@/common/types';
 
 /**
  * Service for recipe-related operations.
@@ -39,6 +43,27 @@ class RecipeApiClient {
     ): Promise<RecipeDTO> {
         return await apiRequestWrapper.get({
             url: `/recipe/id/${id}`,
+            ...config
+        });
+    }
+
+    /**
+     * Gets a paginated list of recipes by calling `GET /api/recipe/list`.
+     *
+     * @param batch - The batch number to fetch.
+     * @param perPage - The number of recipes per page.
+     * @param config - Optional fetch request configuration.
+     * @returns A promise that resolves to the paginated list of recipes.
+     * @throws {Error} Throws an error if the request fails.
+     */
+    async getRecipeList(
+        batch: number,
+        perPage: number,
+        config?: RequestConfig
+    ): Promise<RecipeForDisplayDTO[]> {
+        return await apiRequestWrapper.get({
+            url: `/recipe/list?batch=${batch}&perPage=${perPage}`,
+            params: { batch, perPage },
             ...config
         });
     }

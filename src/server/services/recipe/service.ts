@@ -1,7 +1,8 @@
 import type {
     Ingredient,
     RecipeDTO,
-    RecipeForCreatePayload
+    RecipeForCreatePayload,
+    RecipeForDisplayDTO
 } from '@/common/types';
 import type { RecipeForCreate } from './types';
 import db from '@/server/db/model';
@@ -52,6 +53,7 @@ class RecipeService {
             notes: recipe.notes,
             imageUrl: recipe.imageUrl || '',
             rating: recipe.rating ? Number(recipe.rating) : null,
+            timesRated: recipe.timesRated ?? 0,
             ingredients: recipe.ingredients as Ingredient[],
             instructions: recipe.instructions as string[]
         };
@@ -100,6 +102,7 @@ class RecipeService {
             notes: recipe.notes,
             imageUrl: recipe.imageUrl || '',
             rating: recipe.rating ? Number(recipe.rating) : null,
+            timesRated: recipe.timesRated ?? 0,
             ingredients: recipe.ingredients as Ingredient[],
             instructions: recipe.instructions as string[]
         };
@@ -197,10 +200,89 @@ class RecipeService {
         log.trace('rateRecipe - new average rating', { averageRating });
 
         await db.recipe.updateOneById(recipeId, {
-            rating: averageRating
+            rating: averageRating,
+            timesRated: allRatings.length
         });
 
         log.trace('rateRecipe - success', { recipeId, rating });
+    }
+
+    //~-----------------------------------------------------------------------------------------~//
+    //$                                  FRONT PAGE FETCH                                      $//
+    //~-----------------------------------------------------------------------------------------~//
+
+    /**
+     * Fetch a paginated set of recipes for the front-page infinite scroll.
+     * The method will try to prioritise recent and highly-rated recipes while
+     * ensuring that only recipes that have been rated at least a certain
+     * amount of times are returned. If there are not enough recipes that meet
+     * the strict threshold, it will gradually lower the requirement until the
+     * requested batch size is fulfilled or no further loosening is possible.
+     *
+     * @param batch 1-based index of the batch that is being requested. The
+     *              first batch is 1.
+     * @param perPage Size of the batch. Defaults to 24.
+     */
+    async getFrontPageRecipes(
+        batch: number,
+        perPage: number = 24
+    ): Promise<RecipeForDisplayDTO[]> {
+        log.trace('getFrontPageRecipes - attempt', { batch, perPage });
+
+        const MAX_BATCHES = 5;
+
+        if (batch < 1 || batch > MAX_BATCHES) {
+            log.warn('getFrontPageRecipes - invalid batch requested', {
+                batch
+            });
+            throw new ServerError('app.error.bad-request', 400);
+        }
+
+        if (perPage <= 0 || perPage > 100) {
+            log.warn('getFrontPageRecipes - invalid perPage requested', {
+                perPage
+            });
+            throw new ServerError('app.error.bad-request', 400);
+        }
+
+        const offset = (batch - 1) * perPage;
+
+        // Thresholds for the minimum number of ratings a recipe must have in
+        // order to be considered. These thresholds are applied in order until
+        // a full batch is obtained or until the last threshold has been used.
+        const MIN_TIMES_RATED_THRESHOLDS = [10, 5, 2, 1, 0];
+
+        let results: any[] = [];
+
+        for (const threshold of MIN_TIMES_RATED_THRESHOLDS) {
+            results = await db.recipe.getManyForFrontPage(
+                perPage,
+                offset,
+                threshold
+            );
+
+            if (results.length === perPage || threshold === 0) {
+                break;
+            }
+        }
+
+        const recipes: RecipeForDisplayDTO[] = results.map((recipe) => ({
+            id: recipe.id,
+            displayId: recipe.displayId,
+            title: recipe.title,
+            imageUrl: recipe.imageUrl || '',
+            rating: recipe.rating ? Number(recipe.rating) : null,
+            timesRated: recipe.timesRated ?? 0,
+            time: recipe.time,
+            portionSize: recipe.portionSize
+        }));
+
+        log.trace('getFrontPageRecipes - success', {
+            batch,
+            count: recipes.length
+        });
+
+        return recipes;
     }
 }
 

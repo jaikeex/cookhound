@@ -32,7 +32,8 @@ export const ScrollToTop: React.FC<ScrollToTopProps> = ({
     }, [containerId, enabled]);
 
     usePathnameChangeListener({
-        onChange: handlePathnameChange
+        onChange: handlePathnameChange,
+        ignoreParams: true
     });
 
     return null;

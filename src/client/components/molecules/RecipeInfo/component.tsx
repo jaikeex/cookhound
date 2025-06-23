@@ -5,26 +5,47 @@ import type { TypographyVariant } from '@/client/components';
 import { Icon, Typography } from '@/client/components';
 import { useLocale } from '@/client/store';
 
+type RecipeInfoSize = 'sm' | 'md';
+
+const classConfig = {
+    iconSize: {
+        sm: 16,
+        md: 24
+    },
+    gap: {
+        sm: 'gap-2',
+        md: 'gap-6'
+    },
+    innerGap: {
+        sm: 'gap-1',
+        md: 'gap-2'
+    }
+};
+
 type RecipeInfoProps = Readonly<{
     portionSize?: number | null;
     time?: number | null;
     typographyVariant?: TypographyVariant;
     verbose?: boolean;
+    size?: RecipeInfoSize;
 }>;
 
 export const RecipeInfo: React.FC<RecipeInfoProps> = ({
     portionSize,
     time,
-    typographyVariant,
-    verbose
+    typographyVariant = 'body-sm',
+    verbose,
+    size = 'md'
 }) => {
     const { t } = useLocale();
 
     return (
-        <div className={'flex items-center gap-6'}>
+        <div className={`flex items-center ${classConfig.gap[size]}`}>
             {portionSize ? (
-                <div className={'flex items-center gap-2'}>
-                    <Icon name={'servings'} size={24} />
+                <div
+                    className={`flex items-center ${classConfig.innerGap[size]}`}
+                >
+                    <Icon name={'servings'} size={classConfig.iconSize[size]} />
                     <Typography variant={typographyVariant}>
                         {verbose ? `${t('app.recipe.servings')}: ` : null}
                         {portionSize}
@@ -32,13 +53,16 @@ export const RecipeInfo: React.FC<RecipeInfoProps> = ({
                 </div>
             ) : null}
             {time ? (
-                <div className={'flex items-center gap-2'}>
-                    <Icon name={'time'} size={24} />
+                <div
+                    className={`flex items-center ${classConfig.innerGap[size]}`}
+                >
+                    <Icon name={'time'} size={classConfig.iconSize[size]} />
                     <Typography variant={typographyVariant}>
                         {verbose
                             ? `${t('app.recipe.preparation-time')}: `
                             : null}
                         {time}
+                        {verbose ? null : ` ${t('app.recipe.minutes-short')}`}
                     </Typography>
                 </div>
             ) : null}

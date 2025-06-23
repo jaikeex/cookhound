@@ -8,6 +8,7 @@ import { Logger } from '@/server/logger';
 import type { Prisma, Recipe } from '@prisma/client';
 import { getRecipeById } from '@prisma/client/sql';
 import { getRecipeByDisplayId } from '@prisma/client/sql';
+import { getFrontPageRecipes } from '@prisma/client/sql';
 
 //|=============================================================================================|//
 
@@ -62,6 +63,46 @@ class RecipeModel {
         );
 
         return recipe[0] ?? null;
+    }
+
+    //~=========================================================================================~//
+    //$                               FRONT PAGE COLLECTION                                   $//
+    //~=========================================================================================~//
+
+    async getManyForFrontPage(
+        limit: number,
+        offset: number,
+        minTimesRated: number,
+        ttl?: number
+    ): Promise<getFrontPageRecipes.Result[]> {
+        const cacheKey = generateCacheKey('recipe', 'findManyFrontPage', {
+            limit,
+            offset,
+            minTimesRated
+        });
+
+        log.trace('Getting front page recipes', {
+            limit,
+            offset,
+            minTimesRated
+        });
+
+        const recipes = await cachePrismaQuery(
+            cacheKey,
+            async () => {
+                log.trace('Fetching front page recipes from db', {
+                    limit,
+                    offset,
+                    minTimesRated
+                });
+                return prisma.$queryRawTyped(
+                    getFrontPageRecipes(minTimesRated, limit, offset)
+                );
+            },
+            ttl ?? 60 * 60 // 1 hour
+        );
+
+        return recipes;
     }
 
     //~=========================================================================================~//

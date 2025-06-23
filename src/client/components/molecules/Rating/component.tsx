@@ -7,6 +7,13 @@ import { Star, Tooltip } from '@/client/components';
 import { generateStars } from '@/client/components/molecules/Rating/utils';
 import { useCooldown } from '@/client/hooks';
 
+export type RatingSize = 'sm' | 'md' | 'lg';
+
+const classConfig = {
+    starSize: { sm: 'w-4 h-4', md: 'w-6 h-6', lg: 'w-8 h-8' },
+    gap: { sm: 'gap-1', md: 'gap-2', lg: 'gap-3' }
+};
+
 export type RatingProps = Readonly<{
     className?: string;
     cooldown?: number;
@@ -16,6 +23,7 @@ export type RatingProps = Readonly<{
     cooldownKey?: string;
     onClick?: (rating: number) => void;
     rating: number | null;
+    size?: RatingSize;
 }>;
 
 export const MAX_RATING = 5;
@@ -28,7 +36,8 @@ export const Rating: React.FC<RatingProps> = ({
     iconSize = 24,
     cooldownKey,
     onClick,
-    rating
+    rating,
+    size = 'md'
 }) => {
     const [isHovered, setIsHovered] = useState(false);
     const [isPulsing, setIsPulsing] = useState(false);
@@ -114,9 +123,9 @@ export const Rating: React.FC<RatingProps> = ({
             <div
                 ref={ref}
                 className={classNames(
-                    'flex items-center gap-2 max-w-fit',
-                    (disabled || isOnCooldown) &&
-                        'cursor-not-allowed opacity-80'
+                    'flex items-center max-w-fit',
+                    classConfig.gap[size],
+                    (disabled || isOnCooldown) && 'opacity-80'
                 )}
                 onMouseLeave={handleMouseLeave}
                 onClick={disabled || isOnCooldown ? undefined : handleClick}
@@ -130,6 +139,7 @@ export const Rating: React.FC<RatingProps> = ({
                         state={star}
                         iconSize={iconSize}
                         fill={stars[index] !== 'empty' ? fill : 'silver'}
+                        className={classConfig.starSize[size]}
                         pulse={
                             isPulsing && isHovered && stars[index] !== 'empty'
                         }

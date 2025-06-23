@@ -9,6 +9,7 @@ SELECT
     r.notes,
     r.imageUrl,
     r.rating,
+    r.timesRated,
     r.createdAt,
     r.updatedAt,
     (

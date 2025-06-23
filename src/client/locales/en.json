@@ -81,6 +81,7 @@
     "app.recipe.notes": "Notes",
     "app.recipe.servings": "Servings",
     "app.recipe.preparation-time": "Preparation time (in minutes)",
+    "app.recipe.minutes-short": "min",
     "app.recipe.add-ingredient": "Add ingredient",
     "app.recipe.add-instruction": "Add instruction",
     "app.recipe.create-shopping-list": "Create shopping list",

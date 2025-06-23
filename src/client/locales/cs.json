@@ -81,6 +81,7 @@
     "app.recipe.notes": "Poznámky",
     "app.recipe.servings": "Porce",
     "app.recipe.preparation-time": "Čas přípravy (v minutách)",
+    "app.recipe.minutes-short": "min",
     "app.recipe.add-ingredient": "Přidat ingredienci",
     "app.recipe.add-instruction": "Přidat krok",
     "app.recipe.create-shopping-list": "Vytvořit nákupní seznam",
