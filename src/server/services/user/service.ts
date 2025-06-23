@@ -179,7 +179,7 @@ class UserService {
         for (const recipeId of uniqueRecipeIdList) {
             const recipe = await db.recipe.getOneById(recipeId);
 
-            if (!recipe || !recipe.displayId || !recipe.title) {
+            if (!recipe || !recipe.displayId || !recipe.title || !recipe.id) {
                 log.warn('getShoppingList - recipe not found', { recipeId });
                 throw new ServerError('app.error.bad-request', 400);
             }
@@ -189,6 +189,7 @@ class UserService {
             );
 
             const recipeDTO = {
+                id: recipe.id,
                 displayId: recipe.displayId,
                 title: recipe.title,
                 portionSize: recipe.portionSize

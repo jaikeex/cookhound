@@ -1,5 +1,6 @@
 import BellIcon from './bell.svg';
 import BookIcon from './book.svg';
+import CancelIcon from './cancel.svg';
 import CartIcon from './cart.svg';
 import CheckmarkIcon from './checkmark.svg';
 import ChevronDoubleUpIcon from './chevron-double-up.svg';
@@ -25,6 +26,7 @@ import UploadIcon from './upload.svg';
 export const basicSvg = {
     BellIcon,
     BookIcon,
+    CancelIcon,
     CartIcon,
     CheckmarkIcon,
     ChevronDoubleUpIcon,

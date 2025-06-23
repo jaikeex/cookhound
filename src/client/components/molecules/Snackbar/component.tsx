@@ -37,7 +37,7 @@ export const Snackbar: React.FC<SnackbarProps> = ({
     variant
 }) => {
     return (
-        <div className="fixed left-0 right-0 z-[2000] pointer-events-none bottom-16 md:top-8">
+        <div className="fixed left-0 right-0 z-[2000] pointer-events-none top-4 md:top-8">
             <div
                 className={classnames(
                     'min-h-10 max-w-72 md:max-w-96 py-2.5 px-2 mx-auto rounded-md z-50 flex items-center gap-2',

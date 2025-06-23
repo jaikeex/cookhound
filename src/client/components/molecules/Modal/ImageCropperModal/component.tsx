@@ -139,7 +139,7 @@ export const ImageCropperModal: React.FC<ImageCropperModalProps> = ({
     return (
         <div className="flex flex-col items-center w-full h-full gap-4">
             <Typography variant="body-sm" className="text-center">
-                Resize your image to the desired size.
+                {t('app.form.image-cropper.description')}
             </Typography>
 
             <ReactCrop
@@ -168,7 +168,7 @@ export const ImageCropperModal: React.FC<ImageCropperModalProps> = ({
                     size="md"
                     className="w-full"
                 >
-                    Cancel
+                    {t('app.general.cancel')}
                 </ButtonBase>
 
                 <ButtonBase
@@ -177,7 +177,7 @@ export const ImageCropperModal: React.FC<ImageCropperModalProps> = ({
                     size="md"
                     className="w-full"
                 >
-                    Apply
+                    {t('app.general.confirm')}
                 </ButtonBase>
             </div>
         </div>

@@ -41,16 +41,21 @@ export const IngredientRowView: React.FC<IngredientRowViewProps> = ({
     const [checked, setChecked] = useState<boolean>(selected || false);
 
     const handleRowClick = useCallback(() => {
-        setChecked((prev) => !prev);
-    }, []);
+        const newChecked = !checked;
+        setChecked(newChecked);
 
-    useEffect(
-        () => (checked ? onSelected?.(ingredient) : onDeselected?.(ingredient)),
-        [checked, ingredient, onDeselected, onSelected]
-    );
+        if (newChecked) {
+            onSelected?.(ingredient);
+        } else {
+            onDeselected?.(ingredient);
+        }
+    }, [checked, ingredient, onDeselected, onSelected]);
 
     useEffect(() => {
+        if (checked === selected) return;
         setChecked(selected || false);
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selected]);
 
     return (

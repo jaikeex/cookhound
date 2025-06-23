@@ -1,7 +1,6 @@
 'use client';
 
 import { useLocalStorage } from '@/client/hooks/useLocalStorage';
-import { generateRandomId } from '@/client/utils';
 import { useCallback, useEffect, useState } from 'react';
 
 /**
@@ -9,6 +8,7 @@ import { useCallback, useEffect, useState } from 'react';
  */
 export const useCooldown = (
     cooldown: number,
+    key: string,
     onError?: (error: Error) => void
 ) => {
     //|-----------------------------------------------------------------------------------------|//
@@ -17,7 +17,7 @@ export const useCooldown = (
 
     const { value: endTime, setValue: setEndTime } = useLocalStorage<
         number | null
-    >(`cooldown_${generateRandomId(10)}`, null);
+    >(`cooldown_${key}`, null);
 
     const [isOnCooldown, setIsOnCooldown] = useState(false);
     const [remainingTime, setRemainingTime] = useState(0);

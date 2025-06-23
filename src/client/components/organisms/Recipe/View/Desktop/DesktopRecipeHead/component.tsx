@@ -42,6 +42,7 @@ export const DesktopRecipeHead: React.FC<DesktopRecipeHeadProps> = ({
                             fill={'gold'}
                             iconSize={22}
                             cooldown={60000}
+                            cooldownKey={recipe.displayId}
                         />
                     </Tooltip>
                 </div>

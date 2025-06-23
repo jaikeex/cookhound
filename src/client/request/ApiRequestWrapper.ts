@@ -190,7 +190,13 @@ class ApiRequestWrapper {
             options.headers = headers;
         }
 
-        if (config.data && (method === 'POST' || method === 'PUT')) {
+        if (
+            config.data &&
+            (method === 'POST' ||
+                method === 'PUT' ||
+                method === 'PATCH' ||
+                method === 'DELETE')
+        ) {
             options.body = JSON.stringify(config.data);
         }
 

@@ -7,6 +7,7 @@ export type IconButtonProps = Readonly<{
     className?: string;
     disabled?: boolean;
     icon: IconName;
+    iconClassName?: string;
     onClick: () => void;
     size?: number;
     tabIndex?: number;
@@ -16,6 +17,7 @@ export const IconButton: React.FC<IconButtonProps> = ({
     className,
     disabled,
     icon,
+    iconClassName,
     onClick,
     size,
     tabIndex
@@ -32,7 +34,7 @@ export const IconButton: React.FC<IconButtonProps> = ({
             onClick={onClick}
             disabled={disabled}
         >
-            <Icon name={icon} size={size} />
+            <Icon name={icon} size={size} className={iconClassName} />
         </button>
     );
 };

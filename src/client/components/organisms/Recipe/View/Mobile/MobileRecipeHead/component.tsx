@@ -66,6 +66,7 @@ export const MobileRecipeHead: React.FC<MobileRecipeHeadProps> = ({
                         fill={'gold'}
                         iconSize={22}
                         cooldown={60000}
+                        cooldownKey={recipe.displayId}
                     />
                 </Tooltip>
             </div>

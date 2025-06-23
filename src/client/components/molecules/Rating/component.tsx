@@ -13,6 +13,7 @@ export type RatingProps = Readonly<{
     disabled?: boolean;
     fill?: 'gold' | 'silver' | 'bronze';
     iconSize?: number;
+    cooldownKey?: string;
     onClick?: (rating: number) => void;
     rating: number | null;
 }>;
@@ -25,6 +26,7 @@ export const Rating: React.FC<RatingProps> = ({
     disabled,
     fill = 'gold',
     iconSize = 24,
+    cooldownKey,
     onClick,
     rating
 }) => {
@@ -33,7 +35,8 @@ export const Rating: React.FC<RatingProps> = ({
     const [isTooltipVisible, setIsTooltipVisible] = useState(false);
 
     const { startCooldown, isOnCooldown, remainingTime } = useCooldown(
-        cooldown ?? 0
+        cooldown ?? 0,
+        cooldownKey ?? 'rating'
     );
 
     const isSubmitting = useRef(false);

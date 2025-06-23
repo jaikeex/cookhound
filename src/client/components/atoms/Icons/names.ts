@@ -3,6 +3,7 @@ import { iconsSvg } from './svg';
 export const icons = {
     bell: iconsSvg.BellIcon,
     book: iconsSvg.BookIcon,
+    cancel: iconsSvg.CancelIcon,
     cart: iconsSvg.CartIcon,
     checkmark: iconsSvg.CheckmarkIcon,
     chevronDoubleUp: iconsSvg.ChevronDoubleUpIcon,

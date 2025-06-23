@@ -9,7 +9,7 @@ export type ShoppingListIngredientDTO = {
 };
 
 export type ShoppingListDTO = {
-    recipe: Pick<RecipeDTO, 'displayId' | 'title' | 'portionSize'>;
+    recipe: Pick<RecipeDTO, 'displayId' | 'title' | 'portionSize' | 'id'>;
     ingredients: ShoppingListIngredientDTO[];
 };
 
@@ -22,4 +22,8 @@ export type ShoppingListIngredientPayload = {
 export type ShoppingListPayload = {
     recipeId: number;
     ingredients: ShoppingListIngredientPayload[];
+};
+
+export type DeleteShoppingListPayload = {
+    recipeId?: number;
 };

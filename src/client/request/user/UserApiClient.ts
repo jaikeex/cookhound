@@ -1,6 +1,7 @@
 import type { RequestConfig } from '@/client/request/ApiRequestWrapper';
 import { apiRequestWrapper } from '@/client/request/ApiRequestWrapper';
 import type {
+    DeleteShoppingListPayload,
     ResetPasswordEmailPayload,
     ResetPasswordPayload,
     ShoppingListDTO,
@@ -93,7 +94,7 @@ class UserApiClient {
      * @throws {Error} Throws an error if the request fails.
      */
     async deleteShoppingList(
-        data: ShoppingListPayload,
+        data: DeleteShoppingListPayload,
         config?: RequestConfig
     ): Promise<void> {
         await apiRequestWrapper.delete({
