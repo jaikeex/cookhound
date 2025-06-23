@@ -47,7 +47,8 @@ export const DesktopRecipeHead: React.FC<DesktopRecipeHeadProps> = ({
                 </div>
 
                 <RecipeInfo
-                    recipe={recipe}
+                    portionSize={recipe.portionSize}
+                    time={recipe.time}
                     verbose={true}
                     typographyVariant={'body-sm'}
                 />

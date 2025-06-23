@@ -66,6 +66,7 @@
     "app.general.cookbooks": "Kuchařky",
     "app.general.shopping-list": "Seznam",
     "app.general.shopping-list-tooltip": "Nákupní seznam",
+    "app.shopping-list.edited": "Nákupní seznam byl aktualizován",
     "app.recipe.title": "Název receptu",
     "app.recipe.ingredients": "Ingredience",
     "app.recipe.instructions": "Postup",

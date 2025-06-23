@@ -20,7 +20,7 @@ export const MobileRecipeViewTemplate: React.FC<MobileRecipeViewProps> = ({
     isPreview = false,
     recipe
 }) => {
-    const { rateRecipe } = useDisplayRecipe(recipe);
+    const { rateRecipe, onShoppingListCreate } = useDisplayRecipe(recipe);
 
     return (
         <div className={`max-w-screen-md mx-auto ${className}`}>
@@ -31,7 +31,11 @@ export const MobileRecipeViewTemplate: React.FC<MobileRecipeViewProps> = ({
                     onRateRecipe={rateRecipe}
                 />
                 <Divider />
-                <MobileRecipeBody recipe={recipe} isPreview={isPreview} />
+                <MobileRecipeBody
+                    recipe={recipe}
+                    isPreview={isPreview}
+                    onShoppingListCreate={onShoppingListCreate}
+                />
             </div>
         </div>
     );

@@ -48,7 +48,8 @@ export const MobileRecipeHead: React.FC<MobileRecipeHeadProps> = ({
                 )}
             >
                 <RecipeInfo
-                    recipe={recipe}
+                    portionSize={recipe.portionSize}
+                    time={recipe.time}
                     verbose={false}
                     typographyVariant={'body'}
                 />

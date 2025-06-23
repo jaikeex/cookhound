@@ -22,7 +22,7 @@ export const DesktopRecipeViewTemplate: React.FC<DesktopRecipeViewProps> = ({
     recipe,
     ref
 }) => {
-    const { rateRecipe } = useDisplayRecipe(recipe);
+    const { rateRecipe, onShoppingListCreate } = useDisplayRecipe(recipe);
 
     return (
         <div
@@ -37,7 +37,11 @@ export const DesktopRecipeViewTemplate: React.FC<DesktopRecipeViewProps> = ({
                 />
                 <Divider />
 
-                <DesktopRecipeBody recipe={recipe} isPreview={isPreview} />
+                <DesktopRecipeBody
+                    recipe={recipe}
+                    isPreview={isPreview}
+                    onShoppingListCreate={onShoppingListCreate}
+                />
             </div>
         </div>
     );

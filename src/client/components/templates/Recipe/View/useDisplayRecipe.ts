@@ -1,5 +1,6 @@
 'use client';
 
+import apiClient from '@/client/request';
 import { recipeApiClient } from '@/client/request/recipe/RecipeApiClient';
 import { useLocale, useSnackbar } from '@/client/store';
 import { revalidateRouteCache } from '@/client/utils';
@@ -35,7 +36,27 @@ export const useDisplayRecipe = (recipe: RecipeDTO) => {
         [recipe.id, alert, t, router]
     );
 
+    const onShoppingListCreate = useCallback(async () => {
+        try {
+            await apiClient.user.upsertShoppingList({
+                recipeId: recipe.id,
+                ingredients: recipe.ingredients
+            });
+
+            alert({
+                message: t('app.shopping-list.edited'),
+                variant: 'success'
+            });
+        } catch (error) {
+            alert({
+                message: t('app.error.default'),
+                variant: 'error'
+            });
+        }
+    }, [recipe.id, recipe.ingredients, alert, t]);
+
     return {
-        rateRecipe: handleRateRecipe
+        rateRecipe: handleRateRecipe,
+        onShoppingListCreate
     };
 };

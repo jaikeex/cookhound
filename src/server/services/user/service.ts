@@ -190,7 +190,8 @@ class UserService {
 
             const recipeDTO = {
                 displayId: recipe.displayId,
-                title: recipe.title
+                title: recipe.title,
+                portionSize: recipe.portionSize
             };
 
             shoppingListByRecipeId.push({

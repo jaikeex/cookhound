@@ -54,7 +54,7 @@ class UserApiClient {
      * @returns A promise that resolves when the shopping list is created.
      * @throws {Error} Throws an error if the request fails.
      */
-    async createShoppingList(
+    async upsertShoppingList(
         data: ShoppingListPayload,
         config?: RequestConfig
     ): Promise<ShoppingListDTO[]> {
