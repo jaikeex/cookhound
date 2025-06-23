@@ -15,7 +15,7 @@ export async function logRequest(req: Request) {
         const requestPath = RequestContext.getRequestPath();
         const requestMethod = RequestContext.getRequestMethod();
 
-        log.info(`Incoming request: ${requestMethod} '${requestPath}'`);
+        log.request(`Incoming request: ${requestMethod} '${requestPath}'`);
     } catch {
         // Do nothing
     }
@@ -36,7 +36,7 @@ export async function logResponse(res: Response) {
 
         const status = res.status;
 
-        log.info(
+        log.request(
             `Request complete: ${requestMethod} '${requestPath}'; status: ${status}`
         );
     } catch (err) {

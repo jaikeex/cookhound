@@ -7,7 +7,7 @@ import 'winston-daily-rotate-file';
 import type { Logger as WinstonLogger, transport } from 'winston';
 import { GoogleCloudLoggingTransport } from './transports';
 import { ENV_CONFIG_PRIVATE, ENV_CONFIG_PUBLIC } from '@/common/constants';
-import { LOG_LEVELS } from './types';
+import { LOG_LEVELS, type LogLevel } from './types';
 import { RequestContext } from '@/server/utils/reqwest/context';
 
 //Directory where log files will be stored. Can be overridden through the `LOG_DIR` env variable.
@@ -145,6 +145,10 @@ export class Logger {
         this.log('notice', message, additional);
     }
 
+    public request(message: unknown, ...additional: unknown[]): void {
+        this.log('request', message, additional);
+    }
+
     public warn(message: unknown, ...additional: unknown[]): void {
         this.log('warn', message, additional);
     }
@@ -180,7 +184,7 @@ export class Logger {
     //?—————————————————————————————————————————————————————————————————————————————————————————?//
 
     private log(
-        level: 'trace' | 'info' | 'notice' | 'warn' | 'error',
+        level: LogLevel,
         message: unknown,
         additional: unknown[]
     ): void {
