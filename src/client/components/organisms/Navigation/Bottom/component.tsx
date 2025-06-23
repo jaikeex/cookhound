@@ -5,6 +5,7 @@ import classnames from 'classnames';
 import { Icon, Tooltip } from '@/client/components';
 import Link from 'next/link';
 import { useAuth, useLocale } from '@/client/store';
+import { BOTTOM_NAVBAR_ID } from '@/client/constants';
 
 type BottomNavigationProps = Readonly<NonNullable<unknown>>;
 
@@ -16,7 +17,7 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = () => {
 
     return (
         <div
-            id="bottom-navbar"
+            id={BOTTOM_NAVBAR_ID}
             className={classnames(
                 `block md:hidden sticky bottom-0 left-0 h-14 px-2 py-4 bg-[#f0fdf4] dark:bg-[#021812]`,
                 `flex [&>*]:w-full items-center justify-between border-t border-gray-300 dark:border-gray-800`
@@ -56,7 +57,7 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = () => {
             </Tooltip>
 
             <Link
-                href={'/'}
+                href={'/shopping-list'}
                 tabIndex={isLoggedin ? 0 : -1}
                 className={classnames(!isLoggedin && 'link-disabled')}
             >

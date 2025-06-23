@@ -85,6 +85,7 @@
         "react/jsx-closing-bracket-location": [2, "tag-aligned"],
         //~ General rules
         "prefer-const": "error",
+        "react/prop-types": "off",
         "no-restricted-imports": [
             "error",
             {

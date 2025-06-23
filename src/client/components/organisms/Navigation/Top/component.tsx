@@ -15,6 +15,7 @@ import Link from 'next/link';
 import { useAuth, useLocale } from '@/client/store';
 import { Sidebar } from '@/client/components/molecules/Sidebar';
 import { NavMenu } from './Menu';
+import { TOP_NAVBAR_ID } from '@/client/constants';
 
 type TopNavigationProps = Readonly<NonNullable<unknown>>;
 
@@ -35,7 +36,7 @@ export const TopNavigation: React.FC<TopNavigationProps> = () => {
 
     return (
         <div
-            id="top-navbar"
+            id={TOP_NAVBAR_ID}
             className="h-14 w-full flex items-center justify-between p-4 sticky top-0 z-20 bg-[#d1fae5] dark:bg-[#030712]"
         >
             <Link

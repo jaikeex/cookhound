@@ -7,6 +7,7 @@ export * from './Input';
 export * from './Link';
 export * from './Loader';
 export * from './Logo';
+export * from './ScrollToTop';
 export * from './Skeleton';
 export * from './Star';
 export * from './Tooltip';

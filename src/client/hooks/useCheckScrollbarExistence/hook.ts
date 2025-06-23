@@ -1,6 +1,12 @@
 'use client';
 
 import { useLayoutEffect, useMemo, useState } from 'react';
+import {
+    MAIN_PAGE_ID,
+    CONTENT_WRAPPER_ID,
+    TOP_NAVBAR_ID,
+    BOTTOM_NAVBAR_ID
+} from '@/client/constants';
 
 /**
  * I shamelessly copied this from stack overflow.
@@ -27,19 +33,19 @@ export function useCheckScrollExistence(ref?: React.RefObject<HTMLElement>) {
     const [scrollbarWidth, setScrollbarWidth] = useState<number>(0);
 
     const contentWrapper = useMemo(() => {
-        return ref?.current ?? document.getElementById('main-content');
+        return ref?.current ?? document.getElementById(CONTENT_WRAPPER_ID);
     }, [ref]);
 
     const mainPage = useMemo(() => {
-        return ref?.current ?? document.getElementById('main-page');
+        return ref?.current ?? document.getElementById(MAIN_PAGE_ID);
     }, [ref]);
 
     const topNavbar = useMemo(() => {
-        return ref?.current ?? document.getElementById('top-navbar');
+        return ref?.current ?? document.getElementById(TOP_NAVBAR_ID);
     }, [ref]);
 
     const bottomNavbar = useMemo(() => {
-        return ref?.current ?? document.getElementById('bottom-navbar');
+        return ref?.current ?? document.getElementById(BOTTOM_NAVBAR_ID);
     }, [ref]);
 
     const topNavbarHeight = topNavbar?.clientHeight ?? 0;

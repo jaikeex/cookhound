@@ -9,13 +9,18 @@ import {
     ModalProvider
 } from '@/client/store';
 import { ThemeProvider } from 'next-themes';
-import { BottomNavigation, TopNavigation } from '@/client/components';
+import {
+    BottomNavigation,
+    TopNavigation,
+    ScrollToTop
+} from '@/client/components';
 import { locales } from '@/client/locales';
 import classnames from 'classnames';
 import { cookies, headers } from 'next/headers';
 import type { UserDTO } from '@/common/types';
 import apiClient from '@/client/request';
 import { getUserLocale } from '@/client/utils';
+import { CONTENT_WRAPPER_ID, MAIN_PAGE_ID } from '@/client/constants';
 
 const openSans = Open_Sans({
     subsets: ['latin'],
@@ -95,15 +100,16 @@ export default async function RootLayout({
                         <AuthProvider user={user} authResolved={!!user}>
                             <SnackbarProvider>
                                 <ModalProvider>
+                                    <ScrollToTop />
                                     <div
-                                        id="main-page"
+                                        id={MAIN_PAGE_ID}
                                         className="fixed top-0 flex flex-col h-[100dvh] overflow-y-auto page-background typography-base"
                                     >
                                         <Suspense fallback={null}>
                                             <TopNavigation />
                                         </Suspense>
                                         <div
-                                            id="main-content"
+                                            id={CONTENT_WRAPPER_ID}
                                             className={classnames(
                                                 'flex-1 px-2 pt-4 pb-16 md:px-4 md:pt-12',
                                                 'relative'
