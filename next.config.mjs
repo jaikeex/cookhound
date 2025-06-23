@@ -15,12 +15,6 @@ const nextConfig = {
                 hostname: 'storage.googleapis.com',
                 port: '',
                 pathname: '/**'
-            },
-            {
-                protocol: 'https',
-                hostname: 'static.toprecepty.cz',
-                port: '',
-                pathname: '/**'
             }
         ]
     },

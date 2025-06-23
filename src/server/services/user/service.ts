@@ -270,7 +270,7 @@ class UserService {
     ): Promise<ShoppingListDTO[]> {
         log.trace('updateShoppingListOrder - attempt', { updates });
 
-        if (!Array.isArray(updates) || updates.length === 0) {
+        if (!Array.isArray(updates)) {
             log.warn('updateShoppingListOrder - missing required fields', {
                 updates
             });
@@ -294,6 +294,12 @@ class UserService {
         }
 
         await db.shoppingList.deleteShoppingList(userId, recipeId);
+
+        if (updates.length === 0) {
+            log.trace('updateShoppingListOrder - no updates', { updates });
+            return [];
+        }
+
         await db.shoppingList.upsertShoppingList(userId, recipeId, updates);
 
         log.trace('updateShoppingListOrder - success', { updates });
