@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
 
             const shoppingList = await userService.getShoppingList();
 
-            const response = Response.json({ shoppingList });
+            const response = Response.json(shoppingList);
 
             logResponse(response);
             return response;
@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
                 payload.ingredients
             );
 
-            const response = Response.json({ shoppingList });
+            const response = Response.json(shoppingList);
 
             logResponse(response);
             return response;
@@ -66,12 +66,12 @@ export async function PUT(request: NextRequest) {
 
             const payload = await request.json();
 
-            const shoppingList = await userService.updateShoppingListOrder(
+            const shoppingList = await userService.updateShoppingList(
                 payload.recipeId,
                 payload.ingredients
             );
 
-            const response = Response.json({ shoppingList });
+            const response = Response.json(shoppingList);
 
             logResponse(response);
             return response;

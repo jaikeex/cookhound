@@ -47,11 +47,11 @@ class ShoppingListModel {
     //~=========================================================================================~//
 
     /**
-     * Adds all data to the current shopping list, updating and marking if necessary.
+     * Adds all data to the current shopping list, updating if necessary.
      * Does not remove anything, only inserts or updates stuff.
-     * Does NOT handle reordering - use reorderShoppingList for that.
+     * Does NOT handle reordering.
      */
-    async createShoppingList(
+    async upsertShoppingList(
         userId: number,
         recipeId: number,
         data: ShoppingListIngredientPayload[]
@@ -116,7 +116,6 @@ class ShoppingListModel {
                 //?                                   UPDATE CHECK                                  ?//
                 //|---------------------------------------------------------------------------------|//
 
-                // Determine if we need to update
                 let needsUpdate: boolean = false;
 
                 if (existing && existing.quantity !== ingredient.quantity) {
@@ -145,17 +144,19 @@ class ShoppingListModel {
                     },
                     update: needsUpdate
                         ? {
-                              quantity: ingredient.quantity,
-                              marked: ingredient.marked ?? false
+                              quantity:
+                                  ingredient.quantity ?? existing?.quantity,
+                              marked:
+                                  ingredient.marked ?? existing?.marked ?? false
                           }
                         : {},
                     create: {
-                        quantity: ingredient.quantity,
+                        quantity: ingredient.quantity ?? existing?.quantity,
                         ingredientId: ingredient.id,
                         userId,
                         recipeId,
                         ingredientOrder: targetOrder,
-                        marked: false
+                        marked: ingredient.marked ?? existing?.marked ?? false
                     },
                     include: {
                         ingredient: true

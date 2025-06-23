@@ -65,6 +65,7 @@
     "app.general.resend-email": "Znovu odeslat e-mail",
     "app.general.cookbooks": "Kuchařky",
     "app.general.shopping-list": "Seznam",
+    "app.general.shopping-list-tooltip": "Nákupní seznam",
     "app.recipe.title": "Název receptu",
     "app.recipe.ingredients": "Ingredience",
     "app.recipe.instructions": "Postup",

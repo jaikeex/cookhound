@@ -1,7 +1,6 @@
 import { AuthType, Status, UserRole } from '@/common/types';
 import type {
-    ShoppingListByRecipeIdDTO,
-    ShoppingListIngredientDTO,
+    ShoppingListDTO,
     ShoppingListIngredientPayload,
     UserDTO,
     UserForCreatePayload,
@@ -160,7 +159,7 @@ class UserService {
     //$                                       GET SHOPPING LIST                                  $//
     //~-----------------------------------------------------------------------------------------~//
 
-    async getShoppingList(): Promise<ShoppingListByRecipeIdDTO[]> {
+    async getShoppingList(): Promise<ShoppingListDTO[]> {
         log.trace('getShoppingList - attempt');
 
         const userId = RequestContext.getUserId();
@@ -175,7 +174,7 @@ class UserService {
         const recipeIdList = shoppingList.map((item) => item.recipeId);
         const uniqueRecipeIdList = [...new Set(recipeIdList)];
 
-        const shoppingListByRecipeId: ShoppingListByRecipeIdDTO[] = [];
+        const shoppingListByRecipeId: ShoppingListDTO[] = [];
 
         for (const recipeId of uniqueRecipeIdList) {
             const recipe = await db.recipe.getOneById(recipeId);
@@ -212,7 +211,7 @@ class UserService {
     async createShoppingList(
         recipeId: number,
         ingredients: ShoppingListIngredientPayload[]
-    ): Promise<ShoppingListIngredientDTO[]> {
+    ): Promise<ShoppingListDTO[]> {
         log.trace('createShoppingList - attempt', { recipeId, ingredients });
 
         if (
@@ -247,29 +246,26 @@ class UserService {
             }
         }
 
-        const shoppingListIngredients =
-            await db.shoppingList.createShoppingList(
-                userId,
-                recipeId,
-                ingredients
-            );
+        await db.shoppingList.upsertShoppingList(userId, recipeId, ingredients);
 
         log.trace('createShoppingList - success', {
             recipeId,
             ingredients
         });
 
-        return shoppingListIngredients;
+        const result = this.getShoppingList();
+
+        return result;
     }
 
     //~-----------------------------------------------------------------------------------------~//
-    //$                                 UPDATE SHOPPING LIST ORDER                              $//
+    //$                                    UPDATE SHOPPING LIST                                 $//
     //~-----------------------------------------------------------------------------------------~//
 
-    async updateShoppingListOrder(
+    async updateShoppingList(
         recipeId: number,
         updates: ShoppingListIngredientPayload[]
-    ): Promise<ShoppingListIngredientDTO[]> {
+    ): Promise<ShoppingListDTO[]> {
         log.trace('updateShoppingListOrder - attempt', { updates });
 
         if (!Array.isArray(updates) || updates.length === 0) {
@@ -295,38 +291,14 @@ class UserService {
             throw new ServerError('auth.error.unauthorized', 401);
         }
 
-        const currentShoppingList =
-            await db.shoppingList.getShoppingList(userId);
-
-        if (currentShoppingList.length !== updates.length) {
-            log.warn('updateShoppingListOrder - mismatched length');
-
-            throw new ServerError('app.error.bad-request', 400);
-        }
-
-        const newIds = updates.map((i) => i.id);
-        const currentIds = currentShoppingList.map((i) => i.id);
-
-        const contentMatches =
-            newIds.every((id) => currentIds.includes(id)) &&
-            currentIds.every((id) => newIds.includes(id));
-
-        if (!contentMatches) {
-            log.warn('updateShoppingListOrder - mismatched content');
-            throw new ServerError('app.error.bad-request', 400);
-        }
-
         await db.shoppingList.deleteShoppingList(userId, recipeId);
-
-        const updatedShoppingList = await db.shoppingList.createShoppingList(
-            userId,
-            recipeId,
-            updates
-        );
+        await db.shoppingList.upsertShoppingList(userId, recipeId, updates);
 
         log.trace('updateShoppingListOrder - success', { updates });
 
-        return updatedShoppingList;
+        const result = this.getShoppingList();
+
+        return result;
     }
 
     //~-----------------------------------------------------------------------------------------~//

@@ -11,9 +11,8 @@ export type RecipeViewProps = Readonly<{
 }>;
 
 export const RecipeViewTemplate: React.FC<RecipeViewProps> = ({ recipe }) => {
-    const { resetSelectedIngredients } = useIngredientSelectStore();
-
     const recipeResolved = use(recipe);
+    const { resetSelectedIngredients } = useIngredientSelectStore();
 
     /**
      * Reset selected ingredients when recipe changes

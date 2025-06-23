@@ -3,8 +3,7 @@ import { apiRequestWrapper } from '@/client/request/ApiRequestWrapper';
 import type {
     ResetPasswordEmailPayload,
     ResetPasswordPayload,
-    ShoppingListByRecipeIdDTO,
-    ShoppingListIngredientPayload,
+    ShoppingListDTO,
     ShoppingListPayload,
     UserForCreatePayload
 } from '@/common/types';
@@ -40,9 +39,7 @@ class UserApiClient {
      * @returns A promise that resolves when the shopping list is fetched.
      * @throws {Error} Throws an error if the request fails.
      */
-    async getShoppingList(
-        config?: RequestConfig
-    ): Promise<ShoppingListByRecipeIdDTO[]> {
+    async getShoppingList(config?: RequestConfig): Promise<ShoppingListDTO[]> {
         return await apiRequestWrapper.get({
             url: '/user/shopping-list',
             ...config
@@ -60,8 +57,8 @@ class UserApiClient {
     async createShoppingList(
         data: ShoppingListPayload,
         config?: RequestConfig
-    ): Promise<void> {
-        await apiRequestWrapper.post({
+    ): Promise<ShoppingListDTO[]> {
+        return await apiRequestWrapper.post({
             url: '/user/shopping-list',
             data,
             ...config
@@ -69,18 +66,18 @@ class UserApiClient {
     }
 
     /**
-     * Updates the shopping list order by calling `PUT /api/user/shopping-list`.
+     * Updates the shopping list by calling `PUT /api/user/shopping-list`.
      *
      * @param data - The shopping list data to update.
      * @param config - Optional fetch request configuration.
-     * @returns A promise that resolves when the shopping list order is updated.
+     * @returns A promise that resolves when the shopping list is updated.
      * @throws {Error} Throws an error if the request fails.
      */
-    async updateShoppingListOrder(
-        data: ShoppingListIngredientPayload,
+    async updateShoppingList(
+        data: ShoppingListPayload,
         config?: RequestConfig
-    ): Promise<void> {
-        await apiRequestWrapper.put({
+    ): Promise<ShoppingListDTO[]> {
+        return await apiRequestWrapper.put({
             url: '/user/shopping-list',
             data,
             ...config

@@ -125,7 +125,6 @@ export const ImageInput: React.FC<ImageInputProps> = ({
 
                     if (showPreview) {
                         const imageUrl = URL.createObjectURL(processedFile);
-                        console.log('imageUrl', imageUrl);
                         setPreviewUrl(imageUrl);
                     }
 

@@ -38,7 +38,6 @@ import { array, number, object, string } from 'yup';
 export const createRecipeSchema: ObjectSchema<RecipeForCreateFormData> = object(
     {
         title: string().required('app.recipe.error.title-required'),
-        difficulty: string().required(),
         portionSize: number().nullable().defined(),
         time: number().nullable().defined(),
         imageUrl: string().nullable().defined(),
@@ -60,7 +59,6 @@ export const createRecipeSchema: ObjectSchema<RecipeForCreateFormData> = object(
 
 type RecipeForCreateFormData = {
     title: string;
-    difficulty: string;
     portionSize: number | null;
     time: number | null;
     imageUrl: string | null;
@@ -157,7 +155,7 @@ export const RecipeCreate: React.FC<RecipeCreateProps> = () => {
                     allowNavigation();
                     formElement.reset();
                     setChangedFields([]);
-                    safePush(`/recipe/${createdRecipe.id}`);
+                    safePush(`/recipe/${createdRecipe.displayId}`);
                 }
             } catch (error: any) {
                 setFormErrors({ server: 'auth.error.default' });
@@ -320,11 +318,11 @@ const createRecipePlaceholder = (
     t: (key: I18nMessage) => string
 ): RecipeDTO => ({
     id: 0,
+    displayId: '',
     rating: null,
     language: 'en',
     imageUrl: '',
     title: t('app.recipe.title'),
-    difficulty: 'easy',
     portionSize: null,
     time: null,
     notes: null,
@@ -415,7 +413,6 @@ async function extractFormData(
 
     return {
         title: data.get('title') as string,
-        difficulty: 'easy',
         portionSize: parseInt(data.get('portionSize') as string) || null,
         time: parseInt(data.get('time') as string) || null,
         imageUrl: null,

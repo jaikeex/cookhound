@@ -16,6 +16,11 @@
         disabled:opacity-50 disabled:bg-gray-400 dark:disabled:bg-gray-600 disabled:hover:bg-gray-400 dark:disabled:hover:bg-gray-600;
     }
 
+    .icon-button {
+        @apply min-h-7 min-w-7 flex items-center justify-center rounded hover:bg-stone-200
+        dark:hover:bg-stone-700 transition-colors;
+    }
+
     .typography-base {
         @apply text-black dark:text-gray-100;
     }

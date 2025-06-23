@@ -12,8 +12,10 @@ import { ThemeProvider } from 'next-themes';
 import { BottomNavigation, TopNavigation } from '@/client/components';
 import { locales } from '@/client/locales';
 import classnames from 'classnames';
-// import { cookies, headers } from 'next/headers';
-// import { getUserLocale } from '@/utils';
+import { cookies, headers } from 'next/headers';
+import type { UserDTO } from '@/common/types';
+import apiClient from '@/client/request';
+import { getUserLocale } from '@/client/utils';
 
 const openSans = Open_Sans({
     subsets: ['latin'],
@@ -37,14 +39,45 @@ export default async function RootLayout({
 }: Readonly<{
     children: React.ReactNode;
 }>) {
-    // const cookieStore = cookies();
-    // const headerList = headers();
-    //
-    // const locale = await getUserLocale(cookieStore, headerList);
-    const locale = 'cs';
+    //|-----------------------------------------------------------------------------------------|//
+    //?                                          LOCALE                                         ?//
+    //|-----------------------------------------------------------------------------------------|//
+
+    const cookieStore = await cookies();
+    const headerList = await headers();
+
+    const locale = await getUserLocale(cookieStore, headerList);
 
     // This is required to pass the messages down the tree as the default export from .json files is not serializable
     const messages = { ...locales[locale] };
+
+    //|-----------------------------------------------------------------------------------------|//
+    //?                                      AUTHENTICATION                                     ?//
+    //|-----------------------------------------------------------------------------------------|//
+
+    let user: UserDTO | null = null;
+
+    try {
+        if (typeof window !== 'undefined') {
+            throw new Error('Cannot get user like this in a browser');
+        }
+
+        const token = cookieStore.get('jwt')?.value;
+
+        if (!token) {
+            throw new Error('No token found');
+        }
+
+        user = await apiClient.auth.getCurrentUser({
+            headers: { 'Cookie': `jwt=${token}` }
+        });
+    } catch (error) {
+        user = null;
+    }
+
+    //|-----------------------------------------------------------------------------------------|//
+    //?                                          RENDER                                         ?//
+    //|-----------------------------------------------------------------------------------------|//
 
     return (
         <html lang="en" suppressHydrationWarning>
@@ -59,7 +92,7 @@ export default async function RootLayout({
                         defaultMessages={messages}
                         defaultLocale={locale}
                     >
-                        <AuthProvider>
+                        <AuthProvider user={user} authResolved={!!user}>
                             <SnackbarProvider>
                                 <ModalProvider>
                                     <div

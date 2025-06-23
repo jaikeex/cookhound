@@ -65,6 +65,7 @@
     "app.general.resend-email": "Resend Email",
     "app.general.cookbooks": "Cookbooks",
     "app.general.shopping-list": "Shopping list",
+    "app.general.shopping-list-tooltip": "Shopping list",
     "app.recipe.title": "Recipe title",
     "app.recipe.ingredients": "Ingredients",
     "app.recipe.instructions": "Instructions",

@@ -28,19 +28,39 @@ export const useAuth = () => {
     return context;
 };
 
-type AuthProviderProps = React.PropsWithChildren<NonNullable<unknown>>;
+type AuthProviderProps = Readonly<{
+    user?: UserDTO | null;
+    authResolved?: boolean;
+}> &
+    React.PropsWithChildren<NonNullable<unknown>>;
 
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-    const [authResolved, setAuthResolved] = useState(false);
-    const [user, setUser] = useState<UserDTO | null | undefined>(undefined);
+export const AuthProvider: React.FC<AuthProviderProps> = ({
+    children,
+    user: initialUser,
+    authResolved: initialAuthResolved
+}) => {
+    const [authResolved, setAuthResolved] = useState(
+        initialAuthResolved ?? false
+    );
+
+    const [user, setUser] = useState<UserDTO | null | undefined>(
+        initialUser ?? null
+    );
+
     useEffect(() => {
         const fetchUser = async () => {
+            // This check is sufficient, no need to check the initial values.
+            if (user && authResolved) {
+                return;
+            }
+
             const currentUser = await getCurrentUserOrNull();
             setUser(currentUser);
             setAuthResolved(true);
         };
 
         fetchUser();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const contextValue = useMemo(

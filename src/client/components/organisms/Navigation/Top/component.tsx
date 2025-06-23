@@ -4,8 +4,8 @@ import React, { Suspense, useCallback, useState } from 'react';
 import {
     Avatar,
     ButtonBase,
-    Icon,
     IconButton,
+    IconLink,
     Logo,
     Popup,
     ThemeSwitcherIcon,
@@ -80,12 +80,14 @@ export const TopNavigation: React.FC<TopNavigationProps> = () => {
                                 size="sm"
                                 disabled={!isLoggedin || !authResolved}
                             >
-                                Create
+                                {t('app.recipe.create')}
                             </ButtonBase>
                         </Link>
                     </Tooltip>
 
-                    <Icon name="bell" />
+                    <Tooltip text={t('app.general.shopping-list-tooltip')}>
+                        <IconLink href={'/shopping-list'} icon="shoppingList" />
+                    </Tooltip>
 
                     <ThemeSwitcherIcon />
 
@@ -112,6 +114,7 @@ export const TopNavigation: React.FC<TopNavigationProps> = () => {
                             {t('auth.form.login')}
                         </ButtonBase>
                     </Link>
+
                     <Link
                         href={'/auth/register'}
                         className={`${isLoggedin || !authResolved ? 'hidden' : 'block'}`}
