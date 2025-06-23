@@ -8,6 +8,7 @@ import { googleService } from '@/server/google-api';
 const LEVEL_TO_SEVERITY: Record<LogLevel, string> = {
     trace: 'DEBUG',
     info: 'INFO',
+    request: 'INFO',
     notice: 'NOTICE',
     warn: 'WARNING',
     error: 'ERROR'
