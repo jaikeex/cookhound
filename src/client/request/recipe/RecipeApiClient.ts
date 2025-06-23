@@ -1,3 +1,4 @@
+import type { Locale } from '@/client/locales';
 import type { RequestConfig } from '@/client/request/ApiRequestWrapper';
 import { apiRequestWrapper } from '@/client/request/ApiRequestWrapper';
 import type {
@@ -64,6 +65,20 @@ class RecipeApiClient {
         return await apiRequestWrapper.get({
             url: `/recipe/list?batch=${batch}&perPage=${perPage}`,
             params: { batch, perPage },
+            ...config
+        });
+    }
+
+    async searchRecipes(
+        query: string,
+        language: Locale,
+        batch: number,
+        perPage: number,
+        config?: RequestConfig
+    ): Promise<RecipeForDisplayDTO[]> {
+        return await apiRequestWrapper.get({
+            url: `/recipe/search?query=${query}&language=${language}&batch=${batch}&perPage=${perPage}`,
+            params: { query, language, batch, perPage },
             ...config
         });
     }

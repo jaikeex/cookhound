@@ -284,6 +284,81 @@ class RecipeService {
 
         return recipes;
     }
+
+    //~-----------------------------------------------------------------------------------------~//
+    //$                                 TEXT SEARCH FETCH                                     $//
+    //~-----------------------------------------------------------------------------------------~//
+
+    /**
+     * Search recipes by a free-text query across title, notes, ingredients and instructions.
+     * Results are filtered by language and returned in paginated batches.
+     */
+    async searchRecipes(
+        query: string,
+        language: Locale,
+        batch: number,
+        perPage: number = 24
+    ): Promise<RecipeForDisplayDTO[]> {
+        log.trace('searchRecipes - attempt', {
+            query,
+            language,
+            batch,
+            perPage
+        });
+
+        const MAX_BATCHES = 20;
+
+        const cleanQuery = query.trim();
+
+        if (!cleanQuery) {
+            log.warn('searchRecipes - empty query');
+            throw new ServerError('app.error.bad-request', 400);
+        }
+
+        if (cleanQuery.length > 128) {
+            log.warn('searchRecipes - query too long');
+            throw new ServerError('app.error.bad-request', 400);
+        }
+
+        if (batch < 1 || batch > MAX_BATCHES) {
+            log.warn('searchRecipes - invalid batch', { batch });
+            throw new ServerError('app.error.bad-request', 400);
+        }
+
+        if (perPage <= 0 || perPage > 100) {
+            log.warn('searchRecipes - invalid perPage', { perPage });
+            throw new ServerError('app.error.bad-request', 400);
+        }
+
+        const offset = (batch - 1) * perPage;
+
+        let results: any[] = [];
+
+        results = await db.recipe.searchManyByText(
+            cleanQuery,
+            language,
+            perPage,
+            offset
+        );
+
+        const recipes: RecipeForDisplayDTO[] = results.map((recipe) => ({
+            id: recipe.id,
+            displayId: recipe.displayId,
+            title: recipe.title,
+            imageUrl: recipe.imageUrl || '',
+            rating: recipe.rating ? Number(recipe.rating) : null,
+            timesRated: recipe.timesRated ?? 0,
+            time: recipe.time,
+            portionSize: recipe.portionSize
+        }));
+
+        log.trace('searchRecipes - success', {
+            batch,
+            count: recipes.length
+        });
+
+        return recipes;
+    }
 }
 
 export const recipeService = new RecipeService();

@@ -9,6 +9,7 @@ import type { Prisma, Recipe } from '@prisma/client';
 import { getRecipeById } from '@prisma/client/sql';
 import { getRecipeByDisplayId } from '@prisma/client/sql';
 import { getFrontPageRecipes } from '@prisma/client/sql';
+import { searchRecipes } from '@prisma/client/sql';
 
 //|=============================================================================================|//
 
@@ -100,6 +101,59 @@ class RecipeModel {
                 );
             },
             ttl ?? 60 * 60 // 1 hour
+        );
+
+        return recipes;
+    }
+
+    //~=========================================================================================~//
+    //$                               TEXT SEARCH COLLECTION                                  $//
+    //~=========================================================================================~//
+
+    async searchManyByText(
+        searchTerm: string,
+        language: string,
+        limit: number,
+        offset: number,
+        ttl?: number
+    ): Promise<any[]> {
+        const cacheKey = generateCacheKey('recipe', 'search', {
+            searchTerm,
+            language,
+            limit,
+            offset
+        });
+
+        log.trace('Searching recipes', {
+            searchTerm,
+            language,
+            limit,
+            offset
+        });
+
+        const recipes = await cachePrismaQuery(
+            cacheKey,
+            async () => {
+                log.trace('Fetching searched recipes from db', {
+                    searchTerm,
+                    language,
+                    limit,
+                    offset
+                });
+
+                return prisma.$queryRawTyped(
+                    searchRecipes(
+                        language,
+                        searchTerm,
+                        searchTerm,
+                        searchTerm,
+                        searchTerm,
+                        limit,
+                        offset
+                    )
+                );
+            },
+            ttl ?? 10 * 60 // 10 minutes
         );
 
         return recipes;
