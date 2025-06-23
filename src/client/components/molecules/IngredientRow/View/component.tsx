@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import type { Ingredient } from '@/common/types';
 import type { TypographyVariant } from '@/client/components';
 import { Typography } from '@/client/components';
+import classNames from 'classnames';
 
 //~---------------------------------------------------------------------------------------------~//
 //$                                           OPTIONS                                           $//
@@ -20,7 +21,9 @@ const classConfig = {
 //~---------------------------------------------------------------------------------------------~//
 
 export type IngredientRowViewProps = Readonly<{
+    className?: string;
     ingredient: Ingredient;
+    disabled?: boolean;
     onDeselected?: (ingredient: Ingredient) => void;
     onSelected?: (ingredient: Ingredient) => void;
     selected?: boolean;
@@ -28,7 +31,9 @@ export type IngredientRowViewProps = Readonly<{
 }>;
 
 export const IngredientRowView: React.FC<IngredientRowViewProps> = ({
+    className,
     ingredient,
+    disabled,
     onDeselected,
     onSelected,
     selected,
@@ -41,6 +46,8 @@ export const IngredientRowView: React.FC<IngredientRowViewProps> = ({
     const [checked, setChecked] = useState<boolean>(selected || false);
 
     const handleRowClick = useCallback(() => {
+        if (disabled) return;
+
         const newChecked = !checked;
         setChecked(newChecked);
 
@@ -49,7 +56,7 @@ export const IngredientRowView: React.FC<IngredientRowViewProps> = ({
         } else {
             onDeselected?.(ingredient);
         }
-    }, [checked, ingredient, onDeselected, onSelected]);
+    }, [checked, ingredient, onDeselected, onSelected, disabled]);
 
     useEffect(() => {
         if (checked === selected) return;
@@ -60,7 +67,11 @@ export const IngredientRowView: React.FC<IngredientRowViewProps> = ({
 
     return (
         <div
-            className={`flex items-center cursor-pointer`}
+            className={classNames(
+                'flex items-center',
+                className,
+                disabled ? 'cursor-default' : 'cursor-pointer'
+            )}
             onClick={handleRowClick}
         >
             <div

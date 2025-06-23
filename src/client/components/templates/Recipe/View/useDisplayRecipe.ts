@@ -1,8 +1,12 @@
 'use client';
 
-import apiClient from '@/client/request';
 import { recipeApiClient } from '@/client/request/recipe/RecipeApiClient';
-import { useLocale, useSnackbar } from '@/client/store';
+import {
+    useIngredientSelectStore,
+    useLocale,
+    useShoppingListStore,
+    useSnackbar
+} from '@/client/store';
 import { revalidateRouteCache } from '@/client/utils';
 import type { RecipeDTO } from '@/common/types/recipe';
 import { useRouter } from 'next/navigation';
@@ -13,11 +17,14 @@ export const useDisplayRecipe = (recipe: RecipeDTO) => {
     const { alert } = useSnackbar();
     const router = useRouter();
 
+    const { createShoppingList } = useShoppingListStore();
+    const { selectedIngredients } = useIngredientSelectStore();
+
     const handleRateRecipe = useCallback(
         async (rating: number) => {
             try {
                 await recipeApiClient.rateRecipe(recipe.id.toString(), rating);
-                await revalidateRouteCache(`/recipe/${recipe.id}`);
+                await revalidateRouteCache(`/recipe/${recipe.displayId}`);
 
                 alert({
                     message: t('app.recipe.rated'),
@@ -33,14 +40,19 @@ export const useDisplayRecipe = (recipe: RecipeDTO) => {
                 });
             }
         },
-        [recipe.id, alert, t, router]
+        [recipe.id, recipe.displayId, alert, t, router]
     );
 
     const onShoppingListCreate = useCallback(async () => {
+        const ingredientsToInclude = recipe.ingredients.filter(
+            (ingredient) =>
+                !selectedIngredients.some((i) => i.id === ingredient.id)
+        );
+
         try {
-            await apiClient.user.upsertShoppingList({
+            await createShoppingList({
                 recipeId: recipe.id,
-                ingredients: recipe.ingredients
+                ingredients: ingredientsToInclude
             });
 
             alert({
@@ -53,7 +65,14 @@ export const useDisplayRecipe = (recipe: RecipeDTO) => {
                 variant: 'error'
             });
         }
-    }, [recipe.id, recipe.ingredients, alert, t]);
+    }, [
+        recipe.ingredients,
+        recipe.id,
+        selectedIngredients,
+        createShoppingList,
+        alert,
+        t
+    ]);
 
     return {
         rateRecipe: handleRateRecipe,

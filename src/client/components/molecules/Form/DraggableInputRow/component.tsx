@@ -1,15 +1,24 @@
 'use client';
 
+/* eslint-disable react/jsx-no-bind */
+
 import React, { useCallback, useRef } from 'react';
 import { Icon, IconButton } from '@/client/components';
 import { Reorder, useDragControls } from 'framer-motion';
+import type { PanInfo } from 'framer-motion';
 
 type DraggableInputRowProps = Readonly<{
     className?: string;
     disableDrag?: boolean;
     disableRemove?: boolean;
+    hideRemove?: boolean;
     index: number;
-    onRemove: () => void;
+    onRemove?: () => void;
+    /**
+     * Optional callback fired when the drag ends (after the internal cleanup).
+     * Mirrors the `onDragEnd` signature from `framer-motion`'s `Reorder.Item`.
+     */
+    onDragEnd?: (event: PointerEvent, info: PanInfo) => void;
 }> &
     React.PropsWithChildren<NonNullable<unknown>>;
 
@@ -18,8 +27,10 @@ export const DraggableInputRow: React.FC<DraggableInputRowProps> = ({
     className,
     disableDrag,
     disableRemove,
+    hideRemove,
     index,
-    onRemove
+    onRemove,
+    onDragEnd
 }) => {
     const controls = useDragControls();
     const originalBodyOverflow = useRef<string>('');
@@ -51,24 +62,29 @@ export const DraggableInputRow: React.FC<DraggableInputRowProps> = ({
             className={`flex items-center gap-2 ${className}`}
             dragListener={false}
             dragControls={controls}
-            onDragEnd={handleDragEnd}
+            onDragEnd={(event, info) => {
+                handleDragEnd();
+                onDragEnd?.(event as unknown as PointerEvent, info);
+            }}
         >
             {children}
             <div className={'flex items-center'}>
                 <Icon
                     name={'drag'}
-                    className={`cursor-move ${disableDrag ? 'opacity-50  pointer-events-none' : 'touch-none'}`}
+                    className={`cursor-move ${disableDrag ? 'opacity-50 pointer-events-none' : 'touch-none'}`}
                     size={20}
                     onPointerDown={handleDragStart}
                 />
-                <IconButton
-                    tabIndex={-1}
-                    disabled={disableRemove}
-                    className={'min-w-5'}
-                    icon={'close'}
-                    size={12}
-                    onClick={onRemove}
-                />
+                {hideRemove || !onRemove ? null : (
+                    <IconButton
+                        tabIndex={-1}
+                        disabled={disableRemove}
+                        className={'min-w-5'}
+                        icon={'close'}
+                        size={12}
+                        onClick={onRemove}
+                    />
+                )}
             </div>
         </Reorder.Item>
     );

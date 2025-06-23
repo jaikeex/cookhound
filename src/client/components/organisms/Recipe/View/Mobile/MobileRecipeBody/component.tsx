@@ -41,18 +41,29 @@ export const MobileRecipeBody: React.FC<MobileRecipeBodyProps> = ({
                     />
 
                     {displayShoppingListButton ? (
-                        <ButtonBase
-                            color="secondary"
-                            className={'w-full mt-8'}
-                            onClick={onShoppingListCreate}
-                        >
+                        <React.Fragment>
                             <Typography
-                                variant={'body'}
-                                className={'text-center'}
+                                variant={'label'}
+                                className="px-12 mt-8 text-center text-gray-600 dark:text-gray-400"
                             >
-                                {t('app.recipe.create-shopping-list')}
+                                {t(
+                                    'app.recipe.create-shopping-list-description'
+                                )}
                             </Typography>
-                        </ButtonBase>
+
+                            <ButtonBase
+                                color="secondary"
+                                className={'w-full mt-2'}
+                                onClick={onShoppingListCreate}
+                            >
+                                <Typography
+                                    variant={'body'}
+                                    className={'text-center'}
+                                >
+                                    {t('app.recipe.create-shopping-list')}
+                                </Typography>
+                            </ButtonBase>
+                        </React.Fragment>
                     ) : null}
                 </React.Fragment>
             )
