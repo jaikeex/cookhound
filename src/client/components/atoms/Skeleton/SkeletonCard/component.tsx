@@ -12,7 +12,7 @@ export const SkeletonCard: React.FC<SkeletonCardProps> = ({ className }) => {
             className={`flex flex-col h-full overflow-hidden border border-gray-300 rounded-lg shadow-sm bg-slate-200 dark:bg-slate-800 dark:border-gray-700 ${className || ''}`}
         >
             {/* Skeleton Image */}
-            <div className="flex items-center justify-center flex-shrink-0 object-cover w-full h-40 bg-gray-300 dark:bg-gray-700 animate-pulse">
+            <div className="flex items-center justify-center flex-shrink-0 object-cover w-full h-32 bg-gray-300 dark:bg-gray-700 animate-pulse">
                 <SkeletonImage className="w-full h-full" />
             </div>
 

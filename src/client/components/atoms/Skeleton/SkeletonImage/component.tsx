@@ -7,7 +7,7 @@ export type SkeletonImageProps = Readonly<{
 export const SkeletonImage: React.FC<SkeletonImageProps> = ({ className }) => {
     return (
         <div
-            className={`flex items-center justify-center bg-gray-300 rounded-md sm:w-96 dark:bg-gray-700 ${className} animate-pulse`}
+            className={`flex items-center justify-center bg-gray-300 rounded-md dark:bg-gray-700 ${className} animate-pulse`}
         >
             <svg
                 className={'w-10 h-10 text-gray-200 dark:text-gray-600'}
