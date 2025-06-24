@@ -47,7 +47,7 @@ function redirectToRestricted() {
     throw new MiddlewareError(
         'Unauthorized',
         NextResponse.redirect(
-            new URL(`/auth/restricted`, ENV_CONFIG_PUBLIC.ORIGIN)
+            new URL(`/error/restricted`, ENV_CONFIG_PUBLIC.ORIGIN)
         )
     );
 }
@@ -61,7 +61,7 @@ function redirectToRestrictedWithLogin(pathname: string) {
         'Unauthorized',
         NextResponse.redirect(
             new URL(
-                `/auth/restricted?${params.toString()}`,
+                `/error/restricted?${params.toString()}`,
                 ENV_CONFIG_PUBLIC.ORIGIN
             )
         )
@@ -80,7 +80,7 @@ function redirectToRestrictedWithLogin(pathname: string) {
  * @param request - The request object.
  * @returns promise that resolves to a NextResponse object or null.
  *
- * @throws MiddlewareError (redirect to '/auth/restricted') If some of the checks fail.
+ * @throws MiddlewareError (redirect to '/error/restricted') If some of the checks fail.
  * @returns null if the checks pass.
  */
 export const verifyRouteAccess: MiddlewareStepFunction = async (request) => {
