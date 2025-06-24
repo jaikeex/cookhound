@@ -18,7 +18,6 @@ export const SearchInput: React.FC<SearchInputProps> = ({
     label,
     name,
     onChange,
-    onKeyDown,
     onSearch,
     placeholder,
     isLoading
@@ -26,6 +25,16 @@ export const SearchInput: React.FC<SearchInputProps> = ({
     const handleSearch = useCallback(() => {
         onSearch?.();
     }, [onSearch]);
+
+    const handleInputKeyDown = useCallback(
+        (e: React.KeyboardEvent<HTMLInputElement>) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                onSearch?.();
+            }
+        },
+        [onSearch]
+    );
 
     return (
         <div className={classNames('relative w-full', className)}>
@@ -40,7 +49,7 @@ export const SearchInput: React.FC<SearchInputProps> = ({
                     id={id}
                     name={name}
                     onChange={onChange}
-                    onKeyDown={onKeyDown}
+                    onKeyDown={handleInputKeyDown}
                     disabled={disabled}
                     autoComplete={name}
                     min={0}

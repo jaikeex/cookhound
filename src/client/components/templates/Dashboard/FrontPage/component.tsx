@@ -1,11 +1,10 @@
 'use client';
 
-import type { RecipeForDisplayDTO } from '@/common/types';
 import React, { use, useState, useCallback } from 'react';
-import { Banner, Loader, RecipeCardList } from '@/client/components';
+import type { RecipeForDisplayDTO } from '@/common/types';
+import { Banner, RecipeCardList } from '@/client/components';
 import apiClient from '@/client/request';
 import { useLocale } from '@/client/store/I18nContext';
-import { useInfinityScroll } from '@/client/hooks';
 
 type FrontPageProps = Readonly<{
     recipes: Promise<RecipeForDisplayDTO[]>;
@@ -30,7 +29,7 @@ export const FrontPageTemplate: React.FC<FrontPageProps> = ({ recipes }) => {
     const [isSearchMode, setIsSearchMode] = useState<boolean>(false);
 
     //|-----------------------------------------------------------------------------------------|//
-    //?                                       INFINITY STONE                                    ?//
+    //?                                          FETCHING                                       ?//
     //|-----------------------------------------------------------------------------------------|//
 
     const loadMore = useCallback(async () => {
@@ -113,22 +112,6 @@ export const FrontPageTemplate: React.FC<FrontPageProps> = ({ recipes }) => {
         []
     );
 
-    const handleInputKeyDown = useCallback(
-        (e: React.KeyboardEvent<HTMLInputElement>) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                executeSearch();
-            }
-        },
-        [executeSearch]
-    );
-
-    const { sentinelRef } = useInfinityScroll({
-        loadMore,
-        hasMore,
-        isLoading
-    });
-
     //|-----------------------------------------------------------------------------------------|//
     //?                                          RENDER                                         ?//
     //|-----------------------------------------------------------------------------------------|//
@@ -136,21 +119,18 @@ export const FrontPageTemplate: React.FC<FrontPageProps> = ({ recipes }) => {
     return (
         <div className="flex flex-col max-w-screen-sm gap-4 px-2 mx-auto md:max-w-screen-md xl:max-w-screen-lg">
             <Banner
-                onSearchInputChange={handleInputChange}
-                onSearchInputKeyDown={handleInputKeyDown}
-                onSearchInputSearch={executeSearch}
-                isSearchLoading={isLoading && isSearchMode}
+                onChange={handleInputChange}
+                onSearch={executeSearch}
+                isLoading={isLoading && isSearchMode}
             />
 
-            <RecipeCardList className="mt-32 md:mt-36" recipes={recipeList} />
-
-            <div ref={sentinelRef} className="w-full h-1" />
-
-            {isLoading && (
-                <div className="flex justify-center py-4">
-                    <Loader />
-                </div>
-            )}
+            <RecipeCardList
+                className="mt-32 md:mt-36"
+                recipes={recipeList}
+                loadMore={loadMore}
+                hasMore={hasMore}
+                isLoading={isLoading}
+            />
         </div>
     );
 };

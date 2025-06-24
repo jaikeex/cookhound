@@ -2,23 +2,19 @@ import * as React from 'react';
 import Image from 'next/image';
 import classNames from 'classnames';
 import { SearchInput } from '@/client/components/molecules/Form/SearchInput/component';
-import type { ChangeEvent } from 'react';
+import { type ChangeEvent } from 'react';
 import { Typography } from '@/client/components';
 
 type BannerProps = Readonly<{
-    onSearchInputChange: (event: ChangeEvent<HTMLInputElement>) => void;
-    onSearchInputKeyDown: (
-        event: React.KeyboardEvent<HTMLInputElement>
-    ) => void;
-    onSearchInputSearch: () => void;
-    isSearchLoading: boolean;
+    onChange: (event: ChangeEvent<HTMLInputElement>) => void;
+    onSearch: () => void;
+    isLoading: boolean;
 }>;
 
 export const Banner: React.FC<BannerProps> = ({
-    onSearchInputChange,
-    onSearchInputKeyDown,
-    onSearchInputSearch,
-    isSearchLoading
+    onChange,
+    onSearch,
+    isLoading
 }) => {
     return (
         <React.Fragment>
@@ -49,10 +45,9 @@ export const Banner: React.FC<BannerProps> = ({
                             placeholder="Search for a recipe"
                             id="search"
                             name="search"
-                            onChange={onSearchInputChange}
-                            onKeyDown={onSearchInputKeyDown}
-                            onSearch={onSearchInputSearch}
-                            isLoading={isSearchLoading}
+                            onChange={onChange}
+                            onSearch={onSearch}
+                            isLoading={isLoading}
                         />
                     </div>
                 </div>

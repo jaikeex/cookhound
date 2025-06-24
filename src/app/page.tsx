@@ -1,5 +1,5 @@
-import { FrontPageTemplate } from '@/client/components/templates/FrontPage';
-import { FrontPageSkeleton } from '@/client/components/templates/FrontPage/skeleton';
+import { FrontPageTemplate } from '@/client/components/templates/Dashboard/FrontPage';
+import { FrontPageSkeleton } from '@/client/components/templates/Dashboard/FrontPage/skeleton';
 import apiClient from '@/client/request';
 import React, { Suspense } from 'react';
 
