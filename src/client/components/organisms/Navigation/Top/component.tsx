@@ -93,7 +93,15 @@ export const TopNavigation: React.FC<TopNavigationProps> = () => {
                         </Link>
                     </Tooltip>
 
-                    <Tooltip text={t('app.general.shopping-list-tooltip')}>
+                    <Tooltip
+                        text={
+                            isLoggedin
+                                ? t('app.general.shopping-list-tooltip')
+                                : t(
+                                      'app.general.shopping-list-tooltip-anonymous'
+                                  )
+                        }
+                    >
                         <IconLink
                             href={'/shopping-list'}
                             icon="shoppingList"

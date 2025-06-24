@@ -1,10 +1,11 @@
 'use client';
 
 import type { RecipeForDisplayDTO } from '@/common/types';
-import React, { use, useState, useRef, useCallback, useEffect } from 'react';
+import React, { use, useState, useCallback } from 'react';
 import { RecipeCard, Banner, Loader } from '@/client/components';
 import apiClient from '@/client/request';
 import { useLocale } from '@/client/store/I18nContext';
+import { useInfinityScroll } from '@/client/hooks';
 
 type FrontPageProps = Readonly<{
     recipes: Promise<RecipeForDisplayDTO[]>;
@@ -20,18 +21,13 @@ export const FrontPageTemplate: React.FC<FrontPageProps> = ({ recipes }) => {
     const [recipeList, setRecipeList] =
         useState<RecipeForDisplayDTO[]>(initialRecipes);
 
-    /** Manage pagination */
     const [nextBatch, setNextBatch] = useState<number>(2);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [hasMore, setHasMore] = useState<boolean>(true);
 
-    /** Search related state */
     const { locale } = useLocale();
     const [searchQuery, setSearchQuery] = useState<string>('');
     const [isSearchMode, setIsSearchMode] = useState<boolean>(false);
-
-    /** Sentinel element observed for triggering the next load */
-    const sentinelRef = useRef<HTMLDivElement | null>(null);
 
     //|-----------------------------------------------------------------------------------------|//
     //?                                       INFINITY STONE                                    ?//
@@ -127,31 +123,11 @@ export const FrontPageTemplate: React.FC<FrontPageProps> = ({ recipes }) => {
         [executeSearch]
     );
 
-    useEffect(() => {
-        const node = sentinelRef.current;
-        if (!node || !hasMore) return;
-
-        const observer = new IntersectionObserver(
-            (entries) => {
-                const [entry] = entries;
-                if (entry.isIntersecting) {
-                    loadMore();
-                }
-            },
-            {
-                root: null,
-                rootMargin: '200px 0px', // start loading a bit before the user hits the end
-                threshold: 0.1
-            }
-        );
-
-        observer.observe(node);
-
-        // Cleanup on unmount or dependency change
-        return () => {
-            observer.disconnect();
-        };
-    }, [loadMore, hasMore]);
+    const { sentinelRef } = useInfinityScroll({
+        loadMore,
+        hasMore,
+        isLoading
+    });
 
     //|-----------------------------------------------------------------------------------------|//
     //?                                          RENDER                                         ?//

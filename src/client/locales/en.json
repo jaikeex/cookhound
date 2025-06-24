@@ -66,6 +66,7 @@
     "app.general.cookbooks": "Cookbooks",
     "app.general.shopping-list": "Shopping list",
     "app.general.shopping-list-tooltip": "Shopping list",
+    "app.general.shopping-list-tooltip-anonymous": "Shopping list is available only for registered users",
     "app.general.confirm": "Confirm",
     "app.general.cancel": "Cancel",
     "app.general.edit": "Edit",

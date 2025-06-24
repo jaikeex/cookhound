@@ -66,6 +66,7 @@
     "app.general.cookbooks": "Kuchařky",
     "app.general.shopping-list": "Seznam",
     "app.general.shopping-list-tooltip": "Nákupní seznam",
+    "app.general.shopping-list-tooltip-anonymous": "Nákupní seznam je dostupný pouze registrovaným uživatelům",
     "app.general.confirm": "Potvrdit",
     "app.general.cancel": "Zrušit",
     "app.general.edit": "Upravit",

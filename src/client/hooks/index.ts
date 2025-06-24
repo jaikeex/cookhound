@@ -3,6 +3,7 @@ export * from './useCheckScrollbarExistence';
 export * from './useCooldown';
 export * from './useEventListener';
 export * from './useGoogleSignIn';
+export * from './useInfinityScroll';
 export * from './useLocalStorage';
 export * from './useOutsideClick';
 export * from './useScreenSize';
