@@ -2,6 +2,7 @@ export * from './Avatar';
 export * from './Button';
 export * from './Divider';
 export * from './Checkbox';
+export * from './Chip';
 export * from './Icons';
 export * from './Input';
 export * from './Link';

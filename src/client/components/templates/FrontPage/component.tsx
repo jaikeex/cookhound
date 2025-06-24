@@ -77,7 +77,6 @@ export const FrontPageTemplate: React.FC<FrontPageProps> = ({ recipes }) => {
         // If search cleared, revert to default list
         if (!trimmed) {
             setIsSearchMode(false);
-            setRecipeList(initialRecipes);
             setNextBatch(2);
             setHasMore(true);
             return;
@@ -98,6 +97,7 @@ export const FrontPageTemplate: React.FC<FrontPageProps> = ({ recipes }) => {
             setNextBatch(2);
             setHasMore(true);
         } catch (error) {
+            setRecipeList(initialRecipes);
             setIsSearchMode(false);
             // keep previous list on error
         } finally {

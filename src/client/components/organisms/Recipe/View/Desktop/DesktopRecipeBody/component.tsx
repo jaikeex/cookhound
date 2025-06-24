@@ -54,12 +54,7 @@ export const DesktopRecipeBody: React.FC<DesktopRecipeBodyProps> = ({
                             className={'w-full mt-2'}
                             onClick={onShoppingListCreate}
                         >
-                            <Typography
-                                variant={'body'}
-                                className={'text-center'}
-                            >
-                                {t('app.recipe.create-shopping-list')}
-                            </Typography>
+                            {t('app.recipe.create-shopping-list')}
                         </ButtonBase>
                     </React.Fragment>
                 ) : null}
