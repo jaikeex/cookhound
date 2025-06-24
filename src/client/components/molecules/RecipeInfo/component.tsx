@@ -46,7 +46,7 @@ export const RecipeInfo: React.FC<RecipeInfoProps> = ({
                     className={`flex items-center ${classConfig.innerGap[size]}`}
                 >
                     <Icon name={'servings'} size={classConfig.iconSize[size]} />
-                    <Typography variant={typographyVariant}>
+                    <Typography variant={typographyVariant} disableLinkStyles>
                         {verbose ? `${t('app.recipe.servings')}: ` : null}
                         {portionSize}
                     </Typography>
@@ -57,7 +57,7 @@ export const RecipeInfo: React.FC<RecipeInfoProps> = ({
                     className={`flex items-center ${classConfig.innerGap[size]}`}
                 >
                     <Icon name={'time'} size={classConfig.iconSize[size]} />
-                    <Typography variant={typographyVariant}>
+                    <Typography variant={typographyVariant} disableLinkStyles>
                         {verbose
                             ? `${t('app.recipe.preparation-time')}: `
                             : null}

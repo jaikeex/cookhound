@@ -44,6 +44,7 @@ export type TypographyVariant =
 type TypographyOwnProps<E extends React.ElementType> = Readonly<{
     align?: 'left' | 'center' | 'right' | 'justify';
     as?: E;
+    disableLinkStyles?: boolean;
     variant?: TypographyVariant;
 }>;
 
@@ -57,6 +58,7 @@ export const Typography = <E extends React.ElementType = 'p'>({
     variant = 'body',
     children,
     as,
+    disableLinkStyles = false,
     ...props
 }: TypographyProps<E>) => {
     const Component = as || 'p';
@@ -65,7 +67,7 @@ export const Typography = <E extends React.ElementType = 'p'>({
         <Component
             {...props}
             className={classnames(
-                `font-open-sans ${classConfig.variant[variant]}`,
+                `font-open-sans ${classConfig.variant[variant]} ${disableLinkStyles ? 'no-underline typography-base' : ''}`,
                 align && classConfig.align[align],
                 className
             )}
