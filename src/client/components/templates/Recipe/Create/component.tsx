@@ -246,15 +246,7 @@ export const RecipeCreate: React.FC<RecipeCreateProps> = () => {
                     <div
                         id="preview-handle-background"
                         className={classNames(
-                            /**
-                             * Simple bg faker to give the preview handle some breathing space.
-                             *
-                             * The width calculation is done in order to prevent ovelapping with the document
-                             * scrollbar. Seems sketchy, but no better solution comes to mind...
-                             * Might not even be necessary given it only happens on pc while viewing baby screen.
-                             */
-                            //TODO: Do this better.
-                            'fixed left-0 w-[calc(100dvw-15px)] h-20 bottom-12',
+                            'fixed left-0 w-[100dvw] h-20 bottom-12',
                             'bg-gradient-to-t from-[#f0fdf4] via-[#f0fdf4] via-80% to-transparent',
                             'dark:from-[#030712] dark:via-[#030712] dark:via-80% dark:to-transparent'
                         )}
@@ -320,6 +312,7 @@ const createRecipePlaceholder = (
     id: 0,
     displayId: '',
     rating: null,
+    timesRated: 0,
     language: 'en',
     imageUrl: '',
     title: t('app.recipe.title'),

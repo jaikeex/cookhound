@@ -14,12 +14,12 @@ import classNames from 'classnames';
 const DEFAULT_ANIMATIONS = {
     sidebar: {
         left: {
-            position: 'fixed left-0 top-0 h-full',
+            position: 'fixed left-0 top-0 h-screen',
             show: 'animate-slide-from-left',
             hide: 'animate-slide-to-left'
         },
         right: {
-            position: 'fixed right-0 top-0 h-full',
+            position: 'fixed right-0 top-0 h-screen',
             show: 'animate-slide-from-right',
             hide: 'animate-slide-to-right'
         },

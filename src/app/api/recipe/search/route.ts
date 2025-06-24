@@ -4,7 +4,6 @@ import { handleServerError } from '@/server/utils/reqwest';
 import type { NextRequest } from 'next/server';
 import { ServerError } from '@/server/error';
 import { recipeService } from '@/server/services/recipe/service';
-import { withRateLimit } from '@/server/utils/rate-limit/wrapper';
 import type { Locale } from '@/client/locales';
 
 //|=============================================================================================|//
@@ -14,7 +13,7 @@ import type { Locale } from '@/client/locales';
  *
  * @returns A JSON response containing the search results.
  */
-async function searchRecipesHandler(request: NextRequest) {
+export async function GET(request: NextRequest) {
     return RequestContext.run(request, async () => {
         try {
             logRequest(request);
@@ -46,8 +45,3 @@ async function searchRecipesHandler(request: NextRequest) {
         }
     });
 }
-
-export const GET = withRateLimit(searchRecipesHandler, {
-    maxRequests: 5,
-    windowSizeInSeconds: 60
-});

@@ -13,7 +13,7 @@ export const SkeletonCard: React.FC<SkeletonCardProps> = ({ className }) => {
         >
             {/* Skeleton Image */}
             <div className="flex items-center justify-center flex-shrink-0 object-cover w-full h-40 bg-gray-300 dark:bg-gray-700 animate-pulse">
-                <SkeletonImage />
+                <SkeletonImage className="w-full h-full" />
             </div>
 
             {/* Content Section */}
