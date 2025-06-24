@@ -2,9 +2,9 @@
 
 import type { RecipeForDisplayDTO } from '@/common/types';
 import React, { use, useState, useRef, useCallback, useEffect } from 'react';
-import { RecipeCard } from '@/client/components/molecules';
+import { RecipeCard, Banner, Loader } from '@/client/components';
 import apiClient from '@/client/request';
-import { Loader } from '@/client/components/atoms/Loader';
+import { useLocale } from '@/client/store/I18nContext';
 
 type FrontPageProps = Readonly<{
     recipes: Promise<RecipeForDisplayDTO[]>;
@@ -19,10 +19,16 @@ export const FrontPageTemplate: React.FC<FrontPageProps> = ({ recipes }) => {
 
     const [recipeList, setRecipeList] =
         useState<RecipeForDisplayDTO[]>(initialRecipes);
-    /** The next batch value to request (starts at 2, because 1 is already rendered) */
+
+    /** Manage pagination */
     const [nextBatch, setNextBatch] = useState<number>(2);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [hasMore, setHasMore] = useState<boolean>(true);
+
+    /** Search related state */
+    const { locale } = useLocale();
+    const [searchQuery, setSearchQuery] = useState<string>('');
+    const [isSearchMode, setIsSearchMode] = useState<boolean>(false);
 
     /** Sentinel element observed for triggering the next load */
     const sentinelRef = useRef<HTMLDivElement | null>(null);
@@ -32,17 +38,28 @@ export const FrontPageTemplate: React.FC<FrontPageProps> = ({ recipes }) => {
     //|-----------------------------------------------------------------------------------------|//
 
     const loadMore = useCallback(async () => {
-        if (isLoading || !hasMore || nextBatch > 5) return;
+        if (isLoading || !hasMore) return;
 
         setIsLoading(true);
 
         try {
-            const newRecipes = await apiClient.recipe.getRecipeList(
-                nextBatch,
-                24
-            );
+            let newRecipes: RecipeForDisplayDTO[] = [];
 
-            // If the API returned no items, this is the end of the list.
+            if (isSearchMode) {
+                newRecipes = await apiClient.recipe.searchRecipes(
+                    searchQuery,
+                    locale,
+                    nextBatch,
+                    24
+                );
+            } else {
+                if (nextBatch > 5) return; // limit batches for default list
+                newRecipes = await apiClient.recipe.getRecipeList(
+                    nextBatch,
+                    24
+                );
+            }
+
             if (!newRecipes?.length) {
                 setHasMore(false);
                 return;
@@ -50,17 +67,65 @@ export const FrontPageTemplate: React.FC<FrontPageProps> = ({ recipes }) => {
 
             setRecipeList((prev) => [...prev, ...newRecipes]);
             setNextBatch((prev) => prev + 1);
-
-            // Stop after 5 batches regardless of API response length
-            if (nextBatch >= 5) {
-                setHasMore(false);
-            }
         } catch (error) {
             setHasMore(false);
         } finally {
             setIsLoading(false);
         }
-    }, [isLoading, hasMore, nextBatch]);
+    }, [isLoading, hasMore, nextBatch, isSearchMode, searchQuery, locale]);
+
+    // Handle starting a new search
+    const executeSearch = useCallback(async () => {
+        const trimmed = searchQuery.trim();
+
+        // If search cleared, revert to default list
+        if (!trimmed) {
+            setIsSearchMode(false);
+            setRecipeList(initialRecipes);
+            setNextBatch(2);
+            setHasMore(true);
+            return;
+        }
+
+        setIsLoading(true);
+        setIsSearchMode(true);
+
+        try {
+            const results = await apiClient.recipe.searchRecipes(
+                trimmed,
+                locale,
+                1,
+                24
+            );
+
+            setRecipeList(results);
+            setNextBatch(2);
+            setHasMore(true);
+        } catch (error) {
+            setIsSearchMode(false);
+            // keep previous list on error
+        } finally {
+            setIsLoading(false);
+        }
+    }, [searchQuery, locale, initialRecipes]);
+
+    // Memoised handlers to avoid inline arrow functions in JSX
+    const handleInputChange = useCallback(
+        (e: React.ChangeEvent<HTMLInputElement>) => {
+            setSearchQuery(e.target.value);
+        },
+        []
+    );
+
+    const handleInputKeyDown = useCallback(
+        (e: React.KeyboardEvent<HTMLInputElement>) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                executeSearch();
+            }
+        },
+        [executeSearch]
+    );
 
     useEffect(() => {
         const node = sentinelRef.current;
@@ -93,8 +158,15 @@ export const FrontPageTemplate: React.FC<FrontPageProps> = ({ recipes }) => {
     //|-----------------------------------------------------------------------------------------|//
 
     return (
-        <>
-            <div className="grid max-w-screen-sm grid-cols-2 gap-4 px-2 mx-auto md:max-w-screen-md 3xl:max-w-screen-lg md:grid-cols-3">
+        <div className="flex flex-col max-w-screen-sm gap-4 px-2 mx-auto md:max-w-screen-md xl:max-w-screen-lg">
+            <Banner
+                onSearchInputChange={handleInputChange}
+                onSearchInputKeyDown={handleInputKeyDown}
+                onSearchInputSearch={executeSearch}
+                isSearchLoading={isLoading && isSearchMode}
+            />
+
+            <div className="grid grid-cols-2 gap-4 mt-32 md:mt-36 md:grid-cols-3 xl:grid-cols-4">
                 {recipeList.map((recipe, index) => (
                     <RecipeCard
                         key={`${recipe.id}-${index}`}
@@ -109,15 +181,13 @@ export const FrontPageTemplate: React.FC<FrontPageProps> = ({ recipes }) => {
                 ))}
             </div>
 
-            {/* Sentinel element */}
             <div ref={sentinelRef} className="w-full h-1" />
 
-            {/* Loader displayed while fetching next batch */}
             {isLoading && (
                 <div className="flex justify-center py-4">
                     <Loader />
                 </div>
             )}
-        </>
+        </div>
     );
 };

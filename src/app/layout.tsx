@@ -89,7 +89,7 @@ export default async function RootLayout({
             <body className={`${kalam.variable} ${openSans.variable}`}>
                 <ThemeProvider
                     attribute="class"
-                    defaultTheme="light"
+                    defaultTheme="dark"
                     enableSystem={false}
                     disableTransitionOnChange
                 >
@@ -103,15 +103,16 @@ export default async function RootLayout({
                                     <ScrollToTop />
                                     <div
                                         id={MAIN_PAGE_ID}
-                                        className="fixed top-0 flex flex-col h-[100dvh] overflow-y-auto page-background typography-base"
+                                        className="flex flex-col typography-base"
                                     >
+                                        <div className="fixed top-0 left-0 w-screen h-screen page-background z-[-10]" />
                                         <Suspense fallback={null}>
                                             <TopNavigation />
                                         </Suspense>
                                         <div
                                             id={CONTENT_WRAPPER_ID}
                                             className={classnames(
-                                                'flex-1 px-2 pt-4 pb-16 md:px-4 md:pt-12',
+                                                'flex-1 px-2 pt-16 pb-16 md:px-4 md:pt-24',
                                                 'relative'
                                             )}
                                         >

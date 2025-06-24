@@ -10,7 +10,7 @@ export const FrontPageSkeleton: React.FC = () => {
     return (
         <div
             className={classNames(
-                'max-w-screen-sm px-4 mx-auto mt-44 md:mt-52 md:max-w-screen-md xl:max-w-screen-lg',
+                'max-w-screen-sm px-4 mx-auto mt-32 md:mt-36 md:max-w-screen-md xl:max-w-screen-lg',
                 'grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-4'
             )}
         >

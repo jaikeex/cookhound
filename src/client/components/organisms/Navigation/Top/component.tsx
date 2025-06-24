@@ -16,12 +16,16 @@ import { useAuth, useLocale } from '@/client/store';
 import { Sidebar } from '@/client/components/molecules/Sidebar';
 import { NavMenu } from './Menu';
 import { TOP_NAVBAR_ID } from '@/client/constants';
+import classNames from 'classnames';
+import { usePathname } from 'next/navigation';
 
 type TopNavigationProps = Readonly<NonNullable<unknown>>;
 
 export const TopNavigation: React.FC<TopNavigationProps> = () => {
     const { t } = useLocale();
     const { authResolved, user } = useAuth();
+
+    const pathname = usePathname();
 
     const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
 
@@ -37,7 +41,12 @@ export const TopNavigation: React.FC<TopNavigationProps> = () => {
     return (
         <div
             id={TOP_NAVBAR_ID}
-            className="h-14 w-full flex items-center justify-between p-4 sticky top-0 z-20 bg-[#d1fae5] dark:bg-[#030712]"
+            className={classNames(
+                'fixed top-0 left-0 right-0 z-20 flex items-center justify-between w-full p-4 h-14',
+                pathname === '/'
+                    ? 'backdrop-blur-sm bg-white/50 dark:bg-black/50'
+                    : 'bg-[#d1fae5] dark:bg-[#030712]'
+            )}
         >
             <Link
                 href={'/'}
