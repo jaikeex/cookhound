@@ -1,6 +1,5 @@
 'use client';
 
-import { MAIN_PAGE_ID } from '@/client/constants';
 import { usePathnameChangeListener } from '@/client/hooks';
 import { useCallback } from 'react';
 
@@ -14,22 +13,15 @@ import { useCallback } from 'react';
 //?—————————————————————————————————————————————————————————————————————————————————————————?//
 
 type ScrollToTopProps = Readonly<{
-    containerId?: string;
     enabled?: boolean;
 }>;
 
-export const ScrollToTop: React.FC<ScrollToTopProps> = ({
-    containerId = MAIN_PAGE_ID,
-    enabled = true
-}) => {
+export const ScrollToTop: React.FC<ScrollToTopProps> = ({ enabled = true }) => {
     const handlePathnameChange = useCallback(() => {
         if (!enabled) return;
 
-        const container = document.getElementById(containerId);
-        if (container) {
-            container.scrollTo(0, 0);
-        }
-    }, [containerId, enabled]);
+        window.scrollTo(0, 0);
+    }, [enabled]);
 
     usePathnameChangeListener({
         onChange: handlePathnameChange,

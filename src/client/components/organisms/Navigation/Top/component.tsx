@@ -33,9 +33,7 @@ export const TopNavigation: React.FC<TopNavigationProps> = () => {
     const avatarSrc = user ? (user.avatarUrl ?? 'default') : 'anonymous';
 
     const handleOpenSidebar = useCallback(() => setIsSidebarOpen(true), []);
-
     const handleCloseSidebar = useCallback(() => setIsSidebarOpen(false), []);
-
     const handleSearchClick = useCallback(() => {}, []);
 
     return (
@@ -96,7 +94,11 @@ export const TopNavigation: React.FC<TopNavigationProps> = () => {
                     </Tooltip>
 
                     <Tooltip text={t('app.general.shopping-list-tooltip')}>
-                        <IconLink href={'/shopping-list'} icon="shoppingList" />
+                        <IconLink
+                            href={'/shopping-list'}
+                            icon="shoppingList"
+                            disabled={!isLoggedin || !authResolved}
+                        />
                     </Tooltip>
 
                     <ThemeSwitcherIcon />

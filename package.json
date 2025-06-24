@@ -13,13 +13,16 @@
         "storybook": "storybook dev -p 6006",
         "build-storybook": "storybook build",
         "migrate": "npx prisma migrate dev --name init",
-        "generate": "npx prisma generate --sql"
+        "generate": "npx prisma generate --sql",
+        "setup-typesense": "node scripts/setup-typesense-keys.js"
     },
     "dependencies": {
+        "@babel/runtime": "^7.27.6",
         "@prisma/client": "^6.5.0",
         "bcrypt": "^6.0.0",
         "classnames": "^2.5.1",
         "cookie": "^1.0.2",
+        "dotenv": "^16.5.0",
         "framer-motion": "^11.18.0",
         "jsonwebtoken": "^9.0.2",
         "next": "15.3.3",
@@ -28,6 +31,7 @@
         "react-dom": "^19.1.0",
         "react-image-crop": "^11.0.10",
         "redis": "^5.5.6",
+        "typesense": "^2.0.3",
         "uuid": "^11.0.5",
         "winston": "^3.17.0",
         "winston-daily-rotate-file": "^5.0.0",

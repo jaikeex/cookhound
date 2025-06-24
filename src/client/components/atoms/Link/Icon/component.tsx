@@ -2,23 +2,26 @@ import * as React from 'react';
 import { Icon } from '@/client/components';
 import type { IconName } from '@/client/types';
 import classNames from 'classnames';
-import Link from 'next/link';
+import Link, { type LinkProps } from 'next/link';
 
 type IconLinkProps = Readonly<{
     className?: string;
     disabled?: boolean;
     icon: IconName;
     href: string;
-}>;
+}> &
+    LinkProps;
 
 export const IconLink: React.FC<IconLinkProps> = ({
     className,
     disabled,
     icon,
-    href
+    href,
+    ...props
 }) => {
     return (
         <Link
+            {...props}
             href={href}
             className={classNames(
                 'icon-button',

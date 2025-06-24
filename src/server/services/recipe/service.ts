@@ -12,6 +12,7 @@ import type { Rating } from '@prisma/client';
 import { Logger } from '@/server/logger';
 import { RequestContext } from '@/server/utils/reqwest/context';
 import { randomUUID } from 'crypto';
+import { recipeSearchIndex } from '@/server/integrations/typesense';
 
 //|=============================================================================================|//
 
@@ -145,7 +146,22 @@ class RecipeService {
 
         log.notice('createRecipe - success', { recipe });
 
-        return this.getRecipeById(recipe.id);
+        const recipeDTO = await this.getRecipeById(recipe.id);
+
+        // Index the recipe.
+        try {
+            await recipeSearchIndex.upsert(recipeDTO);
+        } catch (err) {
+            // This is an error that needs to be raised and adressed, Failing to keep the search
+            // index up to date could lead to shitty user experience.
+            // Do NOT throw however – the user should still get a response even if search indexing fails.
+            log.error('createRecipe - failed to index recipe in Typesense', {
+                err,
+                recipeId: recipe.id
+            });
+        }
+
+        return recipeDTO;
     }
 
     //~-----------------------------------------------------------------------------------------~//
@@ -205,6 +221,20 @@ class RecipeService {
         });
 
         log.trace('rateRecipe - success', { recipeId, rating });
+
+        // Update in search index, no need to await this.
+        try {
+            const updatedRecipe = await this.getRecipeById(recipeId);
+            await recipeSearchIndex.upsert(updatedRecipe);
+        } catch (err) {
+            // This is an error that needs to be raised and adressed, Failing to keep the search
+            // index up to date could lead to shitty user experience.
+            // Do NOT throw however – the user should still get a response even if search indexing fails.
+            log.error('rateRecipe - failed to update Typesense index', {
+                err,
+                recipeId
+            });
+        }
     }
 
     //~-----------------------------------------------------------------------------------------~//
@@ -334,12 +364,22 @@ class RecipeService {
 
         let results: any[] = [];
 
-        results = await db.recipe.searchManyByText(
-            cleanQuery,
-            language,
-            perPage,
-            offset
-        );
+        try {
+            results = await recipeSearchIndex.search(
+                cleanQuery,
+                language,
+                perPage,
+                offset
+            );
+        } catch (err) {
+            log.warn('searchRecipes - falling back to DB search', { err });
+            results = await db.recipe.searchManyByText(
+                cleanQuery,
+                language,
+                perPage,
+                offset
+            );
+        }
 
         const recipes: RecipeForDisplayDTO[] = results.map((recipe) => ({
             id: recipe.id,

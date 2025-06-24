@@ -22,7 +22,12 @@ export const ENV_CONFIG_PUBLIC = createConfig(
         API_URL: process.env.NEXT_PUBLIC_API_URL,
         GOOGLE_OAUTH_CLIENT_ID: process.env.NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID,
         ORIGIN: process.env.NEXT_PUBLIC_ORIGIN,
-        COOKIE_DOMAIN: process.env.NEXT_PUBLIC_COOKIE_DOMAIN
+        COOKIE_DOMAIN: process.env.NEXT_PUBLIC_COOKIE_DOMAIN,
+        TYPESENSE_SEARCH_ONLY_KEY:
+            process.env.NEXT_PUBLIC_TYPESENSE_SEARCH_ONLY_KEY,
+        TYPESENSE_HOST: process.env.NEXT_PUBLIC_TYPESENSE_HOST,
+        TYPESENSE_PORT: process.env.NEXT_PUBLIC_TYPESENSE_PORT,
+        TYPESENSE_PROTOCOL: process.env.NEXT_PUBLIC_TYPESENSE_PROTOCOL
     },
     'ENV_CONFIG_PUBLIC',
     process.env.NEXT_PUBLIC_ENV !== 'test'
@@ -56,7 +61,8 @@ export const ENV_CONFIG_PRIVATE = createConfig(
         GOOGLE_STORAGE_CREDENTIALS: process.env.GOOGLE_STORAGE_CREDENTIALS,
         GOOGLE_STORAGE_CLIENT_ID: process.env.GOOGLE_STORAGE_CLIENT_ID,
         GOOGLE_STORAGE_BUCKET_RECIPE_IMAGES:
-            process.env.GOOGLE_STORAGE_BUCKET_RECIPE_IMAGES
+            process.env.GOOGLE_STORAGE_BUCKET_RECIPE_IMAGES,
+        TYPESENSE_API_KEY: process.env.TYPESENSE_API_KEY
     },
     'ENV_CONFIG_PRIVATE',
     process.env.NEXT_PUBLIC_ENV !== 'test' && typeof window === 'undefined'

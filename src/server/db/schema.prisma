@@ -28,7 +28,8 @@ model User {
   lastPasswordReset         DateTime?
 
   // Relations
-  recipes                   Recipe[]
+  recipes                   Recipe[]    @relation("AuthoredRecipes")
+  visitedRecipes            UserVisitedRecipe[]
   ratings                   Rating[]
   shoppingList              ShoppingListIngredient[]
 
@@ -57,11 +58,12 @@ model Recipe {
   updatedAt    DateTime  @updatedAt
 
   // Relations
-  author       User                @relation(fields: [authorId], references: [id])
+  author       User                @relation("AuthoredRecipes", fields: [authorId], references: [id])
   instructions Instruction[]
   ingredients  RecipeIngredient[]
   ratings      Rating[]
   shoppingList ShoppingListIngredient[]
+  visitedBy    UserVisitedRecipe[]
   
   // Indexes
   @@index([authorId])
@@ -176,4 +178,22 @@ model Rating {
   @@index([recipeId])
   @@index([userId])
   @@map("ratings")
+}
+
+model UserVisitedRecipe {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @db.Int
+  recipeId  Int      @db.Int
+  visitedAt DateTime @default(now())
+
+  // Relations
+  user   User   @relation(fields: [userId], references: [id])
+  recipe Recipe @relation(fields: [recipeId], references: [id])
+
+  // Unique constraint to prevent duplicate visits (can be updated with new timestamp)
+  @@unique([userId, recipeId], name: "unique_user_recipe_visit")
+  @@index([userId, visitedAt])
+  @@index([userId])
+  @@index([recipeId])
+  @@map("user_visited_recipes")
 }
