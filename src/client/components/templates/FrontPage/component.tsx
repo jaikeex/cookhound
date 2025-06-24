@@ -2,7 +2,7 @@
 
 import type { RecipeForDisplayDTO } from '@/common/types';
 import React, { use, useState, useCallback } from 'react';
-import { RecipeCard, Banner, Loader } from '@/client/components';
+import { Banner, Loader, RecipeCardList } from '@/client/components';
 import apiClient from '@/client/request';
 import { useLocale } from '@/client/store/I18nContext';
 import { useInfinityScroll } from '@/client/hooks';
@@ -142,20 +142,7 @@ export const FrontPageTemplate: React.FC<FrontPageProps> = ({ recipes }) => {
                 isSearchLoading={isLoading && isSearchMode}
             />
 
-            <div className="grid grid-cols-2 gap-4 mt-32 md:mt-36 md:grid-cols-3 xl:grid-cols-4">
-                {recipeList.map((recipe, index) => (
-                    <RecipeCard
-                        key={`${recipe.id}-${index}`}
-                        displayId={recipe.displayId}
-                        title={recipe.title}
-                        imageUrl={recipe.imageUrl}
-                        rating={recipe.rating}
-                        time={recipe.time ?? 0}
-                        portionSize={recipe.portionSize ?? 0}
-                        index={index}
-                    />
-                ))}
-            </div>
+            <RecipeCardList className="mt-32 md:mt-36" recipes={recipeList} />
 
             <div ref={sentinelRef} className="w-full h-1" />
 
