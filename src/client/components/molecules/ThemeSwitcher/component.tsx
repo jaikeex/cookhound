@@ -45,7 +45,7 @@ export const ThemeSwitcherIcon: React.FC<ThemeSwitcherIconProps> = (props) => {
     );
 
     // Use resolvedTheme which is only available after hydration
-    const currentTheme = mounted ? resolvedTheme || 'light' : 'light';
+    const currentTheme = mounted ? resolvedTheme || 'dark' : 'dark';
 
     const icon = useMemo(() => {
         switch (currentTheme) {
@@ -54,7 +54,7 @@ export const ThemeSwitcherIcon: React.FC<ThemeSwitcherIconProps> = (props) => {
             case 'dark':
                 return <IconButton icon="sun" {...iconProps} />;
             default:
-                return <IconButton icon="moon" {...iconProps} />;
+                return <IconButton icon="sun" {...iconProps} />;
         }
     }, [currentTheme, iconProps]);
 
@@ -81,7 +81,7 @@ export const ThemeSwitcher: React.FC<ThemeSwitcherProps> = (props) => {
     }, [theme, setTheme]);
 
     // Use resolvedTheme which is only available after hydration
-    const currentTheme = mounted ? resolvedTheme || 'light' : 'light';
+    const currentTheme = mounted ? resolvedTheme || 'dark' : 'dark';
 
     return (
         <Switch
