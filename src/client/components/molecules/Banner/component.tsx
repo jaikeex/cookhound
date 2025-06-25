@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import Image from 'next/image';
 import classNames from 'classnames';
 import { SearchInput } from '@/client/components/molecules/Form/SearchInput/component';
@@ -6,12 +6,16 @@ import { type ChangeEvent } from 'react';
 import { Typography } from '@/client/components';
 
 type BannerProps = Readonly<{
+    defaultSearchValue?: string;
+    searchValue?: string;
     onChange: (event: ChangeEvent<HTMLInputElement>) => void;
     onSearch: () => void;
     isLoading: boolean;
 }>;
 
 export const Banner: React.FC<BannerProps> = ({
+    defaultSearchValue,
+    searchValue,
     onChange,
     onSearch,
     isLoading
@@ -45,6 +49,8 @@ export const Banner: React.FC<BannerProps> = ({
                             placeholder="Search for a recipe"
                             id="search"
                             name="search"
+                            value={searchValue}
+                            defaultValue={defaultSearchValue}
                             onChange={onChange}
                             onSearch={onSearch}
                             isLoading={isLoading}

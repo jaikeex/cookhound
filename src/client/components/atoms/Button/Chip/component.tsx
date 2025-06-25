@@ -32,7 +32,10 @@ const classConfig = {
 //$                                          COMPONENT                                          $//
 //~---------------------------------------------------------------------------------------------~//
 
-type ChipButtonProps = ChipProps &
+type ChipButtonProps = Readonly<{
+    onClick: () => void;
+}> &
+    ChipProps &
     Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'color'>;
 
 export const ChipButton: React.FC<ChipButtonProps> = ({
@@ -41,10 +44,12 @@ export const ChipButton: React.FC<ChipButtonProps> = ({
     color = 'primary',
     outlined = false,
     size = 'md',
+    onClick,
+    id,
     ...props
 }) => {
     return (
-        <button>
+        <button onClick={onClick} id={id}>
             <Chip
                 {...props}
                 color={color}

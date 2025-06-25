@@ -13,6 +13,8 @@ import { Logger } from '@/server/logger';
 import { RequestContext } from '@/server/utils/reqwest/context';
 import { randomUUID } from 'crypto';
 import { recipeSearchIndex } from '@/server/integrations/typesense';
+import { intersectArrays } from '@/common/utils';
+import { SEARCH_QUERY_SEPARATOR } from '@/common/constants';
 
 //|=============================================================================================|//
 
@@ -322,6 +324,7 @@ class RecipeService {
     /**
      * Search recipes by a free-text query across title, notes, ingredients and instructions.
      * Results are filtered by language and returned in paginated batches.
+     * Supports multi-query search with "|" delimiter - returns recipes that match ALL queries.
      */
     async searchRecipes(
         query: string,
@@ -339,6 +342,10 @@ class RecipeService {
         const MAX_BATCHES = 20;
 
         const cleanQuery = query.trim();
+
+        //|-------------------------------------------------------------------------------------|//
+        //?                                       CHECKS                                        ?//
+        //|-------------------------------------------------------------------------------------|//
 
         if (!cleanQuery) {
             log.warn('searchRecipes - empty query');
@@ -360,41 +367,133 @@ class RecipeService {
             throw new ServerError('app.error.bad-request', 400);
         }
 
+        //|-------------------------------------------------------------------------------------|//
+        //?                                    PREPARE QUERY                                    ?//
+        //|-------------------------------------------------------------------------------------|//
+
         const offset = (batch - 1) * perPage;
 
-        let results: any[] = [];
+        const queryTerms = cleanQuery
+            .split(SEARCH_QUERY_SEPARATOR)
+            .map((term) => term.trim())
+            .filter((term) => term.length > 0);
+
+        if (queryTerms.length === 0) {
+            log.warn('searchRecipes - no valid query terms after parsing');
+            throw new ServerError('app.error.bad-request', 400);
+        }
+
+        //|-------------------------------------------------------------------------------------|//
+        //?                             FETCH, INTERSECT AND RETURN                             ?//
+        //|-------------------------------------------------------------------------------------|//
+
+        let results: RecipeForDisplayDTO[] = [];
 
         try {
-            results = await recipeSearchIndex.search(
-                cleanQuery,
-                language,
-                perPage,
-                offset
-            );
+            if (queryTerms.length === 1) {
+                // single query fetch.
+
+                results = await recipeSearchIndex.searchSingleQuery(
+                    queryTerms[0],
+                    language,
+                    // I read in docs that fetching extra is useful for dealing with duplicates.
+                    // I dont really know how that helps but here it is...
+                    perPage * 2,
+                    0
+                );
+            } else {
+                // multi query fetch.
+
+                log.trace('searchRecipes - multi-query detected', {
+                    queryTerms,
+                    termCount: queryTerms.length
+                });
+
+                //?—————————————————————————————————————————————————————————————————————————————?//
+                //?                               IMPORTANT INFO                                ?//
+                ///
+                //# This logic deals with incoming multiple-part queries (remember, those are the ones
+                //# delimited by "|"). The expected behaviour ís that the results will contain
+                //# only items hit for both query strings.
+                //# This CANNOT be done natively in typesense it seems, and the only effective way
+                //# i found that did not involve code right from hell is this. Simply fetch for all
+                //# queries and intersect... Easy, simple, no idea how effective.
+                ///
+                //?—————————————————————————————————————————————————————————————————————————————?//
+
+                // Set generous limits here, the intersection provides much better results.
+                const searchLimit = Math.max(perPage * 3, 100);
+                const searchPromises = queryTerms.map((term) =>
+                    recipeSearchIndex.searchSingleQuery(
+                        term,
+                        language,
+                        searchLimit,
+                        0
+                    )
+                );
+
+                const searchResults = await Promise.all(searchPromises);
+
+                log.trace('searchRecipes - individual results', {
+                    resultCounts: searchResults.map((results) => results.length)
+                });
+
+                const intersection = intersectArrays(
+                    searchResults,
+                    (recipe) => recipe.id
+                );
+
+                intersection.sort((a, b) => {
+                    // First sort by rating (higher first)
+                    if (a.rating !== b.rating) {
+                        if (a.rating === null) return 1;
+                        if (b.rating === null) return -1;
+                        return b.rating - a.rating;
+                    }
+                    return (b.timesRated ?? 0) - (a.timesRated ?? 0);
+                });
+
+                results = intersection.slice(offset, offset + perPage);
+            }
         } catch (err) {
             log.warn('searchRecipes - falling back to DB search', { err });
+
+            /**
+             * Fallback to db search if typesense fails. Do not bother with multi-searching here,
+             * fetching all from db would be costly with longer lists and seems pointless.
+             */
             results = await db.recipe.searchManyByText(
-                cleanQuery,
+                queryTerms[0],
                 language,
                 perPage,
                 offset
             );
         }
 
-        const recipes: RecipeForDisplayDTO[] = results.map((recipe) => ({
-            id: recipe.id,
-            displayId: recipe.displayId,
-            title: recipe.title,
-            imageUrl: recipe.imageUrl || '',
-            rating: recipe.rating ? Number(recipe.rating) : null,
-            timesRated: recipe.timesRated ?? 0,
-            time: recipe.time,
-            portionSize: recipe.portionSize
-        }));
+        //|-------------------------------------------------------------------------------------|//
+        //?                                        RETURN                                       ?//
+        //|-------------------------------------------------------------------------------------|//
+
+        // Apply pagination to final results
+        const paginatedResults = results.slice(offset, offset + perPage);
+
+        const recipes: RecipeForDisplayDTO[] = paginatedResults.map(
+            (recipe) => ({
+                id: recipe.id,
+                displayId: recipe.displayId,
+                title: recipe.title,
+                imageUrl: recipe.imageUrl || '',
+                rating: recipe.rating ? Number(recipe.rating) : null,
+                timesRated: recipe.timesRated ?? 0,
+                time: recipe.time,
+                portionSize: recipe.portionSize
+            })
+        );
 
         log.trace('searchRecipes - success', {
             batch,
-            count: recipes.length
+            count: recipes.length,
+            queryTerms: queryTerms.length > 1 ? queryTerms : undefined
         });
 
         return recipes;

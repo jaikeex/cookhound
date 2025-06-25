@@ -2,6 +2,7 @@ import { TypesenseClient } from './client';
 import { Logger } from '@/server/logger';
 import type { RecipeDTO, RecipeForDisplayDTO } from '@/common/types';
 import type { Locale } from '@/client/locales';
+import { redisClient } from '@/server/db/redis';
 
 const log = Logger.getInstance('recipe-index');
 
@@ -40,6 +41,69 @@ class RecipeSearchIndex {
     }
 
     //~-----------------------------------------------------------------------------------------~//
+    //$                                          CACHE                                          $//
+    //~-----------------------------------------------------------------------------------------~//
+
+    private generateSearchCacheKey(
+        query: string,
+        language: Locale,
+        limit: number,
+        offset: number
+    ): string {
+        return `typesense:recipe:search:${JSON.stringify({
+            query: query.trim().toLowerCase(),
+            language,
+            limit,
+            offset
+        })}`;
+    }
+
+    private async cacheSearchQuery<T>(
+        cacheKey: string,
+        queryFn: () => Promise<T>,
+        ttlInSeconds: number = 3600
+    ): Promise<T> {
+        const startTime = Date.now();
+
+        try {
+            const cachedResult = await redisClient.get<T>(cacheKey);
+
+            if (cachedResult !== null) {
+                const fetchTime = Date.now() - startTime;
+
+                log.trace('Cache hit for search query', {
+                    cacheKey,
+                    fetchTime: `${fetchTime}ms`
+                });
+
+                return cachedResult;
+            }
+
+            log.trace('Cache miss for search query', { cacheKey });
+
+            const result = await queryFn();
+
+            await redisClient.set(cacheKey, result, ttlInSeconds);
+
+            const fetchTime = Date.now() - startTime;
+
+            log.trace('Search query executed and cached', {
+                cacheKey,
+                fetchTime: `${fetchTime}ms`
+            });
+
+            return result;
+        } catch (error) {
+            log.error('Cache operation failed for search query', {
+                cacheKey,
+                error
+            });
+
+            return await queryFn();
+        }
+    }
+
+    //~-----------------------------------------------------------------------------------------~//
     //$                                    CREATE COLLECTION                                    $//
     //~-----------------------------------------------------------------------------------------~//
 
@@ -53,7 +117,9 @@ class RecipeSearchIndex {
             this.collectionReady = true;
             return;
         } catch (err: any) {
-            // Check for collection not found - Typesense can return different error formats
+            /**
+             * This explicit check is needed to detect when the collection is not present in typesense.
+             */
             const isNotFound =
                 err?.httpStatus === 404 ||
                 err?.name === 'ObjectNotFound' ||
@@ -88,8 +154,14 @@ class RecipeSearchIndex {
             });
 
             this.collectionReady = true;
+
             log.info('Typesense recipe collection created successfully');
         } catch (err) {
+            /**
+             * Throw the error here.
+             * There is no reasonable reason for this to ever happen, and the collection will be
+             * present already anyway, so failure here is some shitty magic that needs to be seen.
+             */
             log.error('Failed to create Typesense collection', { err });
             throw err;
         }
@@ -123,11 +195,14 @@ class RecipeSearchIndex {
 
     async upsert(recipe: RecipeDTO): Promise<void> {
         try {
+            // Do not ever remove this.
             await this.ensureCollectionExists();
+
             await this.client
                 .collections(COLLECTION_NAME)
                 .documents()
                 .upsert(this.mapRecipeToDocument(recipe));
+
             log.trace('Recipe indexed/updated in Typesense', {
                 id: recipe.id
             });
@@ -141,32 +216,44 @@ class RecipeSearchIndex {
     }
 
     //~-----------------------------------------------------------------------------------------~//
-    //$                                         SEARCH                                          $//
+    //$                                    SINGLE QUERY SEARCH                                  $//
     //~-----------------------------------------------------------------------------------------~//
 
-    async search(
+    async searchSingleQuery(
         query: string,
         language: Locale,
         limit: number,
         offset: number
     ): Promise<RecipeForDisplayDTO[]> {
-        await this.ensureCollectionExists();
-        const page = Math.floor(offset / limit) + 1;
+        const cacheKey = this.generateSearchCacheKey(
+            query,
+            language,
+            limit,
+            offset
+        );
 
-        try {
-            const searchResult = await this.client
-                .collections(COLLECTION_NAME)
-                .documents()
-                .search({
-                    q: query,
-                    query_by: 'title,notes,ingredients,instructions',
-                    filter_by: `language:=${language}`,
-                    per_page: limit,
-                    page
-                });
+        return await this.cacheSearchQuery(cacheKey, async () => {
+            try {
+                await this.ensureCollectionExists();
 
-            const hits: RecipeForDisplayDTO[] = (searchResult.hits || []).map(
-                (hit: any) => {
+                const page = Math.floor(offset / limit) + 1;
+
+                const searchResult = await this.client
+                    .collections(COLLECTION_NAME)
+                    .documents()
+                    .search({
+                        q: query,
+                        query_by: 'title,notes,ingredients,instructions',
+                        sort_by: 'rating:desc,timesRated:desc',
+                        filter_by: `language:=${language}`,
+                        per_page: limit,
+                        page,
+                        operator: 'and'
+                    });
+
+                const hits: RecipeForDisplayDTO[] = (
+                    searchResult.hits || []
+                ).map((hit: any) => {
                     const doc = hit.document as RecipeDocument;
                     return {
                         id: doc.id,
@@ -178,17 +265,16 @@ class RecipeSearchIndex {
                         time: doc.time ?? null,
                         portionSize: doc.portionSize ?? null
                     };
-                }
-            );
+                });
 
-            return hits;
-        } catch (err) {
-            log.error('Typesense search failed', { err, query });
-            throw err;
-        }
+                return hits;
+            } catch (err) {
+                log.error('Typesense search failed', { err, query });
+                throw err;
+            }
+        });
     }
 }
 
 const recipeSearchIndex = RecipeSearchIndex.getInstance();
-
 export { recipeSearchIndex, RecipeSearchIndex };

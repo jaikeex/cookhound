@@ -1,4 +1,6 @@
-import React, { useCallback } from 'react';
+'use client';
+
+import React, { useCallback, useEffect, useState } from 'react';
 import { BaseInput, ButtonBase, InputLabel, Loader } from '@/client/components';
 import type { FormInputProps } from '@/client/components/molecules/Form/types';
 import classNames from 'classnames';
@@ -8,11 +10,13 @@ export type SearchInputProps = Readonly<{
     isLoading?: boolean;
     onSearch?: () => void;
     label?: string;
+    value?: string;
 }> &
     Omit<FormInputProps, 'type' | 'label'>;
 
 export const SearchInput: React.FC<SearchInputProps> = ({
     className,
+    defaultValue,
     disabled,
     id,
     label,
@@ -20,8 +24,19 @@ export const SearchInput: React.FC<SearchInputProps> = ({
     onChange,
     onSearch,
     placeholder,
-    isLoading
+    isLoading,
+    value
 }) => {
+    const [inputValue, setInputValue] = useState(value ?? defaultValue ?? '');
+
+    const handleInputChange = useCallback(
+        (e: React.ChangeEvent<HTMLInputElement>) => {
+            setInputValue(e.target.value);
+            onChange?.(e);
+        },
+        [onChange]
+    );
+
     const handleSearch = useCallback(() => {
         onSearch?.();
     }, [onSearch]);
@@ -36,6 +51,10 @@ export const SearchInput: React.FC<SearchInputProps> = ({
         [onSearch]
     );
 
+    useEffect(() => {
+        setInputValue(value ?? '');
+    }, [value]);
+
     return (
         <div className={classNames('relative w-full', className)}>
             {label && (
@@ -48,7 +67,8 @@ export const SearchInput: React.FC<SearchInputProps> = ({
                     className="pr-[106px]"
                     id={id}
                     name={name}
-                    onChange={onChange}
+                    value={inputValue}
+                    onChange={handleInputChange}
                     onKeyDown={handleInputKeyDown}
                     disabled={disabled}
                     autoComplete={name}

@@ -8,3 +8,4 @@ export * from './useLocalStorage';
 export * from './useOutsideClick';
 export * from './useScreenSize';
 export * from './useUnsavedChangesWarning';
+export * from './useRecipeDiscovery';
