@@ -1,7 +1,7 @@
 import React from 'react';
 import { Icon, IconButton, Typography } from '@/client/components';
 import type { IconName, SnackbarVariant } from '@/client/types';
-import classnames from 'classnames';
+import { classNames } from '@/client/utils';
 
 const config: Record<SnackbarVariant, VariantConfig> = {
     success: {
@@ -39,7 +39,7 @@ export const Snackbar: React.FC<SnackbarProps> = ({
     return (
         <div className="fixed left-0 right-0 z-[2000] pointer-events-none top-4 md:top-8">
             <div
-                className={classnames(
+                className={classNames(
                     'min-h-10 max-w-72 md:max-w-96 py-2.5 px-2 mx-auto rounded-md z-50 flex items-center gap-2',
                     'animate-fade-in pointer-events-auto',
                     config[variant].classnames

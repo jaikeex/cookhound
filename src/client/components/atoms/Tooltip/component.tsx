@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useCallback, useState, useEffect } from 'react';
-import classnames from 'classnames';
+import { classNames } from '@/client/utils';
 import { Typography } from '@/client/components';
 import { useOutsideClick } from '@/client/hooks';
 
@@ -143,7 +143,7 @@ export const Tooltip: React.FC<TooltipProps> = ({
 
         return (
             <div
-                className={classnames(
+                className={classNames(
                     'fixed z-50 px-2 py-2 text-xs bg-gray-300 rounded dark:bg-gray-800',
                     'transition-all duration-200 ease-in-out w-max max-w-64',
                     className
@@ -169,7 +169,7 @@ export const Tooltip: React.FC<TooltipProps> = ({
         >
             {children}
             <div
-                className={classnames(
+                className={classNames(
                     'absolute bg-gray-300 dark:bg-gray-800 text-xs rounded py-2 px-2 z-10',
                     'transition-all duration-200 ease-in-out w-max max-w-64',
                     shouldShow ? 'opacity-100 block' : 'opacity-0 hidden',

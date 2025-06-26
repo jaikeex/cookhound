@@ -1,9 +1,8 @@
 'use client';
 
 import React, { useCallback, useState } from 'react';
-import classnames from 'classnames';
+import { classNames } from '@/client/utils';
 import { TabButton } from '@/client/components';
-import classNames from 'classnames';
 
 export type TabContent = {
     title: string;
@@ -59,7 +58,7 @@ export const Tabs: React.FC<TabsProps> = ({
                 ))}
                 {/* highlighter which moves to the active tab position */}
                 <div
-                    className={classnames(
+                    className={classNames(
                         'absolute w-1/3 h-full bg-blue-600 rounded-md opacity-20',
                         `transition-transform duration-200 ease-in-out`,
                         'top-0 z-0 pointer-events-none'

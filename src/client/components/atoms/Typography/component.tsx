@@ -1,5 +1,5 @@
 import React from 'react';
-import classnames from 'classnames';
+import { classNames } from '@/client/utils';
 
 //~---------------------------------------------------------------------------------------------~//
 //$                                           OPTIONS                                           $//
@@ -66,7 +66,7 @@ export const Typography = <E extends React.ElementType = 'p'>({
     return (
         <Component
             {...props}
-            className={classnames(
+            className={classNames(
                 `font-open-sans ${classConfig.variant[variant]} ${disableLinkStyles ? 'no-underline typography-base' : ''}`,
                 align && classConfig.align[align],
                 className

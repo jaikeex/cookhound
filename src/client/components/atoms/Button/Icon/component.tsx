@@ -1,7 +1,7 @@
 import React from 'react';
 import { Icon } from '@/client/components';
 import type { IconName } from '@/client/types';
-import classnames from 'classnames';
+import { classNames } from '@/client/utils';
 
 export type IconButtonProps = Readonly<{
     className?: string;
@@ -24,7 +24,7 @@ export const IconButton: React.FC<IconButtonProps> = ({
 }) => {
     return (
         <button
-            className={classnames(
+            className={classNames(
                 'icon-button',
                 disabled && 'opacity-50 cursor-not-allowed pointer-events-none',
                 className

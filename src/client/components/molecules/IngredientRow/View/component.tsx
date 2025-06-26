@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import type { Ingredient } from '@/common/types';
 import type { TypographyVariant } from '@/client/components';
 import { Typography } from '@/client/components';
-import classNames from 'classnames';
+import { classNames } from '@/client/utils';
 
 //~---------------------------------------------------------------------------------------------~//
 //$                                           OPTIONS                                           $//

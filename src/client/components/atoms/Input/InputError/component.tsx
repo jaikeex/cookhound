@@ -1,4 +1,4 @@
-import classNames from 'classnames';
+import { classNames } from '@/client/utils';
 import React from 'react';
 
 export type InputErrorProps = Readonly<{

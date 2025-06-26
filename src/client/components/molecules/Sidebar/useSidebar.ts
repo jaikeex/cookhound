@@ -9,7 +9,7 @@ import {
 } from '@/client/hooks';
 import { useRouter, useSearchParams } from 'next/navigation';
 import type { SidebarAnimations, SidebarConfig } from './types';
-import classNames from 'classnames';
+import { classNames } from '@/client/utils';
 
 const DEFAULT_ANIMATIONS = {
     sidebar: {

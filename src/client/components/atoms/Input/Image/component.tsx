@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useCallback, useState } from 'react';
-import classnames from 'classnames';
+import { classNames } from '@/client/utils';
 import { convertImgToWebP, verifyImgSize } from '@/client/utils';
 import { Icon, ImageCropperModal } from '@/client/components';
 import { useLocale, useSnackbar, useModal } from '@/client/store';
@@ -249,14 +249,14 @@ export const ImageInput: React.FC<ImageInputProps> = ({
 
     return (
         <div
-            className={classnames(
+            className={classNames(
                 'flex flex-col items-center justify-center flex-grow w-full h-full',
                 className
             )}
         >
             <label
                 htmlFor={INPUT_ID}
-                className={classnames(
+                className={classNames(
                     `flex flex-col items-center justify-center border-2`,
                     `relative border-gray-300 border-dashed rounded-lg cursor-pointer`,
                     `transition-colors duration-200 ease-in-out`,

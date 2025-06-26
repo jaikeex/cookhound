@@ -3,7 +3,7 @@
 import React, { useCallback } from 'react';
 import type { BaseButtonProps } from '@/client/components';
 import { ButtonBase } from '@/client/components';
-import classnames from 'classnames';
+import { classNames } from '@/client/utils';
 import { useRouter } from 'next/navigation';
 import apiClient from '@/client/request';
 import { useAuth, useLocale, useSnackbar } from '@/client/store';
@@ -33,7 +33,7 @@ export const LogoutButton: React.FC<LogoutButtonProps> = ({ className }) => {
             size="sm"
             icon="exit"
             onClick={handleClick}
-            className={classnames('font-normal', className)}
+            className={classNames('font-normal', className)}
         >
             {t('auth.form.logout')}
         </ButtonBase>

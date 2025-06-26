@@ -1,7 +1,7 @@
 import React from 'react';
 import { InputError, InputLabel } from '@/client/components';
 import type { FormInputProps } from '@/client/components/molecules/Form/types';
-import classNames from 'classnames';
+import { classNames } from '@/client/utils';
 import { BaseTextarea } from '@/client/components/atoms/Input/BaseTextarea/component';
 
 export type TextareaProps = Readonly<{

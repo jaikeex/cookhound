@@ -6,7 +6,7 @@ import { generateImgPlaceholder } from '@/client/utils';
 import { Rating, Tooltip, Typography, RecipeInfo } from '@/client/components';
 import Image from 'next/image';
 import { useAuth, useLocale } from '@/client/store';
-import classNames from 'classnames';
+import { classNames } from '@/client/utils';
 
 export type MobileRecipeHeadProps = Readonly<{
     isPreview?: boolean;

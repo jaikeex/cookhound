@@ -1,5 +1,5 @@
 import React from 'react';
-import classnames from 'classnames';
+import { classNames } from '@/client/utils';
 
 type DividerProps = Readonly<{
     className?: string;
@@ -12,7 +12,7 @@ export const Divider: React.FC<DividerProps> = ({
     dashed,
     text
 }) => {
-    const hrClassName = classnames(
+    const hrClassName = classNames(
         'w-full border-gray-400 dark:border-gray-600',
         'border-t',
         dashed ? 'border-dashed' : 'border-solid'
@@ -27,6 +27,6 @@ export const Divider: React.FC<DividerProps> = ({
             <div className={hrClassName} />
         </div>
     ) : (
-        <div className={classnames(hrClassName, className)} />
+        <div className={classNames(hrClassName, className)} />
     );
 };

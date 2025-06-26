@@ -5,7 +5,7 @@ import type { Ingredient } from '@/common/types';
 import { IngredientRowView } from '@/client/components/molecules/IngredientRow/View';
 import { DraggableInputRow } from '@/client/components';
 import type { PanInfo } from 'framer-motion';
-import classNames from 'classnames';
+import { classNames } from '@/client/utils';
 
 type DraggableIngredientRowProps = Readonly<{
     className?: string;

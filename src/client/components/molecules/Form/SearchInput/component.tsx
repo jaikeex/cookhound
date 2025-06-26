@@ -3,7 +3,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { BaseInput, ButtonBase, InputLabel, Loader } from '@/client/components';
 import type { FormInputProps } from '@/client/components/molecules/Form/types';
-import classNames from 'classnames';
+import { classNames } from '@/client/utils';
 
 export type SearchInputProps = Readonly<{
     placeholder?: string;

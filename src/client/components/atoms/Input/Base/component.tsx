@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import classnames from 'classnames';
+import { classNames } from '@/client/utils';
 
 export type BaseInputProps = Readonly<{
     className?: string;
@@ -18,7 +18,7 @@ export const BaseInput: React.FC<BaseInputProps> = ({
         <input
             ref={ref}
             {...props}
-            className={classnames('base-input', className)}
+            className={classNames('base-input', className)}
         />
     );
 };

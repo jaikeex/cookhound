@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { SkeletonCard, SkeletonBox } from '@/client/components';
-import classNames from 'classnames';
+import { classNames } from '@/client/utils';
 
 export const FrontPageSkeleton: React.FC = () => {
     const cards = Array.from({ length: 12 }, (_, index) => (

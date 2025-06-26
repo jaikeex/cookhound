@@ -1,6 +1,6 @@
 'use client';
 
-import classNames from 'classnames';
+import { classNames } from '@/client/utils';
 import React, { useEffect } from 'react';
 import { useSidebar } from './useSidebar';
 import { IconButton } from '@/client/components/atoms';

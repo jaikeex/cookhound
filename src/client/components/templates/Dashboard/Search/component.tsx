@@ -12,7 +12,7 @@ import {
 import type { RecipeForDisplayDTO } from '@/common/types';
 import { useRecipeDiscovery } from '@/client/hooks';
 import { useRouter } from 'next/navigation';
-import classNames from 'classnames';
+import { classNames } from '@/client/utils';
 import { SEARCH_QUERY_SEPARATOR } from '@/common/constants';
 
 type SearchTemplateProps = Readonly<{

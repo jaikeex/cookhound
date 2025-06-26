@@ -7,7 +7,7 @@ import React, {
     useCallback,
     useLayoutEffect
 } from 'react';
-import classnames from 'classnames';
+import { classNames } from '@/client/utils';
 import { useEventListener, usePathnameChangeListener } from '@/client/hooks';
 
 export type PopupPlacement =
@@ -160,7 +160,7 @@ export const Popup: React.FC<PopupProps> = ({
             <div
                 ref={triggerRef}
                 onClick={handleToggle}
-                className={classnames('inline-block cursor-pointer', className)}
+                className={classNames('inline-block cursor-pointer', className)}
             >
                 {children}
             </div>
@@ -171,7 +171,7 @@ export const Popup: React.FC<PopupProps> = ({
             {isOpen ? (
                 <div
                     ref={popupRef}
-                    className={classnames(
+                    className={classNames(
                         'fixed z-50 rounded sheet px-8 py-6',
                         animationClass,
                         contentClassName

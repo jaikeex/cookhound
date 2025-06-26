@@ -1,6 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
-import classNames from 'classnames';
+import { classNames } from '@/client/utils';
 import { SearchInput } from '@/client/components/molecules/Form/SearchInput/component';
 import { type ChangeEvent } from 'react';
 import { Typography } from '@/client/components';

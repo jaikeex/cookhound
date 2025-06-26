@@ -16,7 +16,7 @@ import { useAuth, useLocale } from '@/client/store';
 import { Sidebar } from '@/client/components/molecules/Sidebar';
 import { NavMenu } from './Menu';
 import { TOP_NAVBAR_ID } from '@/client/constants';
-import classNames from 'classnames';
+import { classNames } from '@/client/utils';
 import { usePathname } from 'next/navigation';
 
 type TopNavigationProps = Readonly<NonNullable<unknown>>;

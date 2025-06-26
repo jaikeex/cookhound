@@ -1,6 +1,5 @@
 import React from 'react';
-import classNames from 'classnames';
-import classnames from 'classnames';
+import { classNames } from '@/client/utils';
 
 //~---------------------------------------------------------------------------------------------~//
 //$                                           OPTIONS                                           $//
@@ -57,7 +56,7 @@ export const Checkbox: React.FC<CheckboxProps> = ({
             />
 
             <svg
-                className={classnames(
+                className={classNames(
                     `absolute mt-0.5 ml-0.5 opacity-0 peer-checked:opacity-100 transition-opacity`,
                     `duration-150 ease-in-out pointer-events-none`,
                     classConfig.size.svg[size]

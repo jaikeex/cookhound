@@ -27,7 +27,7 @@ import type {
     Ingredient,
     RecipeDTO
 } from '@/common/types';
-import classNames from 'classnames';
+import { classNames } from '@/client/utils';
 import type { ObjectSchema } from 'yup';
 import { array, number, object, string } from 'yup';
 

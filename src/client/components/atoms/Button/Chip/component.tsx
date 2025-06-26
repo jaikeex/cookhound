@@ -1,5 +1,5 @@
 import React from 'react';
-import classNames from 'classnames';
+import { classNames } from '@/client/utils';
 import type { ChipProps } from '@/client/components';
 import { Chip } from '@/client/components';
 

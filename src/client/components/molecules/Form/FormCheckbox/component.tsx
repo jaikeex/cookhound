@@ -1,7 +1,7 @@
 import React from 'react';
 import type { FormInputProps } from '@/client/components/molecules/Form/types';
 import { Checkbox, InputLabel } from '@/client/components';
-import classNames from 'classnames';
+import { classNames } from '@/client/utils';
 
 export type FormCheckboxProps = FormInputProps;
 

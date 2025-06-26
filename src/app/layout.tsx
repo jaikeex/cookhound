@@ -15,7 +15,7 @@ import {
     ScrollToTop
 } from '@/client/components';
 import { locales } from '@/client/locales';
-import classnames from 'classnames';
+import { classNames } from '@/client/utils';
 import { cookies, headers } from 'next/headers';
 import type { UserDTO } from '@/common/types';
 import apiClient from '@/client/request';
@@ -111,7 +111,7 @@ export default async function RootLayout({
                                         </Suspense>
                                         <div
                                             id={CONTENT_WRAPPER_ID}
-                                            className={classnames(
+                                            className={classNames(
                                                 'flex-1 px-2 pt-16 pb-16 md:px-4 md:pt-24',
                                                 'relative'
                                             )}

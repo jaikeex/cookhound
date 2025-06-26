@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Typography, ButtonBase, Loader } from '@/client/components';
-import classNames from 'classnames';
+import { classNames } from '@/client/utils';
 import { useLocale } from '@/client/store';
 
 type ShoppingListHeadProps = Readonly<{

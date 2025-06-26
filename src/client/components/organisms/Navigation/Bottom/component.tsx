@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import classnames from 'classnames';
+import { classNames } from '@/client/utils';
 import { Icon, Tooltip } from '@/client/components';
 import Link from 'next/link';
 import { useAuth, useLocale } from '@/client/store';
@@ -18,7 +18,7 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = () => {
     return (
         <div
             id={BOTTOM_NAVBAR_ID}
-            className={classnames(
+            className={classNames(
                 `block md:hidden fixed bottom-0 left-0 right-0 h-14 px-2 py-4 bg-[#f0fdf4] dark:bg-[#021812]`,
                 `flex [&>*]:w-full items-center justify-between border-t border-gray-300 dark:border-gray-800`
             )}
@@ -29,7 +29,7 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = () => {
             <Link
                 href={'/'}
                 tabIndex={isLoggedin ? 0 : -1}
-                className={classnames(!isLoggedin && 'link-disabled')}
+                className={classNames(!isLoggedin && 'link-disabled')}
             >
                 <Icon
                     name="book"
@@ -46,7 +46,7 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = () => {
                 <Link
                     href={'/recipe/create'}
                     tabIndex={isLoggedin ? 0 : -1}
-                    className={classnames(!isLoggedin && 'link-disabled')}
+                    className={classNames(!isLoggedin && 'link-disabled')}
                 >
                     <Icon
                         name="plus"
@@ -59,7 +59,7 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = () => {
             <Link
                 href={'/shopping-list'}
                 tabIndex={isLoggedin ? 0 : -1}
-                className={classnames(!isLoggedin && 'link-disabled')}
+                className={classNames(!isLoggedin && 'link-disabled')}
             >
                 <Icon
                     name="shoppingList"

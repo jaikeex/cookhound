@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useCallback } from 'react';
-import classnames from 'classnames';
+import { classNames } from '@/client/utils';
 
 export type BaseTextareaProps = Readonly<{
     className?: string;
@@ -63,7 +63,7 @@ export const BaseTextarea: React.FC<BaseTextareaProps> = ({
             {...props}
             ref={textareaRef}
             onInput={handleInput}
-            className={classnames(
+            className={classNames(
                 'base-input resize-none overflow-hidden',
                 className
             )}

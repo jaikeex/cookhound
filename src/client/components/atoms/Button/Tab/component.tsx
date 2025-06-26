@@ -1,5 +1,5 @@
 import React from 'react';
-import classnames from 'classnames';
+import { classNames } from '@/client/utils';
 import { Typography } from '@/client/components';
 
 type TabButtonProps = Readonly<{
@@ -20,7 +20,7 @@ export const TabButton: React.FC<TabButtonProps> = ({
     return (
         <button
             onClick={onClick}
-            className={classnames(
+            className={classNames(
                 `z-10 px-4 py-2 rounded-sm cursor-pointer whitespace-nowrap`,
                 className
             )}

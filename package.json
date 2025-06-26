@@ -20,7 +20,6 @@
         "@babel/runtime": "^7.27.6",
         "@prisma/client": "^6.5.0",
         "bcrypt": "^6.0.0",
-        "classnames": "^2.5.1",
         "cookie": "^1.0.2",
         "dotenv": "^16.5.0",
         "framer-motion": "^11.18.0",

@@ -6,7 +6,7 @@ import { DraggableList } from '@/client/components/molecules/List/DraggableList'
 import type { ShoppingListIngredientDTO } from '@/common/types';
 import type { PanInfo } from 'framer-motion';
 import * as React from 'react';
-import classNames from 'classnames';
+import { classNames } from '@/client/utils';
 import { useLocale } from '@/client/store';
 import { Divider } from '@/client/components/atoms/Divider';
 

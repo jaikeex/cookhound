@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import classNames from 'classnames';
+import { classNames } from '@/client/utils';
 import { Icon, Typography } from '@/client/components/atoms';
 import { useCheckScrollExistence } from '@/client/hooks';
 

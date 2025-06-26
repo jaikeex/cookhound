@@ -1,5 +1,5 @@
 import React from 'react';
-import classnames from 'classnames';
+import { classNames } from '@/client/utils';
 import { Typography } from '@/client/components';
 
 export type SwitchProps = Readonly<{
@@ -21,7 +21,7 @@ export const Switch: React.FC<SwitchProps> = ({
 }) => {
     return (
         <label
-            className={classnames(
+            className={classNames(
                 `inline-flex items-center cursor-pointer`,
                 stretch ? 'w-full justify-between' : '',
                 className
@@ -41,7 +41,7 @@ export const Switch: React.FC<SwitchProps> = ({
                 {...props}
             />
             <div
-                className={classnames(
+                className={classNames(
                     `relative w-11 h-6 rounded-full bg-gray-400 peer-focus:outline-none dark:bg-gray-700 dark:border-gray-600 peer-checked:bg-blue-600`,
                     `peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-['']`,
                     `after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all`

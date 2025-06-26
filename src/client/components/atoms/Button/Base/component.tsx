@@ -1,5 +1,5 @@
 import React from 'react';
-import classNames from 'classnames';
+import { classNames } from '@/client/utils';
 import type { TypographyVariant } from '@/client/components';
 import { Icon, Typography } from '@/client/components';
 import type { IconName } from '@/client/types';

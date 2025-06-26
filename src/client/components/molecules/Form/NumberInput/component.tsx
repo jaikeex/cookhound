@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import { BaseInput, InputError, InputLabel } from '@/client/components';
 import type { FormInputProps } from '@/client/components/molecules/Form/types';
-import classNames from 'classnames';
+import { classNames } from '@/client/utils';
 
 export type NumberInputProps = Readonly<{
     allowDecimals?: boolean;

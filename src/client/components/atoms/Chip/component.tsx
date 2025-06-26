@@ -1,4 +1,4 @@
-import classNames from 'classnames';
+import { classNames } from '@/client/utils';
 import * as React from 'react';
 import { Icon, Typography } from '@/client/components';
 import type { TypographyVariant } from '@/client/components';

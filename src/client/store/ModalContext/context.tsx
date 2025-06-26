@@ -9,9 +9,8 @@ import React, {
 } from 'react';
 import ReactDOM from 'react-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import classnames from 'classnames';
+import { classNames } from '@/client/utils';
 import { IconButton } from '@/client/components';
-import classNames from 'classnames';
 import { generateRandomId } from '@/client/utils';
 
 //~=============================================================================================~//
@@ -167,7 +166,7 @@ const ModalWrapper: React.FC<ModalWrapperProps> = ({
                         onClick={onClose}
                         icon="close"
                         size={24}
-                        className={classnames('absolute top-4 right-4')}
+                        className={classNames('absolute top-4 right-4')}
                     />
                 )}
                 {children}

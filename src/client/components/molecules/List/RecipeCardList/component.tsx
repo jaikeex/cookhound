@@ -3,7 +3,7 @@
 import { Loader, RecipeCard } from '@/client/components';
 import { useInfinityScroll } from '@/client/hooks';
 import type { RecipeForDisplayDTO } from '@/common/types';
-import classNames from 'classnames';
+import { classNames } from '@/client/utils';
 import * as React from 'react';
 
 type RecipeCardListProps = Readonly<{

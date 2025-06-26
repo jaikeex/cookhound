@@ -2,7 +2,7 @@
 
 import React, { useCallback, useRef } from 'react';
 import { Icon } from '@/client/components';
-import classnames from 'classnames';
+import { classNames } from '@/client/utils';
 
 export type StarProps = Readonly<{
     disabled?: boolean;
@@ -70,7 +70,7 @@ export const Star: React.FC<StarProps> = ({
             onMouseMove={handleMouseMove}
             name={config.icon[state]}
             size={iconSize}
-            className={classnames(
+            className={classNames(
                 config.fill[fill],
                 highlight && 'scale-105',
                 pulse && 'animate-rating-pulse',

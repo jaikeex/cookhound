@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import classNames from 'classnames';
+import { classNames } from '@/client/utils';
 import type { StarState } from '@/client/components';
 import { Star, Tooltip } from '@/client/components';
 import { generateStars } from '@/client/components/molecules/Rating/utils';
