@@ -1,5 +1,5 @@
 import type { Ingredient } from '@prisma/client';
-import prisma from '@/server/db/prisma';
+import { prisma } from '@/server/integrations';
 import { Logger } from '@/server/logger';
 import {
     cachePrismaQuery,

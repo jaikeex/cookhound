@@ -3,7 +3,7 @@ import {
     generateCacheKey,
     invalidateModelCache
 } from '@/server/db/model/model-cache';
-import prisma from '@/server/db/prisma';
+import { prisma } from '@/server/integrations';
 import { Logger } from '@/server/logger';
 import type { Prisma, Recipe } from '@prisma/client';
 import { getRecipeById } from '@prisma/client/sql';

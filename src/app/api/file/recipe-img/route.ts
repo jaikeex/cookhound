@@ -1,5 +1,5 @@
 import { handleServerError } from '@/server/utils/reqwest';
-import { googleService } from '@/server/google-api';
+import { googleApiService } from '@/server/services';
 import type { NextRequest } from 'next/server';
 import { ENV_CONFIG_PRIVATE } from '@/common/constants';
 import { withRateLimit } from '@/server/utils/rate-limit';
@@ -29,7 +29,7 @@ async function postHandler(request: NextRequest) {
                 throw new ServerError('auth.error.unauthorized', 401);
             }
 
-            await googleService.uploadRecipeImage(data.fileName, data.bytes);
+            await googleApiService.uploadRecipeImage(data.fileName, data.bytes);
 
             // Generate the public URL for the uploaded image
             const bucket =

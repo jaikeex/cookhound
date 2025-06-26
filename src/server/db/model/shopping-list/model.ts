@@ -2,7 +2,7 @@ import type {
     ShoppingListIngredientDTO,
     ShoppingListIngredientPayload
 } from '@/common/types';
-import prisma from '@/server/db/prisma';
+import { prisma } from '@/server/integrations';
 import { Logger } from '@/server/logger';
 
 //|=============================================================================================|//

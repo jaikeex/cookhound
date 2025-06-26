@@ -1,2 +1,1 @@
-export * from './client';
-export * from './recipe-index';
+export { default as typesenseClient } from './client';

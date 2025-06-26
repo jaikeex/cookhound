@@ -42,4 +42,5 @@ class TypesenseClient {
     }
 }
 
-export { TypesenseClient };
+const typesenseClient = TypesenseClient.getInstance();
+export default typesenseClient;

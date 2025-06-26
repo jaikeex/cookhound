@@ -15,8 +15,8 @@ type ServiceAccountMap = {
     [key in ServiceAccountIdentifier]: TokenManager;
 };
 
-class GoogleApiService {
-    private static instance: GoogleApiService;
+class GoogleApiClient {
+    private static instance: GoogleApiClient;
     private tokenManagers: Partial<ServiceAccountMap> = {};
     private initializationPromise: Promise<void> | null = null;
 
@@ -24,11 +24,11 @@ class GoogleApiService {
         this.initializationPromise = this.initialize();
     }
 
-    public static getInstance(): GoogleApiService {
-        if (!GoogleApiService.instance) {
-            GoogleApiService.instance = new GoogleApiService();
+    public static getInstance(): GoogleApiClient {
+        if (!GoogleApiClient.instance) {
+            GoogleApiClient.instance = new GoogleApiClient();
         }
-        return GoogleApiService.instance;
+        return GoogleApiClient.instance;
     }
 
     private async initialize() {
@@ -160,4 +160,5 @@ class GoogleApiService {
     }
 }
 
-export const googleApiService = GoogleApiService.getInstance();
+const googleApiClient = GoogleApiClient.getInstance();
+export default googleApiClient;

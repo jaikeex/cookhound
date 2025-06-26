@@ -1,6 +1,6 @@
 import Transport from 'winston-transport';
 import type { LogLevel } from '@/server/logger/types';
-import { googleService } from '@/server/google-api';
+import { googleApiService } from '@/server/services/google-api/service';
 
 /**
  * Maps app log levels to Google Cloud Logging severities.
@@ -100,7 +100,7 @@ export class GoogleCloudLoggingTransport extends Transport {
 
         try {
             const entries = this.queue.splice(0, this.queue.length);
-            await googleService.writeLogsToGoogleCloud(entries);
+            await googleApiService.writeLogsToGoogleCloud(entries);
         } catch (err) {
             // Failure to write to Cloud Logging should not crash the app.
         }

@@ -12,7 +12,7 @@ import type { Rating } from '@prisma/client';
 import { Logger } from '@/server/logger';
 import { RequestContext } from '@/server/utils/reqwest/context';
 import { randomUUID } from 'crypto';
-import { recipeSearchIndex } from '@/server/integrations/typesense';
+import { recipeSearchIndex } from '@/server/search-index';
 import { intersectArrays } from '@/common/utils';
 import { SEARCH_QUERY_SEPARATOR } from '@/common/constants';
 

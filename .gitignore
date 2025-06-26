@@ -47,6 +47,6 @@ next-env.d.ts
 !.yarn/sdks
 !.yarn/versions
 
-src/server/google-api/gsa/accounts
+src/server/integrations/google/gsa/accounts
 
 .VSCodeCounter/

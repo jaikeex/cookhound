@@ -1,4 +1,4 @@
-import { TypesenseClient } from './client';
+import { typesenseClient } from '@/server/integrations';
 import { Logger } from '@/server/logger';
 import type { RecipeDTO, RecipeForDisplayDTO } from '@/common/types';
 import type { Locale } from '@/client/locales';
@@ -30,7 +30,7 @@ class RecipeSearchIndex {
     private collectionReady: boolean = false;
 
     private constructor() {
-        this.client = TypesenseClient.getInstance().getClient();
+        this.client = typesenseClient.getClient();
     }
 
     static getInstance(): RecipeSearchIndex {
