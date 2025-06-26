@@ -274,6 +274,22 @@ class RecipeModel {
         return recipe;
     }
 
+    async incrementViewCount(id: number): Promise<void> {
+        log.trace('Incrementing view count for recipe', { id });
+
+        await prisma.recipe.update({
+            where: { id },
+            data: {
+                timesViewed: {
+                    increment: 1
+                }
+            }
+        });
+
+        // Invalidate cache for this recipe
+        await this.invalidateRecipeCache({ id });
+    }
+
     //~=========================================================================================~//
     //$                                      PRIVATE METHODS                                    $//
     //~=========================================================================================~//

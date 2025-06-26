@@ -10,6 +10,7 @@ SELECT
     r.imageUrl,
     r.rating,
     r.timesRated,
+    r.timesViewed,
     r.createdAt,
     r.updatedAt,
     (

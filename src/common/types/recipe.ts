@@ -14,6 +14,7 @@ export type RecipeDTO = {
     imageUrl: string;
     rating: number | null;
     timesRated: number;
+    timesViewed: number;
 };
 
 export type RecipeForDisplayDTO = {

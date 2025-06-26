@@ -57,6 +57,7 @@ class RecipeService {
             imageUrl: recipe.imageUrl || '',
             rating: recipe.rating ? Number(recipe.rating) : null,
             timesRated: recipe.timesRated ?? 0,
+            timesViewed: recipe.timesViewed ?? 0,
             ingredients: recipe.ingredients as Ingredient[],
             instructions: recipe.instructions as string[]
         };
@@ -92,6 +93,16 @@ class RecipeService {
             throw new ServerError('recipe.error.not-found', 404);
         }
 
+        try {
+            await db.recipe.incrementViewCount(recipe.id);
+        } catch (err) {
+            // Never fail the request if view count increment fails.
+            log.warn('getRecipeByDisplayId - failed to increment view count', {
+                err,
+                recipeId: recipe.id
+            });
+        }
+
         log.trace('getRecipeByDisplayId - success', { displayId });
 
         const recipeDTO: RecipeDTO = {
@@ -106,6 +117,7 @@ class RecipeService {
             imageUrl: recipe.imageUrl || '',
             rating: recipe.rating ? Number(recipe.rating) : null,
             timesRated: recipe.timesRated ?? 0,
+            timesViewed: (recipe.timesViewed ?? 0) + 1, // Include the increment we just made
             ingredients: recipe.ingredients as Ingredient[],
             instructions: recipe.instructions as string[]
         };

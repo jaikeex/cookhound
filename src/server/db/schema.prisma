@@ -54,6 +54,7 @@ model Recipe {
   imageUrl     String?   @db.VarChar(255)
   rating       Decimal?  @db.Decimal(2, 1)
   timesRated   Int       @default(0)
+  timesViewed  Int       @default(0)
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 
