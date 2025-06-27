@@ -65,9 +65,10 @@ async function createRecipeHandler(request: NextRequest) {
 
             const recipe = await recipeService.createRecipe(payload);
 
-            const response = Response.json(recipe);
+            const response = Response.json(recipe, { status: 201 });
 
             logResponse(response);
+
             return response;
         } catch (error) {
             return handleServerError(error);

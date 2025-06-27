@@ -182,7 +182,6 @@ model Rating {
 }
 
 model UserVisitedRecipe {
-  id        Int      @id @default(autoincrement())
   userId    Int      @db.Int
   recipeId  Int      @db.Int
   visitedAt DateTime @default(now())

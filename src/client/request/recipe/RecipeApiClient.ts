@@ -12,6 +12,25 @@ import type {
  */
 class RecipeApiClient {
     /**
+     * Registers a recipe visit by calling `POST /api/recipes/{id}/visits`.
+     *
+     * @param id - The ID of the recipe to visit.
+     * @param userId - The ID of the user to visit the recipe.
+     * @param config - Optional fetch request configuration.
+     */
+    async registerRecipeVisit(
+        id: string,
+        userId: string,
+        config?: RequestConfig
+    ) {
+        return await apiRequestWrapper.post({
+            url: `/recipes/${id}/visits`,
+            data: { userId },
+            ...config
+        });
+    }
+
+    /**
      * Gets a recipe by its display ID by calling `GET /api/recipes/display/{displayId}`.
      *
      * @param id - The ID of the recipe to retrieve.

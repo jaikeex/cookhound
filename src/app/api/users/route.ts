@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
 
             const user = await userService.createUser(body);
 
-            const response = Response.json({ user });
+            const response = Response.json({ user }, { status: 201 });
 
             logResponse(response);
             return response;

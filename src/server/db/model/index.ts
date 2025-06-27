@@ -2,7 +2,7 @@ import ingredientModel from './ingredient/model';
 import ratingModel from './rating/model';
 import recipeModel from './recipe/model';
 import shoppingListModel from './shopping-list/model';
-import userModel from './user/userModel';
+import userModel from './user/model';
 
 const dbModel = {
     ingredient: ingredientModel,

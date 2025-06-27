@@ -220,6 +220,37 @@ class UserModel {
         return this.reviveUserDates(user);
     }
 
+    /**
+     * Adds a recipe to the user's last viewed recipes
+     * Write class -> W2
+     */
+    async addRecipeToLastViewed(
+        userId: number,
+        recipeId: number
+    ): Promise<void> {
+        log.trace("Adding recipe to user's last viewed recipes", {
+            userId,
+            recipeId
+        });
+
+        await prisma.userVisitedRecipe.upsert({
+            where: {
+                unique_user_recipe_visit: {
+                    userId,
+                    recipeId
+                }
+            },
+            update: {
+                visitedAt: new Date()
+            },
+            create: {
+                userId,
+                recipeId,
+                visitedAt: new Date()
+            }
+        });
+    }
+
     //~=========================================================================================~//
     //$                                      PRIVATE METHODS                                    $//
     //~=========================================================================================~//

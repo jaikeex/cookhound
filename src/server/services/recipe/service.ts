@@ -93,16 +93,6 @@ class RecipeService {
             throw new ServerError('recipe.error.not-found', 404);
         }
 
-        try {
-            await db.recipe.incrementViewCount(recipe.id);
-        } catch (err) {
-            // Never fail the request if view count increment fails.
-            log.warn('getRecipeByDisplayId - failed to increment view count', {
-                err,
-                recipeId: recipe.id
-            });
-        }
-
         log.trace('getRecipeByDisplayId - success', { displayId });
 
         const recipeDTO: RecipeDTO = {
@@ -176,6 +166,41 @@ class RecipeService {
         }
 
         return recipeDTO;
+    }
+
+    //~-----------------------------------------------------------------------------------------~//
+    //$                                      REGISTER VISIT                                     $//
+    //~-----------------------------------------------------------------------------------------~//
+
+    async registerRecipeVisit(recipeId: number, userId: number | null) {
+        try {
+            log.trace('registerRecipeVisit - attempt', { recipeId, userId });
+
+            if (!recipeId) {
+                log.warn('registerRecipeVisit - recipeId is required');
+                throw new ServerError('app.error.bad-request', 400);
+            }
+
+            await db.recipe.incrementViewCount(recipeId);
+
+            /**
+             * The code below depends on the userId being present, if it is not, terminate the request.
+             */
+            if (!userId) {
+                log.warn('registerRecipeVisit - anonymous call');
+                throw new ServerError('auth.error.unauthorized', 401);
+            }
+
+            await db.user.addRecipeToLastViewed(userId, recipeId);
+
+            log.trace('registerRecipeVisit - success', { recipeId, userId });
+        } catch (err) {
+            /**
+             * Explicitly swallow everything here, registering a visit can NEVER
+             * break any request, dedicated or otherwise.
+             */
+            log.warn('registerRecipeVisit - failed', { err, recipeId, userId });
+        }
     }
 
     //~-----------------------------------------------------------------------------------------~//

@@ -313,6 +313,7 @@ const createRecipePlaceholder = (
     displayId: '',
     rating: null,
     timesRated: 0,
+    timesViewed: 0,
     language: 'en',
     imageUrl: '',
     title: t('app.recipe.title'),
