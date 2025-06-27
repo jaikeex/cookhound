@@ -20,7 +20,7 @@ class RecipeApiClient {
      */
     async registerRecipeVisit(
         id: string,
-        userId: string,
+        userId: string | null,
         config?: RequestConfig
     ) {
         return await apiRequestWrapper.post({
