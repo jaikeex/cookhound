@@ -2,6 +2,7 @@
 
 import { recipeApiClient } from '@/client/request/recipe/RecipeApiClient';
 import {
+    useAuth,
     useIngredientSelectStore,
     useLocale,
     useShoppingListStore,
@@ -14,6 +15,7 @@ import { useCallback } from 'react';
 
 export const useDisplayRecipe = (recipe: RecipeDTO) => {
     const { t } = useLocale();
+    const { user } = useAuth();
     const { alert } = useSnackbar();
     const router = useRouter();
 
@@ -49,8 +51,10 @@ export const useDisplayRecipe = (recipe: RecipeDTO) => {
                 !selectedIngredients.some((i) => i.id === ingredient.id)
         );
 
+        if (!user) return;
+
         try {
-            await createShoppingList({
+            await createShoppingList(user.id, {
                 recipeId: recipe.id,
                 ingredients: ingredientsToInclude
             });
@@ -71,7 +75,8 @@ export const useDisplayRecipe = (recipe: RecipeDTO) => {
         selectedIngredients,
         createShoppingList,
         alert,
-        t
+        t,
+        user
     ]);
 
     return {

@@ -21,6 +21,7 @@ import type { UserDTO } from '@/common/types';
 import apiClient from '@/client/request';
 import { getUserLocale } from '@/client/utils';
 import { CONTENT_WRAPPER_ID, MAIN_PAGE_ID } from '@/client/constants';
+import { JWT_COOKIE_NAME } from '@/common/constants';
 
 const openSans = Open_Sans({
     subsets: ['latin'],
@@ -67,7 +68,7 @@ export default async function RootLayout({
             throw new Error('Cannot get user like this in a browser');
         }
 
-        const token = cookieStore.get('jwt')?.value;
+        const token = cookieStore.get(JWT_COOKIE_NAME)?.value;
 
         if (!token) {
             throw new Error('No token found');

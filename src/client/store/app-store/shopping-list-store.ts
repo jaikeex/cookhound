@@ -22,12 +22,25 @@ type ShoppingListStore = Readonly<{
         updater: (prev: ShoppingListDTO[] | null) => ShoppingListDTO[] | null
     ) => void;
 
-    refreshShoppingList: () => Promise<void>;
-    createShoppingList: (list: ShoppingListPayload) => Promise<void>;
-    deleteShoppingList: () => Promise<void>;
-    deleteRecipeShoppingList: (recipeId: number) => Promise<void>;
-    updateShoppingList: (updates: ShoppingListPayload[]) => Promise<void>;
-    markIngredient: (recipeId: number, ingredientId: number) => Promise<void>;
+    refreshShoppingList: (userId: number) => Promise<void>;
+    createShoppingList: (
+        userId: number,
+        list: ShoppingListPayload
+    ) => Promise<void>;
+    deleteShoppingList: (userId: number) => Promise<void>;
+    deleteRecipeShoppingList: (
+        userId: number,
+        recipeId: number
+    ) => Promise<void>;
+    updateShoppingList: (
+        userId: number,
+        updates: ShoppingListPayload[]
+    ) => Promise<void>;
+    markIngredient: (
+        userId: number,
+        recipeId: number,
+        ingredientId: number
+    ) => Promise<void>;
 }>;
 
 export const useShoppingListStore = create<ShoppingListStore>()((set, get) => ({
@@ -58,16 +71,19 @@ export const useShoppingListStore = create<ShoppingListStore>()((set, get) => ({
             editingShoppingList: updater(state.editingShoppingList)
         })),
 
-    refreshShoppingList: async () => {
-        const list = await apiClient.user.getShoppingList();
+    refreshShoppingList: async (userId: number) => {
+        const list = await apiClient.user.getShoppingList(userId);
         set({ shoppingList: list });
     },
 
-    createShoppingList: async (list: ShoppingListPayload) => {
+    createShoppingList: async (userId: number, list: ShoppingListPayload) => {
         set({ isLoading: true, error: null });
 
         try {
-            const newList = await apiClient.user.upsertShoppingList(list);
+            const newList = await apiClient.user.upsertShoppingList(
+                userId,
+                list
+            );
             set({ shoppingList: newList });
         } catch (error) {
             set({ error });
@@ -76,7 +92,7 @@ export const useShoppingListStore = create<ShoppingListStore>()((set, get) => ({
         }
     },
 
-    deleteShoppingList: async () => {
+    deleteShoppingList: async (userId: number) => {
         const prev = get().shoppingList;
         set({ isLoading: true, error: null });
 
@@ -85,6 +101,7 @@ export const useShoppingListStore = create<ShoppingListStore>()((set, get) => ({
 
         try {
             await apiClient.user.deleteShoppingList(
+                userId,
                 {} as DeleteShoppingListPayload
             );
         } catch (error) {
@@ -94,7 +111,7 @@ export const useShoppingListStore = create<ShoppingListStore>()((set, get) => ({
         }
     },
 
-    deleteRecipeShoppingList: async (recipeId: number) => {
+    deleteRecipeShoppingList: async (userId: number, recipeId: number) => {
         const prev = get().shoppingList;
         set({ isLoading: true, error: null });
 
@@ -106,7 +123,7 @@ export const useShoppingListStore = create<ShoppingListStore>()((set, get) => ({
         set({ shoppingList: optimistic });
 
         try {
-            await apiClient.user.deleteShoppingList({ recipeId });
+            await apiClient.user.deleteShoppingList(userId, { recipeId });
         } catch (error) {
             set({ shoppingList: prev, error });
         } finally {
@@ -114,7 +131,10 @@ export const useShoppingListStore = create<ShoppingListStore>()((set, get) => ({
         }
     },
 
-    updateShoppingList: async (updates: ShoppingListPayload[]) => {
+    updateShoppingList: async (
+        userId: number,
+        updates: ShoppingListPayload[]
+    ) => {
         if (updates.length === 0) return;
 
         /**
@@ -129,7 +149,10 @@ export const useShoppingListStore = create<ShoppingListStore>()((set, get) => ({
 
             // Every call returns the full list, only set the last one.
             for (const update of updates) {
-                serverResult = await apiClient.user.updateShoppingList(update);
+                serverResult = await apiClient.user.updateShoppingList(
+                    userId,
+                    update
+                );
             }
 
             if (serverResult) {
@@ -142,7 +165,11 @@ export const useShoppingListStore = create<ShoppingListStore>()((set, get) => ({
         }
     },
 
-    markIngredient: async (recipeId, ingredientId) => {
+    markIngredient: async (
+        userId: number,
+        recipeId: number,
+        ingredientId: number
+    ) => {
         const prev = get().shoppingList;
         set({ error: null });
 
@@ -196,7 +223,7 @@ export const useShoppingListStore = create<ShoppingListStore>()((set, get) => ({
                 ]
             };
 
-            await apiClient.user.upsertShoppingList(payload);
+            await apiClient.user.upsertShoppingList(userId, payload);
         } catch (error) {
             set({ shoppingList: prev, error });
         } finally {

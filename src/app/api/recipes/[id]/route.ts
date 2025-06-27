@@ -8,7 +8,7 @@ import { handleServerError } from '@/server/utils/reqwest';
 //|=============================================================================================|//
 
 /**
- * Handles GET requests to `/api/recipe/display/{displayId}` to fetch a specific recipe.
+ * Handles GET requests to `/api/recipes/{id}` to fetch a specific recipe.
  *
  * @returns A JSON response with the recipe data.
  *
@@ -22,13 +22,13 @@ export async function GET(request: NextRequest) {
         try {
             logRequest(request);
 
-            const displayId = request.nextUrl.pathname.split('/').pop();
+            const id = request.nextUrl.pathname.split('/').pop();
 
-            if (!displayId) {
+            if (!id || isNaN(Number(id))) {
                 throw new ServerError('app.error.bad-request', 400);
             }
 
-            const recipe = await recipeService.getRecipeByDisplayId(displayId);
+            const recipe = await recipeService.getRecipeById(Number(id));
 
             if (!recipe) {
                 throw new ServerError('app.error.not-found', 404);

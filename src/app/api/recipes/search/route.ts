@@ -9,7 +9,7 @@ import type { Locale } from '@/client/locales';
 //|=============================================================================================|//
 
 /**
- * Handles GET requests to `/api/recipe/search` to search for recipes.
+ * Handles GET requests to `/api/recipes/search` to search for recipes.
  *
  * @returns A JSON response containing the search results.
  */

@@ -12,7 +12,7 @@ import type {
  */
 class RecipeApiClient {
     /**
-     * Gets a recipe by its display ID by calling `GET /api/recipe/display/{displayId}`.
+     * Gets a recipe by its display ID by calling `GET /api/recipes/display/{displayId}`.
      *
      * @param id - The ID of the recipe to retrieve.
      * @param config - Optional fetch request configuration.
@@ -24,13 +24,13 @@ class RecipeApiClient {
         config?: RequestConfig
     ): Promise<RecipeDTO> {
         return await apiRequestWrapper.get({
-            url: `/recipe/display/${displayId}`,
+            url: `/recipes/display/${displayId}`,
             ...config
         });
     }
 
     /**
-     * Gets a recipe by its ID by calling `GET /api/recipe/id/{id}`.
+     * Gets a recipe by its ID by calling `GET /api/recipes/{id}`.
      * This is the internal ID of the recipe, not the display ID.
      *
      * @param id - The ID of the recipe to retrieve.
@@ -43,13 +43,13 @@ class RecipeApiClient {
         config?: RequestConfig
     ): Promise<RecipeDTO> {
         return await apiRequestWrapper.get({
-            url: `/recipe/id/${id}`,
+            url: `/recipes/${id}`,
             ...config
         });
     }
 
     /**
-     * Gets a paginated list of recipes by calling `GET /api/recipe/list`.
+     * Gets a paginated list of recipes by calling `GET /api/recipes`.
      *
      * @param batch - The batch number to fetch.
      * @param perPage - The number of recipes per page.
@@ -63,12 +63,23 @@ class RecipeApiClient {
         config?: RequestConfig
     ): Promise<RecipeForDisplayDTO[]> {
         return await apiRequestWrapper.get({
-            url: `/recipe/list?batch=${batch}&perPage=${perPage}`,
+            url: `/recipes?batch=${batch}&perPage=${perPage}`,
             params: { batch, perPage },
             ...config
         });
     }
 
+    /**
+     * Searches for recipes by calling `GET /api/recipes/search`.
+     *
+     * @param query - The query to search for.
+     * @param language - The language of the recipes to search for.
+     * @param batch - The batch number to fetch.
+     * @param perPage - The number of recipes per page.
+     * @param config - Optional fetch request configuration.
+     * @returns A promise that resolves to the search results.
+     * @throws {Error} Throws an error if the request fails.
+     */
     async searchRecipes(
         query: string,
         language: Locale,
@@ -77,14 +88,14 @@ class RecipeApiClient {
         config?: RequestConfig
     ): Promise<RecipeForDisplayDTO[]> {
         return await apiRequestWrapper.get({
-            url: `/recipe/search?query=${query}&language=${language}&batch=${batch}&perPage=${perPage}`,
+            url: `/recipes/search?query=${query}&language=${language}&batch=${batch}&perPage=${perPage}`,
             params: { query, language, batch, perPage },
             ...config
         });
     }
 
     /**
-     * Creates a new recipe by calling `POST /api/recipe`.
+     * Creates a new recipe by calling `POST /api/recipes`.
      *
      * @param recipe - The recipe data for creation.
      * @param config - Optional fetch request configuration.
@@ -96,14 +107,14 @@ class RecipeApiClient {
         config?: RequestConfig
     ): Promise<RecipeDTO> {
         return await apiRequestWrapper.post({
-            url: '/recipe',
+            url: '/recipes',
             data: recipe,
             ...config
         });
     }
 
     /**
-     * Rates a recipe by calling `POST /api/recipe/{id}/rate`.
+     * Rates a recipe by calling `POST /api/recipes/{id}/ratings`.
      *
      * @param id - The ID of the recipe to rate.
      * @param rating - The rating to give to the recipe.
@@ -111,7 +122,7 @@ class RecipeApiClient {
      */
     async rateRecipe(id: string, rating: number, config?: RequestConfig) {
         return await apiRequestWrapper.post({
-            url: `/recipe/${id}/rate`,
+            url: `/recipes/${id}/ratings`,
             data: { rating },
             ...config
         });

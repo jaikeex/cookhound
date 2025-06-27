@@ -17,7 +17,12 @@ import {
     Trash,
     Typography
 } from '@/client/components';
-import { useLocale, useModal, useShoppingListStore } from '@/client/store';
+import {
+    useAuth,
+    useLocale,
+    useModal,
+    useShoppingListStore
+} from '@/client/store';
 import type { PanInfo } from 'framer-motion';
 import Link from 'next/link';
 
@@ -32,6 +37,7 @@ export const ShoppingListTemplate: React.FC<ShoppingListTemplateProps> = ({
     //?                                          SETUP                                          ?//
     //|-----------------------------------------------------------------------------------------|//
 
+    const { user } = useAuth();
     const { openModal } = useModal();
     const { t } = useLocale();
 
@@ -66,6 +72,8 @@ export const ShoppingListTemplate: React.FC<ShoppingListTemplateProps> = ({
     //|-----------------------------------------------------------------------------------------|//
 
     const handleEdit = useCallback(async () => {
+        if (!user) return;
+
         if (!isEditing) {
             // Put the list into edit mode.
             // Set all state necessary for editing here.
@@ -95,13 +103,13 @@ export const ShoppingListTemplate: React.FC<ShoppingListTemplateProps> = ({
             })
         );
 
-        await shoppingListStore.updateShoppingList(payloads);
+        await shoppingListStore.updateShoppingList(user.id, payloads);
 
         // Clear temp state and exit editing
         shoppingListStore.setEditingShoppingList(null);
         setBinIngredients([]);
         setIsEditing(false);
-    }, [isEditing, data, editingShoppingList, shoppingListStore]);
+    }, [isEditing, editingShoppingList, shoppingListStore, user, data]);
 
     //|-----------------------------------------------------------------------------------------|//
     //?                                         MARKING                                         ?//
@@ -109,6 +117,8 @@ export const ShoppingListTemplate: React.FC<ShoppingListTemplateProps> = ({
 
     const handleMarkIngredient = useCallback(
         (recipeId: number) => async (ingredient: Ingredient) => {
+            if (!user) return;
+
             try {
                 const isIngredientCurrentlyMarked = isIngredientMarked(
                     recipeId,
@@ -118,17 +128,23 @@ export const ShoppingListTemplate: React.FC<ShoppingListTemplateProps> = ({
 
                 if (isIngredientCurrentlyMarked === true || isEditing) return;
 
-                shoppingListStore.markIngredient(recipeId, ingredient.id);
+                shoppingListStore.markIngredient(
+                    user.id,
+                    recipeId,
+                    ingredient.id
+                );
             } catch {
                 // If something above throws, the list is probably fucked. Do nothing in that case
                 return;
             }
         },
-        [shoppingListStore, shoppingList, isEditing]
+        [shoppingListStore, shoppingList, isEditing, user]
     );
 
     const handleUnmarkIngredient = useCallback(
         (recipeId: number) => async (ingredient: Ingredient) => {
+            if (!user) return;
+
             try {
                 const isIngredientCurrentlyMarked = isIngredientMarked(
                     recipeId,
@@ -138,13 +154,17 @@ export const ShoppingListTemplate: React.FC<ShoppingListTemplateProps> = ({
 
                 if (isIngredientCurrentlyMarked === false || isEditing) return;
 
-                shoppingListStore.markIngredient(recipeId, ingredient.id);
+                shoppingListStore.markIngredient(
+                    user.id,
+                    recipeId,
+                    ingredient.id
+                );
             } catch {
                 // If something above throws, the list is probably fucked. Do nothing in that case
                 return;
             }
         },
-        [shoppingListStore, shoppingList, isEditing]
+        [shoppingListStore, shoppingList, isEditing, user]
     );
 
     //|-----------------------------------------------------------------------------------------|//
@@ -153,12 +173,12 @@ export const ShoppingListTemplate: React.FC<ShoppingListTemplateProps> = ({
 
     const handleDeleteRecipeShoppingList = useCallback(
         (recipeId: number, close: () => void) => () => {
-            if (isEditing) return;
+            if (!user || isEditing) return;
 
             close();
-            shoppingListStore.deleteRecipeShoppingList(recipeId);
+            shoppingListStore.deleteRecipeShoppingList(user.id, recipeId);
         },
-        [shoppingListStore, isEditing]
+        [shoppingListStore, isEditing, user]
     );
 
     const getModalContent = useCallback(

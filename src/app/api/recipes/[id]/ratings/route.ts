@@ -10,7 +10,7 @@ import { UserRole } from '@/common/types';
 //|=============================================================================================|//
 
 /**
- * Handles POST requests to `/api/recipe/{id}/rate` to rate a recipe.
+ * Handles POST requests to `/api/recipes/{id}/ratings` to rate a recipe.
  *
  * ! This endpoint is restricted and only accessible to authenticated users.
  *

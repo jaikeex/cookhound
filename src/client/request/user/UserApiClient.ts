@@ -34,21 +34,24 @@ class UserApiClient {
     }
 
     /**
-     * Gets the shopping list by calling `GET /api/user/shopping-list`.
+     * Gets the shopping list by calling `GET /api/users/{id}/shopping-list`.
      *
      * @param config - Optional fetch request configuration.
      * @returns A promise that resolves when the shopping list is fetched.
      * @throws {Error} Throws an error if the request fails.
      */
-    async getShoppingList(config?: RequestConfig): Promise<ShoppingListDTO[]> {
+    async getShoppingList(
+        userId: number,
+        config?: RequestConfig
+    ): Promise<ShoppingListDTO[]> {
         return await apiRequestWrapper.get({
-            url: '/user/shopping-list',
+            url: `/users/${userId}/shopping-list`,
             ...config
         });
     }
 
     /**
-     * Creates a new shopping list by calling `POST /api/user/shopping-list`.
+     * Creates a new shopping list by calling `POST /api/users/{id}/shopping-list`.
      *
      * @param data - The shopping list data to create.
      * @param config - Optional fetch request configuration.
@@ -56,18 +59,19 @@ class UserApiClient {
      * @throws {Error} Throws an error if the request fails.
      */
     async upsertShoppingList(
+        userId: number,
         data: ShoppingListPayload,
         config?: RequestConfig
     ): Promise<ShoppingListDTO[]> {
         return await apiRequestWrapper.post({
-            url: '/user/shopping-list',
+            url: `/users/${userId}/shopping-list`,
             data,
             ...config
         });
     }
 
     /**
-     * Updates the shopping list by calling `PUT /api/user/shopping-list`.
+     * Updates the shopping list by calling `PUT /api/users/{id}/shopping-list`.
      *
      * @param data - The shopping list data to update.
      * @param config - Optional fetch request configuration.
@@ -75,18 +79,19 @@ class UserApiClient {
      * @throws {Error} Throws an error if the request fails.
      */
     async updateShoppingList(
+        userId: number,
         data: ShoppingListPayload,
         config?: RequestConfig
     ): Promise<ShoppingListDTO[]> {
         return await apiRequestWrapper.put({
-            url: '/user/shopping-list',
+            url: `/users/${userId}/shopping-list`,
             data,
             ...config
         });
     }
 
     /**
-     * Deletes a shopping list by calling `DELETE /api/user/shopping-list`.
+     * Deletes a shopping list by calling `DELETE /api/users/{id}/shopping-list`.
      *
      * @param data - The shopping list data to delete.
      * @param config - Optional fetch request configuration.
@@ -94,18 +99,19 @@ class UserApiClient {
      * @throws {Error} Throws an error if the request fails.
      */
     async deleteShoppingList(
+        userId: number,
         data: DeleteShoppingListPayload,
         config?: RequestConfig
     ): Promise<void> {
         await apiRequestWrapper.delete({
-            url: '/user/shopping-list',
+            url: `/users/${userId}/shopping-list`,
             data,
             ...config
         });
     }
 
     /**
-     * Verifies a user's email address by calling `PUT /api/user/verify-email`.
+     * Verifies a user's email address by calling `PUT /api/users/verify-email`.
      *
      * @param token - The verification token from the email.
      * @param config - Optional fetch request configuration.
@@ -128,7 +134,7 @@ class UserApiClient {
     }
 
     /**
-     * Resends a verification email by calling `POST /api/user/verify-email`.
+     * Resends a verification email by calling `POST /api/users/verify-email`.
      *
      * @param email - The email address to resend the verification link to.
      * @param config - Optional fetch request configuration.
@@ -147,7 +153,7 @@ class UserApiClient {
     }
 
     /**
-     * Sends a password reset email to the user by calling `POST /user/password-reset`.
+     * Sends a password reset email to the user by calling `POST /api/users/reset-password`.
      *
      * @param data - The email address to send the password reset email to.
      * @param config - The fetch request configuration.
@@ -160,14 +166,14 @@ class UserApiClient {
         config?: RequestConfig
     ): Promise<void> {
         await apiRequestWrapper.post({
-            url: '/user/password-reset',
+            url: '/users/reset-password',
             data,
             ...config
         });
     }
 
     /**
-     * Resets a user's password by calling `PUT /user/password-reset`.
+     * Resets a user's password by calling `PUT /api/users/reset-password`.
      *
      * @param data - The new password and the password reset token.
      * @param config - The fetch request configuration.
@@ -180,7 +186,7 @@ class UserApiClient {
         config?: RequestConfig
     ): Promise<void> {
         await apiRequestWrapper.put({
-            url: '/user/password-reset',
+            url: '/users/reset-password',
             data,
             ...config
         });

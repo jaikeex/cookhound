@@ -159,12 +159,10 @@ class UserService {
     //$                                       GET SHOPPING LIST                                  $//
     //~-----------------------------------------------------------------------------------------~//
 
-    async getShoppingList(): Promise<ShoppingListDTO[]> {
-        log.trace('getShoppingList - attempt');
+    async getShoppingList(userId: number): Promise<ShoppingListDTO[]> {
+        log.trace('getShoppingList - attempt', { userId });
 
-        const userId = RequestContext.getUserId();
-
-        if (!userId) {
+        if (RequestContext.getUserId() !== userId) {
             log.warn('getShoppingList - user not found');
             throw new ServerError('auth.error.unauthorized', 401);
         }
@@ -211,6 +209,7 @@ class UserService {
     //~-----------------------------------------------------------------------------------------~//
 
     async createShoppingList(
+        userId: number,
         recipeId: number,
         ingredients: ShoppingListIngredientPayload[]
     ): Promise<ShoppingListDTO[]> {
@@ -229,9 +228,7 @@ class UserService {
             throw new ServerError('app.error.bad-request', 400);
         }
 
-        const userId = RequestContext.getUserId();
-
-        if (!userId) {
+        if (RequestContext.getUserId() !== userId) {
             log.warn('createShoppingList - user not found');
             throw new ServerError('auth.error.unauthorized', 401);
         }
@@ -255,7 +252,7 @@ class UserService {
             ingredients
         });
 
-        const result = this.getShoppingList();
+        const result = this.getShoppingList(userId);
 
         return result;
     }
@@ -265,6 +262,7 @@ class UserService {
     //~-----------------------------------------------------------------------------------------~//
 
     async updateShoppingList(
+        userId: number,
         recipeId: number,
         updates: ShoppingListIngredientPayload[]
     ): Promise<ShoppingListDTO[]> {
@@ -286,9 +284,7 @@ class UserService {
             throw new ServerError('app.error.bad-request', 400);
         }
 
-        const userId = RequestContext.getUserId();
-
-        if (!userId) {
+        if (RequestContext.getUserId() !== userId) {
             log.warn('updateShoppingListOrder - user not found');
             throw new ServerError('auth.error.unauthorized', 401);
         }
@@ -304,7 +300,7 @@ class UserService {
 
         log.trace('updateShoppingListOrder - success', { updates });
 
-        const result = this.getShoppingList();
+        const result = this.getShoppingList(userId);
 
         return result;
     }
@@ -313,12 +309,10 @@ class UserService {
     //$                                     DELETE SHOPPING LIST                                $//
     //~-----------------------------------------------------------------------------------------~//
 
-    async deleteShoppingList(recipeId: number): Promise<void> {
+    async deleteShoppingList(userId: number, recipeId: number): Promise<void> {
         log.trace('deleteShoppingList - attempt', { recipeId });
 
-        const userId = RequestContext.getUserId();
-
-        if (!userId) {
+        if (RequestContext.getUserId() !== userId) {
             log.warn('deleteShoppingList - user not found');
             throw new ServerError('auth.error.unauthorized', 401);
         }

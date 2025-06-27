@@ -8,6 +8,13 @@ import { ServerError } from '@/server/error';
 
 //|=============================================================================================|//
 
+/**
+ * Handles GET requests to `/api/users/{id}/shopping-list` to fetch a user's shopping list.
+ *
+ * @param request - The incoming Next.js request object.
+ * @returns A JSON response with the user's shopping list.
+ * @throws {Error} Throws an error if the request fails.
+ */
 export async function GET(request: NextRequest) {
     return RequestContext.run(request, async () => {
         try {
@@ -17,7 +24,15 @@ export async function GET(request: NextRequest) {
                 throw new ServerError('auth.error.unauthorized', 401);
             }
 
-            const shoppingList = await userService.getShoppingList();
+            const userId = request.nextUrl.pathname.split('/').at(-2);
+
+            if (!userId || isNaN(Number(userId))) {
+                throw new ServerError('app.error.bad-request', 400);
+            }
+
+            const shoppingList = await userService.getShoppingList(
+                Number(userId)
+            );
 
             const response = Response.json(shoppingList);
 
@@ -29,6 +44,13 @@ export async function GET(request: NextRequest) {
     });
 }
 
+/**
+ * Handles POST requests to `/api/users/{id}/shopping-list` to create a new shopping list.
+ *
+ * @param request - The incoming Next.js request object.
+ * @returns A JSON response with the created shopping list item.
+ * @throws {Error} Throws an error if the request fails.
+ */
 export async function POST(request: NextRequest) {
     return RequestContext.run(request, async () => {
         try {
@@ -38,9 +60,16 @@ export async function POST(request: NextRequest) {
                 throw new ServerError('auth.error.unauthorized', 401);
             }
 
+            const userId = request.nextUrl.pathname.split('/').at(-2);
+
+            if (!userId || isNaN(Number(userId))) {
+                throw new ServerError('app.error.bad-request', 400);
+            }
+
             const payload = await request.json();
 
             const shoppingList = await userService.createShoppingList(
+                Number(userId),
                 payload.recipeId,
                 payload.ingredients
             );
@@ -64,9 +93,16 @@ export async function PUT(request: NextRequest) {
                 throw new ServerError('auth.error.unauthorized', 401);
             }
 
+            const userId = request.nextUrl.pathname.split('/').at(-2);
+
+            if (!userId || isNaN(Number(userId))) {
+                throw new ServerError('app.error.bad-request', 400);
+            }
+
             const payload = await request.json();
 
             const shoppingList = await userService.updateShoppingList(
+                Number(userId),
                 payload.recipeId,
                 payload.ingredients
             );
@@ -90,9 +126,15 @@ export async function DELETE(request: NextRequest) {
                 throw new ServerError('auth.error.unauthorized', 401);
             }
 
+            const userId = request.nextUrl.pathname.split('/').at(-2);
+
+            if (!userId || isNaN(Number(userId))) {
+                throw new ServerError('app.error.bad-request', 400);
+            }
+
             const { recipeId } = await request.json();
 
-            await userService.deleteShoppingList(recipeId);
+            await userService.deleteShoppingList(Number(userId), recipeId);
 
             const response = Response.json({
                 message: 'Shopping list deleted'
