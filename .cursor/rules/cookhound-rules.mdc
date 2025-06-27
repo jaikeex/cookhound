@@ -36,6 +36,10 @@ cookhound-mk3/
 └── scripts/                   # Build and deployment scripts
 ```
 
+## Build
+
+-   This project uses yarn for package management
+
 ## Core Principles
 
 ### 1. TypeScript-First Development
