@@ -32,3 +32,9 @@
 
 export * from './emails/SendVerificationEmailJob';
 export * from './emails/SendPasswordResetEmailJob';
+
+//|-----------------------------------------------------------------------------------------|//
+//?                                        SEARCH                                          ?//
+//|-----------------------------------------------------------------------------------------|//
+
+export * from './search/ReindexRecipesJob';

@@ -11,12 +11,16 @@
 
 import 'dotenv/config';
 import { queueManager } from './QueueManager';
+import { scheduleRecurringJobs } from './cron';
 
 // Import job implementations ----------------------------------------------------
 // eslint-disable-next-line import/no-unassigned-import
 
 (async () => {
     await queueManager.initialize(true);
+
+    // Schedule recurring cron jobs (e.g. Typesense re-index)
+    await scheduleRecurringJobs();
 
     // Graceful shutdown ---------------------------------------------------------
     const shutdown = async () => {
