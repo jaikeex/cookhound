@@ -27,7 +27,10 @@ export default async function SearchPage({
 
     return (
         <Suspense fallback={<FrontPageSkeleton />}>
-            <SearchTemplate initialRecipes={recipesForDisplay} initialQuery={searchQuery} />
+            <SearchTemplate
+                initialRecipes={recipesForDisplay}
+                initialQuery={searchQuery}
+            />
         </Suspense>
     );
 }

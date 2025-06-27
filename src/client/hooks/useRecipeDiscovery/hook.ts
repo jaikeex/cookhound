@@ -37,16 +37,22 @@ export const useRecipeDiscovery = (
 ) => {
     const { locale } = useLocale();
 
-    const [queries, setQueries] = useState<string[]>(normaliseToArray(initialQuery));
+    const [queries, setQueries] = useState<string[]>(
+        normaliseToArray(initialQuery)
+    );
 
-    const [recipes, setRecipes] = useState<RecipeForDisplayDTO[]>(initialRecipes);
+    const [recipes, setRecipes] =
+        useState<RecipeForDisplayDTO[]>(initialRecipes);
     const [nextBatch, setNextBatch] = useState(2);
     const [isLoading, setIsLoading] = useState(false);
     const [hasMore, setHasMore] = useState(true);
     const [error, setError] = useState<Error | null>(null);
 
     // A single string sent to the API.
-    const queryString = useMemo(() => queries.join(SEARCH_QUERY_SEPARATOR), [queries]);
+    const queryString = useMemo(
+        () => queries.join(SEARCH_QUERY_SEPARATOR),
+        [queries]
+    );
 
     /**
      * Clears relevant local state and makes the hook ready for another round of browsing.
@@ -91,7 +97,10 @@ export const useRecipeDiscovery = (
                     return;
                 }
 
-                newRecipes = await apiClient.recipe.getRecipeList(batch, perPage);
+                newRecipes = await apiClient.recipe.getRecipeList(
+                    batch,
+                    perPage
+                );
             }
 
             if (!newRecipes?.length) {
@@ -222,7 +231,12 @@ export const useRecipeDiscovery = (
             setHasMore(true);
 
             try {
-                const results = await apiClient.recipe.searchRecipes(trimmed, locale, 1, PER_PAGE);
+                const results = await apiClient.recipe.searchRecipes(
+                    trimmed,
+                    locale,
+                    1,
+                    PER_PAGE
+                );
 
                 setRecipes(results);
             } catch (_) {

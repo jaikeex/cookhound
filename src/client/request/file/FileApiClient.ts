@@ -1,9 +1,5 @@
-import type {
-    RequestConfig
-} from '@/client/request/ApiRequestWrapper';
-import {
-    apiRequestWrapper
-} from '@/client/request/ApiRequestWrapper';
+import type { RequestConfig } from '@/client/request/ApiRequestWrapper';
+import { apiRequestWrapper } from '@/client/request/ApiRequestWrapper';
 import type { FileForUpload, FileUploadResponse } from '@/common/types';
 
 /**
