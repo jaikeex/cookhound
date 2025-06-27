@@ -31,7 +31,7 @@ export const RecipeViewTemplate: React.FC<RecipeViewProps> = ({ recipe }) => {
                 )
                 .catch(() => {});
         }
-    });
+    }, [recipeResolved?.id]);
 
     return (
         <React.Fragment>

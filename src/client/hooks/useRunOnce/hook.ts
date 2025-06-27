@@ -1,6 +1,9 @@
 import { useEffect, useRef } from 'react';
 
-export const useRunOnce = (callback: () => void) => {
+export const useRunOnce = (
+    callback: () => void,
+    deps?: React.DependencyList
+) => {
     const hasRun = useRef(false);
 
     useEffect(() => {
@@ -10,5 +13,5 @@ export const useRunOnce = (callback: () => void) => {
         }
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [...(deps ?? [])]);
 };
