@@ -277,4 +277,5 @@ export class MailClient {
     }
 }
 
-export const mailClient = new MailClient();
+const mailClient = new MailClient();
+export default mailClient;

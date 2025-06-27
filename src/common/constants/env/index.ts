@@ -46,6 +46,8 @@ export const ENV_CONFIG_PRIVATE = createConfig(
         DB_MAX_ATTEMPTS: process.env.DB_MAX_ATTEMPTS,
         REDIS_TTL: process.env.REDIS_TTL,
         REDIS_PASSWORD: process.env.REDIS_PASSWORD,
+        REDIS_HOST: process.env.REDIS_HOST,
+        REDIS_PORT: process.env.REDIS_PORT,
         GOOGLE_SMTP_USERNAME: process.env.GOOGLE_SMTP_USERNAME,
         GOOGLE_SMTP_PASSWORD: process.env.GOOGLE_SMTP_PASSWORD,
         LOG_DIR: process.env.LOG_DIR,

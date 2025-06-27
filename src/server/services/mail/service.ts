@@ -1,8 +1,6 @@
-import { mailClient } from './client';
-import { emailVerificationTemplate } from './templates/email-verification';
-import { resetPasswordTemplate } from './templates/reset-password';
-import { ENV_CONFIG_PUBLIC } from '@/common/constants';
 import { Logger } from '@/server/logger';
+import { queueManager } from '@/server/queues/QueueManager';
+import { JOB_NAMES } from '@/server/queues/jobs/names';
 
 //|=============================================================================================|//
 
@@ -25,25 +23,12 @@ class MailService {
         username: string,
         token: string
     ) {
-        log.trace('attempting to send verification email', { email, username });
+        log.trace('queueing verification email', { email, username });
 
-        const verificationLink = `${ENV_CONFIG_PUBLIC.ORIGIN}/auth/callback/verify-email?token=${token}`;
-        const html = emailVerificationTemplate(username, verificationLink);
-
-        await mailClient.send({
-            from: {
-                name: 'Cookhound',
-                address: 'no-reply@cookhound.com'
-            },
-            to: {
-                name: username,
-                address: email
-            },
-            subject: 'Welcome to CookHound!',
-            html
+        await queueManager.addJob(JOB_NAMES.SEND_VERIFICATION_EMAIL, {
+            token,
+            to: { name: username, address: email }
         });
-
-        log.notice('verification email sent', { email, username });
 
         return;
     }
@@ -56,28 +41,15 @@ class MailService {
      * @param token - The verification token.
      */
     async sendPasswordReset(email: string, username: string, token: string) {
-        log.trace('attempting to send password reset email', {
+        log.trace('queueing password reset email', {
             email,
             username
         });
 
-        const reset_link = `${ENV_CONFIG_PUBLIC.ORIGIN}/auth/callback/reset-password?token=${token}`;
-        const html = resetPasswordTemplate(username, reset_link);
-
-        await mailClient.send({
-            from: {
-                name: 'Cookhound',
-                address: 'no-reply@cookhound.com'
-            },
-            to: {
-                name: username,
-                address: email
-            },
-            subject: 'Password reset',
-            html
+        await queueManager.addJob(JOB_NAMES.SEND_PASSWORD_RESET_EMAIL, {
+            token,
+            to: { name: username, address: email }
         });
-
-        log.info('password reset email sent', { email, username });
 
         return;
     }
