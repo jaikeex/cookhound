@@ -23,6 +23,10 @@ class RatingModel {
     ///
     //?—————————————————————————————————————————————————————————————————————————————————————————?//
 
+    /**
+     * Get a rating by user id and recipe id
+     * Query class -> C3
+     */
     async getOneByUserIdAndRecipeId(
         userId: number,
         recipeId: number
@@ -42,6 +46,10 @@ class RatingModel {
         });
     }
 
+    /**
+     * Get all ratings for a recipe
+     * Query class -> C3
+     */
     async getAllByRecipeId(recipeId: number): Promise<Rating[]> {
         log.trace('Getting all ratings for recipe', { recipeId });
 
@@ -54,6 +62,10 @@ class RatingModel {
     //$                                         MUTATIONS                                       $//
     //~=========================================================================================~//
 
+    /**
+     * Create a new rating
+     * Write class -> W3
+     */
     async createOne(
         userId: number,
         recipeId: number,
@@ -84,6 +96,10 @@ class RatingModel {
         return rating;
     }
 
+    /**
+     * Update a rating
+     * Write class -> W1
+     */
     async updateOne(
         userId: number,
         recipeId: number,

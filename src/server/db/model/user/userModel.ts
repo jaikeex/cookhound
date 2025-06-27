@@ -1,4 +1,5 @@
 import {
+    CACHE_TTL,
     cachePrismaQuery,
     generateCacheKey,
     invalidateModelCache
@@ -18,8 +19,7 @@ class UserModel {
 
     /**
      * Cached user lookup by email
-     * @param email - User email
-     * @param ttl - Cache TTL in seconds (optional)
+     * Query class -> C2
      */
     async getOneByEmail(email: string, ttl?: number): Promise<User | null> {
         const cacheKey = generateCacheKey('user', 'findUnique', {
@@ -34,7 +34,7 @@ class UserModel {
                 log.trace('Fetching user from db by email', { email });
                 return prisma.user.findUnique({ where: { email } });
             },
-            ttl
+            ttl ?? CACHE_TTL.TTL_2
         );
 
         return this.reviveUserDates(user);
@@ -42,8 +42,7 @@ class UserModel {
 
     /**
      * Cached user lookup by ID
-     * @param id - User ID
-     * @param ttl - Cache TTL in seconds (optional)
+     * Query class -> C2
      */
     async getOneById(id: number, ttl?: number): Promise<User | null> {
         const cacheKey = generateCacheKey('user', 'findUnique', {
@@ -59,7 +58,7 @@ class UserModel {
 
                 return prisma.user.findUnique({ where: { id } });
             },
-            ttl
+            ttl ?? CACHE_TTL.TTL_2
         );
 
         return this.reviveUserDates(user);
@@ -67,8 +66,7 @@ class UserModel {
 
     /**
      * Cached user lookup by username
-     * @param username - Username
-     * @param ttl - Cache TTL in seconds (optional)
+     * Query class -> C2
      */
     async getOneByUsername(
         username: string,
@@ -87,7 +85,7 @@ class UserModel {
 
                 return prisma.user.findUnique({ where: { username } });
             },
-            ttl
+            ttl ?? CACHE_TTL.TTL_2
         );
 
         return this.reviveUserDates(user);
@@ -95,9 +93,7 @@ class UserModel {
 
     /**
      * Cached user lookup with OR condition (email or username)
-     * @param email - User email
-     * @param username - Username
-     * @param ttl - Cache TTL in seconds (optional)
+     * Query class -> C2
      */
     async getOneByEmailOrUsername(
         email: string,
@@ -122,7 +118,7 @@ class UserModel {
                     where: { OR: [{ email }, { username }] }
                 });
             },
-            ttl
+            ttl ?? CACHE_TTL.TTL_2
         );
 
         return this.reviveUserDates(user);
@@ -130,8 +126,7 @@ class UserModel {
 
     /**
      * Cached user lookup by verification token
-     * @param token - Email verification token
-     * @param ttl - Cache TTL in seconds (optional)
+     * Query class -> C1
      */
     async getOneByEmailVerificationToken(
         token: string,
@@ -152,12 +147,16 @@ class UserModel {
                     where: { emailVerificationToken: token }
                 });
             },
-            ttl
+            ttl ?? CACHE_TTL.TTL_1
         );
 
         return this.reviveUserDates(user);
     }
 
+    /**
+     * Cached user lookup by password reset token
+     * Query class -> C1
+     */
     async getOneByPasswordResetToken(
         token: string,
         ttl?: number
@@ -177,7 +176,7 @@ class UserModel {
                     where: { passwordResetToken: token }
                 });
             },
-            ttl
+            ttl ?? CACHE_TTL.TTL_1
         );
 
         return this.reviveUserDates(user);
@@ -187,6 +186,10 @@ class UserModel {
     //$                                         MUTATIONS                                       $//
     //~=========================================================================================~//
 
+    /**
+     * Create a new user
+     * Write class -> W3
+     */
     async createOne(data: Prisma.UserCreateInput): Promise<User> {
         log.trace('Creating user', {
             email: data.email,
@@ -197,6 +200,10 @@ class UserModel {
         return user;
     }
 
+    /**
+     * Update a user by id
+     * Write class -> W1
+     */
     async updateOneById(
         id: number,
         data: Prisma.UserUpdateInput
@@ -220,7 +227,6 @@ class UserModel {
     /**
      * Invalidate all cache entries for a specific user using pattern-based invalidation
      * This automatically handles all current and future cache keys without manual maintenance
-     * @param user - User object with id, email, and username
      */
     private async invalidateUserCache(
         changed: Partial<User>,

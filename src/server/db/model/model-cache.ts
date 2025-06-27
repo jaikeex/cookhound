@@ -1,10 +1,51 @@
-import { redisClient } from '@/server/db/redis';
+import { redisClient } from '@/server/integrations';
 import { ENV_CONFIG_PRIVATE } from '@/common/constants';
 import { Logger } from '@/server/logger';
 
 //|=============================================================================================|//
 
 const log = Logger.getInstance('model-cache');
+
+//?—————————————————————————————————————————————————————————————————————————————————————————————?//
+//?                                      CACHING STRATEGY                                       ?//
+///
+//# The caching strategy for db access in this project is as follows:
+//#
+//# QUERY CLASSIFICATION:
+//#
+//#   C1 (high traffic, mildly stale OK)           -> cache with short ttl (TTL_1)
+//#   C2 (high traffic, rarely updated data)       -> cache with medium ttl (TTL_2)
+//#   C3 (frequently updated or must be real-time) -> no cache (TTL = 0)
+//#
+//# WRITE CLASSIFICATION:
+//#   W1 (must be real-time data)                  -> invalidate related cache
+//#   W2 (mildly stale OK data)                    -> do not invalidate the cache
+//#   W3 (newly created data)                      -> invalidate related cache
+//#
+//# KEY POINTS:
+//#   - TTL constants live in CACHE_TTL enum – never hard-code numbers.
+//#
+//# OR, in other words:
+//#
+//# (1) Queries that need not display info up to date (especially high demand ones)
+//#     SHOULD be cached at all times with a reasonable ttl.
+//#
+//# (2) Queries for data expected to rarely change SHOULD be cached, because the invalidation
+//#     logic is generally easy to deal with (e.g. user credentials).
+//#
+//# (3) Queries expected to return up to date info at all times SHOULD NOT be cached,
+//#     unless you want to deal with all the invalidation shit... (e.g. )
+//#
+//# (4) Only invalidate the cache when changing data thtat are required to be up to date.
+//#     (e.g. recipe instructions update). ttls should be used instead wherever possible.
+//#
+///
+//?—————————————————————————————————————————————————————————————————————————————————————————————?//
+
+export const CACHE_TTL = {
+    TTL_1: 60 * 5, // C1 - 5 minutes
+    TTL_2: 60 * 60 * 6 // C2 - 6 hours
+} as const;
 
 /**
  * Generic cache wrapper for Prisma queries

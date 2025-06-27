@@ -3,7 +3,7 @@ import type {
     RateLimiter,
     RateLimitResult
 } from '@/server/utils/rate-limit/types';
-import { redisClient } from '@/server/db/redis';
+import { redisClient } from '@/server/integrations';
 
 //|=============================================================================================|//
 

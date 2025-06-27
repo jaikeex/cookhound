@@ -1,4 +1,5 @@
 import {
+    CACHE_TTL,
     cachePrismaQuery,
     generateCacheKey,
     invalidateModelCache
@@ -20,6 +21,10 @@ class RecipeModel {
     //$                                          QUERIES                                        $//
     //~=========================================================================================~//
 
+    /**
+     * Get a recipe by id
+     * Query class -> C2
+     */
     async getOneById(
         id: number,
         ttl?: number
@@ -36,15 +41,19 @@ class RecipeModel {
                 log.trace('Fetching recipe from db by id', { id });
                 return prisma.$queryRawTyped(getRecipeById(id));
             },
-            ttl
+            ttl ?? CACHE_TTL.TTL_2
         );
 
         return recipe[0] ?? null;
     }
 
+    /**
+     * Get a recipe by display id
+     * Query class -> C2
+     */
     async getOneByDisplayId(
         displayId: string,
-        ttl: number = 60 * 60 * 24 * 30 // 30 days
+        ttl?: number
     ): Promise<getRecipeById.Result | null> {
         const cacheKey = generateCacheKey('recipe', 'findUnique', {
             where: { displayId }
@@ -60,16 +69,20 @@ class RecipeModel {
                 });
                 return prisma.$queryRawTyped(getRecipeByDisplayId(displayId));
             },
-            ttl
+            ttl ?? CACHE_TTL.TTL_2
         );
 
         return recipe[0] ?? null;
     }
 
     //~=========================================================================================~//
-    //$                               FRONT PAGE COLLECTION                                   $//
+    //$                                 FRONT PAGE COLLECTION                                   $//
     //~=========================================================================================~//
 
+    /**
+     * Get many recipes for the front page
+     * Query class -> C1
+     */
     async getManyForFrontPage(
         limit: number,
         offset: number,
@@ -100,16 +113,20 @@ class RecipeModel {
                     getFrontPageRecipes(minTimesRated, limit, offset)
                 );
             },
-            ttl ?? 60 * 60 // 1 hour
+            ttl ?? CACHE_TTL.TTL_2
         );
 
         return recipes;
     }
 
     //~=========================================================================================~//
-    //$                               TEXT SEARCH COLLECTION                                  $//
+    //$                                 TEXT SEARCH COLLECTION                                  $//
     //~=========================================================================================~//
 
+    /**
+     * Search for recipes by text
+     * Query class -> C1
+     */
     async searchManyByText(
         searchTerm: string,
         language: string,
@@ -153,7 +170,7 @@ class RecipeModel {
                     )
                 );
             },
-            ttl ?? 10 * 60 // 10 minutes
+            ttl ?? CACHE_TTL.TTL_1
         );
 
         return recipes;
@@ -163,6 +180,10 @@ class RecipeModel {
     //$                                         MUTATIONS                                       $//
     //~=========================================================================================~//
 
+    /**
+     * Create a new recipe
+     * Write class -> W3
+     */
     async createOne(data: {
         recipe: Omit<
             Prisma.RecipeCreateInput,
@@ -258,6 +279,10 @@ class RecipeModel {
         });
     }
 
+    /**
+     * Update a recipe by id
+     * Write class -> W1
+     */
     async updateOneById(
         id: number,
         data: Prisma.RecipeUpdateInput
@@ -274,6 +299,10 @@ class RecipeModel {
         return recipe;
     }
 
+    /**
+     * Increment the view count for a recipe
+     * Write class -> W2
+     */
     async incrementViewCount(id: number): Promise<void> {
         log.trace('Incrementing view count for recipe', { id });
 

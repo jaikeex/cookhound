@@ -9,11 +9,24 @@ import { Logger } from '@/server/logger';
 
 const log = Logger.getInstance('shopping-list-model');
 
+//?—————————————————————————————————————————————————————————————————————————————————————————————?//
+//?                                          NO CACHE                                           ?//
+///
+//# None of the queries in here should be cached, the shopping list needs to stay up to date
+//# and synced all the times, dealing with that kind of invalidation logic as the features
+//# here grow seems like a lot of headache i do not want to deal with... maybe later.
+///
+//?—————————————————————————————————————————————————————————————————————————————————————————————?//
+
 class ShoppingListModel {
     //~=========================================================================================~//
     //$                                          QUERIES                                        $//
     //~=========================================================================================~//
 
+    /**
+     * Get the shopping list for a user
+     * Query class -> C3
+     */
     async getShoppingList(
         userId: number
     ): Promise<ShoppingListIngredientDTO[]> {
@@ -47,6 +60,8 @@ class ShoppingListModel {
     //~=========================================================================================~//
 
     /**
+     * Write class -> W1
+     *
      * Adds all data to the current shopping list, updating if necessary.
      * Does not remove anything, only inserts or updates stuff.
      * Does NOT handle reordering.
@@ -188,6 +203,10 @@ class ShoppingListModel {
         return shoppingList;
     }
 
+    /**
+     * Delete the shopping list for a user
+     * Write class -> W1
+     */
     async deleteShoppingList(userId: number, recipeId?: number): Promise<void> {
         log.trace('Deleting shopping list', { userId, recipeId });
         await prisma.shoppingListIngredient.deleteMany({

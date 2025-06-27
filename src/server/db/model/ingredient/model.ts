@@ -2,6 +2,7 @@ import type { Ingredient } from '@prisma/client';
 import { prisma } from '@/server/integrations';
 import { Logger } from '@/server/logger';
 import {
+    CACHE_TTL,
     cachePrismaQuery,
     generateCacheKey
 } from '@/server/db/model/model-cache';
@@ -15,6 +16,10 @@ class IngredientModel {
     //$                                          QUERIES                                        $//
     //~=========================================================================================~//
 
+    /**
+     * Get an ingredient by id
+     * Query class -> C2
+     */
     async getOneById(id: number, ttl?: number): Promise<Ingredient | null> {
         log.trace('Getting ingredient by id', { id });
 
@@ -28,12 +33,16 @@ class IngredientModel {
                 log.trace('Fetching ingredient from db by id', { id });
                 return prisma.ingredient.findUnique({ where: { id } });
             },
-            ttl
+            ttl ?? CACHE_TTL.TTL_2
         );
 
         return ingredient;
     }
 
+    /**
+     * Get an ingredient by name
+     * Query class -> C2
+     */
     async getOneByName(
         name: string,
         language: string,
@@ -53,7 +62,7 @@ class IngredientModel {
                     where: { name, language }
                 });
             },
-            ttl
+            ttl ?? CACHE_TTL.TTL_2
         );
 
         return ingredient;

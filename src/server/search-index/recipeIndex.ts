@@ -2,7 +2,7 @@ import { typesenseClient } from '@/server/integrations';
 import { Logger } from '@/server/logger';
 import type { RecipeDTO, RecipeForDisplayDTO } from '@/common/types';
 import type { Locale } from '@/client/locales';
-import { redisClient } from '@/server/db/redis';
+import { redisClient } from '@/server/integrations';
 
 const log = Logger.getInstance('recipe-index');
 
