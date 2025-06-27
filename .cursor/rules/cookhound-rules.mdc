@@ -60,7 +60,7 @@ cookhound-mk3/
 
 ### 3. Error Handling & Safety
 
--   Always use try-catch blocks in async operations
+-   Always use try-catch blocks where calls may fail
 -   Create custom error classes that extend base Error
 -   Use ServerError class for server-side errors with proper HTTP status codes
 -   Handle errors gracefully in UI with proper user feedback
