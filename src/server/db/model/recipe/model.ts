@@ -44,7 +44,7 @@ class RecipeModel {
 
     async getOneByDisplayId(
         displayId: string,
-        ttl?: number
+        ttl: number = 60 * 60 * 24 * 30 // 30 days
     ): Promise<getRecipeById.Result | null> {
         const cacheKey = generateCacheKey('recipe', 'findUnique', {
             where: { displayId }
@@ -285,9 +285,6 @@ class RecipeModel {
                 }
             }
         });
-
-        // Invalidate cache for this recipe
-        await this.invalidateRecipeCache({ id });
     }
 
     //~=========================================================================================~//
