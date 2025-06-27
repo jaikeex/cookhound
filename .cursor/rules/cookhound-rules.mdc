@@ -27,7 +27,8 @@ cookhound-mk3/
 │   │   ├── services/          # Business logic services
 │   │   ├── utils/             # Server utilities
 │   │   ├── logger/            # Logging infrastructure
-│   │   └── integrations/      # External service integrations
+│   │   │── integrations/      # External service integrations
+│   │   │── queues/            # BullMQ queues and jobs 
 │   └── common/                # Shared code between client/server
 │       ├── types/             # Shared TypeScript types
 │       ├── constants/         # Shared constants
