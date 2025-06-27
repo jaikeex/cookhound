@@ -233,20 +233,49 @@ class UserModel {
             recipeId
         });
 
-        await prisma.userVisitedRecipe.upsert({
-            where: {
-                unique_user_recipe_visit: {
+        const MAX_VIEWED_RECIPES = 10;
+
+        await prisma.$transaction(async (tx) => {
+            // First, upsert the current recipe visit
+            await tx.userVisitedRecipe.upsert({
+                where: {
+                    unique_user_recipe_visit: {
+                        userId,
+                        recipeId
+                    }
+                },
+                update: {
+                    visitedAt: new Date()
+                },
+                create: {
                     userId,
-                    recipeId
+                    recipeId,
+                    visitedAt: new Date()
                 }
-            },
-            update: {
-                visitedAt: new Date()
-            },
-            create: {
-                userId,
-                recipeId,
-                visitedAt: new Date()
+            });
+
+            const totalVisited = await tx.userVisitedRecipe.count({
+                where: { userId }
+            });
+
+            if (totalVisited > MAX_VIEWED_RECIPES) {
+                const recipesToRemove = await tx.userVisitedRecipe.findMany({
+                    where: { userId },
+                    orderBy: { visitedAt: 'asc' },
+                    take: totalVisited - MAX_VIEWED_RECIPES,
+                    select: { userId: true, recipeId: true }
+                });
+
+                if (recipesToRemove.length > 0) {
+                    await tx.userVisitedRecipe.deleteMany({
+                        where: {
+                            userId,
+                            recipeId: {
+                                in: recipesToRemove.map((r) => r.recipeId)
+                            }
+                        }
+                    });
+                }
             }
         });
     }

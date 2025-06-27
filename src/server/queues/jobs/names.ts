@@ -1,5 +1,6 @@
 import { QUEUE_NAME as EMAILS_QUEUE_NAME } from './emails/constants';
 import { QUEUE_NAME as SEARCH_QUEUE_NAME } from './search/constants';
+import { QUEUE_NAME as RECIPES_QUEUE_NAME } from './recipes/constants';
 
 //?—————————————————————————————————————————————————————————————————————————————————————————————?//
 //?                                       IMPORTANT INFO                                        ?//
@@ -26,10 +27,17 @@ export const JOB_NAMES = Object.freeze({
     //?                                      SEARCH                                         ?//
     //|-------------------------------------------------------------------------------------|//
 
-    REINDEX_RECIPES: 'reindex-recipes'
+    REINDEX_RECIPES: 'reindex-recipes',
+
+    //|-------------------------------------------------------------------------------------|//
+    //?                                      RECIPES                                        ?//
+    //|-------------------------------------------------------------------------------------|//
+
+    REGISTER_RECIPE_VISIT: 'register-recipe-visit'
 });
 
 export const QUEUE_NAMES = Object.freeze({
     EMAILS: EMAILS_QUEUE_NAME,
-    SEARCH: SEARCH_QUEUE_NAME
+    SEARCH: SEARCH_QUEUE_NAME,
+    RECIPES: RECIPES_QUEUE_NAME
 });

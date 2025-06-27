@@ -15,6 +15,8 @@ import { randomUUID } from 'crypto';
 import { recipeSearchIndex } from '@/server/search-index';
 import { intersectArrays } from '@/common/utils';
 import { SEARCH_QUERY_SEPARATOR } from '@/common/constants';
+import { queueManager } from '@/server/queues/QueueManager';
+import { JOB_NAMES } from '@/server/queues/jobs/names';
 
 //|=============================================================================================|//
 
@@ -172,7 +174,10 @@ class RecipeService {
     //$                                      REGISTER VISIT                                     $//
     //~-----------------------------------------------------------------------------------------~//
 
-    async registerRecipeVisit(recipeId: number, userId: number | null) {
+    async registerRecipeVisit(
+        recipeId: number,
+        userId: number | null
+    ): Promise<void> {
         try {
             log.trace('registerRecipeVisit - attempt', { recipeId, userId });
 
@@ -181,25 +186,26 @@ class RecipeService {
                 throw new ServerError('app.error.bad-request', 400);
             }
 
-            await db.recipe.incrementViewCount(recipeId);
+            // Queue the visit processing instead of doing it synchronously
+            await queueManager.addJob(JOB_NAMES.REGISTER_RECIPE_VISIT, {
+                recipeId,
+                userId
+            });
 
-            /**
-             * The code below depends on the userId being present, if it is not, terminate the request.
-             */
-            if (!userId) {
-                log.warn('registerRecipeVisit - anonymous call');
-                throw new ServerError('auth.error.unauthorized', 401);
-            }
-
-            await db.user.addRecipeToLastViewed(userId, recipeId);
-
-            log.trace('registerRecipeVisit - success', { recipeId, userId });
+            log.trace('registerRecipeVisit - queued successfully', {
+                recipeId,
+                userId
+            });
         } catch (err) {
             /**
              * Explicitly swallow everything here, registering a visit can NEVER
              * break any request, dedicated or otherwise.
              */
-            log.warn('registerRecipeVisit - failed', { err, recipeId, userId });
+            log.warn('registerRecipeVisit - failed to queue', {
+                err,
+                recipeId,
+                userId
+            });
         }
     }
 
