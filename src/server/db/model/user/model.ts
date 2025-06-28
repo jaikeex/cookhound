@@ -7,6 +7,7 @@ import {
 import { prisma } from '@/server/integrations';
 import { Logger } from '@/server/logger';
 import type { Prisma, User } from '@prisma/client';
+import { getUserLastViewedRecipes } from '@prisma/client/sql';
 
 //|=============================================================================================|//
 
@@ -122,6 +123,23 @@ class UserModel {
         );
 
         return this.reviveUserDates(user);
+    }
+
+    /**
+     * Get user's last viewed recipes
+     * Query class -> C3
+     */
+    async getLastViewedRecipes(
+        userId: number,
+        limit: number = 10
+    ): Promise<getUserLastViewedRecipes.Result[]> {
+        log.trace("Getting user's last viewed recipes", { userId });
+
+        const recipes = await prisma.$queryRawTyped(
+            getUserLastViewedRecipes(userId, limit)
+        );
+
+        return recipes;
     }
 
     /**

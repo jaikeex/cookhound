@@ -1,5 +1,6 @@
 import { AuthType, Status, UserRole } from '@/common/types';
 import type {
+    RecipeForDisplayDTO,
     ShoppingListDTO,
     ShoppingListIngredientPayload,
     UserDTO,
@@ -322,6 +323,39 @@ class UserService {
         log.trace('deleteShoppingList - success');
 
         return;
+    }
+
+    //~-----------------------------------------------------------------------------------------~//
+    //$                                    GET LAST VIEWED RECIPES                              $//
+    //~-----------------------------------------------------------------------------------------~//
+
+    async getLastViewedRecipes(userId: number): Promise<RecipeForDisplayDTO[]> {
+        log.trace('getLastViewedRecipes - attempt', { userId });
+
+        if (userId !== RequestContext.getUserId()) {
+            log.warn('getLastViewedRecipes - user not found');
+            throw new ServerError('auth.error.unauthorized', 401);
+        }
+
+        const recipes = await db.user.getLastViewedRecipes(userId);
+
+        if (!recipes || recipes.length === 0) {
+            log.warn('getLastViewedRecipes - no recipes found');
+            return [];
+        }
+
+        const recipeDTOs: RecipeForDisplayDTO[] = recipes.map((recipe) => ({
+            id: recipe.id,
+            displayId: recipe.displayId,
+            title: recipe.title,
+            imageUrl: recipe.imageUrl ?? '',
+            rating: recipe.rating ? Number(recipe.rating) : null,
+            timesRated: recipe.timesRated,
+            time: recipe.time,
+            portionSize: recipe.portionSize
+        }));
+
+        return recipeDTOs;
     }
 
     //~-----------------------------------------------------------------------------------------~//
