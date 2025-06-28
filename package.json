@@ -5,7 +5,7 @@
     "private": true,
     "scripts": {
         "dev": "next dev",
-        "build": "next build && npm run copy-static",
+        "build": "next build && npm run copy-static && npm run setup-typesense",
         "copy-static": "node scripts/copy-standalone.js",
         "start": "node .next/standalone/server.js",
         "dev-worker": "tsx src/server/queues/worker.ts",
