@@ -522,26 +522,13 @@ class RecipeService {
         // Apply pagination to final results
         const paginatedResults = results.slice(offset, offset + perPage);
 
-        const recipes: RecipeForDisplayDTO[] = paginatedResults.map(
-            (recipe) => ({
-                id: recipe.id,
-                displayId: recipe.displayId,
-                title: recipe.title,
-                imageUrl: recipe.imageUrl || '',
-                rating: recipe.rating ? Number(recipe.rating) : null,
-                timesRated: recipe.timesRated ?? 0,
-                time: recipe.time,
-                portionSize: recipe.portionSize
-            })
-        );
-
         log.trace('searchRecipes - success', {
             batch,
-            count: recipes.length,
+            count: paginatedResults.length,
             queryTerms: queryTerms.length > 1 ? queryTerms : undefined
         });
 
-        return recipes;
+        return paginatedResults;
     }
 }
 
