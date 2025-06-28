@@ -4,7 +4,7 @@
     "type": "module",
     "private": true,
     "scripts": {
-        "dev": "next dev",
+        "dev": "next dev --turbopack",
         "build": "next build && npm run copy-static && npm run setup-typesense",
         "copy-static": "node scripts/copy-standalone.js",
         "start": "node .next/standalone/server.js",
