@@ -1,5 +1,5 @@
-const https = require('https');
-const http = require('http');
+import https from 'https';
+import http from 'http';
 
 // Load environment variables from .env file
 require('dotenv').config();

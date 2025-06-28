@@ -1,5 +1,5 @@
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
 
 function copyDirectory(src, dest) {
     // Create destination directory if it doesn't exist
