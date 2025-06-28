@@ -43,8 +43,9 @@ export const DraggableInputRow: React.FC<DraggableInputRowProps> = ({
                 // This (together with the handleDragEnd) prevents the body from scrolling when the
                 // drag starts. this is needed expecially for mobile screens, since the screen
                 // scrolling while attempting to drag the input row is pure hell.
-                originalBodyOverflow.current = document.body.style.overflow;
-                document.body.style.overflow = 'hidden';
+                originalBodyOverflow.current =
+                    document.documentElement.style.overflow;
+                document.documentElement.style.overflow = 'hidden';
 
                 controls.start(e);
             }
@@ -53,7 +54,7 @@ export const DraggableInputRow: React.FC<DraggableInputRowProps> = ({
     );
 
     const handleDragEnd = useCallback(() => {
-        document.body.style.overflow = originalBodyOverflow.current;
+        document.documentElement.style.overflow = originalBodyOverflow.current;
     }, []);
 
     return (

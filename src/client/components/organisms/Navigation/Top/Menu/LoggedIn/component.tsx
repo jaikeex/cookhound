@@ -29,7 +29,7 @@ export const LoggedInMenuContent: React.FC<LoggedInMenuContentProps> = ({
                 {user.username}
             </Typography>
 
-            <div className="flex flex-col items-center gap-6 mt-8">
+            <div className="flex flex-col items-center h-full gap-6 mt-8">
                 <ThemeSwitcher stretch />
 
                 <div className="flex flex-col items-center gap-4">
@@ -38,9 +38,7 @@ export const LoggedInMenuContent: React.FC<LoggedInMenuContentProps> = ({
                     </ButtonBase>
                 </div>
 
-                <LogoutButton
-                    className={`mt-auto absolute bottom-8 md:static`}
-                />
+                <LogoutButton />
             </div>
         </React.Fragment>
     );

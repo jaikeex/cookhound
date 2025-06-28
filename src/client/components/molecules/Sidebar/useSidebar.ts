@@ -14,12 +14,12 @@ import { classNames } from '@/client/utils';
 const DEFAULT_ANIMATIONS = {
     sidebar: {
         left: {
-            position: 'fixed left-0 top-0 h-screen',
+            position: 'fixed left-0 top-0 h-[100dvh]',
             show: 'animate-slide-from-left',
             hide: 'animate-slide-to-left'
         },
         right: {
-            position: 'fixed right-0 top-0 h-screen',
+            position: 'fixed right-0 top-0 h-[100dvh]',
             show: 'animate-slide-from-right',
             hide: 'animate-slide-to-right'
         },
@@ -74,6 +74,8 @@ export const useSidebar = (config: SidebarConfig = {}) => {
      */
     const isOpeningRef = useRef(false);
     const isClosingRef = useRef(false);
+
+    const originalBodyOverflow = useRef<string>('');
 
     ///=========================================================================================///
     ///                                           HANDLE                                        ///
@@ -149,6 +151,8 @@ export const useSidebar = (config: SidebarConfig = {}) => {
         isClosingRef.current = true;
         toggleSidebarWithAnimation(false);
 
+        document.documentElement.style.overflow = originalBodyOverflow.current;
+
         setTimeout(() => {
             isClosingRef.current = false;
         }, 200);
@@ -181,7 +185,12 @@ export const useSidebar = (config: SidebarConfig = {}) => {
 
     const openSidebar = useCallback(() => {
         isOpeningRef.current = true;
+
         toggleSidebarWithAnimation(true);
+
+        originalBodyOverflow.current = document.documentElement.style.overflow;
+        document.documentElement.style.overflow = 'hidden';
+
         setTimeout(() => {
             isOpeningRef.current = false;
         }, 200);

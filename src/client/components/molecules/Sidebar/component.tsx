@@ -86,7 +86,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <React.Fragment>
                     <div
                         className={classNames(
-                            'fixed inset-0 z-20 w-screen h-screen bg-black bg-opacity-75',
+                            'fixed inset-0 z-20 w-screen bg-black bg-opacity-75 h-[100dvh]',
                             backdropClass
                         )}
                     />
