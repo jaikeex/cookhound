@@ -1,7 +1,7 @@
 node_modules
 scripts
 docs
-tailwind.config.js
+tailwind.config.cjs
 .next
 .env
 .env.local
