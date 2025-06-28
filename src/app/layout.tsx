@@ -1,5 +1,5 @@
 import React, { Suspense } from 'react';
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Kalam, Open_Sans } from 'next/font/google';
 import '@/client/globals.css';
 import {
@@ -38,6 +38,12 @@ const kalam = Kalam({
 export const metadata: Metadata = {
     title: 'Cookhound',
     description: 'Cookhound is a platform for sharing recipes'
+};
+
+export const viewport: Viewport = {
+    width: 'device-width',
+    initialScale: 1,
+    viewportFit: 'cover'
 };
 
 export default async function RootLayout({

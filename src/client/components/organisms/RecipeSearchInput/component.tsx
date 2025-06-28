@@ -25,6 +25,7 @@ export const RecipeSearchInput: React.FC<RecipeSearchInputProps> = ({
     value,
     defaultValue,
     initialQueries,
+    onSearch,
     ...rest
 }) => {
     //~-----------------------------------------------------------------------------------------~//
@@ -225,6 +226,11 @@ export const RecipeSearchInput: React.FC<RecipeSearchInputProps> = ({
         }, 200);
     }, []);
 
+    const handleSearch = useCallback(() => {
+        onSearch?.();
+        setIsInputFocused(false);
+    }, [onSearch]);
+
     // Clear pending timeout on unmount to avoid memory leaks
     // This is probably completely useless, but i just learned about how effect
     // callback work in-depth, and wanted to use it immediately.
@@ -310,6 +316,7 @@ export const RecipeSearchInput: React.FC<RecipeSearchInputProps> = ({
             onFocus={handleInputFocus}
             onBlur={handleInputBlur}
             isLoading={isSuggestionsLoading}
+            onSearch={handleSearch}
         >
             {shouldShowSuggestions && (
                 <SearchSuggestionBox
