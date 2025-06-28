@@ -2,6 +2,7 @@ import type { RequestConfig } from '@/client/request/ApiRequestWrapper';
 import { apiRequestWrapper } from '@/client/request/ApiRequestWrapper';
 import type {
     DeleteShoppingListPayload,
+    RecipeForDisplayDTO,
     ResetPasswordEmailPayload,
     ResetPasswordPayload,
     ShoppingListDTO,
@@ -106,6 +107,24 @@ class UserApiClient {
         await apiRequestWrapper.delete({
             url: `/users/${userId}/shopping-list`,
             data,
+            ...config
+        });
+    }
+
+    /**
+     * Gets the last viewed recipes by calling `GET /api/users/{id}/last-viewed`.
+     *
+     * @param userId - The ID of the user.
+     * @param config - Optional fetch request configuration.
+     * @returns A promise that resolves when the last viewed recipes are fetched.
+     * @throws {Error} Throws an error if the request fails.
+     */
+    async getUserLastViewedRecipes(
+        userId: number,
+        config?: RequestConfig
+    ): Promise<RecipeForDisplayDTO[]> {
+        return await apiRequestWrapper.get({
+            url: `/users/${userId}/last-viewed`,
             ...config
         });
     }

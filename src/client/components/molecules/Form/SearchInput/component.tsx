@@ -2,17 +2,23 @@
 
 import React, { useCallback, useEffect, useState } from 'react';
 import { BaseInput, ButtonBase, InputLabel, Loader } from '@/client/components';
+import type { ReactNode } from 'react';
 import type { FormInputProps } from '@/client/components/molecules/Form/types';
 import { classNames } from '@/client/utils';
+import { useLocale } from '@/client/store';
 
 export type SearchInputProps = Readonly<{
     placeholder?: string;
     isLoading?: boolean;
     onSearch?: () => void;
+    ref?: React.RefObject<HTMLDivElement | null>;
     label?: string;
     value?: string;
+    children?: ReactNode;
+    onFocus?: () => void;
+    onBlur?: () => void;
 }> &
-    Omit<FormInputProps, 'type' | 'label'>;
+    Omit<FormInputProps, 'type' | 'label' | 'children'>;
 
 export const SearchInput: React.FC<SearchInputProps> = ({
     className,
@@ -25,8 +31,14 @@ export const SearchInput: React.FC<SearchInputProps> = ({
     onSearch,
     placeholder,
     isLoading,
-    value
+    value,
+    children,
+    onFocus,
+    onBlur,
+    ref
 }) => {
+    const { t } = useLocale();
+
     const [inputValue, setInputValue] = useState(value ?? defaultValue ?? '');
 
     const handleInputChange = useCallback(
@@ -45,10 +57,12 @@ export const SearchInput: React.FC<SearchInputProps> = ({
         (e: React.KeyboardEvent<HTMLInputElement>) => {
             if (e.key === 'Enter') {
                 e.preventDefault();
-                onSearch?.();
+                handleSearch();
+            } else if (e.key === 'Escape') {
+                setInputValue('');
             }
         },
-        [onSearch]
+        [handleSearch]
     );
 
     useEffect(() => {
@@ -56,7 +70,7 @@ export const SearchInput: React.FC<SearchInputProps> = ({
     }, [value]);
 
     return (
-        <div className={classNames('relative w-full', className)}>
+        <div className={classNames('relative w-full', className)} ref={ref}>
             {label && (
                 <InputLabel htmlFor={id} text={label} disabled={disabled} />
             )}
@@ -70,8 +84,10 @@ export const SearchInput: React.FC<SearchInputProps> = ({
                     value={inputValue}
                     onChange={handleInputChange}
                     onKeyDown={handleInputKeyDown}
+                    onFocus={onFocus}
+                    onBlur={onBlur}
                     disabled={disabled}
-                    autoComplete={name}
+                    autoComplete={'off'}
                     min={0}
                 />
                 <ButtonBase
@@ -82,8 +98,9 @@ export const SearchInput: React.FC<SearchInputProps> = ({
                     className="absolute w-24 transform -translate-y-1/2 right-1 top-1/2"
                     disabled={isLoading}
                 >
-                    {isLoading ? <Loader /> : 'Search'}
+                    {isLoading ? <Loader /> : t('app.general.search')}
                 </ButtonBase>
+                {children}
             </div>
         </div>
     );

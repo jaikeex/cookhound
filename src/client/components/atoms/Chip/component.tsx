@@ -37,6 +37,12 @@ const classConfig = {
         }
     },
     sizes: {
+        xs: {
+            dimensions: 'py-0.5 px-2',
+            text: 'text-xs',
+            icon: 12,
+            iconMargin: 'ml-1'
+        },
         sm: {
             dimensions: 'py-1 px-3',
             text: 'text-sm',
@@ -66,7 +72,7 @@ export type ChipProps = Readonly<{
     color?: 'primary' | 'secondary' | 'danger' | 'subtle' | 'warning';
     icon?: IconName;
     outlined?: boolean;
-    size?: 'sm' | 'md' | 'lg';
+    size?: 'xs' | 'sm' | 'md' | 'lg';
     textClassName?: string;
     textVariant?: TypographyVariant;
 }> &

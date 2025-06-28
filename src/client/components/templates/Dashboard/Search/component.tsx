@@ -111,6 +111,7 @@ export const SearchTemplate: React.FC<SearchTemplateProps> = ({
             <Banner
                 defaultSearchValue={initialQuery ?? undefined}
                 searchValue={searchInput ?? undefined}
+                initialQueries={initialQueries}
                 onChange={handleInputChange}
                 onSearch={executeSearch}
                 isLoading={isLoading}
