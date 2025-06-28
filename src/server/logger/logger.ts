@@ -55,13 +55,19 @@ const baseLogger: WinstonLogger = createLogger({
             maxSize: 20 * 1024 * 1024,
             maxFiles: '14d',
             datePattern: 'YYYY-MM-DD'
-        }),
-        new GoogleCloudLoggingTransport({
-            allowedLevels: ['error', 'notice']
         })
     ],
     exitOnError: false
 });
+
+// Add the Google Cloud Logging transport ONLY in production.
+if (ENV_CONFIG_PUBLIC.ENV === 'production') {
+    baseLogger.add(
+        new GoogleCloudLoggingTransport({
+            allowedLevels: ['error', 'notice']
+        })
+    );
+}
 
 //~=============================================================================================~//
 //$                                           CONSOLE                                           $//

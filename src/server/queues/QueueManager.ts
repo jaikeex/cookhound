@@ -427,6 +427,8 @@ export class QueueManager {
 
         const queue = new Queue(name, queueOptions);
 
+        this.queues.set(name, queue);
+
         log.info('getOrCreateQueue - queue created', { name });
         return queue;
     }

@@ -186,7 +186,6 @@ class RecipeService {
                 throw new ServerError('app.error.bad-request', 400);
             }
 
-            // Queue the visit processing instead of doing it synchronously
             await queueManager.addJob(JOB_NAMES.REGISTER_RECIPE_VISIT, {
                 recipeId,
                 userId
