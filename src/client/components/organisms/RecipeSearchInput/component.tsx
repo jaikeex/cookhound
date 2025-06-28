@@ -186,6 +186,7 @@ export const RecipeSearchInput: React.FC<RecipeSearchInputProps> = ({
         return () => {
             cancelled = true;
         };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
         isInputFocused,
         enableSuggestions,
@@ -199,7 +200,7 @@ export const RecipeSearchInput: React.FC<RecipeSearchInputProps> = ({
     //$                                         UTILITY                                         $//
     //~-----------------------------------------------------------------------------------------~//
 
-    const isEmpty = suggestions.length === 0;
+    const isEmpty = !isSuggestionsLoading && suggestions.length === 0;
     const isShowingSearchResults = !!inputValue && preparedQuery.length > 0;
     const shouldShowSuggestions = enableSuggestions && isInputFocused;
 
@@ -308,11 +309,11 @@ export const RecipeSearchInput: React.FC<RecipeSearchInputProps> = ({
             onChange={handleInputChange}
             onFocus={handleInputFocus}
             onBlur={handleInputBlur}
+            isLoading={isSuggestionsLoading}
         >
             {shouldShowSuggestions && (
                 <SearchSuggestionBox
                     suggestions={suggestions}
-                    isLoading={isSuggestionsLoading}
                     isEmpty={isEmpty}
                     error={suggestionsError}
                     onSuggestionClick={handleSuggestionClick}

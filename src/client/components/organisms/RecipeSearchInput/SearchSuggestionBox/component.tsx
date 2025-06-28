@@ -1,13 +1,12 @@
 import React, { type ReactNode } from 'react';
 import Link from 'next/link';
-import { Loader, Typography } from '@/client/components';
+import { Typography } from '@/client/components';
 import { classNames } from '@/client/utils';
 import Image from 'next/image';
 import type { RecipeForDisplayDTO } from '@/common/types';
 
 export type SearchSuggestionBoxProps = Readonly<{
     suggestions: RecipeForDisplayDTO[];
-    isLoading: boolean;
     isEmpty: boolean;
     error?: string | null;
     className?: string;
@@ -18,7 +17,6 @@ export type SearchSuggestionBoxProps = Readonly<{
 
 export const SearchSuggestionBox: React.FC<SearchSuggestionBoxProps> = ({
     suggestions,
-    isLoading,
     isEmpty,
     error,
     className,
@@ -49,14 +47,6 @@ export const SearchSuggestionBox: React.FC<SearchSuggestionBoxProps> = ({
     );
 
     const renderContent = () => {
-        if (isLoading) {
-            return (
-                <div className="flex items-center justify-center h-full">
-                    <Loader />
-                </div>
-            );
-        }
-
         if (error) {
             return (
                 <div className="flex items-center justify-center h-full px-4">
