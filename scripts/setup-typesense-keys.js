@@ -2,7 +2,8 @@ import https from 'https';
 import http from 'http';
 
 // Load environment variables from .env file
-require('dotenv').config();
+import dotenv from 'dotenv';
+dotenv.config();
 
 /**
  * Script to create search-only API keys for Typesense after container startup
@@ -156,19 +157,19 @@ async function main() {
         console.log(
             '💡 You can now use the search-only key in your frontend application'
         );
+
+        process.exit(0);
     } catch (error) {
         console.error('❌ Setup failed:', error.message);
         process.exit(1);
     }
 }
 
-// Run if called directly
-if (require.main === module) {
+try {
     main();
+} catch (error) {
+    console.error('❌ Setup failed:', error.message);
+    process.exit(1);
 }
 
-module.exports = {
-    createSearchOnlyKey,
-    checkTypesenseHealth,
-    waitForTypesense
-};
+export { createSearchOnlyKey, checkTypesenseHealth, waitForTypesense };
