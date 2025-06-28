@@ -8,3 +8,5 @@ export const GOOGLE_SIGNIN_REDIRECT_URL = `https://accounts.google.com/o/oauth2/
 export const JWT_COOKIE_NAME = 'jwt';
 
 export const SEARCH_QUERY_SEPARATOR = '|';
+
+export const LOCAL_STORAGE_LAST_VIEWED_RECIPES_KEY = 'lastViewedRecipes';

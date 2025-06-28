@@ -31,14 +31,12 @@ type UseLocalStorageReturn<T> = {
  * Custom React hook for managing values in the browser's localStorage.
  * Automatically syncs state across components and browser tabs.
  *
- *~If the user does not provide an onError callback inside the options, all errors will be rethrown.
+ * ~If the user does not provide an onError callback inside the options, all errors will be rethrown.
  *
  * I shamelessly copied this from my job, then made it better, but did not tell them.
- *
  * @template T - The type of the value to be stored in localStorage.
  * @param {string} key - The key under which the value will be stored in localStorage.
  * @param {T} initialValue - The initial value to use if no value exists in localStorage.
- * @param {Function} onError - Callback function called when an error occurs.
  * @param {UseLocalStorageOptions<T>} [options] - Optional configuration options.
  * @returns {UseLocalStorageReturn<T>} Object containing the current value, setter, remover, and error state.
  */
@@ -109,8 +107,12 @@ export const useLocalStorage = <T>(
      * This is the value that should be relied upon on the client to contain the most up to date value.
      */
     const [storedValue, setStoredValue] = useState<T>(() => {
-        if (isFirstRender.current) return initialValue;
-        return readValue();
+        // On the server return initialValue immediately to avoid hydration mismatch.
+        if (typeof window === 'undefined') {
+            return initialValue;
+        }
+
+        return readValue() ?? initialValue;
     });
 
     //~-----------------------------------------------------------------------------------------~//
@@ -132,10 +134,13 @@ export const useLocalStorage = <T>(
                 //# Type support included.
                 //#
                 //# Allways remember to pass along the currently stored value (prev).
+                //# Also i found the safest way to avoid shitty stale updates
+                //# is to call it with the FRESHEST value obtainable - reading from ls itself.
                 ///
                 //?—————————————————————————————————————————————————————————————————————————————?//
+
                 const newValue =
-                    value instanceof Function ? value(storedValue) : value;
+                    value instanceof Function ? value(readValue()) : value;
 
                 window.localStorage.setItem(key, serializer(newValue));
 
@@ -151,7 +156,7 @@ export const useLocalStorage = <T>(
                 handleError(err);
             }
         },
-        [key, storedValue, serializer, handleError]
+        [key, readValue, serializer, handleError]
     );
 
     //~-----------------------------------------------------------------------------------------~//
@@ -217,11 +222,9 @@ export const useLocalStorage = <T>(
     useEffect(() => {
         if (isFirstRender.current) {
             isFirstRender.current = false;
-            const value = readValue();
-            setStoredValue(value);
             setIsHydrated(true);
         }
-    }, [readValue]);
+    }, []);
 
     // Return the hydrated value on client, initialValue on server
     const returnValue = isHydrated ? storedValue : initialValue;

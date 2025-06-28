@@ -10,6 +10,8 @@ import { SEARCH_QUERY_SEPARATOR } from '@/common/constants';
 import type { RecipeForDisplayDTO } from '@/common/types';
 import type { SearchInputProps } from '@/client/components/molecules/Form/SearchInput/component';
 import { Chip, Typography, SearchInput } from '@/client/components';
+import { useLocalStorage } from '@/client/hooks/useLocalStorage';
+import { LOCAL_STORAGE_LAST_VIEWED_RECIPES_KEY } from '@/common/constants';
 
 export type RecipeSearchInputProps = Readonly<{
     enableSuggestions?: boolean;
@@ -49,6 +51,10 @@ export const RecipeSearchInput: React.FC<RecipeSearchInputProps> = ({
         setIsInputFocused(false);
     });
 
+    const { value: localLastViewedRecipes } = useLocalStorage<
+        RecipeForDisplayDTO[]
+    >(LOCAL_STORAGE_LAST_VIEWED_RECIPES_KEY, []);
+
     //~-----------------------------------------------------------------------------------------~//
     //$                                     FETCH FUNCTIONS                                     $//
     //~-----------------------------------------------------------------------------------------~//
@@ -87,17 +93,22 @@ export const RecipeSearchInput: React.FC<RecipeSearchInputProps> = ({
     const fetchLastViewedRecipes = useCallback(async (): Promise<
         RecipeForDisplayDTO[]
     > => {
-        if (!user?.id) return [];
-
-        try {
-            const results = await apiClient.user.getUserLastViewedRecipes(
-                user.id
-            );
-            return results.slice(0, 5);
-        } catch {
-            return [];
+        if (user?.id) {
+            try {
+                const results = await apiClient.user.getUserLastViewedRecipes(
+                    user.id
+                );
+                return results.slice(0, 5);
+            } catch {
+                return [];
+            }
         }
-    }, [user]);
+
+        /**
+         * Fallback to the ls data for anonymous users.
+         */
+        return localLastViewedRecipes;
+    }, [user, localLastViewedRecipes]);
 
     //~-----------------------------------------------------------------------------------------~//
     //$                                   SUGGESTIONS EFFECT                                    $//
@@ -175,7 +186,14 @@ export const RecipeSearchInput: React.FC<RecipeSearchInputProps> = ({
         return () => {
             cancelled = true;
         };
-    }, [isInputFocused, enableSuggestions, preparedQuery, locale, user?.id]);
+    }, [
+        isInputFocused,
+        enableSuggestions,
+        preparedQuery,
+        locale,
+        user?.id,
+        localLastViewedRecipes
+    ]);
 
     //~-----------------------------------------------------------------------------------------~//
     //$                                         UTILITY                                         $//
