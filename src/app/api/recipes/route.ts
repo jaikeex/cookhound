@@ -7,6 +7,7 @@ import { NextResponse } from 'next/server';
 import { UserRole } from '@/common/types';
 import { ServerError } from '@/server/error';
 import { withRateLimit } from '@/server/utils/rate-limit';
+import type { Locale } from '@/client/locales';
 
 //|=============================================================================================|//
 
@@ -25,8 +26,14 @@ export async function GET(request: NextRequest) {
 
             const batch = Number(searchParams.get('batch'));
             const perPage = Number(searchParams.get('perPage'));
+            const language = searchParams.get('language');
+
+            if (!language || !batch || !perPage) {
+                throw new ServerError('app.error.bad-request', 400);
+            }
 
             const recipes = await recipeService.getFrontPageRecipes(
+                language as Locale,
                 batch,
                 perPage
             );

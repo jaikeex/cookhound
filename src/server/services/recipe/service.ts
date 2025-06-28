@@ -293,11 +293,13 @@ class RecipeService {
      * the strict threshold, it will gradually lower the requirement until the
      * requested batch size is fulfilled or no further loosening is possible.
      *
+     * @param language The language of the recipes to fetch.
      * @param batch 1-based index of the batch that is being requested. The
      *              first batch is 1.
      * @param perPage Size of the batch. Defaults to 24.
      */
     async getFrontPageRecipes(
+        language: Locale,
         batch: number,
         perPage: number = 24
     ): Promise<RecipeForDisplayDTO[]> {
@@ -330,6 +332,7 @@ class RecipeService {
 
         for (const threshold of MIN_TIMES_RATED_THRESHOLDS) {
             results = await db.recipe.getManyForFrontPage(
+                language,
                 perPage,
                 offset,
                 threshold

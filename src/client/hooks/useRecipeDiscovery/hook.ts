@@ -98,6 +98,7 @@ export const useRecipeDiscovery = (
                 }
 
                 newRecipes = await apiClient.recipe.getRecipeList(
+                    locale,
                     batch,
                     perPage
                 );

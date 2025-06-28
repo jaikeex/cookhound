@@ -84,18 +84,21 @@ class RecipeModel {
      * Query class -> C1
      */
     async getManyForFrontPage(
+        language: string,
         limit: number,
         offset: number,
         minTimesRated: number,
         ttl?: number
     ): Promise<getFrontPageRecipes.Result[]> {
         const cacheKey = generateCacheKey('recipe', 'findManyFrontPage', {
+            language,
             limit,
             offset,
             minTimesRated
         });
 
         log.trace('Getting front page recipes', {
+            language,
             limit,
             offset,
             minTimesRated
@@ -105,12 +108,13 @@ class RecipeModel {
             cacheKey,
             async () => {
                 log.trace('Fetching front page recipes from db', {
+                    language,
                     limit,
                     offset,
                     minTimesRated
                 });
                 return prisma.$queryRawTyped(
-                    getFrontPageRecipes(minTimesRated, limit, offset)
+                    getFrontPageRecipes(minTimesRated, language, limit, offset)
                 );
             },
             ttl ?? CACHE_TTL.TTL_2

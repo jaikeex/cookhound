@@ -37,7 +37,7 @@ SELECT
 FROM
     recipes r
 WHERE
-    r.timesRated >= ?
+    r.timesRated >= ? AND r.language = ?
 ORDER BY
     r.rating DESC,
     r.createdAt DESC
