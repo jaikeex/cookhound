@@ -3,6 +3,7 @@ import type { JobsOptions, Job, Processor, QueueOptions } from 'bullmq';
 import IORedis from 'ioredis';
 import { Logger } from '@/server/logger';
 import { ENV_CONFIG_PRIVATE } from '@/common/constants';
+import { ServerError } from '@/server/error';
 
 //~=============================================================================================~//
 //$                                            TYPES                                            $//
@@ -221,7 +222,7 @@ export class QueueManager {
             if (!def) {
                 // This should never happen if everything works correctly so throwing here is acceptable.
                 log.error('addJob - job is not registered', { jobName: name });
-                throw new Error(`Job ${name} is not registered`);
+                throw new ServerError('app.error.default', 500);
             }
         }
 
@@ -269,7 +270,7 @@ export class QueueManager {
              * Should never happen. Throwing here is acceptable.
              */
             log.warn('scheduleCronJob - queue name is required for cron jobs');
-            throw new Error('Queue name is required for cron jobs');
+            throw new ServerError('app.error.default', 500);
         }
 
         const queue =
@@ -442,7 +443,7 @@ export class QueueManager {
 
         if (!this.redis) {
             log.error('getOrCreateWorker - redis connection fucked');
-            throw new Error('Redis connection failed.');
+            throw new ServerError('app.error.default', 500);
         }
 
         const worker = new Worker(
@@ -469,9 +470,7 @@ export class QueueManager {
                         'getOrCreateWorker - no processor found for job',
                         { jobName: job.name }
                     );
-                    throw new Error(
-                        `No processor registered for job ${job.name}`
-                    );
+                    throw new ServerError('app.error.default', 500);
                 }
 
                 try {

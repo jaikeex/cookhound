@@ -1,6 +1,5 @@
 import Transport from 'winston-transport';
 import type { LogLevel } from '@/server/logger/types';
-import { googleApiService } from '@/server/services/google-api/service';
 
 /**
  * Maps app log levels to Google Cloud Logging severities.
@@ -95,11 +94,39 @@ export class GoogleCloudLoggingTransport extends Transport {
         });
     }
 
+    private async getGoogleApiService() {
+        //?—————————————————————————————————————————————————————————————————————————————————————?//
+        //?                                   IMPORTANT INFO                                    ?//
+        ///
+        //# If the googleApiService was imported statically, it would be locked from ever
+        //# using the logger itself because of circular import shenanigans. This ensures that
+        //# the initialization of the service can proceed with the logger imported.
+        //# The service reference is saved on the first import.
+        ///
+        //?—————————————————————————————————————————————————————————————————————————————————————?//
+
+        if (this._googleApiService) return this._googleApiService;
+
+        const serviceModule = await import(
+            '@/server/services/google-api/service'
+        );
+        this._googleApiService = serviceModule.googleApiService;
+        return this._googleApiService;
+    }
+
+    private _googleApiService?: {
+        writeLogsToGoogleCloud: (entries: any[]) => Promise<unknown>;
+    };
+
     private async flush(): Promise<void> {
         if (this.queue.length === 0) return;
 
         try {
             const entries = this.queue.splice(0, this.queue.length);
+
+            // Lazily import the Google API service the first time we need it.
+            const googleApiService = await this.getGoogleApiService();
+
             await googleApiService.writeLogsToGoogleCloud(entries);
         } catch (err) {
             // Failure to write to Cloud Logging should not crash the app.

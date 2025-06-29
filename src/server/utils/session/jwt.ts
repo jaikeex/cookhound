@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
 import type { UserRole } from '@/common/types';
 import { ENV_CONFIG_PRIVATE } from '@/common/constants';
+import { ServerError } from '@/server/error';
 
 interface JwtPayload {
     id: string;
@@ -13,9 +14,7 @@ const JWT_ISSUER = ENV_CONFIG_PRIVATE.JWT_ISSUER;
 
 export const createToken = (payload: JwtPayload): string => {
     if (!JWT_SECRET || !JWT_TOKEN_DURATION_DAYS || !JWT_ISSUER) {
-        throw new Error(
-            'JWT variables are not defined in environment variables'
-        );
+        throw new ServerError('app.error.default', 500);
     }
 
     // @ts-expect-error - expiresIn is not defined in the arguments somehow
@@ -27,7 +26,7 @@ export const createToken = (payload: JwtPayload): string => {
 
 export const verifyToken = (token: string): JwtPayload => {
     if (!JWT_SECRET) {
-        throw new Error('JWT_SECRET is not defined in environment variables');
+        throw new ServerError('app.error.default', 500);
     }
 
     try {
@@ -37,6 +36,6 @@ export const verifyToken = (token: string): JwtPayload => {
 
         return decoded;
     } catch (error) {
-        throw new Error('Invalid token');
+        throw new ServerError('app.error.bad-request', 400);
     }
 };

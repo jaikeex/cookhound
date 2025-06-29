@@ -2,6 +2,10 @@ import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { SlidingWindowRateLimit } from './limiters/SlidingWindow';
 import type { RateLimitConfig, RateLimiter, RateLimitResult } from './types';
+import { ServerError } from '@/server/error';
+import { Logger } from '@/server/logger';
+
+const logger = Logger.getInstance('rate-limit');
 
 //|=============================================================================================|//
 
@@ -34,6 +38,11 @@ export function withRateLimit(
     options: RateLimitOptions
 ): (req: NextRequest, context?: any) => Promise<Response> {
     return async (req: NextRequest, context?: any): Promise<Response> => {
+        logger.info('withRateLimit - guarded reqeust received', {
+            path: req.nextUrl.pathname,
+            method: req.method
+        });
+
         const rateLimiter = createRateLimiter(options);
         let result: RateLimitResult;
 
@@ -42,7 +51,7 @@ export function withRateLimit(
             result = await rateLimiter.checkLimit(identifier);
         } catch (error) {
             return NextResponse.json(
-                { error: 'Internal Server Error' },
+                { error: 'app.error.default' },
                 { status: 500 }
             );
         }
@@ -51,7 +60,7 @@ export function withRateLimit(
             const response = options.onRateLimitExceeded
                 ? options.onRateLimitExceeded(req)
                 : NextResponse.json(
-                      { error: 'Too many requests' },
+                      { error: 'app.error.too-many-requests' },
                       { status: 429 }
                   );
 
@@ -99,7 +108,10 @@ function getAppRouterClientIdentifier(req: NextRequest): string {
         //TODO: I don't really know what happens here, since the error thrown here
         //TODO: would not be caught by the handler, and it is not straightforward
         //TODO: to test this...
-        throw new Error('app.error.default');
+        logger.error('getAppRouterClientIdentifier - Unknown IP address', {
+            ip
+        });
+        throw new ServerError('app.error.default', 500);
     }
 
     return `${ip.trim()}:${path}`;

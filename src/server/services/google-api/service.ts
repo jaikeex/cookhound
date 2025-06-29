@@ -1,16 +1,9 @@
 import { ENV_CONFIG_PRIVATE } from '@/common/constants';
 import { googleApiClient } from '@/server/integrations/google';
 import type { LogEntry } from '@/server/integrations/google';
+import { Logger } from '@/server/logger';
 
-//§—————————————————————————————————————————————————————————————————————————————————————————————§//
-//§                                           WARNING                                           §//
-///
-//# THIS SERVICE CANNOT IMPORT LOGGER
-//# As it is currently written and structured, the logger imports this service in order
-//# to write logs to gcl. Importing logger here will fuck the app over with circular imports.
-//# It is very sad.
-///
-//§—————————————————————————————————————————————————————————————————————————————————————————————§//
+const log = Logger.getInstance('google-api-service');
 
 class GoogleApiService {
     async uploadRecipeImage(fileName: string, data: number[] | BodyInit) {
@@ -19,9 +12,19 @@ class GoogleApiService {
         // Convert array of numbers to Buffer if needed
         const binaryData = Array.isArray(data) ? Buffer.from(data) : data;
 
+        log.trace('uploadRecipeImage - uploading recipe image to bucket', {
+            fileName,
+            bucket
+        });
+
         const response = await googleApiClient
             .getStorageService()
             .upload(fileName, binaryData, bucket, 'image/webp');
+
+        log.trace('uploadRecipeImage - upload finished', {
+            fileName,
+            status: response.status
+        });
 
         return response;
     }
@@ -52,6 +55,10 @@ class GoogleApiService {
             logName,
             resource
         }));
+
+        log.trace('writeLogsToGoogleCloud - writing logs', {
+            entriesCount: logs.length
+        });
 
         const response = await googleApiClient
             .getLoggingService()

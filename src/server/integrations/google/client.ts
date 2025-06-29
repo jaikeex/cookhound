@@ -1,6 +1,10 @@
+import { ServerError } from '@/server/error';
 import { loadServiceAccount } from './gsa/gsaStore';
 import { TokenManager } from './tokenManager';
 import type { ServiceAccount, ServiceAccountIdentifier } from './types';
+import { Logger } from '@/server/logger';
+
+const log = Logger.getInstance('google-api-client');
 
 const SERVICE_ACCOUNT_SCOPES: Record<ServiceAccountIdentifier, string[]> = {
     GOOGLE_STORAGE_CREDENTIALS: [
@@ -59,9 +63,11 @@ class GoogleApiClient {
         const requiredFields = ['client_email', 'private_key', 'project_id'];
         for (const field of requiredFields) {
             if (!serviceAccount[field as keyof ServiceAccount]) {
-                throw new Error(
-                    `Missing required google service account field: ${field}`
+                log.error(
+                    'validateServiceAccount - missing required google service account field',
+                    { field }
                 );
+                throw new ServerError('app.error.default', 500);
             }
         }
     }
@@ -78,9 +84,11 @@ class GoogleApiClient {
         await this.ensureInitialized();
         const manager = this.tokenManagers[service];
         if (!manager) {
-            throw new Error(
-                `Google service account ${service} not initialized or configured.`
+            log.error(
+                'getAccessToken - google service account not initialized or configured',
+                { service }
             );
+            throw new ServerError('app.error.default', 500);
         }
         return manager.getAccessToken();
     }

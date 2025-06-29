@@ -1,5 +1,9 @@
 import { createSign } from 'crypto';
 import type { ServiceAccount, AccessToken } from './types';
+import { Logger } from '@/server/logger';
+import { ServerError } from '@/server/error';
+
+const log = Logger.getInstance('google-token-manager');
 
 const GOOGLE_TOKEN_URI = 'https://oauth2.googleapis.com/token';
 
@@ -107,15 +111,32 @@ export class TokenManager {
                 const jwt = this.createJwt();
                 const response = await this.makeTokenRequest(jwt);
                 return (await response.json()) as AccessToken;
-            } catch (error) {
-                if (attempt === maxRetries) throw error;
+            } catch (error: any) {
+                if (attempt === maxRetries) {
+                    log.error(
+                        'fetchNewAccessToken - failed to fetch google api access token',
+                        {
+                            error,
+                            stack: error.stack
+                        }
+                    );
+                    throw new ServerError('app.error.default', 500);
+                }
+
                 await new Promise((resolve) =>
                     setTimeout(resolve, backoffMs * attempt)
                 );
             }
         }
 
-        throw new Error('Failed to fetch google api access token');
+        /**
+         * Realistically, the code should never reach this point.
+         */
+        log.error(
+            'fetchNewAccessToken - failed to fetch google api access token'
+        );
+
+        throw new ServerError('app.error.default', 500);
     }
 
     private async makeTokenRequest(jwt: string): Promise<Response> {
@@ -132,9 +153,15 @@ export class TokenManager {
 
         if (!response.ok) {
             const errorText = await response.text();
-            throw new Error(
-                `Failed to fetch google api access token: ${errorText}`
+
+            log.error(
+                'makeTokenRequest - failed to fetch google api access token',
+                {
+                    errorText
+                }
             );
+
+            throw new ServerError('app.error.default', 500);
         }
 
         return response;

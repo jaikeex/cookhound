@@ -1,4 +1,5 @@
 import { ENV_CONFIG_PRIVATE } from '@/common/constants/env';
+import { ServerError } from '@/server/error';
 import { Logger } from '@/server/logger';
 import net from 'net';
 import tls from 'tls';
@@ -53,7 +54,7 @@ export class MailClient {
             !ENV_CONFIG_PRIVATE.GOOGLE_SMTP_PASSWORD
         ) {
             log.error('SMTP credentials are not configured.');
-            throw new Error('SMTP credentials are not configured.');
+            throw new ServerError('app.error.default', 500);
         }
 
         this.user = ENV_CONFIG_PRIVATE.GOOGLE_SMTP_USERNAME;
@@ -72,7 +73,8 @@ export class MailClient {
      */
     public async send(options: MailOptions): Promise<void> {
         if (!this.user || !this.pass) {
-            throw new Error('SMTP credentials are not configured.');
+            log.error('send - SMTP credentials are not configured.');
+            throw new ServerError('app.error.default', 500);
         }
 
         try {
@@ -81,9 +83,12 @@ export class MailClient {
             await this.authenticate();
             await this.sendEmail(options);
             await this.quit();
-        } catch (error) {
-            log.error('Failed to send email:', error);
-            throw error; // Rethrow to be handled by the caller
+        } catch (error: any) {
+            log.error('send - failed to send email', {
+                error,
+                stack: error.stack
+            });
+            throw new ServerError('app.error.default', 500);
         } finally {
             if (this.socket) {
                 this.socket.end();
@@ -154,17 +159,16 @@ export class MailClient {
         this.socket.write(command + '\r\n');
         const response = await this.readResponse();
         const responseCode = parseInt(response.substring(0, 3), 10);
+
         if (responseCode !== expectedCode) {
-            log.error('Unexpected SMTP response.', {
+            log.error('sendAndVerify - unexpected SMTP response.', {
                 command,
                 expectedCode,
                 responseCode,
                 response
             });
 
-            throw new Error(
-                `Unexpected SMTP response. Expected ${expectedCode}, got ${responseCode}: ${response}`
-            );
+            throw new ServerError('app.error.default', 500);
         }
         return response;
     }
@@ -200,16 +204,24 @@ export class MailClient {
      */
     private connect(): Promise<void> {
         return new Promise((resolve, reject) => {
-            this.socket = net.createConnection({
-                port: this.smtpPort,
-                host: this.smtpHost
-            });
-            this.socket.setEncoding('utf-8');
-            this.socket.once('connect', () => {
-                this.socket.removeListener('error', reject);
-                resolve();
-            });
-            this.socket.once('error', reject);
+            try {
+                this.socket = net.createConnection({
+                    port: this.smtpPort,
+                    host: this.smtpHost
+                });
+                this.socket.setEncoding('utf-8');
+                this.socket.once('connect', () => {
+                    this.socket.removeListener('error', reject);
+                    resolve();
+                });
+                this.socket.once('error', reject);
+            } catch (error: any) {
+                log.error('connect - failed to connect to SMTP server', {
+                    error,
+                    stack: error.stack
+                });
+                throw new ServerError('app.error.default', 500);
+            }
         });
     }
 
@@ -221,24 +233,33 @@ export class MailClient {
     private async upgradeToTls(): Promise<void> {
         const greeting = await this.readResponse();
         if (parseInt(greeting.substring(0, 3), 10) !== 220) {
-            throw new Error('Did not receive SMTP greeting.');
+            log.error('upgradeToTls - did not receive SMTP greeting.');
+            throw new ServerError('app.error.default', 500);
         }
 
         await this.sendAndVerify(`EHLO ${this.smtpHost}`, 250);
         await this.sendAndVerify('STARTTLS', 220);
 
         return new Promise((resolve, reject) => {
-            this.socket = tls.connect(
-                {
-                    socket: this.socket,
-                    host: this.smtpHost
-                },
-                () => {
-                    this.socket.setEncoding('utf-8');
-                    resolve();
-                }
-            );
-            this.socket.once('error', reject);
+            try {
+                this.socket = tls.connect(
+                    {
+                        socket: this.socket,
+                        host: this.smtpHost
+                    },
+                    () => {
+                        this.socket.setEncoding('utf-8');
+                        resolve();
+                    }
+                );
+                this.socket.once('error', reject);
+            } catch (error: any) {
+                log.error('upgradeToTls - failed to upgrade to TLS', {
+                    error,
+                    stack: error.stack
+                });
+                throw new ServerError('app.error.default', 500);
+            }
         });
     }
 
@@ -259,7 +280,8 @@ export class MailClient {
         this.socket.write(pass64 + '\r\n');
         const response = await this.readResponse();
         if (parseInt(response.substring(0, 3), 10) !== 235) {
-            throw new Error('SMTP authentication failed.');
+            log.error('authenticate - SMTP authentication failed.');
+            throw new ServerError('app.error.default', 500);
         }
     }
 
@@ -271,8 +293,11 @@ export class MailClient {
     private async quit(): Promise<void> {
         try {
             await this.sendAndVerify('QUIT', 221);
-        } catch (error) {
-            log.warn('Error during QUIT', error);
+        } catch (error: any) {
+            log.warn('quit - error during QUIT', {
+                error,
+                stack: error.stack
+            });
         }
     }
 }

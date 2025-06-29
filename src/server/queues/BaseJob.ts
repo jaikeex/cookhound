@@ -1,4 +1,8 @@
 import type { Job, JobsOptions, Processor, QueueOptions } from 'bullmq';
+import { Logger } from '@/server/logger';
+import { ServerError } from '@/server/error';
+
+const log = Logger.getInstance('base-job');
 
 /**
  * BaseJob is an abstract class that all concrete jobs MUST extend.
@@ -61,9 +65,11 @@ export abstract class BaseJob<TData = any, TResult = any> {
         const ctor = this.constructor as typeof BaseJob;
 
         if (!ctor.jobName || !ctor.queueName) {
-            throw new Error(
-                `Job ${ctor.name} is missing static jobName / queueName declarations`
+            log.error(
+                'getDefinition - job is missing static jobName / queueName declarations',
+                { jobName: ctor.jobName, queueName: ctor.queueName }
             );
+            throw new ServerError('app.error.default', 500);
         }
 
         const processor: Processor<TData, TResult> = async (job) =>

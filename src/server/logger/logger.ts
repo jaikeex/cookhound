@@ -129,6 +129,9 @@ export class Logger {
         }
 
         if (!instance) {
+            /**
+             * It is ok to throw here, since all instances should be crated at app startup.
+             */
             throw new Error('Logger context is missing');
         }
 
