@@ -1,11 +1,24 @@
 import { userService } from '@/server/services';
 import type { NextRequest } from 'next/server';
-import { handleServerError } from '@/server/utils/reqwest';
+import { handleServerError, validatePayload } from '@/server/utils/reqwest';
 import { ServerError } from '@/server/error';
 import { logRequest, logResponse } from '@/server/logger';
 import { RequestContext } from '@/server/utils/reqwest/context';
 import { UserRole } from '@/common/types';
+import { z } from 'zod';
 
+//|=============================================================================================|//
+//?                                     VALIDATION SCHEMAS                                      ?//
+//|=============================================================================================|//
+
+const UserForCreateSchema = z.strictObject({
+    email: z.string().trim().email(),
+    password: z.string().trim().min(6).max(40),
+    username: z.string().trim().min(3).max(20)
+});
+
+//|=============================================================================================|//
+//?                                           HANDLERS                                          ?//
 //|=============================================================================================|//
 
 /**
@@ -36,14 +49,16 @@ export async function POST(request: NextRequest) {
         try {
             logRequest(request);
 
-            const body = await request.json();
-
             // Check if the user is already logged in.
             if (RequestContext.getUserRole() !== UserRole.Guest) {
                 throw new ServerError('auth.error.user-already-logged-in', 400);
             }
 
-            const user = await userService.createUser(body);
+            const rawPayload = await request.json();
+
+            const payload = validatePayload(UserForCreateSchema, rawPayload);
+
+            const user = await userService.createUser(payload);
 
             const response = Response.json({ user }, { status: 201 });
 

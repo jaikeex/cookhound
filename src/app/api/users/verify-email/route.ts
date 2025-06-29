@@ -2,9 +2,20 @@ import { ServerError } from '@/server/error/server';
 import { logRequest, logResponse } from '@/server/logger';
 import { userService } from '@/server/services';
 import { RequestContext } from '@/server/utils/reqwest/context';
-import { handleServerError } from '@/server/utils/reqwest';
+import { handleServerError, validatePayload } from '@/server/utils/reqwest';
 import type { NextRequest } from 'next/server';
+import { z } from 'zod';
 
+//|=============================================================================================|//
+//?                                     VALIDATION SCHEMAS                                      ?//
+//|=============================================================================================|//
+
+const SendVerificationEmailSchema = z.strictObject({
+    email: z.string().trim().email()
+});
+
+//|=============================================================================================|//
+//?                                           HANDLERS                                          ?//
 //|=============================================================================================|//
 
 /**
@@ -18,7 +29,14 @@ export async function POST(request: NextRequest) {
         try {
             logRequest(request);
 
-            const { email } = await request.json();
+            const rawPayload = await request.json();
+
+            const payload = validatePayload(
+                SendVerificationEmailSchema,
+                rawPayload
+            );
+
+            const { email } = payload;
 
             await userService.resendVerificationEmail(email);
 

@@ -24,6 +24,11 @@ export async function GET(request: NextRequest) {
 
             const displayId = request.nextUrl.pathname.split('/').pop();
 
+            /**
+             * Do NOT validate the params by schema here, requesting a recipe that does
+             * not exist should return a 404 error and be handled by the service, not a 400.
+             */
+
             if (!displayId) {
                 throw new ServerError('app.error.bad-request', 400);
             }

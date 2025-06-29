@@ -2,10 +2,26 @@ import { RequestContext } from '@/server/utils/reqwest/context';
 import { logRequest, logResponse } from '@/server/logger';
 import { handleServerError } from '@/server/utils/reqwest';
 import type { NextRequest } from 'next/server';
-import { ServerError } from '@/server/error';
 import { recipeService } from '@/server/services/recipe/service';
 import type { Locale } from '@/client/locales';
+import { z } from 'zod';
+import { validateQuery } from '@/server/utils/reqwest/validators';
 
+//|=============================================================================================|//
+//?                                     VALIDATION SCHEMAS                                      ?//
+//|=============================================================================================|//
+
+const SearchRecipesSchema = z.strictObject({
+    query: z.string().trim().min(1).max(100),
+    language: z.enum(['en', 'cs'], {
+        errorMap: () => ({ message: 'Language must be supported' })
+    }),
+    perPage: z.coerce.number().int().positive(),
+    batch: z.coerce.number().int().positive()
+});
+
+//|=============================================================================================|//
+//?                                           HANDLERS                                          ?//
 //|=============================================================================================|//
 
 /**
@@ -18,16 +34,9 @@ export async function GET(request: NextRequest) {
         try {
             logRequest(request);
 
-            const { searchParams } = new URL(request.url);
+            const payload = validateQuery(SearchRecipesSchema, request.nextUrl);
 
-            const query = searchParams.get('query');
-            const language = searchParams.get('language');
-            const perPage = Number(searchParams.get('perPage'));
-            const batch = Number(searchParams.get('batch'));
-
-            if (!query || !language || !perPage || !batch) {
-                throw new ServerError('app.error.bad-request', 400);
-            }
+            const { query, language, perPage, batch } = payload;
 
             const recipes = await recipeService.searchRecipes(
                 query,

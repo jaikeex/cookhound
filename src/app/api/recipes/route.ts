@@ -1,14 +1,48 @@
 import { logRequest, logResponse } from '@/server/logger';
 import { recipeService } from '@/server/services/recipe/service';
 import { RequestContext } from '@/server/utils/reqwest/context';
-import { handleServerError } from '@/server/utils/reqwest';
+import { handleServerError, validatePayload } from '@/server/utils/reqwest';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { UserRole } from '@/common/types';
 import { ServerError } from '@/server/error';
 import { withRateLimit } from '@/server/utils/rate-limit';
 import type { Locale } from '@/client/locales';
+import { z } from 'zod';
+import { validateQuery } from '@/server/utils/reqwest/validators';
 
+//|=============================================================================================|//
+//?                                     VALIDATION SCHEMAS                                      ?//
+//|=============================================================================================|//
+
+const FrontPageRecipesSchema = z.strictObject({
+    language: z.enum(['en', 'cs'], {
+        errorMap: () => ({ message: 'Language must be supported' })
+    }),
+    batch: z.coerce.number().int().positive(),
+    perPage: z.coerce.number().int().positive()
+});
+
+const IngredientForCreateSchema = z.strictObject({
+    name: z.string().trim().min(1).max(100),
+    quantity: z.string().trim().max(50).nullable()
+});
+
+const RecipeForCreatePayloadSchema = z.strictObject({
+    language: z.enum(['en', 'cs'], {
+        errorMap: () => ({ message: 'Language must be supported' })
+    }),
+    title: z.string().trim().min(1).max(200),
+    instructions: z.array(z.string().trim().min(1)).min(1),
+    notes: z.string().trim().max(1400).nullable(),
+    time: z.coerce.number().int().positive().nullable(),
+    portionSize: z.coerce.number().int().positive().nullable(),
+    imageUrl: z.string().trim().url().nullable(),
+    ingredients: z.array(IngredientForCreateSchema).min(1)
+});
+
+//|=============================================================================================|//
+//?                                           HANDLERS                                          ?//
 //|=============================================================================================|//
 
 /**
@@ -22,15 +56,12 @@ export async function GET(request: NextRequest) {
         try {
             logRequest(request);
 
-            const { searchParams } = new URL(request.url);
+            const payload = validateQuery(
+                FrontPageRecipesSchema,
+                request.nextUrl
+            );
 
-            const batch = Number(searchParams.get('batch'));
-            const perPage = Number(searchParams.get('perPage'));
-            const language = searchParams.get('language');
-
-            if (!language || !batch || !perPage) {
-                throw new ServerError('app.error.bad-request', 400);
-            }
+            const { language, batch, perPage } = payload;
 
             const recipes = await recipeService.getFrontPageRecipes(
                 language as Locale,
@@ -57,6 +88,7 @@ export async function GET(request: NextRequest) {
  *
  * - 200: Success, with recipe data.
  * - 401: Unauthorized, if the user is not authenticated.
+ * - 400: Bad Request, if the payload validation fails.
  * - 500: Internal Server Error, if there is another error during the creation process.
  */
 async function createRecipeHandler(request: NextRequest) {
@@ -68,7 +100,12 @@ async function createRecipeHandler(request: NextRequest) {
                 throw new ServerError('auth.error.unauthorized', 401);
             }
 
-            const payload = await request.json();
+            const rawPayload = await request.json();
+
+            const payload = validatePayload(
+                RecipeForCreatePayloadSchema,
+                rawPayload
+            );
 
             const recipe = await recipeService.createRecipe(payload);
 

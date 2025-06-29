@@ -22,6 +22,11 @@ export async function GET(request: NextRequest) {
         try {
             logRequest(request);
 
+            /**
+             * Do NOT validate the params by schema here, requesting a recipe that does
+             * not exist should return a 404 error and be handled by the service, not a 400.
+             */
+
             const id = request.nextUrl.pathname.split('/').pop();
 
             if (!id || isNaN(Number(id))) {

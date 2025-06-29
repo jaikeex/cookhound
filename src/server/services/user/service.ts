@@ -310,7 +310,7 @@ class UserService {
     //$                                     DELETE SHOPPING LIST                                $//
     //~-----------------------------------------------------------------------------------------~//
 
-    async deleteShoppingList(userId: number, recipeId: number): Promise<void> {
+    async deleteShoppingList(userId: number, recipeId?: number): Promise<void> {
         log.trace('deleteShoppingList - attempt', { recipeId });
 
         if (RequestContext.getUserId() !== userId) {

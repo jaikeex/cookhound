@@ -1,9 +1,17 @@
-import { ServerError } from '@/server/error';
 import { logRequest, logResponse } from '@/server/logger';
 import { userService } from '@/server/services';
-import { handleServerError } from '@/server/utils/reqwest';
+import { handleServerError, validateParams } from '@/server/utils/reqwest';
 import { RequestContext } from '@/server/utils/reqwest/context';
 import type { NextRequest } from 'next/server';
+import { z } from 'zod';
+
+//|=============================================================================================|//
+//?                                     VALIDATION SCHEMAS                                      ?//
+//|=============================================================================================|//
+
+const LastViewedParamsSchema = z.strictObject({
+    userId: z.coerce.number().int().positive()
+});
 
 /**
  * Handles GET requests to `/api/users/{id}/last-viewed` to fetch a user's last viewed recipes.
@@ -17,11 +25,9 @@ export async function GET(request: NextRequest) {
         try {
             logRequest(request);
 
-            const userId = request.nextUrl.pathname.split('/').at(-2);
-
-            if (!userId || isNaN(Number(userId))) {
-                throw new ServerError('app.error.bad-request', 400);
-            }
+            const { userId } = validateParams(LastViewedParamsSchema, {
+                userId: request.nextUrl.pathname.split('/').at(-2)
+            });
 
             const lastViewedRecipes = await userService.getLastViewedRecipes(
                 Number(userId)

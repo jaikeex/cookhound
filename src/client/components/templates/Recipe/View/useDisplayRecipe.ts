@@ -46,10 +46,16 @@ export const useDisplayRecipe = (recipe: RecipeDTO) => {
     );
 
     const onShoppingListCreate = useCallback(async () => {
-        const ingredientsToInclude = recipe.ingredients.filter(
-            (ingredient) =>
-                !selectedIngredients.some((i) => i.id === ingredient.id)
-        );
+        const ingredientsToInclude = recipe.ingredients
+            .filter(
+                (ingredient) =>
+                    !selectedIngredients.some((i) => i.id === ingredient.id)
+            )
+            .map((ingredient) => ({
+                id: ingredient.id,
+                quantity: ingredient.quantity,
+                marked: false
+            }));
 
         if (!user) return;
 

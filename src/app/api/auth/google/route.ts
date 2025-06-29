@@ -1,12 +1,23 @@
 import type { NextRequest } from 'next/server';
 import { authService } from '@/server/services/auth/service';
 import { serialize } from 'cookie';
-import { handleServerError } from '@/server/utils/reqwest';
+import { handleServerError, validatePayload } from '@/server/utils/reqwest';
 import { ServerError } from '@/server/error';
 import { logRequest, logResponse } from '@/server/logger';
 import { RequestContext } from '@/server/utils/reqwest/context';
 import { UserRole } from '@/common/types';
+import z from 'zod';
 
+//|=============================================================================================|//
+//?                                     VALIDATION SCHEMAS                                      ?//
+//|=============================================================================================|//
+
+const GoogleAuthSchema = z.strictObject({
+    code: z.string().trim()
+});
+
+//|=============================================================================================|//
+//?                                           HANDLERS                                          ?//
 //|=============================================================================================|//
 
 /**
@@ -34,9 +45,13 @@ export async function POST(request: NextRequest) {
                 throw new ServerError('auth.error.user-already-logged-in', 400);
             }
 
-            const { code } = await request.json();
+            const rawPayload = await request.json();
 
-            const user = await authService.loginWithGoogle({ code });
+            const payload = validatePayload(GoogleAuthSchema, rawPayload);
+
+            const user = await authService.loginWithGoogle({
+                code: payload.code
+            });
 
             const cookie = serialize('jwt', user.token, {
                 httpOnly: true,

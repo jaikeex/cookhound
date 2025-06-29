@@ -1,4 +1,4 @@
-import { handleServerError } from '@/server/utils/reqwest';
+import { handleServerError, validatePayload } from '@/server/utils/reqwest';
 import { googleApiService } from '@/server/services';
 import type { NextRequest } from 'next/server';
 import { ENV_CONFIG_PRIVATE } from '@/common/constants';
@@ -7,7 +7,19 @@ import { ServerError } from '@/server/error';
 import { logRequest, logResponse } from '@/server/logger';
 import { RequestContext } from '@/server/utils/reqwest/context';
 import { UserRole } from '@/common/types';
+import { z } from 'zod';
 
+//|=============================================================================================|//
+//?                                     VALIDATION SCHEMAS                                      ?//
+//|=============================================================================================|//
+
+const RecipeImageSchema = z.strictObject({
+    fileName: z.string().trim(),
+    bytes: z.instanceof(Uint8Array)
+});
+
+//|=============================================================================================|//
+//?                                           HANDLERS                                          ?//
 //|=============================================================================================|//
 
 /**
@@ -22,19 +34,24 @@ async function postHandler(request: NextRequest) {
         try {
             logRequest(request);
 
-            const data = await request.json();
+            const rawPayload = await request.json();
+
+            const payload = validatePayload(RecipeImageSchema, rawPayload);
 
             // Check if the user is authenticated.
             if (RequestContext.getUserRole() === UserRole.Guest) {
                 throw new ServerError('auth.error.unauthorized', 401);
             }
 
-            await googleApiService.uploadRecipeImage(data.fileName, data.bytes);
+            await googleApiService.uploadRecipeImage(
+                payload.fileName,
+                payload.bytes
+            );
 
             // Generate the public URL for the uploaded image
             const bucket =
                 ENV_CONFIG_PRIVATE.GOOGLE_STORAGE_BUCKET_RECIPE_IMAGES;
-            const objectUrl = `https://storage.googleapis.com/${bucket}/${data.fileName}`;
+            const objectUrl = `https://storage.googleapis.com/${bucket}/${payload.fileName}`;
 
             const response = Response.json({ objectUrl });
 

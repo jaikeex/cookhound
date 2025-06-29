@@ -1,9 +1,25 @@
 import type { NextRequest } from 'next/server';
 import { RequestContext } from '@/server/utils/reqwest/context';
-import { handleServerError } from '@/server/utils/reqwest';
+import { handleServerError, validatePayload } from '@/server/utils/reqwest';
 import { logRequest, logResponse } from '@/server/logger';
 import { userService } from '@/server/services/user/service';
+import { z } from 'zod';
 
+//|=============================================================================================|//
+//?                                     VALIDATION SCHEMAS                                      ?//
+//|=============================================================================================|//
+
+const SendResetPasswordEmailSchema = z.strictObject({
+    email: z.string().trim().email()
+});
+
+const ResetPasswordSchema = z.strictObject({
+    token: z.string().trim(),
+    password: z.string().trim().min(6).max(40)
+});
+
+//|=============================================================================================|//
+//?                                           HANDLERS                                          ?//
 //|=============================================================================================|//
 
 /**
@@ -18,7 +34,14 @@ export async function POST(request: NextRequest) {
         try {
             logRequest(request);
 
-            const { email } = await request.json();
+            const rawPayload = await request.json();
+
+            const payload = validatePayload(
+                SendResetPasswordEmailSchema,
+                rawPayload
+            );
+
+            const { email } = payload;
 
             await userService.sendPasswordResetEmail(email);
 
@@ -46,7 +69,11 @@ export async function PUT(request: NextRequest) {
         try {
             logRequest(request);
 
-            const { token, password } = await request.json();
+            const rawPayload = await request.json();
+
+            const payload = validatePayload(ResetPasswordSchema, rawPayload);
+
+            const { token, password } = payload;
 
             await userService.resetPassword(token, password);
 

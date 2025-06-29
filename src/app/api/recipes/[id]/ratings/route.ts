@@ -1,12 +1,31 @@
 import type { NextRequest } from 'next/server';
 import { recipeService } from '@/server/services/recipe/service';
-import { handleServerError } from '@/server/utils/reqwest';
+import {
+    handleServerError,
+    validatePayload,
+    validateParams
+} from '@/server/utils/reqwest';
 import { withRateLimit } from '@/server/utils/rate-limit/wrapper';
 import { ServerError } from '@/server/error';
 import { logRequest, logResponse } from '@/server/logger';
 import { RequestContext } from '@/server/utils/reqwest/context';
 import { UserRole } from '@/common/types';
+import { z } from 'zod';
 
+//|=============================================================================================|//
+//?                                     VALIDATION SCHEMAS                                      ?//
+//|=============================================================================================|//
+
+const RatingForCreateSchema = z.strictObject({
+    rating: z.coerce.number().int().min(1).max(5)
+});
+
+const RatingParamsSchema = z.strictObject({
+    recipeId: z.coerce.number().int().positive()
+});
+
+//|=============================================================================================|//
+//?                                           HANDLERS                                          ?//
 //|=============================================================================================|//
 
 /**
@@ -27,23 +46,19 @@ async function rateRecipeHandler(request: NextRequest) {
         try {
             logRequest(request);
 
-            const id = request.nextUrl.pathname.split('/').at(-2);
-            const payload = await request.json();
-
             if (RequestContext.getUserRole() === UserRole.Guest) {
                 throw new ServerError('auth.error.unauthorized', 401);
             }
 
-            if (
-                !id ||
-                isNaN(Number(id)) ||
-                !payload?.rating ||
-                isNaN(Number(payload.rating))
-            ) {
-                throw new ServerError('app.error.bad-request', 400);
-            }
+            const { recipeId } = validateParams(RatingParamsSchema, {
+                recipeId: request.nextUrl.pathname.split('/').at(-2)
+            });
 
-            await recipeService.rateRecipe(Number(id), payload.rating);
+            const rawPayload = await request.json();
+
+            const payload = validatePayload(RatingForCreateSchema, rawPayload);
+
+            await recipeService.rateRecipe(Number(recipeId), payload.rating);
 
             const response = Response.json({
                 message: 'Recipe rated successfully'

@@ -5,9 +5,22 @@ import { ENV_CONFIG_PUBLIC } from '@/common/constants/env';
 import { ServerError } from '@/server/error';
 import { logRequest, logResponse } from '@/server/logger';
 import { RequestContext } from '@/server/utils/reqwest/context';
-import { handleServerError } from '@/server/utils/reqwest';
+import { handleServerError, validatePayload } from '@/server/utils/reqwest';
 import { UserRole } from '@/common/types';
+import z from 'zod';
 
+//|=============================================================================================|//
+//?                                     VALIDATION SCHEMAS                                      ?//
+//|=============================================================================================|//
+
+const LoginSchema = z.object({
+    email: z.string().email(),
+    password: z.string().trim().min(1).max(40), // Don't validate password strength on login
+    keepLoggedIn: z.boolean().optional()
+});
+
+//|=============================================================================================|//
+//?                                           HANDLERS                                          ?//
 //|=============================================================================================|//
 
 /**
@@ -30,24 +43,26 @@ export async function POST(request: NextRequest) {
         try {
             logRequest(request);
 
-            const { email, password, keepLoggedIn } = await request.json();
-
             // Check if the user is already logged in.
             if (RequestContext.getUserRole() !== UserRole.Guest) {
                 throw new ServerError('auth.error.user-already-logged-in', 400);
             }
 
+            const rawPayload = await request.json();
+
+            const payload = validatePayload(LoginSchema, rawPayload);
+
             const user = await authService.login({
-                email,
-                password,
-                keepLoggedIn
+                email: payload.email,
+                password: payload.password,
+                keepLoggedIn: payload.keepLoggedIn ?? false
             });
 
             const cookie = serialize('jwt', user.token, {
                 httpOnly: true,
                 secure: ENV_CONFIG_PUBLIC.ENV !== 'development',
                 sameSite: 'strict',
-                maxAge: keepLoggedIn ? 60 * 60 * 24 * 30 : undefined,
+                maxAge: payload.keepLoggedIn ? 60 * 60 * 24 * 30 : undefined,
                 path: '/'
             });
 

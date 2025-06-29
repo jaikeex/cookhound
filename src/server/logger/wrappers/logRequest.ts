@@ -40,7 +40,6 @@ export async function logResponse(res: Response) {
             `Request complete: ${requestMethod} '${requestPath}'; status: ${status}`
         );
     } catch (err) {
-        console.log(err);
         // Do nothing
     }
 }

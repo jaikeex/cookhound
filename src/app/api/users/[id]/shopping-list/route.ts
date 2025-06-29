@@ -1,11 +1,41 @@
 import type { NextRequest } from 'next/server';
 import { RequestContext } from '@/server/utils/reqwest/context';
-import { handleServerError } from '@/server/utils/reqwest';
+import {
+    handleServerError,
+    validateParams,
+    validatePayload
+} from '@/server/utils/reqwest';
 import { logRequest, logResponse } from '@/server/logger';
 import { userService } from '@/server/services/user/service';
 import { UserRole } from '@/common/types';
 import { ServerError } from '@/server/error';
+import { z } from 'zod';
 
+//|=============================================================================================|//
+//?                                     VALIDATION SCHEMAS                                      ?//
+//|=============================================================================================|//
+
+const ShoppingListIngredientPayloadSchema = z.strictObject({
+    id: z.coerce.number().int().positive(),
+    marked: z.boolean().optional(),
+    quantity: z.string().trim().max(50).nullable()
+});
+
+const ShoppingListPayloadSchema = z.strictObject({
+    recipeId: z.coerce.number().int().positive(),
+    ingredients: z.array(ShoppingListIngredientPayloadSchema).min(1)
+});
+
+const DeleteShoppingListPayloadSchema = z.strictObject({
+    recipeId: z.coerce.number().int().positive().nullable().optional()
+});
+
+const ShoppingListParamsSchema = z.strictObject({
+    userId: z.coerce.number().int().positive()
+});
+
+//|=============================================================================================|//
+//?                                           HANDLERS                                          ?//
 //|=============================================================================================|//
 
 /**
@@ -24,11 +54,9 @@ export async function GET(request: NextRequest) {
                 throw new ServerError('auth.error.unauthorized', 401);
             }
 
-            const userId = request.nextUrl.pathname.split('/').at(-2);
-
-            if (!userId || isNaN(Number(userId))) {
-                throw new ServerError('app.error.bad-request', 400);
-            }
+            const { userId } = validateParams(ShoppingListParamsSchema, {
+                userId: request.nextUrl.pathname.split('/').at(-2)
+            });
 
             const shoppingList = await userService.getShoppingList(
                 Number(userId)
@@ -60,13 +88,16 @@ export async function POST(request: NextRequest) {
                 throw new ServerError('auth.error.unauthorized', 401);
             }
 
-            const userId = request.nextUrl.pathname.split('/').at(-2);
+            const { userId } = validateParams(ShoppingListParamsSchema, {
+                userId: request.nextUrl.pathname.split('/').at(-2)
+            });
 
-            if (!userId || isNaN(Number(userId))) {
-                throw new ServerError('app.error.bad-request', 400);
-            }
+            const rawPayload = await request.json();
 
-            const payload = await request.json();
+            const payload = validatePayload(
+                ShoppingListPayloadSchema,
+                rawPayload
+            );
 
             const shoppingList = await userService.createShoppingList(
                 Number(userId),
@@ -84,6 +115,13 @@ export async function POST(request: NextRequest) {
     });
 }
 
+/**
+ * Handles PUT requests to `/api/users/{id}/shopping-list` to update a user's shopping list.
+ *
+ * @param request - The incoming Next.js request object.
+ * @returns A JSON response with the updated shopping list item.
+ * @throws {Error} Throws an error if the request fails.
+ */
 export async function PUT(request: NextRequest) {
     return RequestContext.run(request, async () => {
         try {
@@ -93,13 +131,16 @@ export async function PUT(request: NextRequest) {
                 throw new ServerError('auth.error.unauthorized', 401);
             }
 
-            const userId = request.nextUrl.pathname.split('/').at(-2);
+            const { userId } = validateParams(ShoppingListParamsSchema, {
+                userId: request.nextUrl.pathname.split('/').at(-2)
+            });
 
-            if (!userId || isNaN(Number(userId))) {
-                throw new ServerError('app.error.bad-request', 400);
-            }
+            const rawPayload = await request.json();
 
-            const payload = await request.json();
+            const payload = validatePayload(
+                ShoppingListPayloadSchema,
+                rawPayload
+            );
 
             const shoppingList = await userService.updateShoppingList(
                 Number(userId),
@@ -117,6 +158,13 @@ export async function PUT(request: NextRequest) {
     });
 }
 
+/**
+ * Handles DELETE requests to `/api/users/{id}/shopping-list` to delete a user's shopping list.
+ *
+ * @param request - The incoming Next.js request object.
+ * @returns A JSON response with a message indicating that the shopping list has been deleted.
+ * @throws {Error} Throws an error if the request fails.
+ */
 export async function DELETE(request: NextRequest) {
     return RequestContext.run(request, async () => {
         try {
@@ -126,15 +174,21 @@ export async function DELETE(request: NextRequest) {
                 throw new ServerError('auth.error.unauthorized', 401);
             }
 
-            const userId = request.nextUrl.pathname.split('/').at(-2);
+            const { userId } = validateParams(ShoppingListParamsSchema, {
+                userId: request.nextUrl.pathname.split('/').at(-2)
+            });
 
-            if (!userId || isNaN(Number(userId))) {
-                throw new ServerError('app.error.bad-request', 400);
-            }
+            const rawPayload = await request.json();
 
-            const { recipeId } = await request.json();
+            const payload = validatePayload(
+                DeleteShoppingListPayloadSchema,
+                rawPayload
+            );
 
-            await userService.deleteShoppingList(Number(userId), recipeId);
+            await userService.deleteShoppingList(
+                Number(userId),
+                payload.recipeId ?? undefined
+            );
 
             const response = Response.json({
                 message: 'Shopping list deleted'

@@ -1,10 +1,28 @@
 import { recipeService } from '@/server/services/recipe/service';
 import type { NextRequest } from 'next/server';
-import { ServerError } from '@/server/error';
 import { RequestContext } from '@/server/utils/reqwest/context';
 import { logRequest, logResponse } from '@/server/logger';
-import { handleServerError } from '@/server/utils/reqwest';
+import {
+    handleServerError,
+    validatePayload,
+    validateParams
+} from '@/server/utils/reqwest';
+import z from 'zod';
 
+//|=============================================================================================|//
+//?                                     VALIDATION SCHEMAS                                      ?//
+//|=============================================================================================|//
+
+const RecipeVisitForCreateSchema = z.strictObject({
+    userId: z.coerce.number().int().positive().optional()
+});
+
+const RecipeVisitParamsSchema = z.strictObject({
+    recipeId: z.coerce.number().int().positive()
+});
+
+//|=============================================================================================|//
+//?                                           HANDLERS                                          ?//
 //|=============================================================================================|//
 
 /**
@@ -22,12 +40,18 @@ export async function POST(request: NextRequest) {
         try {
             logRequest(request);
 
-            const recipeId = request.nextUrl.pathname.split('/').at(-2);
-            const { userId } = await request.json();
+            const { recipeId } = validateParams(RecipeVisitParamsSchema, {
+                recipeId: request.nextUrl.pathname.split('/').at(-2)
+            });
 
-            if (!recipeId || isNaN(Number(recipeId))) {
-                throw new ServerError('app.error.bad-request', 400);
-            }
+            const rawPayload = await request.json();
+
+            const payload = validatePayload(
+                RecipeVisitForCreateSchema,
+                rawPayload
+            );
+
+            const { userId } = payload;
 
             await recipeService.registerRecipeVisit(
                 Number(recipeId),
