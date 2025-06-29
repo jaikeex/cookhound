@@ -1,5 +1,6 @@
 import { ENV_CONFIG_PRIVATE } from '@/common/constants/env';
-import { ServerError } from '@/server/error';
+import { InfrastructureError } from '@/server/error';
+import { InfrastructureErrorCode } from '@/server/error/codes';
 import { Logger } from '@/server/logger';
 import net from 'net';
 import tls from 'tls';
@@ -54,7 +55,9 @@ export class MailClient {
             !ENV_CONFIG_PRIVATE.GOOGLE_SMTP_PASSWORD
         ) {
             log.error('SMTP credentials are not configured.');
-            throw new ServerError('app.error.default', 500);
+            throw new InfrastructureError(
+                InfrastructureErrorCode.SMTP_NOT_CONFIGURED
+            );
         }
 
         this.user = ENV_CONFIG_PRIVATE.GOOGLE_SMTP_USERNAME;
@@ -74,7 +77,9 @@ export class MailClient {
     public async send(options: MailOptions): Promise<void> {
         if (!this.user || !this.pass) {
             log.error('send - SMTP credentials are not configured.');
-            throw new ServerError('app.error.default', 500);
+            throw new InfrastructureError(
+                InfrastructureErrorCode.SMTP_NOT_CONFIGURED
+            );
         }
 
         try {
@@ -85,7 +90,9 @@ export class MailClient {
             await this.quit();
         } catch (error: unknown) {
             log.errorWithStack('send - failed to send email', error);
-            throw new ServerError('app.error.default', 500);
+            throw new InfrastructureError(
+                InfrastructureErrorCode.SMTP_SEND_FAILED
+            );
         } finally {
             if (this.socket) {
                 this.socket.end();
@@ -165,7 +172,9 @@ export class MailClient {
                 response
             });
 
-            throw new ServerError('app.error.default', 500);
+            throw new InfrastructureError(
+                InfrastructureErrorCode.SMTP_SEND_FAILED
+            );
         }
         return response;
     }
@@ -217,7 +226,9 @@ export class MailClient {
                     'connect - failed to connect to SMTP server',
                     error
                 );
-                throw new ServerError('app.error.default', 500);
+                throw new InfrastructureError(
+                    InfrastructureErrorCode.SMTP_CONNECT_FAILED
+                );
             }
         });
     }
@@ -231,7 +242,9 @@ export class MailClient {
         const greeting = await this.readResponse();
         if (parseInt(greeting.substring(0, 3), 10) !== 220) {
             log.error('upgradeToTls - did not receive SMTP greeting.');
-            throw new ServerError('app.error.default', 500);
+            throw new InfrastructureError(
+                InfrastructureErrorCode.SMTP_CONNECT_FAILED
+            );
         }
 
         await this.sendAndVerify(`EHLO ${this.smtpHost}`, 250);
@@ -255,7 +268,9 @@ export class MailClient {
                     'upgradeToTls - failed to upgrade to TLS',
                     error
                 );
-                throw new ServerError('app.error.default', 500);
+                throw new InfrastructureError(
+                    InfrastructureErrorCode.SMTP_CONNECT_FAILED
+                );
             }
         });
     }
@@ -278,7 +293,9 @@ export class MailClient {
         const response = await this.readResponse();
         if (parseInt(response.substring(0, 3), 10) !== 235) {
             log.error('authenticate - SMTP authentication failed.');
-            throw new ServerError('app.error.default', 500);
+            throw new InfrastructureError(
+                InfrastructureErrorCode.SMTP_AUTH_FAILED
+            );
         }
     }
 

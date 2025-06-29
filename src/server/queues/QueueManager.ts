@@ -3,7 +3,8 @@ import type { JobsOptions, Job, Processor, QueueOptions } from 'bullmq';
 import IORedis from 'ioredis';
 import { Logger } from '@/server/logger';
 import { ENV_CONFIG_PRIVATE } from '@/common/constants';
-import { ServerError } from '@/server/error';
+import { InfrastructureError } from '@/server/error';
+import { InfrastructureErrorCode } from '@/server/error/codes';
 
 //~=============================================================================================~//
 //$                                            TYPES                                            $//
@@ -224,7 +225,9 @@ export class QueueManager {
                 log.error('addJob - job is not registered', undefined, {
                     jobName: name
                 });
-                throw new ServerError('app.error.default', 500);
+                throw new InfrastructureError(
+                    InfrastructureErrorCode.QUEUE_JOB_ADD_FAILED
+                );
             }
         }
 
@@ -272,7 +275,9 @@ export class QueueManager {
              * Should never happen. Throwing here is acceptable.
              */
             log.warn('scheduleCronJob - queue name is required for cron jobs');
-            throw new ServerError('app.error.default', 500);
+            throw new InfrastructureError(
+                InfrastructureErrorCode.QUEUE_JOB_ADD_FAILED
+            );
         }
 
         const queue =
@@ -445,7 +450,9 @@ export class QueueManager {
 
         if (!this.redis) {
             log.error('getOrCreateWorker - redis connection fucked');
-            throw new ServerError('app.error.default', 500);
+            throw new InfrastructureError(
+                InfrastructureErrorCode.QUEUE_JOB_PROCESS_FAILED
+            );
         }
 
         const worker = new Worker(
@@ -471,7 +478,9 @@ export class QueueManager {
                     log.warn('getOrCreateWorker - no processor found for job', {
                         jobName: job.name
                     });
-                    throw new ServerError('app.error.default', 500);
+                    throw new InfrastructureError(
+                        InfrastructureErrorCode.QUEUE_JOB_PROCESS_FAILED
+                    );
                 }
 
                 try {
@@ -484,7 +493,9 @@ export class QueueManager {
                             jobName: jobDef.name
                         }
                     );
-                    throw new ServerError('app.error.default', 500);
+                    throw new InfrastructureError(
+                        InfrastructureErrorCode.QUEUE_JOB_PROCESS_FAILED
+                    );
                 }
             },
             {

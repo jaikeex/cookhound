@@ -2,7 +2,8 @@ import Typesense from 'typesense';
 import { ENV_CONFIG_PUBLIC, ENV_CONFIG_PRIVATE } from '@/common/constants/env';
 import { Logger } from '@/server/logger';
 import { randomUUID } from 'crypto';
-import { ServerError } from '@/server/error';
+import { InfrastructureError } from '@/server/error';
+import { InfrastructureErrorCode } from '@/server/error/codes';
 
 const log = Logger.getInstance('typesense-client');
 
@@ -90,7 +91,9 @@ class TypesenseClient {
                 instanceId: this.instanceId,
                 processId: process.pid
             });
-            throw new ServerError('app.error.default', 500);
+            throw new InfrastructureError(
+                InfrastructureErrorCode.TYPESENSE_INIT_FAILED
+            );
         }
     }
 

@@ -43,3 +43,23 @@ export async function logResponse(res: Response) {
         // Do nothing
     }
 }
+
+/**
+ * Intended to be used everywhere a request errors are handled and sent
+ * back to report that a request has failed.
+ */
+export async function logErrorResponse(res: ErrorResponse) {
+    try {
+        const requestPath = RequestContext.getRequestPath();
+        const requestMethod = RequestContext.getRequestMethod();
+
+        const status = res.status;
+        const code = res.code;
+
+        log.request(
+            `Request failed: ${requestMethod} '${requestPath}'; status: ${status}; code: ${code}`
+        );
+    } catch (error: unknown) {
+        // Do nothing
+    }
+}

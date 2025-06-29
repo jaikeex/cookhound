@@ -1,9 +1,10 @@
 import { recipeService } from '@/server/services/recipe/service';
 import type { NextRequest } from 'next/server';
-import { ServerError } from '@/server/error';
+import { NotFoundError, ValidationError } from '@/server/error';
 import { RequestContext } from '@/server/utils/reqwest/context';
 import { logRequest, logResponse } from '@/server/logger';
 import { handleServerError } from '@/server/utils/reqwest';
+import { ApplicationErrorCode } from '@/server/error/codes';
 
 //|=============================================================================================|//
 
@@ -30,13 +31,19 @@ export async function GET(request: NextRequest) {
              */
 
             if (!displayId) {
-                throw new ServerError('app.error.bad-request', 400);
+                throw new ValidationError(
+                    'app.error.bad-request',
+                    ApplicationErrorCode.MISSING_FIELD
+                );
             }
 
             const recipe = await recipeService.getRecipeByDisplayId(displayId);
 
             if (!recipe) {
-                throw new ServerError('app.error.not-found', 404);
+                throw new NotFoundError(
+                    'app.error.not-found',
+                    ApplicationErrorCode.RECIPE_NOT_FOUND
+                );
             }
 
             const response = Response.json(recipe);

@@ -1,11 +1,12 @@
 import { userService } from '@/server/services';
 import type { NextRequest } from 'next/server';
 import { handleServerError, validatePayload } from '@/server/utils/reqwest';
-import { ServerError } from '@/server/error';
+import { AuthErrorForbidden } from '@/server/error';
 import { logRequest, logResponse } from '@/server/logger';
 import { RequestContext } from '@/server/utils/reqwest/context';
 import { UserRole } from '@/common/types';
 import { z } from 'zod';
+import { ApplicationErrorCode } from '@/server/error/codes';
 
 //|=============================================================================================|//
 //?                                     VALIDATION SCHEMAS                                      ?//
@@ -51,7 +52,10 @@ export async function POST(request: NextRequest) {
 
             // Check if the user is already logged in.
             if (RequestContext.getUserRole() !== UserRole.Guest) {
-                throw new ServerError('auth.error.user-already-logged-in', 400);
+                throw new AuthErrorForbidden(
+                    'auth.error.user-already-logged-in',
+                    ApplicationErrorCode.ALREADY_LOGGED_IN
+                );
             }
 
             const rawPayload = await request.json();

@@ -14,8 +14,8 @@ at all times.
 ```
 cookhound-mk3/
 ├── src/
-│   ├── app/                    # Next.js App Router (pages, layouts, API routes)
-│   │   ├── components/         # React components (atomic design pattern)
+│   ├── app/                   # Next.js App Router (pages, layouts, API routes)
+│   │   ├── components/        # React components (atomic design pattern)
 │   │   │   ├── atoms/         # Basic building blocks
 │   │   │   ├── molecules/     # Simple component combinations
 │   │   │   ├── organisms/     # Complex UI sections
@@ -153,7 +153,7 @@ class ServiceName {
         try {
             // Validation
             if (!param) {
-                throw new ServerError('validation.error', 400);
+                throw new ValidationError();
             }
 
             // Business logic

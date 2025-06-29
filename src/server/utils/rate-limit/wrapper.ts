@@ -2,8 +2,9 @@ import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { SlidingWindowRateLimit } from './limiters/SlidingWindow';
 import type { RateLimitConfig, RateLimiter, RateLimitResult } from './types';
-import { ServerError } from '@/server/error';
+import { InfrastructureError } from '@/server/error';
 import { Logger } from '@/server/logger';
+import { InfrastructureErrorCode } from '@/server/error/codes';
 
 const logger = Logger.getInstance('rate-limit');
 
@@ -111,7 +112,9 @@ function getAppRouterClientIdentifier(req: NextRequest): string {
         logger.error('getAppRouterClientIdentifier - Unknown IP address', {
             ip
         });
-        throw new ServerError('app.error.default', 500);
+        throw new InfrastructureError(
+            InfrastructureErrorCode.RATE_LIMIT_UNKNOWN_IP
+        );
     }
 
     return `${ip.trim()}:${path}`;

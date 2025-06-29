@@ -1,6 +1,7 @@
-import { ServerError } from '@/server/error';
+import { ValidationError } from '@/server/error';
 import { Logger } from '@/server/logger';
 import type { z } from 'zod';
+import { ApplicationErrorCode } from '@/server/error/codes';
 
 const log = Logger.getInstance('api');
 
@@ -48,7 +49,10 @@ export function validateQuery<T>(schema: z.ZodType<T>, url: URL): T {
             validationErrors: errorDetails
         });
 
-        throw new ServerError('app.error.bad-request', 400);
+        throw new ValidationError(
+            undefined,
+            ApplicationErrorCode.VALIDATION_FAILED
+        );
     }
 
     return result.data;
@@ -87,7 +91,10 @@ export function validateHeaders<T>(schema: z.ZodType<T>, headers: Headers): T {
             validationErrors: errorDetails
         });
 
-        throw new ServerError('app.error.bad-request', 400);
+        throw new ValidationError(
+            undefined,
+            ApplicationErrorCode.VALIDATION_FAILED
+        );
     }
 
     return result.data;
@@ -117,7 +124,10 @@ export function validateParams<T>(
             validationErrors: errorDetails
         });
 
-        throw new ServerError('app.error.bad-request', 400);
+        throw new ValidationError(
+            undefined,
+            ApplicationErrorCode.VALIDATION_FAILED
+        );
     }
 
     return result.data;
@@ -144,7 +154,10 @@ export function validatePayload<T>(schema: z.ZodType<T>, payload: any): T {
             validationErrors: errorDetails
         });
 
-        throw new ServerError('app.error.bad-request', 400);
+        throw new ValidationError(
+            undefined,
+            ApplicationErrorCode.VALIDATION_FAILED
+        );
     }
 
     return validationResult.data;

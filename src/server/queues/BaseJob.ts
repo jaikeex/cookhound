@@ -1,6 +1,7 @@
 import type { Job, JobsOptions, Processor, QueueOptions } from 'bullmq';
 import { Logger } from '@/server/logger';
-import { ServerError } from '@/server/error';
+import { InfrastructureError } from '@/server/error';
+import { InfrastructureErrorCode } from '@/server/error/codes';
 
 const log = Logger.getInstance('base-job');
 
@@ -70,7 +71,9 @@ export abstract class BaseJob<TData = any, TResult = any> {
                 undefined,
                 { jobName: ctor.jobName, queueName: ctor.queueName }
             );
-            throw new ServerError('app.error.default', 500);
+            throw new InfrastructureError(
+                InfrastructureErrorCode.QUEUE_JOB_ADD_FAILED
+            );
         }
 
         const processor: Processor<TData, TResult> = async (job) =>

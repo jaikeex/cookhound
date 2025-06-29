@@ -3,7 +3,7 @@ import { googleApiService } from '@/server/services';
 import type { NextRequest } from 'next/server';
 import { ENV_CONFIG_PRIVATE } from '@/common/constants';
 import { withRateLimit } from '@/server/utils/rate-limit';
-import { ServerError } from '@/server/error';
+import { AuthErrorUnauthorized } from '@/server/error';
 import { logRequest, logResponse } from '@/server/logger';
 import { RequestContext } from '@/server/utils/reqwest/context';
 import { UserRole } from '@/common/types';
@@ -40,7 +40,7 @@ async function postHandler(request: NextRequest) {
 
             // Check if the user is authenticated.
             if (RequestContext.getUserRole() === UserRole.Guest) {
-                throw new ServerError('auth.error.unauthorized', 401);
+                throw new AuthErrorUnauthorized();
             }
 
             await googleApiService.uploadRecipeImage(

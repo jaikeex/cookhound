@@ -1,8 +1,9 @@
-import { ServerError } from '@/server/error';
+import { InfrastructureError } from '@/server/error';
 import { loadServiceAccount } from './gsa/gsaStore';
 import { TokenManager } from './tokenManager';
 import type { ServiceAccount, ServiceAccountIdentifier } from './types';
 import { Logger } from '@/server/logger';
+import { InfrastructureErrorCode } from '@/server/error/codes';
 
 const log = Logger.getInstance('google-api-client');
 
@@ -55,7 +56,9 @@ class GoogleApiClient {
                     'initialize - failed to initialize google api client',
                     error
                 );
-                throw new ServerError('app.error.default', 500);
+                throw new InfrastructureError(
+                    InfrastructureErrorCode.GOOGLE_API_REQUEST_FAILED
+                );
             }
         }
     }
@@ -69,7 +72,9 @@ class GoogleApiClient {
                     undefined,
                     { field }
                 );
-                throw new ServerError('app.error.default', 500);
+                throw new InfrastructureError(
+                    InfrastructureErrorCode.GOOGLE_API_REQUEST_FAILED
+                );
             }
         }
     }
@@ -91,7 +96,9 @@ class GoogleApiClient {
                 undefined,
                 { service }
             );
-            throw new ServerError('app.error.default', 500);
+            throw new InfrastructureError(
+                InfrastructureErrorCode.GOOGLE_API_REQUEST_FAILED
+            );
         }
         return manager.getAccessToken();
     }

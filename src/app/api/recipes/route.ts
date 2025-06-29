@@ -5,7 +5,7 @@ import { handleServerError, validatePayload } from '@/server/utils/reqwest';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { UserRole } from '@/common/types';
-import { ServerError } from '@/server/error';
+import { AuthErrorUnauthorized } from '@/server/error';
 import { withRateLimit } from '@/server/utils/rate-limit';
 import type { Locale } from '@/client/locales';
 import { z } from 'zod';
@@ -97,7 +97,7 @@ async function createRecipeHandler(request: NextRequest) {
             logRequest(request);
 
             if (RequestContext.getUserRole() === UserRole.Guest) {
-                throw new ServerError('auth.error.unauthorized', 401);
+                throw new AuthErrorUnauthorized();
             }
 
             const rawPayload = await request.json();

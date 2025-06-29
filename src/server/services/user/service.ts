@@ -10,12 +10,19 @@ import type {
 import bcrypt from 'bcrypt';
 import { v4 as uuid } from 'uuid';
 import { mailService } from '@/server/services';
-import { ServerError } from '@/server/error';
+import {
+    AuthErrorForbidden,
+    AuthErrorUnauthorized,
+    ConflictError,
+    NotFoundError,
+    ValidationError
+} from '@/server/error';
 import { type UserForGoogleCreate, type UserForLocalCreate } from './types';
 import { createUserDTO } from './utils';
 import db from '@/server/db/model';
 import { Logger } from '@/server/logger';
 import { RequestContext } from '@/server/utils/reqwest/context';
+import { ApplicationErrorCode } from '@/server/error/codes';
 
 //|=============================================================================================|//
 
@@ -55,9 +62,9 @@ class UserService {
                 username
             });
 
-            throw new ServerError(
+            throw new ValidationError(
                 'auth.error.email-password-username-required',
-                400
+                ApplicationErrorCode.MISSING_FIELD
             );
         }
 
@@ -73,12 +80,18 @@ class UserService {
 
         if (!availability.email) {
             log.trace('createUser - email already taken', { email });
-            throw new ServerError('auth.error.email-already-taken', 409);
+            throw new ConflictError(
+                'auth.error.email-already-taken',
+                ApplicationErrorCode.CONFLICT
+            );
         }
 
         if (!availability.username) {
             log.trace('createUser - username already taken', { username });
-            throw new ServerError('auth.error.username-already-taken', 409);
+            throw new ConflictError(
+                'auth.error.username-already-taken',
+                ApplicationErrorCode.CONFLICT
+            );
         }
 
         const salt = await bcrypt.genSalt(10);
@@ -134,7 +147,10 @@ class UserService {
         if (existingUser) {
             log.info('createUserFromGoogle - user already exists', { email });
 
-            throw new ServerError('auth.error.user-already-exists', 400);
+            throw new ConflictError(
+                'auth.error.user-already-exists',
+                ApplicationErrorCode.USER_ALREADY_EXISTS
+            );
         }
 
         const userForCreate: UserForGoogleCreate = {
@@ -165,7 +181,7 @@ class UserService {
 
         if (RequestContext.getUserId() !== userId) {
             log.warn('getShoppingList - user not found');
-            throw new ServerError('auth.error.unauthorized', 401);
+            throw new AuthErrorUnauthorized();
         }
 
         const shoppingList = await db.shoppingList.getShoppingList(userId);
@@ -180,7 +196,10 @@ class UserService {
 
             if (!recipe || !recipe.displayId || !recipe.title || !recipe.id) {
                 log.warn('getShoppingList - recipe not found', { recipeId });
-                throw new ServerError('app.error.bad-request', 400);
+                throw new NotFoundError(
+                    'app.error.not-found',
+                    ApplicationErrorCode.RECIPE_NOT_FOUND
+                );
             }
 
             const ingredients = shoppingList.filter(
@@ -226,12 +245,15 @@ class UserService {
                 ingredients
             });
 
-            throw new ServerError('app.error.bad-request', 400);
+            throw new ValidationError(
+                undefined,
+                ApplicationErrorCode.MISSING_FIELD
+            );
         }
 
         if (RequestContext.getUserId() !== userId) {
             log.warn('createShoppingList - user not found');
-            throw new ServerError('auth.error.unauthorized', 401);
+            throw new AuthErrorUnauthorized();
         }
 
         for (const i of ingredients) {
@@ -242,7 +264,10 @@ class UserService {
                     ingredientId: i.id
                 });
 
-                throw new ServerError('app.error.bad-request', 400);
+                throw new ValidationError(
+                    undefined,
+                    ApplicationErrorCode.MISSING_FIELD
+                );
             }
         }
 
@@ -274,7 +299,10 @@ class UserService {
                 updates
             });
 
-            throw new ServerError('app.error.bad-request', 400);
+            throw new ValidationError(
+                undefined,
+                ApplicationErrorCode.MISSING_FIELD
+            );
         }
 
         if (!recipeId) {
@@ -282,12 +310,15 @@ class UserService {
                 recipeId
             });
 
-            throw new ServerError('app.error.bad-request', 400);
+            throw new ValidationError(
+                undefined,
+                ApplicationErrorCode.MISSING_FIELD
+            );
         }
 
         if (RequestContext.getUserId() !== userId) {
             log.warn('updateShoppingListOrder - user not found');
-            throw new ServerError('auth.error.unauthorized', 401);
+            throw new AuthErrorUnauthorized();
         }
 
         await db.shoppingList.deleteShoppingList(userId, recipeId);
@@ -315,7 +346,7 @@ class UserService {
 
         if (RequestContext.getUserId() !== userId) {
             log.warn('deleteShoppingList - user not found');
-            throw new ServerError('auth.error.unauthorized', 401);
+            throw new AuthErrorUnauthorized();
         }
 
         await db.shoppingList.deleteShoppingList(userId, recipeId);
@@ -334,7 +365,7 @@ class UserService {
 
         if (userId !== RequestContext.getUserId()) {
             log.warn('getLastViewedRecipes - user not found');
-            throw new ServerError('auth.error.unauthorized', 401);
+            throw new AuthErrorUnauthorized();
         }
 
         const recipes = await db.user.getLastViewedRecipes(userId);
@@ -376,7 +407,10 @@ class UserService {
         if (!token) {
             log.warn('verifyEmail - missing token', { token });
 
-            throw new ServerError('auth.error.missing-token', 400);
+            throw new ValidationError(
+                'auth.error.missing-token',
+                ApplicationErrorCode.MISSING_FIELD
+            );
         }
 
         const user = await db.user.getOneByEmailVerificationToken(token);
@@ -384,13 +418,19 @@ class UserService {
         if (!user) {
             log.warn('verifyEmail - user not found', { token });
 
-            throw new ServerError('auth.error.user-not-found', 404);
+            throw new NotFoundError(
+                'auth.error.user-not-found',
+                ApplicationErrorCode.USER_NOT_FOUND
+            );
         }
 
         if (user.emailVerified) {
             log.info('verifyEmail - email already verified', { token });
 
-            throw new ServerError('auth.error.email-already-verified', 403);
+            throw new AuthErrorForbidden(
+                'auth.error.email-already-verified',
+                ApplicationErrorCode.EMAIL_ALREADY_VERIFIED
+            );
         }
 
         await db.user.updateOneById(user.id, {
@@ -418,7 +458,10 @@ class UserService {
         log.trace('resendVerificationEmail - attempt', { email });
 
         if (!email) {
-            throw new ServerError('auth.error.email-required', 400);
+            throw new ValidationError(
+                'auth.error.email-required',
+                ApplicationErrorCode.MISSING_FIELD
+            );
         }
 
         const user = await db.user.getOneByEmail(email);
@@ -426,7 +469,10 @@ class UserService {
         if (!user) {
             log.warn('resendVerificationEmail - user not found', { email });
 
-            throw new ServerError('auth.error.user-not-found', 404);
+            throw new NotFoundError(
+                'auth.error.user-not-found',
+                ApplicationErrorCode.USER_NOT_FOUND
+            );
         }
 
         if (user.emailVerified) {
@@ -434,7 +480,10 @@ class UserService {
                 email
             });
 
-            throw new ServerError('auth.error.email-already-verified', 400);
+            throw new AuthErrorForbidden(
+                'auth.error.email-already-verified',
+                ApplicationErrorCode.EMAIL_ALREADY_VERIFIED
+            );
         }
 
         const verificationToken = uuid();
@@ -470,19 +519,28 @@ class UserService {
 
         if (!email) {
             log.warn('sendPasswordResetEmail - missing email', { email });
-            throw new ServerError('auth.error.email-required', 400);
+            throw new ValidationError(
+                'auth.error.email-required',
+                ApplicationErrorCode.MISSING_FIELD
+            );
         }
 
         const user = await db.user.getOneByEmail(email);
 
         if (!user) {
             log.info('sendPasswordResetEmail - user not found', { email });
-            throw new ServerError('auth.error.user-not-found', 404);
+            throw new NotFoundError(
+                'auth.error.user-not-found',
+                ApplicationErrorCode.USER_NOT_FOUND
+            );
         }
 
         if (!user.emailVerified) {
             log.warn('sendPasswordResetEmail - email not verified', { email });
-            throw new ServerError('auth.error.email-not-verified', 400);
+            throw new AuthErrorForbidden(
+                'auth.error.email-not-verified',
+                ApplicationErrorCode.EMAIL_NOT_VERIFIED
+            );
         }
 
         if (user.authType === AuthType.Google) {
@@ -490,7 +548,10 @@ class UserService {
                 'sendPasswordResetEmail - tried for user with google auth',
                 { email }
             );
-            throw new ServerError('auth.error.google-auth-not-supported', 400);
+            throw new AuthErrorForbidden(
+                'auth.error.google-auth-not-supported',
+                ApplicationErrorCode.GOOGLE_OAUTH_FAILED
+            );
         }
 
         const passwordResetToken = uuid();
@@ -530,19 +591,28 @@ class UserService {
 
         if (!token || !password) {
             log.warn('resetPassword - missing token or password');
-            throw new ServerError('app.error.bad-request', 400);
+            throw new ValidationError(
+                undefined,
+                ApplicationErrorCode.MISSING_FIELD
+            );
         }
 
         const user = await db.user.getOneByPasswordResetToken(token);
 
         if (!user) {
             log.warn('resetPassword - user not found');
-            throw new ServerError('auth.error.user-not-found', 404);
+            throw new NotFoundError(
+                'auth.error.user-not-found',
+                ApplicationErrorCode.USER_NOT_FOUND
+            );
         }
 
         if (user.authType === AuthType.Google) {
             log.info('resetPassword - tried for user with google auth');
-            throw new ServerError('auth.error.google-auth-not-supported', 400);
+            throw new AuthErrorForbidden(
+                'auth.error.google-auth-not-supported',
+                ApplicationErrorCode.GOOGLE_OAUTH_FAILED
+            );
         }
 
         if (
@@ -550,9 +620,9 @@ class UserService {
             user.passwordResetTokenExpires < new Date()
         ) {
             log.trace('resetPassword - token expired');
-            throw new ServerError(
+            throw new ValidationError(
                 'auth.error.password-reset-token-expired',
-                400
+                ApplicationErrorCode.PASSWORD_RESET_TOKEN_EXPIRED
             );
         }
 
@@ -561,9 +631,9 @@ class UserService {
             user.lastPasswordReset > new Date(Date.now() - 1000 * 60 * 60 * 24)
         ) {
             log.warn('resetPassword - password changed too recently');
-            throw new ServerError(
+            throw new ValidationError(
                 'auth.error.password-changed-too-recently',
-                400
+                ApplicationErrorCode.PRECONDITION_FAILED
             );
         }
 

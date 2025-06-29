@@ -42,6 +42,7 @@
     "auth.error.email-already-taken": "E-mail již je používán",
     "auth.error.username-already-taken": "Uživatelské jméno již je používáno",
     "auth.error.unauthorized": "Neautorizováno",
+    "auth.error.forbidden": "Přístup odepřen",
     "auth.error.user-not-found": "Uživatel nebyl nalezen",
     "auth.error.google-oauth-code-required": "Google OAuth kód je povinný",
     "auth.error.failed-to-get-access-token": "Nepodařilo se získat přístupový token",
@@ -119,5 +120,7 @@
     "app.error.image-dimensions-too-large": "Obrázek je příliš velký. Maximální povolené rozměry jsou {{maxWidth}}x{{maxHeight}} px.",
     "app.error.image-upload-failed": "Nahrání obrázku selhalo",
     "app.error.bad-request": "Tuto akci nelze provést",
+    "app.error.conflict": "Konflikt – akci nelze dokončit",
+    "app.error.infrastructure": "Služba není momentálně dostupná, zkuste to prosím později",
     "recipe.error.not-found": "Recept nebyl nalezen"
 }

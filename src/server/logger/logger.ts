@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import util from 'util';
 import { addColors, createLogger, format, transports } from 'winston';
 import 'winston-daily-rotate-file';
 import type { Logger as WinstonLogger, transport } from 'winston';
@@ -7,8 +8,10 @@ import { GoogleCloudLoggingTransport } from './transports';
 import { ENV_CONFIG_PRIVATE, ENV_CONFIG_PUBLIC } from '@/common/constants';
 import { LOG_LEVELS, type LogLevel } from './types';
 import { RequestContext } from '@/server/utils/reqwest/context';
+import { ServerError } from '@/server/error';
+import { ApplicationErrorCode } from '@/server/error/codes';
 
-//Directory where log files will be stored. Can be overridden through the `LOG_DIR` env variable.
+// Directory where log files will be stored. Can be overridden through the `LOG_DIR` env variable.
 const LOG_DIR =
     ENV_CONFIG_PRIVATE.LOG_DIR || path.resolve(process.cwd(), 'logs');
 
@@ -98,6 +101,45 @@ export class Logger {
 
     private constructor(private readonly context: string) {
         this.logger = baseLogger.child({ context });
+
+        //?—————————————————————————————————————————————————————————————————————————————————————?//
+        //?                                GLOBAL PROCESS GUARDS                                ?//
+        ///
+        //# These listeners serve as an insurance that no uncaught error inside the app process
+        //# (or any other process that imports this module, which includes the worker process)
+        //# is ever silently ignored.
+        //#
+        //# The placement here is odd, the intention is to have them in a place that will get
+        //# executed early every time the app runs. I initially tried to place them at the top
+        //# level in this file but that does not work since the logger did not yet initalize,
+        //# so this is the second best place that i found.
+        ///
+        //?—————————————————————————————————————————————————————————————————————————————————————?//
+
+        (function registerProcessGuards() {
+            /**
+             * Skip on invocation that does not run in node.js process (e.g. middleware edge).
+             */
+            if (typeof process === 'undefined' || !process.on) return;
+
+            /**
+             * Save the guard symbol so that the listeners are not registered twice or more.
+             */
+            const GUARD = Symbol.for('cookhound.process-guards');
+            if ((globalThis as any)[GUARD]) return;
+            (globalThis as any)[GUARD] = true;
+
+            const log = Logger.getInstance('process');
+
+            // Throwing here makes no sense, but logging is essential
+            process.on('uncaughtException', (err) => {
+                log.errorWithStack('uncaughtException', err);
+            });
+
+            process.on('unhandledRejection', (reason) => {
+                log.errorWithStack('unhandledRejection', reason);
+            });
+        })();
     }
 
     //|-----------------------------------------------------------------------------------------|//
@@ -132,7 +174,6 @@ export class Logger {
              */
             throw new Error('Logger context is missing');
         }
-
         return instance;
     }
 
@@ -166,7 +207,12 @@ export class Logger {
         ...additional: unknown[]
     ): void {
         const errorInformation = {
-            message: error && error instanceof Error ? error.message : 'unknown'
+            message:
+                error && error instanceof Error ? error.message : 'unknown',
+            code:
+                error && error instanceof ServerError
+                    ? error.code
+                    : ApplicationErrorCode.DEFAULT
         };
 
         this.log('error', message, [
@@ -180,11 +226,7 @@ export class Logger {
         error: unknown,
         ...additional: unknown[]
     ): void {
-        const errorInformation = {
-            message: error instanceof Error ? error.message : 'unknown',
-            stack: error instanceof Error ? error.stack : undefined
-        };
-
+        const errorInformation = this.serialiseError(error);
         this.log('error', message, [errorInformation, ...additional]);
     }
 
@@ -257,16 +299,55 @@ export class Logger {
         return `${main} | ${extras.join(' | ')}`;
     }
 
+    private serialiseError(error: unknown): string {
+        if (!(error instanceof Error)) {
+            return String(error);
+        }
+
+        const stack = error.stack ?? error.message;
+
+        const code =
+            error instanceof ServerError
+                ? error.code
+                : ApplicationErrorCode.DEFAULT;
+
+        const causePart = error.cause
+            ? `\nCaused by: ${this.serialiseError(error.cause)}`
+            : '';
+
+        return `${code} | ${stack}${causePart}`;
+    }
+
     /**
      * Attempt to stringify a value while guarding against circular structures.
      * Falls back to `toString()` if `JSON.stringify` fails.
      */
     private safeStringify(value: unknown): string {
+        /**
+         * Preserve plain strings as is so that existing characters render correctly in both the
+         * console and file outputs. Calling `util.inspect` or `JSON.stringify` on a string would escape everything,
+         * causing the readability of log to go negative. By short-circuiting here multiline messages are kept intact.
+         */
+
+        if (typeof value === 'string') {
+            return value;
+        }
+
         try {
+            const isDev = ENV_CONFIG_PUBLIC.ENV !== 'production';
+
+            if (isDev) {
+                return util.inspect(value, {
+                    depth: null,
+                    compact: false,
+                    breakLength: 120
+                });
+            }
+
             return JSON.stringify(value);
         } catch {
             try {
-                // Some objects may implement their own `toString` method.
+                // Fall back to toString implementations.
                 return String(value);
             } catch {
                 return '[Unserialisable value]';

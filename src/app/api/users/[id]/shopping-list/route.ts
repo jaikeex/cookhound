@@ -8,7 +8,7 @@ import {
 import { logRequest, logResponse } from '@/server/logger';
 import { userService } from '@/server/services/user/service';
 import { UserRole } from '@/common/types';
-import { ServerError } from '@/server/error';
+import { AuthErrorUnauthorized } from '@/server/error';
 import { z } from 'zod';
 
 //|=============================================================================================|//
@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
             logRequest(request);
 
             if (RequestContext.getUserRole() === UserRole.Guest) {
-                throw new ServerError('auth.error.unauthorized', 401);
+                throw new AuthErrorUnauthorized();
             }
 
             const { userId } = validateParams(ShoppingListParamsSchema, {
@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
             logRequest(request);
 
             if (RequestContext.getUserRole() === UserRole.Guest) {
-                throw new ServerError('auth.error.unauthorized', 401);
+                throw new AuthErrorUnauthorized();
             }
 
             const { userId } = validateParams(ShoppingListParamsSchema, {
@@ -128,7 +128,7 @@ export async function PUT(request: NextRequest) {
             logRequest(request);
 
             if (RequestContext.getUserRole() === UserRole.Guest) {
-                throw new ServerError('auth.error.unauthorized', 401);
+                throw new AuthErrorUnauthorized();
             }
 
             const { userId } = validateParams(ShoppingListParamsSchema, {
@@ -171,7 +171,7 @@ export async function DELETE(request: NextRequest) {
             logRequest(request);
 
             if (RequestContext.getUserRole() === UserRole.Guest) {
-                throw new ServerError('auth.error.unauthorized', 401);
+                throw new AuthErrorUnauthorized();
             }
 
             const { userId } = validateParams(ShoppingListParamsSchema, {

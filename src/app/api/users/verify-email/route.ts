@@ -1,10 +1,11 @@
-import { ServerError } from '@/server/error/server';
+import { ValidationError } from '@/server/error/server';
 import { logRequest, logResponse } from '@/server/logger';
 import { userService } from '@/server/services';
 import { RequestContext } from '@/server/utils/reqwest/context';
 import { handleServerError, validatePayload } from '@/server/utils/reqwest';
 import type { NextRequest } from 'next/server';
 import { z } from 'zod';
+import { ApplicationErrorCode } from '@/server/error/codes';
 
 //|=============================================================================================|//
 //?                                     VALIDATION SCHEMAS                                      ?//
@@ -73,7 +74,10 @@ export async function PUT(request: NextRequest) {
             const token = request.nextUrl.searchParams.get('token');
 
             if (!token) {
-                throw new ServerError('app.error.bad-request', 400);
+                throw new ValidationError(
+                    undefined,
+                    ApplicationErrorCode.MISSING_FIELD
+                );
             }
 
             await userService.verifyEmail(token);

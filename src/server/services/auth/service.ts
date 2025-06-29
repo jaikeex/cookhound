@@ -5,7 +5,11 @@ import type {
     AuthCodePayload
 } from '@/common/types';
 import bcrypt from 'bcrypt';
-import { ServerError } from '@/server/error';
+import {
+    AuthErrorForbidden,
+    AuthErrorUnauthorized,
+    ValidationError
+} from '@/server/error';
 import { createToken } from '@/server/utils/session/jwt';
 import { ENV_CONFIG_PRIVATE, ENV_CONFIG_PUBLIC } from '@/common/constants';
 import { userService } from '@/server/services/user/service';
@@ -13,6 +17,7 @@ import db from '@/server/db/model';
 import { Logger } from '@/server/logger';
 import { deleteSession } from '@/server/utils/session';
 import { RequestContext } from '@/server/utils/reqwest/context';
+import { ApplicationErrorCode } from '@/server/error/codes';
 
 //|=============================================================================================|//
 
@@ -49,24 +54,36 @@ class AuthService {
 
         if (!email) {
             log.info('login - email required', { email });
-            throw new ServerError('auth.error.email-required', 400);
+            throw new ValidationError(
+                'auth.error.email-required',
+                ApplicationErrorCode.MISSING_FIELD
+            );
         }
 
         if (!password) {
             log.info('login - password required', { password });
-            throw new ServerError('auth.error.password-required', 400);
+            throw new ValidationError(
+                'auth.error.password-required',
+                ApplicationErrorCode.MISSING_FIELD
+            );
         }
 
         const user = await db.user.getOneByEmail(email);
 
         if (!user || !user.passwordHash) {
             log.info('login - user not found', { email });
-            throw new ServerError('auth.error.invalid-credentials', 401);
+            throw new AuthErrorUnauthorized(
+                'auth.error.invalid-credentials',
+                ApplicationErrorCode.INVALID_CREDENTIALS
+            );
         }
 
         if (!user.emailVerified) {
             log.info('login - email not verified', { email });
-            throw new ServerError('auth.error.email-not-verified', 403);
+            throw new AuthErrorForbidden(
+                'auth.error.email-not-verified',
+                ApplicationErrorCode.EMAIL_NOT_VERIFIED
+            );
         }
 
         const isPasswordValid = await bcrypt.compare(
@@ -76,7 +93,10 @@ class AuthService {
 
         if (!isPasswordValid) {
             log.info('login - invalid password', { email });
-            throw new ServerError('auth.error.invalid-credentials', 401);
+            throw new AuthErrorUnauthorized(
+                'auth.error.invalid-credentials',
+                ApplicationErrorCode.INVALID_CREDENTIALS
+            );
         }
 
         await db.user.updateOneById(user.id, { lastLogin: new Date() });
@@ -124,7 +144,10 @@ class AuthService {
 
         if (!code) {
             log.warn('loginWithGoogle - code required');
-            throw new ServerError('auth.error.google-oauth-code-required', 400);
+            throw new ValidationError(
+                'auth.error.google-oauth-code-required',
+                ApplicationErrorCode.MISSING_FIELD
+            );
         }
 
         const accessTokenParams = new URLSearchParams({
@@ -150,7 +173,10 @@ class AuthService {
 
         if (!accessTokenResponse.ok) {
             log.warn('loginWithGoogle - failed to get access token');
-            throw new ServerError('auth.error.failed-to-get-access-token', 401);
+            throw new AuthErrorUnauthorized(
+                'auth.error.failed-to-get-access-token',
+                ApplicationErrorCode.GOOGLE_OAUTH_FAILED
+            );
         }
 
         const accessTokenData = await accessTokenResponse.json();
@@ -167,7 +193,10 @@ class AuthService {
 
         if (!userInfoResponse.ok) {
             log.warn('loginWithGoogle - failed to get user info');
-            throw new ServerError('auth.error.failed-to-get-user-info', 401);
+            throw new AuthErrorUnauthorized(
+                'auth.error.failed-to-get-user-info',
+                ApplicationErrorCode.GOOGLE_OAUTH_FAILED
+            );
         }
 
         const userInfoData: UserFromGoogle = await userInfoResponse.json();
@@ -248,7 +277,7 @@ class AuthService {
 
         if (!userId) {
             log.trace('getCurrentUser - no token found');
-            throw new ServerError('auth.error.unauthorized', 401);
+            throw new AuthErrorUnauthorized();
         }
 
         const user = await db.user.getOneById(Number(userId));
@@ -259,7 +288,10 @@ class AuthService {
             });
 
             deleteSession();
-            throw new ServerError('auth.error.user-not-found', 401);
+            throw new AuthErrorUnauthorized(
+                'auth.error.user-not-found',
+                ApplicationErrorCode.USER_NOT_FOUND
+            );
         }
 
         if (!user.emailVerified) {
@@ -268,7 +300,10 @@ class AuthService {
             });
 
             deleteSession();
-            throw new ServerError('auth.error.email-not-verified', 401);
+            throw new AuthErrorUnauthorized(
+                'auth.error.email-not-verified',
+                ApplicationErrorCode.EMAIL_NOT_VERIFIED
+            );
         }
 
         log.trace('getCurrentUser - success', {

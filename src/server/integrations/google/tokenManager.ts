@@ -1,7 +1,8 @@
 import { createSign } from 'crypto';
 import type { ServiceAccount, AccessToken } from './types';
 import { Logger } from '@/server/logger';
-import { ServerError } from '@/server/error';
+import { InfrastructureError } from '@/server/error';
+import { InfrastructureErrorCode } from '@/server/error/codes';
 
 const log = Logger.getInstance('google-token-manager');
 
@@ -117,7 +118,9 @@ export class TokenManager {
                         'fetchNewAccessToken - failed to fetch google api access token',
                         error
                     );
-                    throw new ServerError('app.error.default', 500);
+                    throw new InfrastructureError(
+                        InfrastructureErrorCode.GOOGLE_API_REQUEST_FAILED
+                    );
                 }
 
                 await new Promise((resolve) =>
@@ -133,7 +136,9 @@ export class TokenManager {
             'fetchNewAccessToken - failed to fetch google api access token'
         );
 
-        throw new ServerError('app.error.default', 500);
+        throw new InfrastructureError(
+            InfrastructureErrorCode.GOOGLE_API_REQUEST_FAILED
+        );
     }
 
     private async makeTokenRequest(jwt: string): Promise<Response> {
@@ -159,7 +164,9 @@ export class TokenManager {
                 }
             );
 
-            throw new ServerError('app.error.default', 500);
+            throw new InfrastructureError(
+                InfrastructureErrorCode.GOOGLE_API_REQUEST_FAILED
+            );
         }
 
         return response;

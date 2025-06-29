@@ -3,7 +3,8 @@ import { Logger } from '@/server/logger';
 import type { RecipeDTO, RecipeForDisplayDTO } from '@/common/types';
 import type { Locale } from '@/client/locales';
 import { redisClient } from '@/server/integrations';
-import { ServerError } from '@/server/error';
+import { InfrastructureError } from '@/server/error';
+import { InfrastructureErrorCode } from '@/server/error/codes';
 
 const log = Logger.getInstance('recipe-index');
 
@@ -128,7 +129,9 @@ class RecipeSearchIndex {
 
             if (!isNotFound) {
                 log.error('Failed to retrieve Typesense collection', error);
-                throw new ServerError('app.error.default', 500);
+                throw new InfrastructureError(
+                    InfrastructureErrorCode.TYPESENSE_COLLECTION_CREATE_FAILED
+                );
             }
         }
 
@@ -164,7 +167,9 @@ class RecipeSearchIndex {
              * present already anyway, so failure here is some shitty magic that needs to be seen.
              */
             log.error('Failed to create Typesense collection', error);
-            throw new ServerError('app.error.default', 500);
+            throw new InfrastructureError(
+                InfrastructureErrorCode.TYPESENSE_COLLECTION_CREATE_FAILED
+            );
         }
     }
 
@@ -211,8 +216,7 @@ class RecipeSearchIndex {
             log.error('Failed to upsert recipe document in Typesense', error, {
                 id: recipe.id
             });
-
-            throw new ServerError('app.error.default', 500);
+            // This should not break the app, so we just log and continue.
         }
     }
 
@@ -273,7 +277,9 @@ class RecipeSearchIndex {
                 log.error('Typesense search failed', error, {
                     query
                 });
-                throw new ServerError('app.error.default', 500);
+                throw new InfrastructureError(
+                    InfrastructureErrorCode.TYPESENSE_SEARCH_FAILED
+                );
             }
         });
     }

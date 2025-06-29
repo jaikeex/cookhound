@@ -1,5 +1,7 @@
-import { ServerError } from '@/server/error/server';
-import { Logger, logResponse } from '@/server/logger';
+import { isServerError } from '@/server/error';
+import { logErrorResponse, Logger } from '@/server/logger';
+import { RequestContext } from './context';
+import { ApplicationErrorCode } from '@/server/error/codes';
 
 const log = Logger.getInstance('api');
 
@@ -10,24 +12,38 @@ const log = Logger.getInstance('api');
  * It is intended to be called as the final catch in the request path and returned as is.
  *
  * @param error the error object to be handled
- * @returns 'sanitized' response object with message and status
+ * @returns 'sanitized' response object with message, status and other metadata.
  */
 export function handleServerError(error: unknown) {
-    if (error instanceof ServerError) {
-        const response = Response.json(
-            { message: error.message },
-            { status: error.status }
-        );
-
-        logResponse(response);
-        return response;
-    }
+    const requestId = RequestContext.getRequestId() ?? 'unknown';
 
     /**
-     * If the error is NOT a ServerError, something non-expected happened.
-     * Do not send the error details to the client, instead log/sentry them
-     * in order to be ignored for ages and finally never fixed.
+     * This here is something called RFC-7807 “Problem Details” style JSON.
+     * Well, the type field is missing and some are named differently but it is
+     * close enough. Google for more info.
      */
-    log.errorWithStack('unchecked server error', error);
-    return Response.json({ message: 'app.error.default' }, { status: 500 });
+    const response: ErrorResponse = {
+        title: 'error',
+        message: 'app.error.default',
+        status: 500,
+        code: ApplicationErrorCode.DEFAULT,
+        requestId,
+        timestamp: new Date().toISOString()
+    };
+
+    switch (true) {
+        case isServerError(error): {
+            response.message = error.message;
+            response.status = error.status;
+            response.code = error.code;
+            break;
+        }
+
+        default:
+            log.errorWithStack('unchecked server error', error);
+    }
+
+    logErrorResponse(response);
+
+    return Response.json(response);
 }

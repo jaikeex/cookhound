@@ -1,7 +1,8 @@
 import { createClient } from 'redis';
 import { ENV_CONFIG_PRIVATE } from '@/common/constants';
 import { Logger } from '@/server/logger';
-import { ServerError } from '@/server/error/server';
+import { InfrastructureError } from '@/server/error/server';
+import { InfrastructureErrorCode } from '@/server/error/codes';
 
 const log = Logger.getInstance('redis-client');
 
@@ -49,7 +50,9 @@ class RedisClient {
         } catch (error: unknown) {
             this.isConnecting = false;
             this.connectionPromise = null;
-            throw new ServerError('app.error.default', 500);
+            throw new InfrastructureError(
+                InfrastructureErrorCode.REDIS_CONNECTION_FAILED
+            );
         }
     }
 

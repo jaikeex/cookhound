@@ -1,7 +1,8 @@
 import jwt from 'jsonwebtoken';
 import type { UserRole } from '@/common/types';
 import { ENV_CONFIG_PRIVATE } from '@/common/constants';
-import { ServerError } from '@/server/error';
+import { InfrastructureError } from '@/server/error';
+import { InfrastructureErrorCode } from '@/server/error/codes';
 
 interface JwtPayload {
     id: string;
@@ -14,7 +15,9 @@ const JWT_ISSUER = ENV_CONFIG_PRIVATE.JWT_ISSUER;
 
 export const createToken = (payload: JwtPayload): string => {
     if (!JWT_SECRET || !JWT_TOKEN_DURATION_DAYS || !JWT_ISSUER) {
-        throw new ServerError('app.error.default', 500);
+        throw new InfrastructureError(
+            InfrastructureErrorCode.JWT_SECRET_NOT_SET
+        );
     }
 
     // @ts-expect-error - expiresIn is not defined in the arguments somehow
@@ -26,7 +29,9 @@ export const createToken = (payload: JwtPayload): string => {
 
 export const verifyToken = (token: string): JwtPayload => {
     if (!JWT_SECRET) {
-        throw new ServerError('app.error.default', 500);
+        throw new InfrastructureError(
+            InfrastructureErrorCode.JWT_SECRET_NOT_SET
+        );
     }
 
     try {
@@ -36,6 +41,9 @@ export const verifyToken = (token: string): JwtPayload => {
 
         return decoded;
     } catch (error: unknown) {
-        throw new ServerError('app.error.bad-request', 400);
+        throw new InfrastructureError(
+            InfrastructureErrorCode.JWT_VERIFY_FAILED,
+            error
+        );
     }
 };

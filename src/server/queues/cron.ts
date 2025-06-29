@@ -1,7 +1,8 @@
-import { ServerError } from '@/server/error';
+import { InfrastructureError } from '@/server/error';
 import { queueManager } from './QueueManager';
 import { JOB_NAMES, QUEUE_NAMES } from './jobs/names';
 import { Logger } from '@/server/logger';
+import { InfrastructureErrorCode } from '@/server/error/codes';
 
 const log = Logger.getInstance('queue-crons');
 
@@ -32,6 +33,8 @@ export async function scheduleRecurringJobs(): Promise<void> {
         );
         // rethrow so that worker start-up fails in a controlled way – without this cron the
         // search index might silently drift out of sync.
-        throw new ServerError('app.error.default', 500);
+        throw new InfrastructureError(
+            InfrastructureErrorCode.CRON_SCHEDULER_FAILED
+        );
     }
 }

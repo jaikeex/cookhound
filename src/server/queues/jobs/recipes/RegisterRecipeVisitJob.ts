@@ -5,7 +5,8 @@ import { queueManager } from '@/server/queues/QueueManager';
 import { JOB_NAMES, QUEUE_NAMES } from '@/server/queues/jobs/names';
 import { QUEUE_OPTIONS } from './constants';
 import db from '@/server/db/model';
-import { ServerError } from '@/server/error/server';
+import { InfrastructureError } from '@/server/error/server';
+import { InfrastructureErrorCode } from '@/server/error/codes';
 
 const log = Logger.getInstance('recipe-visit-worker');
 
@@ -57,7 +58,9 @@ class RegisterRecipeVisitJob extends BaseJob<RecipeVisitJobData> {
                 userId,
                 jobId: job.id
             });
-            throw new ServerError('app.error.default', 500);
+            throw new InfrastructureError(
+                InfrastructureErrorCode.QUEUE_JOB_PROCESS_FAILED
+            );
         }
     }
 }

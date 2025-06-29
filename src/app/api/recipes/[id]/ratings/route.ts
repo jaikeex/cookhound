@@ -6,7 +6,7 @@ import {
     validateParams
 } from '@/server/utils/reqwest';
 import { withRateLimit } from '@/server/utils/rate-limit/wrapper';
-import { ServerError } from '@/server/error';
+import { AuthErrorUnauthorized } from '@/server/error';
 import { logRequest, logResponse } from '@/server/logger';
 import { RequestContext } from '@/server/utils/reqwest/context';
 import { UserRole } from '@/common/types';
@@ -47,7 +47,7 @@ async function rateRecipeHandler(request: NextRequest) {
             logRequest(request);
 
             if (RequestContext.getUserRole() === UserRole.Guest) {
-                throw new ServerError('auth.error.unauthorized', 401);
+                throw new AuthErrorUnauthorized();
             }
 
             const { recipeId } = validateParams(RatingParamsSchema, {

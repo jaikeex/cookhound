@@ -7,7 +7,11 @@ import type {
 import type { RecipeForCreate } from './types';
 import db from '@/server/db/model';
 import type { Locale } from '@/client/locales';
-import { ServerError } from '@/server/error';
+import {
+    AuthErrorUnauthorized,
+    NotFoundError,
+    ValidationError
+} from '@/server/error';
 import type { Rating } from '@prisma/client';
 import { Logger } from '@/server/logger';
 import { RequestContext } from '@/server/utils/reqwest/context';
@@ -17,6 +21,7 @@ import { intersectArrays } from '@/common/utils';
 import { SEARCH_QUERY_SEPARATOR } from '@/common/constants';
 import { queueManager } from '@/server/queues/QueueManager';
 import { JOB_NAMES } from '@/server/queues/jobs/names';
+import { ApplicationErrorCode } from '@/server/error/codes';
 
 //|=============================================================================================|//
 
@@ -34,7 +39,10 @@ class RecipeService {
 
         if (!recipe) {
             log.info('getRecipeById - recipe not found', { id });
-            throw new ServerError('recipe.error.not-found', 404);
+            throw new NotFoundError(
+                'app.error.not-found',
+                ApplicationErrorCode.RECIPE_NOT_FOUND
+            );
         }
 
         if (
@@ -44,7 +52,10 @@ class RecipeService {
             !recipe.displayId
         ) {
             log.warn('getRecipeById - recipe missing required fields', { id });
-            throw new ServerError('recipe.error.not-found', 404);
+            throw new NotFoundError(
+                'app.error.not-found',
+                ApplicationErrorCode.RECIPE_NOT_FOUND
+            );
         }
 
         const recipeDTO: RecipeDTO = {
@@ -80,7 +91,10 @@ class RecipeService {
 
         if (!recipe) {
             log.info('getRecipeByDisplayId - recipe not found', { displayId });
-            throw new ServerError('recipe.error.not-found', 404);
+            throw new NotFoundError(
+                'app.error.not-found',
+                ApplicationErrorCode.RECIPE_NOT_FOUND
+            );
         }
 
         if (
@@ -92,7 +106,10 @@ class RecipeService {
             log.warn('getRecipeByDisplayId - recipe missing required fields', {
                 displayId
             });
-            throw new ServerError('recipe.error.not-found', 404);
+            throw new NotFoundError(
+                'app.error.not-found',
+                ApplicationErrorCode.RECIPE_NOT_FOUND
+            );
         }
 
         log.trace('getRecipeByDisplayId - success', { displayId });
@@ -128,7 +145,7 @@ class RecipeService {
 
         if (!authorId) {
             log.warn('createRecipe - anonymous call');
-            throw new ServerError('auth.error.unauthorized', 401);
+            throw new AuthErrorUnauthorized();
         }
 
         const displayId = randomUUID();
@@ -186,7 +203,10 @@ class RecipeService {
 
             if (!recipeId) {
                 log.warn('registerRecipeVisit - recipeId is required');
-                throw new ServerError('app.error.bad-request', 400);
+                throw new ValidationError(
+                    undefined,
+                    ApplicationErrorCode.VALIDATION_FAILED
+                );
             }
 
             await queueManager.addJob(JOB_NAMES.REGISTER_RECIPE_VISIT, {
@@ -219,21 +239,27 @@ class RecipeService {
         log.trace('rateRecipe - attempt', { recipeId, rating });
 
         if (rating < 0 || rating > 5) {
-            throw new ServerError('app.error.bad-request', 400);
+            throw new ValidationError(
+                undefined,
+                ApplicationErrorCode.VALIDATION_FAILED
+            );
         }
 
         const authorId = RequestContext.getUserId();
 
         if (!authorId) {
             log.warn('rateRecipe - anonymous call');
-            throw new ServerError('auth.error.unauthorized', 401);
+            throw new AuthErrorUnauthorized();
         }
 
         const recipe = await this.getRecipeById(recipeId);
 
         if (!recipe) {
             log.warn('rateRecipe - recipe not found', { recipeId });
-            throw new ServerError('recipe.error.not-found', 404);
+            throw new NotFoundError(
+                'app.error.not-found',
+                ApplicationErrorCode.RECIPE_NOT_FOUND
+            );
         }
 
         const existingRating: Rating | null =
@@ -317,14 +343,20 @@ class RecipeService {
             log.warn('getFrontPageRecipes - invalid batch requested', {
                 batch
             });
-            throw new ServerError('app.error.bad-request', 400);
+            throw new ValidationError(
+                undefined,
+                ApplicationErrorCode.VALIDATION_FAILED
+            );
         }
 
         if (perPage <= 0 || perPage > 100) {
             log.warn('getFrontPageRecipes - invalid perPage requested', {
                 perPage
             });
-            throw new ServerError('app.error.bad-request', 400);
+            throw new ValidationError(
+                undefined,
+                ApplicationErrorCode.VALIDATION_FAILED
+            );
         }
 
         const offset = (batch - 1) * perPage;
@@ -400,22 +432,34 @@ class RecipeService {
 
         if (!cleanQuery) {
             log.warn('searchRecipes - empty query');
-            throw new ServerError('app.error.bad-request', 400);
+            throw new ValidationError(
+                undefined,
+                ApplicationErrorCode.VALIDATION_FAILED
+            );
         }
 
         if (cleanQuery.length > 128) {
             log.warn('searchRecipes - query too long');
-            throw new ServerError('app.error.bad-request', 400);
+            throw new ValidationError(
+                undefined,
+                ApplicationErrorCode.VALIDATION_FAILED
+            );
         }
 
         if (batch < 1 || batch > MAX_BATCHES) {
             log.warn('searchRecipes - invalid batch', { batch });
-            throw new ServerError('app.error.bad-request', 400);
+            throw new ValidationError(
+                undefined,
+                ApplicationErrorCode.VALIDATION_FAILED
+            );
         }
 
         if (perPage <= 0 || perPage > 100) {
             log.warn('searchRecipes - invalid perPage', { perPage });
-            throw new ServerError('app.error.bad-request', 400);
+            throw new ValidationError(
+                undefined,
+                ApplicationErrorCode.VALIDATION_FAILED
+            );
         }
 
         //|-------------------------------------------------------------------------------------|//
@@ -431,7 +475,10 @@ class RecipeService {
 
         if (queryTerms.length === 0) {
             log.warn('searchRecipes - no valid query terms after parsing');
-            throw new ServerError('app.error.bad-request', 400);
+            throw new ValidationError(
+                undefined,
+                ApplicationErrorCode.VALIDATION_FAILED
+            );
         }
 
         //|-------------------------------------------------------------------------------------|//
