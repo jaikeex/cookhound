@@ -91,13 +91,16 @@ class ReindexRecipesJob extends BaseJob {
 
                 try {
                     await recipeSearchIndex.upsert(dto);
-                } catch (err) {
+                } catch (error: unknown) {
                     // Do not crash the whole batch – log and continue. The job will run again
                     // later, so a temporary Typesense outage is acceptable.
-                    log.error('handle - failed to upsert recipe', {
-                        recipeId: recipe.id,
-                        err
-                    });
+                    log.errorWithStack(
+                        'handle - failed to upsert recipe',
+                        error,
+                        {
+                            recipeId: recipe.id
+                        }
+                    );
                 }
             }
 

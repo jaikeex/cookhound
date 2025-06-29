@@ -26,7 +26,7 @@ export async function middleware(request: NextRequest) {
         //?—————————————————————————————————————————————————————————————————————————————————————————?//
 
         response = (await verifyRouteAccess(request)) ?? response;
-    } catch (error) {
+    } catch (error: unknown) {
         if (error instanceof MiddlewareError && error?.response) {
             response = error.response;
         } else {

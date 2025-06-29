@@ -1,6 +1,7 @@
 import { createClient } from 'redis';
 import { ENV_CONFIG_PRIVATE } from '@/common/constants';
 import { Logger } from '@/server/logger';
+import { ServerError } from '@/server/error/server';
 
 const log = Logger.getInstance('redis-client');
 
@@ -16,8 +17,8 @@ class RedisClient {
             password: ENV_CONFIG_PRIVATE.REDIS_PASSWORD
         });
 
-        this.client.on('error', (err: Error) =>
-            log.error('Redis Client Error:', err)
+        this.client.on('error', (error: Error) =>
+            log.error('Redis Client Error:', error)
         );
         this.client.on('connect', () => {
             this.isConnected = true;
@@ -45,10 +46,10 @@ class RedisClient {
         try {
             await this.connectionPromise;
             return this.client;
-        } catch (error) {
+        } catch (error: unknown) {
             this.isConnecting = false;
             this.connectionPromise = null;
-            throw error;
+            throw new ServerError('app.error.default', 500);
         }
     }
 

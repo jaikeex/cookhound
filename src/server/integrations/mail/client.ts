@@ -83,11 +83,8 @@ export class MailClient {
             await this.authenticate();
             await this.sendEmail(options);
             await this.quit();
-        } catch (error: any) {
-            log.error('send - failed to send email', {
-                error,
-                stack: error.stack
-            });
+        } catch (error: unknown) {
+            log.errorWithStack('send - failed to send email', error);
             throw new ServerError('app.error.default', 500);
         } finally {
             if (this.socket) {
@@ -161,7 +158,7 @@ export class MailClient {
         const responseCode = parseInt(response.substring(0, 3), 10);
 
         if (responseCode !== expectedCode) {
-            log.error('sendAndVerify - unexpected SMTP response.', {
+            log.error('sendAndVerify - unexpected SMTP response.', undefined, {
                 command,
                 expectedCode,
                 responseCode,
@@ -215,11 +212,11 @@ export class MailClient {
                     resolve();
                 });
                 this.socket.once('error', reject);
-            } catch (error: any) {
-                log.error('connect - failed to connect to SMTP server', {
-                    error,
-                    stack: error.stack
-                });
+            } catch (error: unknown) {
+                log.errorWithStack(
+                    'connect - failed to connect to SMTP server',
+                    error
+                );
                 throw new ServerError('app.error.default', 500);
             }
         });
@@ -253,11 +250,11 @@ export class MailClient {
                     }
                 );
                 this.socket.once('error', reject);
-            } catch (error: any) {
-                log.error('upgradeToTls - failed to upgrade to TLS', {
-                    error,
-                    stack: error.stack
-                });
+            } catch (error: unknown) {
+                log.errorWithStack(
+                    'upgradeToTls - failed to upgrade to TLS',
+                    error
+                );
                 throw new ServerError('app.error.default', 500);
             }
         });
@@ -293,11 +290,8 @@ export class MailClient {
     private async quit(): Promise<void> {
         try {
             await this.sendAndVerify('QUIT', 221);
-        } catch (error: any) {
-            log.warn('quit - error during QUIT', {
-                error,
-                stack: error.stack
-            });
+        } catch (error: unknown) {
+            log.warn('quit - error during QUIT', { error });
         }
     }
 }

@@ -12,6 +12,7 @@ import { z } from 'zod';
 import { useLocale } from '@/client/store';
 
 import { validateFormData } from '@/client/utils';
+import type { I18nMessage } from '@/client/locales';
 
 const sendResetPasswordEmailSchema = z.object({
     email: z
@@ -70,7 +71,7 @@ export const SendResetPasswordEmailTemplate: React.FC = () => {
                     setIsSubmitting(false);
                     return;
                 }
-            } catch (error) {
+            } catch (error: unknown) {
                 setFormErrors({ server: 'auth.error.default' });
                 setIsSubmitting(false);
                 return;
@@ -82,10 +83,13 @@ export const SendResetPasswordEmailTemplate: React.FC = () => {
                 formRef.current?.reset();
                 disableForm();
                 setSubmitted(true);
-            } catch (error: any) {
+            } catch (error: unknown) {
                 if (submitted) setSubmitted(false);
                 setFormErrors({
-                    server: error.message ?? 'auth.error.default'
+                    server:
+                        error instanceof Error
+                            ? (error.message as I18nMessage)
+                            : 'auth.error.default'
                 });
             } finally {
                 setIsSubmitting(false);

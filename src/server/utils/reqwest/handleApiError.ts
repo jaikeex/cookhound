@@ -12,7 +12,7 @@ const log = Logger.getInstance('api');
  * @param error the error object to be handled
  * @returns 'sanitized' response object with message and status
  */
-export function handleServerError(error: any) {
+export function handleServerError(error: unknown) {
     if (error instanceof ServerError) {
         const response = Response.json(
             { message: error.message },
@@ -28,9 +28,6 @@ export function handleServerError(error: any) {
      * Do not send the error details to the client, instead log/sentry them
      * in order to be ignored for ages and finally never fixed.
      */
-    log.error('unchecked server error', {
-        message: error.message,
-        stack: error.stack
-    });
+    log.errorWithStack('unchecked server error', error);
     return Response.json({ message: 'app.error.default' }, { status: 500 });
 }

@@ -35,7 +35,7 @@ export const useDisplayRecipe = (recipe: RecipeDTO) => {
 
                 // Refresh the server component to get updated data
                 router.refresh();
-            } catch (error) {
+            } catch (error: unknown) {
                 alert({
                     message: t('app.error.default'),
                     variant: 'error'
@@ -69,7 +69,7 @@ export const useDisplayRecipe = (recipe: RecipeDTO) => {
                 message: t('app.shopping-list.edited'),
                 variant: 'success'
             });
-        } catch (error) {
+        } catch (error: unknown) {
             alert({
                 message: t('app.error.default'),
                 variant: 'error'

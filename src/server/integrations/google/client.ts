@@ -50,12 +50,10 @@ class GoogleApiClient {
                     serviceAccount,
                     scopes
                 );
-            } catch (error) {
-                log.error(
+            } catch (error: unknown) {
+                log.errorWithStack(
                     'initialize - failed to initialize google api client',
-                    {
-                        error
-                    }
+                    error
                 );
                 throw new ServerError('app.error.default', 500);
             }
@@ -68,6 +66,7 @@ class GoogleApiClient {
             if (!serviceAccount[field as keyof ServiceAccount]) {
                 log.error(
                     'validateServiceAccount - missing required google service account field',
+                    undefined,
                     { field }
                 );
                 throw new ServerError('app.error.default', 500);
@@ -89,6 +88,7 @@ class GoogleApiClient {
         if (!manager) {
             log.error(
                 'getAccessToken - google service account not initialized or configured',
+                undefined,
                 { service }
             );
             throw new ServerError('app.error.default', 500);

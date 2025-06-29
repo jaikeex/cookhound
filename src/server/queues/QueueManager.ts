@@ -102,7 +102,7 @@ export class QueueManager {
         });
 
         this.redis.on('error', (err) =>
-            log.error('initialize - redis connection error', { err })
+            log.error('initialize - redis connection error', err)
         );
 
         this.redis.on('connect', () =>
@@ -221,7 +221,9 @@ export class QueueManager {
 
             if (!def) {
                 // This should never happen if everything works correctly so throwing here is acceptable.
-                log.error('addJob - job is not registered', { jobName: name });
+                log.error('addJob - job is not registered', undefined, {
+                    jobName: name
+                });
                 throw new ServerError('app.error.default', 500);
             }
         }
@@ -355,24 +357,24 @@ export class QueueManager {
         for (const worker of this.workers.values()) {
             try {
                 await worker.close();
-            } catch (err) {
-                log.error('shutdown - error closing worker', { err });
+            } catch (error: unknown) {
+                log.error('shutdown - error closing worker', error);
             }
         }
 
         for (const queue of this.queues.values()) {
             try {
                 await queue.close();
-            } catch (err) {
-                log.error('shutdown - error closing queue', { err });
+            } catch (error: unknown) {
+                log.error('shutdown - error closing queue', error);
             }
         }
 
         if (this.redis) {
             try {
                 await this.redis.quit();
-            } catch (err) {
-                log.error('shutdown - error closing redis connection', { err });
+            } catch (error: unknown) {
+                log.error('shutdown - error closing redis connection', error);
             }
         }
     }
@@ -466,21 +468,23 @@ export class QueueManager {
                 const jobDef = this.jobDefinitions.get(job.name);
 
                 if (!jobDef) {
-                    log.error(
-                        'getOrCreateWorker - no processor found for job',
-                        { jobName: job.name }
-                    );
+                    log.warn('getOrCreateWorker - no processor found for job', {
+                        jobName: job.name
+                    });
                     throw new ServerError('app.error.default', 500);
                 }
 
                 try {
                     return await jobDef.processor(job as any);
-                } catch (err) {
-                    log.error('getOrCreateWorker - job processor threw', {
-                        jobName: jobDef.name,
-                        err
-                    });
-                    throw err;
+                } catch (error: unknown) {
+                    log.errorWithStack(
+                        'getOrCreateWorker - job processor threw',
+                        error,
+                        {
+                            jobName: jobDef.name
+                        }
+                    );
+                    throw new ServerError('app.error.default', 500);
                 }
             },
             {
@@ -502,16 +506,14 @@ export class QueueManager {
             });
         });
         worker.on('failed', (job, err) => {
-            log.error('bullWorker - job failed', {
+            log.error('bullWorker - job failed', err, {
                 queue: queue.name,
-                jobId: job?.id,
-                err
+                jobId: job?.id
             });
         });
         worker.on('error', (err) => {
-            log.error('bullWorker - worker errored', {
-                queue: queue.name,
-                err
+            log.error('bullWorker - worker errored', err, {
+                queue: queue.name
             });
         });
         worker.on('stalled', (jobId) => {
@@ -527,7 +529,7 @@ export class QueueManager {
                 jobId: string | number | undefined;
                 failedReason: string;
             }) => {
-                log.error('bullWorker - queue events failed', {
+                log.error('bullWorker - queue events failed', undefined, {
                     queue: queue.name,
                     jobId,
                     failedReason

@@ -67,6 +67,7 @@ export abstract class BaseJob<TData = any, TResult = any> {
         if (!ctor.jobName || !ctor.queueName) {
             log.error(
                 'getDefinition - job is missing static jobName / queueName declarations',
+                undefined,
                 { jobName: ctor.jobName, queueName: ctor.queueName }
             );
             throw new ServerError('app.error.default', 500);

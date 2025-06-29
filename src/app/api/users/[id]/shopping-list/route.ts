@@ -66,7 +66,7 @@ export async function GET(request: NextRequest) {
 
             logResponse(response);
             return response;
-        } catch (error: any) {
+        } catch (error: unknown) {
             return handleServerError(error);
         }
     });
@@ -109,7 +109,7 @@ export async function POST(request: NextRequest) {
 
             logResponse(response);
             return response;
-        } catch (error: any) {
+        } catch (error: unknown) {
             return handleServerError(error);
         }
     });
@@ -152,7 +152,7 @@ export async function PUT(request: NextRequest) {
 
             logResponse(response);
             return response;
-        } catch (error: any) {
+        } catch (error: unknown) {
             return handleServerError(error);
         }
     });
@@ -196,7 +196,7 @@ export async function DELETE(request: NextRequest) {
 
             logResponse(response);
             return response;
-        } catch (error: any) {
+        } catch (error: unknown) {
             return handleServerError(error);
         }
     });

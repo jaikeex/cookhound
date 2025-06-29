@@ -85,7 +85,7 @@ export const useShoppingListStore = create<ShoppingListStore>()((set, get) => ({
                 list
             );
             set({ shoppingList: newList });
-        } catch (error) {
+        } catch (error: unknown) {
             set({ error });
         } finally {
             set({ isLoading: false });
@@ -104,7 +104,7 @@ export const useShoppingListStore = create<ShoppingListStore>()((set, get) => ({
                 userId,
                 {} as DeleteShoppingListPayload
             );
-        } catch (error) {
+        } catch (error: unknown) {
             set({ shoppingList: prev, error });
         } finally {
             set({ isLoading: false });
@@ -124,7 +124,7 @@ export const useShoppingListStore = create<ShoppingListStore>()((set, get) => ({
 
         try {
             await apiClient.user.deleteShoppingList(userId, { recipeId });
-        } catch (error) {
+        } catch (error: unknown) {
             set({ shoppingList: prev, error });
         } finally {
             set({ isLoading: false });
@@ -158,7 +158,7 @@ export const useShoppingListStore = create<ShoppingListStore>()((set, get) => ({
             if (serverResult) {
                 set({ shoppingList: serverResult });
             }
-        } catch (error) {
+        } catch (error: unknown) {
             set({ error });
         } finally {
             set({ isLoading: false });
@@ -224,7 +224,7 @@ export const useShoppingListStore = create<ShoppingListStore>()((set, get) => ({
             };
 
             await apiClient.user.upsertShoppingList(userId, payload);
-        } catch (error) {
+        } catch (error: unknown) {
             set({ shoppingList: prev, error });
         } finally {
             set({ isLoading: false });

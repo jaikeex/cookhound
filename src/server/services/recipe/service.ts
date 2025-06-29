@@ -157,14 +157,17 @@ class RecipeService {
         // Index the recipe.
         try {
             await recipeSearchIndex.upsert(recipeDTO);
-        } catch (err) {
+        } catch (error: unknown) {
             // This is an error that needs to be raised and adressed, Failing to keep the search
             // index up to date could lead to shitty user experience.
             // Do NOT throw however – the user should still get a response even if search indexing fails.
-            log.error('createRecipe - failed to index recipe in Typesense', {
-                err,
-                recipeId: recipe.id
-            });
+            log.errorWithStack(
+                'createRecipe - failed to index recipe in Typesense',
+                error,
+                {
+                    recipeId: recipe.id
+                }
+            );
         }
 
         return recipeDTO;
@@ -195,13 +198,13 @@ class RecipeService {
                 recipeId,
                 userId
             });
-        } catch (err) {
+        } catch (error: unknown) {
             /**
              * Explicitly swallow everything here, registering a visit can NEVER
              * break any request, dedicated or otherwise.
              */
             log.warn('registerRecipeVisit - failed to queue', {
-                err,
+                error,
                 recipeId,
                 userId
             });
@@ -270,14 +273,17 @@ class RecipeService {
         try {
             const updatedRecipe = await this.getRecipeById(recipeId);
             await recipeSearchIndex.upsert(updatedRecipe);
-        } catch (err) {
+        } catch (error: unknown) {
             // This is an error that needs to be raised and adressed, Failing to keep the search
             // index up to date could lead to shitty user experience.
             // Do NOT throw however – the user should still get a response even if search indexing fails.
-            log.error('rateRecipe - failed to update Typesense index', {
-                err,
-                recipeId
-            });
+            log.errorWithStack(
+                'rateRecipe - failed to update Typesense index',
+                error,
+                {
+                    recipeId
+                }
+            );
         }
     }
 
@@ -500,8 +506,8 @@ class RecipeService {
 
                 results = intersection.slice(offset, offset + perPage);
             }
-        } catch (err) {
-            log.warn('searchRecipes - falling back to DB search', { err });
+        } catch (error: unknown) {
+            log.warn('searchRecipes - falling back to DB search', { error });
 
             /**
              * Fallback to db search if typesense fails. Do not bother with multi-searching here,

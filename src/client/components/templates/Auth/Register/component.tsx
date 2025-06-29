@@ -128,7 +128,7 @@ export const RegisterTemplate: React.FC<RegisterTemplateProps> = () => {
                     setIsSubmitting(false);
                     return;
                 }
-            } catch (error) {
+            } catch (error: unknown) {
                 setFormErrors({ server: 'auth.error.default' });
                 setIsSubmitting(false);
                 return;
@@ -150,9 +150,12 @@ export const RegisterTemplate: React.FC<RegisterTemplateProps> = () => {
                 cleanUpAndRedirectAfterSubmit(
                     `/auth/verify-email?email=${formData.email}`
                 );
-            } catch (error: any) {
+            } catch (error: unknown) {
                 setFormErrors({
-                    server: error.message ?? 'auth.error.default'
+                    server:
+                        error instanceof Error
+                            ? (error.message as I18nMessage)
+                            : 'auth.error.default'
                 });
             } finally {
                 setIsSubmitting(false);

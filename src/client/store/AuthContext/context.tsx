@@ -86,7 +86,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
 const getCurrentUserOrNull = async () => {
     try {
         return await apiClient.auth.getCurrentUser();
-    } catch (err) {
+    } catch (error: unknown) {
         return null;
     }
 };

@@ -25,7 +25,7 @@ export async function GET(request: Request) {
 
             logResponse(response);
             return response;
-        } catch (error: any) {
+        } catch (error: unknown) {
             return handleServerError(error);
         }
     });

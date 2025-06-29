@@ -39,7 +39,7 @@ export async function logResponse(res: Response) {
         log.request(
             `Request complete: ${requestMethod} '${requestPath}'; status: ${status}`
         );
-    } catch (err) {
+    } catch (error: unknown) {
         // Do nothing
     }
 }

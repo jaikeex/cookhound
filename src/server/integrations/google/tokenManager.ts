@@ -111,14 +111,11 @@ export class TokenManager {
                 const jwt = this.createJwt();
                 const response = await this.makeTokenRequest(jwt);
                 return (await response.json()) as AccessToken;
-            } catch (error: any) {
+            } catch (error: unknown) {
                 if (attempt === maxRetries) {
                     log.error(
                         'fetchNewAccessToken - failed to fetch google api access token',
-                        {
-                            error,
-                            stack: error.stack
-                        }
+                        error
                     );
                     throw new ServerError('app.error.default', 500);
                 }
@@ -156,6 +153,7 @@ export class TokenManager {
 
             log.error(
                 'makeTokenRequest - failed to fetch google api access token',
+                undefined,
                 {
                     errorText
                 }

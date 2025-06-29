@@ -5,6 +5,7 @@ import { queueManager } from '@/server/queues/QueueManager';
 import { JOB_NAMES, QUEUE_NAMES } from '@/server/queues/jobs/names';
 import { QUEUE_OPTIONS } from './constants';
 import db from '@/server/db/model';
+import { ServerError } from '@/server/error/server';
 
 const log = Logger.getInstance('recipe-visit-worker');
 
@@ -49,14 +50,14 @@ class RegisterRecipeVisitJob extends BaseJob<RecipeVisitJobData> {
                 recipeId,
                 userId
             });
-        } catch (error) {
+        } catch (error: unknown) {
             log.warn('handle - failed to process recipe visit', {
                 error,
                 recipeId,
                 userId,
                 jobId: job.id
             });
-            throw error;
+            throw new ServerError('app.error.default', 500);
         }
     }
 }

@@ -161,7 +161,7 @@ class ServiceName {
 
             log.trace('methodName - success', { result });
             return result;
-        } catch (error) {
+        } catch (error: unknown) {
             log.error('methodName - error', { error, param });
             throw error;
         }
@@ -176,7 +176,7 @@ class ServiceName {
 try {
     const result = await service.method();
     return Response.json(result);
-} catch (error) {
+} catch (error: unknown) {
     return handleServerError(error);
 }
 
@@ -184,7 +184,7 @@ try {
 try {
     const result = await apiClient.method();
     // Handle success
-} catch (error) {
+} catch (error: unknown) {
     if (error instanceof RequestError) {
         // Show user-friendly error message
         snackbar.show(error.message, 'error');

@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
 
             logResponse(response);
             return response;
-        } catch (error) {
+        } catch (error: unknown) {
             return handleServerError(error);
         }
     });

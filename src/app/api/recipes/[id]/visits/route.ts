@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
 
             logResponse(response);
             return response;
-        } catch (error) {
+        } catch (error: unknown) {
             return handleServerError(error);
         }
     });

@@ -92,7 +92,7 @@ export const LoginTemplate: React.FC<LoginTemplateProps> = ({
                     setIsSubmitting(false);
                     return;
                 }
-            } catch (error) {
+            } catch (error: unknown) {
                 setFormErrors({ server: 'auth.error.default' });
                 setIsSubmitting(false);
                 return;
@@ -103,9 +103,12 @@ export const LoginTemplate: React.FC<LoginTemplateProps> = ({
 
                 const user = await apiClient.auth.login(formData);
                 cleanUpAndRedirectAfterLogin(user);
-            } catch (error: any) {
+            } catch (error: unknown) {
                 setFormErrors({
-                    server: error.message ?? 'auth.error.default'
+                    server:
+                        error instanceof Error
+                            ? (error.message as I18nMessage)
+                            : 'auth.error.default'
                 });
             } finally {
                 setIsSubmitting(false);

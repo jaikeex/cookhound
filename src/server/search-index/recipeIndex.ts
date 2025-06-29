@@ -3,6 +3,7 @@ import { Logger } from '@/server/logger';
 import type { RecipeDTO, RecipeForDisplayDTO } from '@/common/types';
 import type { Locale } from '@/client/locales';
 import { redisClient } from '@/server/integrations';
+import { ServerError } from '@/server/error';
 
 const log = Logger.getInstance('recipe-index');
 
@@ -93,10 +94,9 @@ class RecipeSearchIndex {
             });
 
             return result;
-        } catch (error) {
-            log.error('Cache operation failed for search query', {
-                cacheKey,
-                error
+        } catch (error: unknown) {
+            log.error('Cache operation failed for search query', error, {
+                cacheKey
             });
 
             return await queryFn();
@@ -116,18 +116,19 @@ class RecipeSearchIndex {
             await this.client.collections(COLLECTION_NAME).retrieve();
             this.collectionReady = true;
             return;
-        } catch (err: any) {
+        } catch (error: unknown) {
             /**
              * This explicit check is needed to detect when the collection is not present in typesense.
+             * The any is needed here because typesense does not care about typescript.
              */
             const isNotFound =
-                err?.httpStatus === 404 ||
-                err?.name === 'ObjectNotFound' ||
-                err?.code === 404;
+                (error as any)?.httpStatus === 404 ||
+                (error as any)?.name === 'ObjectNotFound' ||
+                (error as any)?.code === 404;
 
             if (!isNotFound) {
-                log.error('Failed to retrieve Typesense collection', { err });
-                throw err;
+                log.error('Failed to retrieve Typesense collection', error);
+                throw new ServerError('app.error.default', 500);
             }
         }
 
@@ -156,14 +157,14 @@ class RecipeSearchIndex {
             this.collectionReady = true;
 
             log.info('Typesense recipe collection created successfully');
-        } catch (err) {
+        } catch (error: unknown) {
             /**
              * Throw the error here.
              * There is no reasonable reason for this to ever happen, and the collection will be
              * present already anyway, so failure here is some shitty magic that needs to be seen.
              */
-            log.error('Failed to create Typesense collection', { err });
-            throw err;
+            log.error('Failed to create Typesense collection', error);
+            throw new ServerError('app.error.default', 500);
         }
     }
 
@@ -206,12 +207,12 @@ class RecipeSearchIndex {
             log.trace('Recipe indexed/updated in Typesense', {
                 id: recipe.id
             });
-        } catch (err: any) {
-            log.error('Failed to upsert recipe document in Typesense', {
-                id: recipe.id,
-                stack: err.stack
+        } catch (error: unknown) {
+            log.error('Failed to upsert recipe document in Typesense', error, {
+                id: recipe.id
             });
-            throw err;
+
+            throw new ServerError('app.error.default', 500);
         }
     }
 
@@ -268,9 +269,11 @@ class RecipeSearchIndex {
                 });
 
                 return hits;
-            } catch (err) {
-                log.error('Typesense search failed', { err, query });
-                throw err;
+            } catch (error: unknown) {
+                log.error('Typesense search failed', error, {
+                    query
+                });
+                throw new ServerError('app.error.default', 500);
             }
         });
     }

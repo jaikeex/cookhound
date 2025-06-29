@@ -35,7 +35,7 @@ export const verifyToken = (token: string): JwtPayload => {
         }) as JwtPayload;
 
         return decoded;
-    } catch (error) {
+    } catch (error: unknown) {
         throw new ServerError('app.error.bad-request', 400);
     }
 };

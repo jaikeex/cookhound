@@ -1,3 +1,4 @@
+import { ServerError } from '@/server/error';
 import { queueManager } from './QueueManager';
 import { JOB_NAMES, QUEUE_NAMES } from './jobs/names';
 import { Logger } from '@/server/logger';
@@ -24,12 +25,13 @@ export async function scheduleRecurringJobs(): Promise<void> {
         }
 
         log.info('scheduleRecurringJobs - cron jobs scheduled');
-    } catch (error) {
-        log.error('scheduleRecurringJobs - failed to schedule cron jobs', {
+    } catch (error: unknown) {
+        log.errorWithStack(
+            'scheduleRecurringJobs - failed to schedule cron jobs',
             error
-        });
+        );
         // rethrow so that worker start-up fails in a controlled way – without this cron the
         // search index might silently drift out of sync.
-        throw error;
+        throw new ServerError('app.error.default', 500);
     }
 }

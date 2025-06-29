@@ -128,7 +128,7 @@ export class GoogleCloudLoggingTransport extends Transport {
             const googleApiService = await this.getGoogleApiService();
 
             await googleApiService.writeLogsToGoogleCloud(entries);
-        } catch (err) {
+        } catch (error: unknown) {
             // Failure to write to Cloud Logging should not crash the app.
         }
     }

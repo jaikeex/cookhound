@@ -118,7 +118,7 @@ export class Logger {
             try {
                 instance = new Logger(context);
                 this.instances.set(context, instance);
-            } catch (error) {
+            } catch (error: unknown) {
                 /**
                  * Do nothing here. Failure to log an entry should never result in the app crashing
                  * or in any feedback to the user.
@@ -160,8 +160,32 @@ export class Logger {
         this.log('warn', message, additional);
     }
 
-    public error(message: unknown, ...additional: unknown[]): void {
-        this.log('error', message, additional);
+    public error(
+        message: unknown,
+        error?: unknown,
+        ...additional: unknown[]
+    ): void {
+        const errorInformation = {
+            message: error && error instanceof Error ? error.message : 'unknown'
+        };
+
+        this.log('error', message, [
+            ...(error ? [errorInformation] : []),
+            ...additional
+        ]);
+    }
+
+    public errorWithStack(
+        message: unknown,
+        error: unknown,
+        ...additional: unknown[]
+    ): void {
+        const errorInformation = {
+            message: error instanceof Error ? error.message : 'unknown',
+            stack: error instanceof Error ? error.stack : undefined
+        };
+
+        this.log('error', message, [errorInformation, ...additional]);
     }
 
     //|-----------------------------------------------------------------------------------------|//

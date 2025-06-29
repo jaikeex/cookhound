@@ -118,7 +118,7 @@ export const RecipeCreate: React.FC<RecipeCreateProps> = () => {
                     setIsSubmitting(false);
                     return;
                 }
-            } catch (error) {
+            } catch (error: unknown) {
                 setFormErrors({ server: 'auth.error.default' });
                 setIsSubmitting(false);
                 return;
@@ -153,7 +153,7 @@ export const RecipeCreate: React.FC<RecipeCreateProps> = () => {
                     setChangedFields([]);
                     safePush(`/recipe/${createdRecipe.displayId}`);
                 }
-            } catch (error: any) {
+            } catch (error: unknown) {
                 setFormErrors({ server: 'auth.error.default' });
             } finally {
                 setIsSubmitting(false);
@@ -340,7 +340,7 @@ async function uploadImage(
 
             image_url = response.objectUrl;
         }
-    } catch (error) {
+    } catch (error: unknown) {
         alert({
             message: t('app.error.image-upload-failed'),
             variant: 'error'

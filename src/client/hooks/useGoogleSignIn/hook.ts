@@ -40,8 +40,12 @@ export const useGoogleSignIn: UseGoogleSignInType = ({ onSuccess }) => {
                         code: event.data.authCode
                     });
                     onSuccess && onSuccess(user);
-                } catch (error: any) {
-                    setError(error.message);
+                } catch (error: unknown) {
+                    setError(
+                        error instanceof Error
+                            ? error.message
+                            : 'app.error.default'
+                    );
                     return;
                 }
             }

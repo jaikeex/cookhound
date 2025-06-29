@@ -126,7 +126,7 @@ export const ImageCropperModal: React.FC<ImageCropperModalProps> = ({
 
             onComplete(croppedFile);
             close();
-        } catch (error) {
+        } catch (error: unknown) {
             alert({
                 message: t('app.error.default'),
                 variant: 'error'

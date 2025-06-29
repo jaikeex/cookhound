@@ -12,6 +12,7 @@ import type { SearchInputProps } from '@/client/components/molecules/Form/Search
 import { Chip, Typography, SearchInput } from '@/client/components';
 import { useLocalStorage } from '@/client/hooks/useLocalStorage';
 import { LOCAL_STORAGE_LAST_VIEWED_RECIPES_KEY } from '@/common/constants';
+import type { I18nMessage } from '@/client/locales';
 
 export type RecipeSearchInputProps = Readonly<{
     enableSuggestions?: boolean;
@@ -165,10 +166,14 @@ export const RecipeSearchInput: React.FC<RecipeSearchInputProps> = ({
                 ) {
                     setSuggestions(results);
                 }
-            } catch (err) {
+            } catch (error: unknown) {
                 if (!cancelled) {
                     setSuggestionsError(
-                        err instanceof Error ? err.message : 'Unknown error'
+                        t(
+                            error instanceof Error
+                                ? (error.message as I18nMessage)
+                                : 'app.error.default'
+                        )
                     );
                     setSuggestions([]);
                 }

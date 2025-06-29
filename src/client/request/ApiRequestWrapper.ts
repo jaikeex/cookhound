@@ -218,7 +218,7 @@ class ApiRequestWrapper {
 
             try {
                 data = await response.json();
-            } catch (err) {
+            } catch (error: unknown) {
                 data = null;
             }
 
@@ -235,7 +235,7 @@ class ApiRequestWrapper {
 
                 throw RequestError.fromFetchError(data, response);
             }
-        } catch (error) {
+        } catch (error: unknown) {
             // Re-throw notFound() calls and other Next.js redirects
             if (error && typeof error === 'object' && 'digest' in error) {
                 throw error;

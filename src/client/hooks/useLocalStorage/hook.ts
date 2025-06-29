@@ -96,8 +96,8 @@ export const useLocalStorage = <T>(
             }
 
             return deserializer(item);
-        } catch (err) {
-            handleError(err);
+        } catch (error: unknown) {
+            handleError(error);
             return initialValue;
         }
     }, [initialValue, key, deserializer, handleError]);
@@ -152,8 +152,8 @@ export const useLocalStorage = <T>(
                         detail: { key, newValue }
                     })
                 );
-            } catch (err) {
-                handleError(err);
+            } catch (error: unknown) {
+                handleError(error);
             }
         },
         [key, readValue, serializer, handleError]
@@ -180,8 +180,8 @@ export const useLocalStorage = <T>(
                     detail: { key, newValue: initialValue }
                 })
             );
-        } catch (err) {
-            handleError(err);
+        } catch (error: unknown) {
+            handleError(error);
         }
     }, [key, initialValue, handleError]);
 

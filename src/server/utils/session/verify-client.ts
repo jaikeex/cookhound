@@ -116,7 +116,7 @@ export const verifyRouteAccess: MiddlewareStepFunction = async (request) => {
         user = await apiClient.auth.getCurrentUser({
             headers: { 'Cookie': `jwt=${session}` }
         });
-    } catch (error) {
+    } catch (error: unknown) {
         /**
          * If the getCurrentUser() call fails, the session is not valid (or something else, who cares).
          * That's the same as trying to access a protected route without a sesssion token so GTFO.

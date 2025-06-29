@@ -15,8 +15,10 @@ export const VerifyEmailTemplate: React.FC = () => {
         try {
             if (!email) return;
             await apiClient.user.resendVerificationEmail(email);
-        } catch (error: any) {
-            setError(error.message);
+        } catch (error: unknown) {
+            setError(
+                error instanceof Error ? error.message : 'app.error.default'
+            );
         }
     }, []);
 

@@ -49,7 +49,7 @@ export function withRateLimit(
         try {
             const identifier = getAppRouterClientIdentifier(req);
             result = await rateLimiter.checkLimit(identifier);
-        } catch (error) {
+        } catch (error: unknown) {
             return NextResponse.json(
                 { error: 'app.error.default' },
                 { status: 500 }

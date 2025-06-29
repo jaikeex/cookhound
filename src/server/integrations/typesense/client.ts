@@ -2,6 +2,7 @@ import Typesense from 'typesense';
 import { ENV_CONFIG_PUBLIC, ENV_CONFIG_PRIVATE } from '@/common/constants/env';
 import { Logger } from '@/server/logger';
 import { randomUUID } from 'crypto';
+import { ServerError } from '@/server/error';
 
 const log = Logger.getInstance('typesense-client');
 
@@ -84,13 +85,12 @@ class TypesenseClient {
                 host: ENV_CONFIG_PUBLIC.TYPESENSE_HOST,
                 port: ENV_CONFIG_PUBLIC.TYPESENSE_PORT
             });
-        } catch (err) {
-            log.error('Failed to initialise Typesense client', {
-                err,
+        } catch (error: unknown) {
+            log.errorWithStack('Failed to initialise Typesense client', error, {
                 instanceId: this.instanceId,
                 processId: process.pid
             });
-            throw err;
+            throw new ServerError('app.error.default', 500);
         }
     }
 
@@ -147,10 +147,9 @@ class TypesenseClient {
                 health
             });
             return health.ok === true;
-        } catch (err) {
-            log.error('Typesense health check failed', {
-                instanceId: this.instanceId,
-                err
+        } catch (error: unknown) {
+            log.error('Typesense health check failed', error, {
+                instanceId: this.instanceId
             });
             return false;
         }

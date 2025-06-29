@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
 
             logResponse(response);
             return response;
-        } catch (error: any) {
+        } catch (error: unknown) {
             return handleServerError(error);
         }
     });

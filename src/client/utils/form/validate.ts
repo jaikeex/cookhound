@@ -7,7 +7,7 @@ export const validateFormData = async <T>(
     try {
         await schema.parseAsync(formData);
         return {}; // No validation errors
-    } catch (error) {
+    } catch (error: unknown) {
         const validationErrors: Record<string, string> = {};
 
         if (error instanceof z.ZodError) {

@@ -19,8 +19,8 @@ export default function VerifyEmailCallback() {
         try {
             await apiClient.user.verifyEmail(data.token);
             setResult(true);
-        } catch (error: any) {
-            setError(error.message);
+        } catch (error: unknown) {
+            setError(error instanceof Error ? error.message : 'unknown error');
         }
     };
 

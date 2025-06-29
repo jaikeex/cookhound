@@ -83,7 +83,7 @@ export default async function RootLayout({
         user = await apiClient.auth.getCurrentUser({
             headers: { 'Cookie': `jwt=${token}` }
         });
-    } catch (error) {
+    } catch (error: unknown) {
         user = null;
     }
 

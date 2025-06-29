@@ -6,6 +6,7 @@ import { convertImgToWebP, verifyImgSize } from '@/client/utils';
 import { Icon, ImageCropperModal } from '@/client/components';
 import { useLocale, useSnackbar, useModal } from '@/client/store';
 import Image from 'next/image';
+import type { I18nMessage } from '@/client/locales';
 
 type ImageInputProps = Readonly<{
     className?: string;
@@ -136,10 +137,12 @@ export const ImageInput: React.FC<ImageInputProps> = ({
                         });
                     }
                 }
-            } catch (error: any) {
+            } catch (error: unknown) {
                 alert({
                     message: t(
-                        error.message,
+                        error instanceof Error
+                            ? (error.message as I18nMessage)
+                            : 'app.error.default',
                         {
                             maxSize: maxSize / 1024 / 1024,
                             maxWidth,

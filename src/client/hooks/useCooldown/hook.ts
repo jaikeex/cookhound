@@ -51,8 +51,8 @@ export const useCooldown = (
                     return diff > 100 ? remaining : prev;
                 });
             }
-        } catch (err) {
-            onError?.(err as Error);
+        } catch (error: unknown) {
+            onError?.(error as Error);
         }
     }, [endTime, setEndTime, onError]);
 
@@ -76,8 +76,8 @@ export const useCooldown = (
             setEndTime(endTime);
             setIsOnCooldown(true);
             setRemainingTime(cooldown);
-        } catch (err) {
-            onError?.(err as Error);
+        } catch (error: unknown) {
+            onError?.(error as Error);
         }
     }, [cooldown, setEndTime, onError]);
 

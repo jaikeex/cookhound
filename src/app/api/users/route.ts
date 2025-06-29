@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
 
             logResponse(response);
             return response;
-        } catch (error: any) {
+        } catch (error: unknown) {
             return handleServerError(error);
         }
     });
