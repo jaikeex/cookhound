@@ -133,7 +133,7 @@ export const RequestContext = {
     ): void {
         const store = asyncLocalStorage.getStore();
         if (store) {
-            (store as any)[key] = value;
+            (store as RequestContextShape)[key] = value;
         }
     },
 

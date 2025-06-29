@@ -51,10 +51,13 @@ class GoogleApiClient {
                     scopes
                 );
             } catch (error) {
-                console.error(
-                    `Failed to initialize service account ${id}:`,
-                    error
+                log.error(
+                    'initialize - failed to initialize google api client',
+                    {
+                        error
+                    }
                 );
+                throw new ServerError('app.error.default', 500);
             }
         }
     }

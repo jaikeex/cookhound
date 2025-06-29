@@ -52,7 +52,6 @@ export const useCooldown = (
                 });
             }
         } catch (err) {
-            console.error('Cooldown state update error:', err);
             onError?.(err as Error);
         }
     }, [endTime, setEndTime, onError]);
@@ -78,7 +77,6 @@ export const useCooldown = (
             setIsOnCooldown(true);
             setRemainingTime(cooldown);
         } catch (err) {
-            console.error('Start cooldown error:', err);
             onError?.(err as Error);
         }
     }, [cooldown, setEndTime, onError]);

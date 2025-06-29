@@ -1,7 +1,5 @@
 'use client';
 
-/* eslint-disable react/jsx-no-bind */
-
 import React, { useCallback, useRef } from 'react';
 import { Icon, IconButton } from '@/client/components';
 import { Reorder, useDragControls } from 'framer-motion';
@@ -53,9 +51,15 @@ export const DraggableInputRow: React.FC<DraggableInputRowProps> = ({
         [controls, disableDrag]
     );
 
-    const handleDragEnd = useCallback(() => {
-        document.documentElement.style.overflow = originalBodyOverflow.current;
-    }, []);
+    const handleDragEnd = useCallback(
+        (event: PointerEvent, info: PanInfo) => {
+            document.documentElement.style.overflow =
+                originalBodyOverflow.current;
+
+            onDragEnd?.(event as unknown as PointerEvent, info);
+        },
+        [onDragEnd]
+    );
 
     return (
         <Reorder.Item
@@ -63,10 +67,7 @@ export const DraggableInputRow: React.FC<DraggableInputRowProps> = ({
             className={`flex items-center gap-2 ${className}`}
             dragListener={false}
             dragControls={controls}
-            onDragEnd={(event, info) => {
-                handleDragEnd();
-                onDragEnd?.(event as unknown as PointerEvent, info);
-            }}
+            onDragEnd={handleDragEnd}
         >
             {children}
             <div className={'flex items-center'}>

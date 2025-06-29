@@ -1,5 +1,4 @@
 'use client';
-/* eslint-disable react/jsx-no-bind */
 
 import React, { use, useCallback, useState } from 'react';
 import type { ChangeEvent } from 'react';
@@ -81,7 +80,7 @@ export const SearchTemplate: React.FC<SearchTemplateProps> = ({
     }, [searchInput, router, addQuery, reset, queries]);
 
     const handleClearQuery = useCallback(
-        (term: string) => {
+        (term: string) => () => {
             removeQuery(term);
 
             const remaining = queries.filter((q) => q !== term);
@@ -101,10 +100,6 @@ export const SearchTemplate: React.FC<SearchTemplateProps> = ({
         },
         [removeQuery, queries, router]
     );
-
-    // ———————————————————————————————————————————————————————————————————— //
-    // Render
-    // ———————————————————————————————————————————————————————————————————— //
 
     return (
         <div className="flex flex-col max-w-screen-sm gap-4 px-2 mx-auto mt-32 md:max-w-screen-md xl:max-w-screen-lg md:mt-36">
@@ -127,7 +122,7 @@ export const SearchTemplate: React.FC<SearchTemplateProps> = ({
                             size="sm"
                             color="warning"
                             icon="close"
-                            onClick={() => handleClearQuery(term)}
+                            onClick={handleClearQuery(term)}
                         >
                             {term}
                         </ChipButton>

@@ -1,8 +1,5 @@
 'use client';
 
-/* eslint-disable react/jsx-no-bind */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import type {
     Ingredient,
@@ -23,7 +20,6 @@ import {
     useModal,
     useShoppingListStore
 } from '@/client/store';
-import type { PanInfo } from 'framer-motion';
 import Link from 'next/link';
 
 type ShoppingListTemplateProps = Readonly<{
@@ -262,7 +258,7 @@ export const ShoppingListTemplate: React.FC<ShoppingListTemplateProps> = ({
 
     const createIngredientDragEnd = useCallback(
         (ingredient: ShoppingListIngredientDTO, recipeId: number) =>
-            (event: PointerEvent, _info?: PanInfo) => {
+            (event: PointerEvent) => {
                 if (!isEditing || !binRef.current) return;
 
                 const x = event.clientX;
@@ -342,6 +338,12 @@ export const ShoppingListTemplate: React.FC<ShoppingListTemplateProps> = ({
         [isEditing, shoppingListStore, binIngredients]
     );
 
+    const handleIngredientDragEnd = useCallback(
+        (recipeId: number) => (ingredient: ShoppingListIngredientDTO) =>
+            createIngredientDragEnd(ingredient, recipeId),
+        [createIngredientDragEnd]
+    );
+
     /**
      * Implementing reordering of the trash was (believe it or not) easier than learning framer-motion
      * and finding a way to keep the state synced.
@@ -400,9 +402,9 @@ export const ShoppingListTemplate: React.FC<ShoppingListTemplateProps> = ({
                     onDelete={openConfirmDeleteModal(list.recipe.id)}
                     ref={createRecipeRefCallback(list.recipe.id)}
                     onReorder={handleReorder(list.recipe.id)}
-                    onIngredientDragEnd={(ingredient) =>
-                        createIngredientDragEnd(ingredient, list.recipe.id)
-                    }
+                    onIngredientDragEnd={handleIngredientDragEnd(
+                        list.recipe.id
+                    )}
                     onMark={handleMarkIngredient(list.recipe.id)}
                     onUnMark={handleUnmarkIngredient(list.recipe.id)}
                 />

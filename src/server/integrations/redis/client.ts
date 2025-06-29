@@ -1,5 +1,8 @@
 import { createClient } from 'redis';
 import { ENV_CONFIG_PRIVATE } from '@/common/constants';
+import { Logger } from '@/server/logger';
+
+const log = Logger.getInstance('redis-client');
 
 class RedisClient {
     private client;
@@ -14,7 +17,7 @@ class RedisClient {
         });
 
         this.client.on('error', (err: Error) =>
-            console.error('Redis Client Error:', err)
+            log.error('Redis Client Error:', err)
         );
         this.client.on('connect', () => {
             this.isConnected = true;

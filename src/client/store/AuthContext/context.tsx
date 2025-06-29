@@ -83,7 +83,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
     );
 };
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const getCurrentUserOrNull = async () => {
     try {
         return await apiClient.auth.getCurrentUser();
