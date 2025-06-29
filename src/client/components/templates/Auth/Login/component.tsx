@@ -10,8 +10,7 @@ import {
 } from '@/client/components';
 import type { UserDTO, UserForLogin } from '@/common/types';
 import apiClient from '@/client/request';
-import type { ObjectSchema } from 'yup';
-import { boolean, object, string } from 'yup';
+import { z } from 'zod';
 import { validateFormData } from '@/client/utils/form';
 
 import { useGoogleSignIn } from '@/client/hooks';
@@ -24,12 +23,15 @@ export type LoginTemplateProps = Readonly<{
     callbackUrl?: string;
 }>;
 
-export const loginSchema: ObjectSchema<UserForLogin> = object({
-    email: string()
+export const loginSchema = z.object({
+    email: z
+        .string()
         .email('auth.error.email-invalid')
-        .required('auth.error.email-required'),
-    password: string().required('auth.error.password-required'),
-    keepLoggedIn: boolean().required('auth.error.keep-logged-in-required')
+        .min(1, 'auth.error.email-required'),
+    password: z.string().trim().min(1, 'auth.error.password-required'),
+    keepLoggedIn: z.boolean({
+        required_error: 'auth.error.keep-logged-in-required'
+    })
 });
 
 export const LoginTemplate: React.FC<LoginTemplateProps> = ({

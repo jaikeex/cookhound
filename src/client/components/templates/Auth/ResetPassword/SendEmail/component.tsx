@@ -8,15 +8,16 @@ import type {
 import { SimpleEmailForm, Typography } from '@/client/components';
 import type { ResetPasswordEmailPayload } from '@/common/types';
 import apiClient from '@/client/request';
-import { object, string } from 'yup';
+import { z } from 'zod';
 import { useLocale } from '@/client/store';
 
 import { validateFormData } from '@/client/utils';
 
-const sendResetPasswordEmailSchema = object().shape({
-    email: string()
+const sendResetPasswordEmailSchema = z.object({
+    email: z
+        .string()
         .email('auth.error.email-invalid')
-        .required('auth.error.email-required')
+        .min(1, 'auth.error.email-required')
 });
 
 export const SendResetPasswordEmailTemplate: React.FC = () => {

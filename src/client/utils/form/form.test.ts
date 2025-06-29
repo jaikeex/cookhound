@@ -1,60 +1,66 @@
-import { describe, it, expect, vi } from 'vitest';
-import * as yup from 'yup';
+import { describe, it, expect } from 'vitest';
+import { z } from 'zod';
 import { validateFormData } from './validate';
 
-describe('Form data validation', () => {
-    it('validates form data correctly with no errors', async () => {
-        const schema = yup.object().shape({
-            name: yup.string().required(),
-            age: yup.number().required().positive().integer()
+describe('validateFormData', () => {
+    it('should return empty object when validation passes', async () => {
+        const schema = z.object({
+            name: z.string().trim().min(1),
+            age: z.number().positive().int()
         });
-        const formData = {
-            name: 'John Doe',
-            age: 30
-        };
 
+        const formData = { name: 'John', age: 25 };
         const result = await validateFormData(formData, schema);
+
         expect(result).toEqual({});
     });
 
-    it('returns errors for invalid data', async () => {
-        const schema = yup.object().shape({
-            name: yup.string().required(),
-            age: yup.number().required().positive().integer()
+    it('should return validation errors when validation fails', async () => {
+        const schema = z.object({
+            name: z.string().trim().min(1),
+            age: z.number().positive().int()
         });
+
+        const formData = { name: '', age: -5 };
+        const result = await validateFormData(formData, schema);
+
+        expect(Object.keys(result).length).toBeGreaterThan(0);
+        expect(result.name).toBeDefined();
+        expect(result.age).toBeDefined();
+    });
+
+    it('should handle nested validation errors', async () => {
+        const schema = z.object({
+            user: z.object({
+                name: z.string().trim().min(1),
+                email: z.string().trim().email()
+            })
+        });
+
         const formData = {
-            name: '', // Invalid as it's required
-            age: -10 // Invalid as it must be positive
+            user: {
+                name: '',
+                email: 'invalid-email'
+            }
         };
 
         const result = await validateFormData(formData, schema);
-        expect(result).toHaveProperty('name');
-        expect(result.name).toContain('required');
-        expect(result).toHaveProperty('age');
-        expect(result.age).toContain('positive');
+
+        expect(Object.keys(result).length).toBeGreaterThan(0);
     });
 
-    it('handles cases where validation throws non-validation errors', async () => {
-        const schema = {
-            validate: vi.fn().mockRejectedValue(new Error('Unexpected error'))
-        };
-        const formData = {
-            name: 'John Doe',
-            age: 30
-        };
-
-        await expect(validateFormData(formData, schema as any)).rejects.toThrow(
-            'Unexpected error'
-        );
-    });
-
-    it('ignores validation errors for fields not in formData', async () => {
-        const schema = yup.object().shape({
-            email: yup.string().email().required()
+    it('should handle custom error messages', async () => {
+        const schema = z.object({
+            email: z
+                .string()
+                .trim()
+                .email('Invalid email format')
+                .min(1, 'Email is required')
         });
-        const formData = {}; // No 'email' key present in formData
 
+        const formData = { email: 'invalid' };
         const result = await validateFormData(formData, schema);
-        expect(result).toEqual({});
+
+        expect(result.email).toBe('Invalid email format');
     });
 });

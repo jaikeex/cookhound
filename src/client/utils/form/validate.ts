@@ -1,19 +1,20 @@
-import type { ObjectSchema } from 'yup';
-import { ValidationError } from 'yup';
+import { z } from 'zod';
 
-export const validateFormData = async (
+export const validateFormData = async <T>(
     formData: any,
-    schema: ObjectSchema<AnyObject>
+    schema: z.ZodType<T>
 ): Promise<Record<string, string>> => {
     try {
-        await schema.validate(formData, { abortEarly: false, strict: true });
+        await schema.parseAsync(formData);
         return {}; // No validation errors
     } catch (error) {
         const validationErrors: Record<string, string> = {};
-        if (error instanceof ValidationError) {
-            error.inner.forEach((err) => {
-                if (err.path && err.path in formData) {
-                    validationErrors[err.path] = err.message;
+
+        if (error instanceof z.ZodError) {
+            error.errors.forEach((err) => {
+                const path = err.path.join('.');
+                if (path && path in formData) {
+                    validationErrors[path] = err.message;
                 }
             });
         } else {

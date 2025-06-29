@@ -1,8 +1,6 @@
 'use client';
 
 import React, { useCallback, useEffect, useState } from 'react';
-import type { ObjectSchema } from 'yup';
-import { object, ref, string } from 'yup';
 import type { UserForCreatePayload } from '@/common/types';
 import apiClient from '@/client/request';
 import { useGoogleSignIn } from '@/client/hooks';
@@ -20,6 +18,7 @@ import { useAuth, useLocale, useSnackbar } from '@/client/store';
 import type { I18nMessage } from '@/client/locales';
 import Link from 'next/link';
 import type { UserDTO } from '@/common/types';
+import { z } from 'zod';
 
 export type RegisterTemplateProps = NonNullable<unknown>;
 
@@ -30,27 +29,36 @@ type UserForCreateFormData = {
     repeatPassword: string;
 };
 
-export const registerSchema: ObjectSchema<UserForCreatePayload> = object({
-    username: string()
-        .matches(/^[a-zA-Z0-9_]*$/, 'auth.error.invalid-characters')
-        .required('auth.error.username-required')
-        .min(3, 'auth.error.username-min-length')
-        .max(20, 'auth.error.username-max-length'),
-    email: string()
-        .email('auth.error.email-invalid')
-        .required('auth.error.email-required'),
-    password: string()
-        .matches(
-            /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).*$/,
-            'auth.error.password-missing-character'
-        )
-        .min(6, 'auth.error.password-min-length')
-        .max(40, 'auth.error.password-max-length')
-        .required('auth.error.password-required'),
-    repeatPassword: string()
-        .oneOf([ref('password')], 'auth.error.passwords-dont-match')
-        .required('auth.error.repeat-password-required')
-});
+export const registerSchema = z
+    .object({
+        username: z
+            .string()
+            .regex(/^[a-zA-Z0-9_]*$/, 'auth.error.invalid-characters')
+            .min(3, 'auth.error.username-min-length')
+            .min(1, 'auth.error.username-required')
+            .max(20, 'auth.error.username-max-length'),
+        email: z
+            .string()
+            .email('auth.error.email-invalid')
+            .min(1, 'auth.error.email-required'),
+        password: z
+            .string()
+            .regex(
+                /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).*$/,
+                'auth.error.password-missing-character'
+            )
+            .min(6, 'auth.error.password-min-length')
+            .min(1, 'auth.error.password-required')
+            .max(40, 'auth.error.password-max-length'),
+        repeatPassword: z
+            .string()
+            .trim()
+            .min(1, 'auth.error.repeat-password-required')
+    })
+    .refine((data) => data.password === data.repeatPassword, {
+        message: 'auth.error.passwords-dont-match',
+        path: ['repeatPassword']
+    });
 
 export const RegisterTemplate: React.FC<RegisterTemplateProps> = () => {
     const formRef = React.useRef<HTMLFormElement>(null);

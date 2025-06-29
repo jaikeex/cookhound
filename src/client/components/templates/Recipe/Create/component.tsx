@@ -28,34 +28,30 @@ import type {
     RecipeDTO
 } from '@/common/types';
 import { classNames } from '@/client/utils';
-import type { ObjectSchema } from 'yup';
-import { array, number, object, string } from 'yup';
+import { z } from 'zod';
 
 //~---------------------------------------------------------------------------------------------~//
 //$                                           SCHEMA                                            $//
 //~---------------------------------------------------------------------------------------------~//
 
-export const createRecipeSchema: ObjectSchema<RecipeForCreateFormData> = object(
-    {
-        title: string().required('app.recipe.error.title-required'),
-        portionSize: number().nullable().defined(),
-        time: number().nullable().defined(),
-        imageUrl: string().nullable().defined(),
-        notes: string().nullable().defined(),
-        ingredients: array()
-            .of(
-                object().shape({
-                    name: string().required().max(100),
-                    quantity: string().required().max(256)
-                })
-            )
-            .min(1, 'app.recipe.error.ingredients-required')
-            .required('app.recipe.error.ingredients-required'),
-        instructions: array(string().required())
-            .min(1, 'app.recipe.error.instructions-required')
-            .required('app.recipe.error.instructions-required')
-    }
-);
+export const createRecipeSchema = z.object({
+    title: z.string().trim().trim().min(1, 'app.recipe.error.title-required'),
+    portionSize: z.number().nullable(),
+    time: z.number().nullable(),
+    imageUrl: z.string().trim().nullable(),
+    notes: z.string().trim().nullable(),
+    ingredients: z
+        .array(
+            z.object({
+                name: z.string().trim().min(1).max(100),
+                quantity: z.string().trim().max(256)
+            })
+        )
+        .min(1, 'app.recipe.error.ingredients-required'),
+    instructions: z
+        .array(z.string().trim().min(1))
+        .min(1, 'app.recipe.error.instructions-required')
+});
 
 type RecipeForCreateFormData = {
     title: string;

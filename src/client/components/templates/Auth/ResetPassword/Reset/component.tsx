@@ -8,7 +8,7 @@ import type {
 import { ResetPasswordForm, Typography } from '@/client/components';
 import type { ResetPasswordPayload } from '@/common/types';
 import apiClient from '@/client/request';
-import { object, ref, string } from 'yup';
+import { z } from 'zod';
 import { useLocale } from '@/client/store';
 
 import { validateFormData } from '@/client/utils';
@@ -19,19 +19,26 @@ type ResetPasswordFormData = {
     repeatPassword: string;
 };
 
-const resetPasswordSchema = object().shape({
-    password: string()
-        .matches(
-            /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).*$/,
-            'auth.error.password-missing-character'
-        )
-        .min(6, 'auth.error.password-min-length')
-        .max(40, 'auth.error.password-max-length')
-        .required('auth.error.password-required'),
-    repeatPassword: string()
-        .oneOf([ref('password')], 'auth.error.passwords-dont-match')
-        .required('auth.error.repeat-password-required')
-});
+const resetPasswordSchema = z
+    .object({
+        password: z
+            .string()
+            .regex(
+                /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).*$/,
+                'auth.error.password-missing-character'
+            )
+            .min(6, 'auth.error.password-min-length')
+            .max(40, 'auth.error.password-max-length')
+            .min(1, 'auth.error.password-required'),
+        repeatPassword: z
+            .string()
+            .trim()
+            .min(1, 'auth.error.repeat-password-required')
+    })
+    .refine((data) => data.password === data.repeatPassword, {
+        message: 'auth.error.passwords-dont-match',
+        path: ['repeatPassword']
+    });
 
 export const ResetPasswordTemplate: React.FC = () => {
     const formRef = React.useRef<HTMLFormElement>(null);
