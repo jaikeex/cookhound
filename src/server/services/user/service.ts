@@ -546,7 +546,7 @@ class UserService {
         if (user.authType === AuthType.Google) {
             log.info(
                 'sendPasswordResetEmail - tried for user with google auth',
-                { email }
+                { email, authType: user.authType }
             );
             throw new AuthErrorForbidden(
                 'auth.error.google-auth-not-supported',

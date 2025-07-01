@@ -22,7 +22,7 @@ cookhound-mk3/
 │   │   │   └── templates/     # Page-level layouts
 │   │   ├── hooks/             # Custom React hooks
 │   │   ├── store/             # State management (contexts, stores)
-│   │   ├── request/           # API client wrappers
+│   │   ├── request/           # API client and react-query wrappers
 │   │   ├── types/             # Client-specific types
 │   │   ├── utils/             # Client utilities
 │   │   └── locales/           # Internationalization
@@ -180,18 +180,6 @@ try {
     return handleServerError(error);
 }
 
-// Client-side error handling with user feedback
-try {
-    const result = await apiClient.method();
-    // Handle success
-} catch (error: unknown) {
-    if (error instanceof RequestError) {
-        // Show user-friendly error message
-        snackbar.show(error.message, 'error');
-    }
-    throw error;
-}
-```
 
 ## Security & Authentication
 

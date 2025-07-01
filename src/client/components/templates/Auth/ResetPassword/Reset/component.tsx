@@ -1,24 +1,23 @@
 'use client';
 
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import type {
     LoginFormErrors,
     ResetPasswordFormErrors
 } from '@/client/components';
 import { ResetPasswordForm, Typography } from '@/client/components';
 import type { ResetPasswordPayload } from '@/common/types';
-import apiClient from '@/client/request';
 import { z } from 'zod';
 import { useLocale } from '@/client/store';
 
 import { validateFormData } from '@/client/utils';
 import Link from 'next/link';
 import type { I18nMessage } from '@/client/locales';
+import { chqc } from '@/client/request/queryClient';
 
-type ResetPasswordFormData = {
-    password: string;
-    repeatPassword: string;
-};
+//~---------------------------------------------------------------------------------------------~//
+//$                                          VALIDATION                                         $//
+//~---------------------------------------------------------------------------------------------~//
 
 const resetPasswordSchema = z
     .object({
@@ -41,15 +40,35 @@ const resetPasswordSchema = z
         path: ['repeatPassword']
     });
 
+//~---------------------------------------------------------------------------------------------~//
+//$                                          COMPONENT                                          $//
+//~---------------------------------------------------------------------------------------------~//
+
+type ResetPasswordFormData = {
+    password: string;
+    repeatPassword: string;
+};
+
 export const ResetPasswordTemplate: React.FC = () => {
+    const { t } = useLocale();
+
     const formRef = React.useRef<HTMLFormElement>(null);
 
     const [formErrors, setFormErrors] = useState<LoginFormErrors>({});
-    const [isSubmitting, setIsSubmitting] = useState(false);
     const [disabled, setDisabled] = React.useState(false);
     const [submitted, setSubmitted] = React.useState(false);
 
-    const { t } = useLocale();
+    const {
+        mutate: resetPassword,
+        error,
+        isPending
+    } = chqc.user.useResetPassword({
+        onSuccess: () => {
+            formRef.current?.reset();
+            disableForm();
+            setSubmitted(true);
+        }
+    });
 
     const disableForm = useCallback(() => {
         setDisabled(true);
@@ -68,8 +87,6 @@ export const ResetPasswordTemplate: React.FC = () => {
             const data = new FormData(formElement);
             let formData: ResetPasswordFormData;
 
-            setIsSubmitting(true);
-
             try {
                 formData = extractFormData(data);
                 const validationErrors: ResetPasswordFormErrors =
@@ -77,50 +94,39 @@ export const ResetPasswordTemplate: React.FC = () => {
 
                 if (Object.keys(validationErrors).length > 0) {
                     setFormErrors(validationErrors);
-                    setIsSubmitting(false);
                     return;
                 }
             } catch (error: unknown) {
                 setFormErrors({ server: 'auth.error.default' });
-                setIsSubmitting(false);
                 return;
             }
 
-            try {
-                const token = new URLSearchParams(window.location.search).get(
-                    'token'
-                );
+            const token = new URLSearchParams(window.location.search).get(
+                'token'
+            );
 
-                if (!token) {
-                    setFormErrors({ server: 'auth.error.missing-token' });
-                    setIsSubmitting(false);
-                    return;
-                }
-
-                setFormErrors({});
-                const payload: ResetPasswordPayload = {
-                    password: formData.password,
-                    token
-                };
-
-                await apiClient.user.resetPassword(payload);
-                formRef.current?.reset();
-                disableForm();
-                setSubmitted(true);
-            } catch (error: unknown) {
-                if (submitted) setSubmitted(false);
-                setFormErrors({
-                    server:
-                        error instanceof Error
-                            ? (error.message as I18nMessage)
-                            : 'auth.error.default'
-                });
-            } finally {
-                setIsSubmitting(false);
+            if (!token) {
+                setFormErrors({ server: 'auth.error.missing-token' });
+                return;
             }
+
+            setFormErrors({});
+
+            const payload: ResetPasswordPayload = {
+                password: formData.password,
+                token
+            };
+
+            resetPassword(payload);
         },
-        [disableForm, submitted]
+        [resetPassword]
     );
+
+    useEffect(() => {
+        if (error) {
+            setFormErrors({ server: error.message as I18nMessage });
+        }
+    }, [error]);
 
     return (
         <div className="flex flex-col items-center w-full max-w-md mx-auto space-y-4">
@@ -132,7 +138,7 @@ export const ResetPasswordTemplate: React.FC = () => {
                 <ResetPasswordForm
                     errors={formErrors}
                     disabled={disabled}
-                    pending={isSubmitting}
+                    pending={isPending}
                 />
             </form>
 

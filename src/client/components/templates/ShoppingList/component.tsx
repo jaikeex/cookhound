@@ -14,12 +14,8 @@ import {
     Trash,
     Typography
 } from '@/client/components';
-import {
-    useAuth,
-    useLocale,
-    useModal,
-    useShoppingListStore
-} from '@/client/store';
+import { useAuth, useLocale, useModal } from '@/client/store';
+import { useShoppingList } from '@/client/hooks';
 import Link from 'next/link';
 
 type ShoppingListTemplateProps = Readonly<{
@@ -42,7 +38,7 @@ export const ShoppingListTemplate: React.FC<ShoppingListTemplateProps> = ({
         editingShoppingList,
         isLoading,
         ...shoppingListStore
-    } = useShoppingListStore();
+    } = useShoppingList();
 
     const isEmpty = initialData.length === 0;
     const data = shoppingList ? shoppingList : initialData;
@@ -99,7 +95,7 @@ export const ShoppingListTemplate: React.FC<ShoppingListTemplateProps> = ({
             })
         );
 
-        await shoppingListStore.updateShoppingList(user.id, payloads);
+        await shoppingListStore.updateShoppingList(payloads);
 
         // Clear temp state and exit editing
         shoppingListStore.setEditingShoppingList(null);
@@ -124,11 +120,7 @@ export const ShoppingListTemplate: React.FC<ShoppingListTemplateProps> = ({
 
                 if (isIngredientCurrentlyMarked === true || isEditing) return;
 
-                shoppingListStore.markIngredient(
-                    user.id,
-                    recipeId,
-                    ingredient.id
-                );
+                shoppingListStore.markIngredient(recipeId, ingredient.id);
             } catch {
                 // If something above throws, the list is probably fucked. Do nothing in that case
                 return;
@@ -150,11 +142,7 @@ export const ShoppingListTemplate: React.FC<ShoppingListTemplateProps> = ({
 
                 if (isIngredientCurrentlyMarked === false || isEditing) return;
 
-                shoppingListStore.markIngredient(
-                    user.id,
-                    recipeId,
-                    ingredient.id
-                );
+                shoppingListStore.markIngredient(recipeId, ingredient.id);
             } catch {
                 // If something above throws, the list is probably fucked. Do nothing in that case
                 return;
@@ -172,7 +160,7 @@ export const ShoppingListTemplate: React.FC<ShoppingListTemplateProps> = ({
             if (!user || isEditing) return;
 
             close();
-            shoppingListStore.deleteRecipeShoppingList(user.id, recipeId);
+            shoppingListStore.deleteRecipeShoppingList(recipeId);
         },
         [shoppingListStore, isEditing, user]
     );

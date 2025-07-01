@@ -6,10 +6,10 @@ import { MobileRecipeViewTemplate } from './Mobile';
 import type { RecipeDTO } from '@/common/types';
 import type { RecipeForDisplayDTO } from '@/common/types';
 import { useIngredientSelectStore, useAuth } from '@/client/store';
-import apiClient from '@/client/request';
 import { useRunOnce } from '@/client/hooks';
 import { useLocalStorage } from '@/client/hooks/useLocalStorage';
 import { LOCAL_STORAGE_LAST_VIEWED_RECIPES_KEY } from '@/common/constants';
+import { chqc } from '@/client/request/queryClient';
 
 export type RecipeViewProps = Readonly<{
     recipe: Promise<RecipeDTO>;
@@ -25,6 +25,9 @@ export const RecipeViewTemplate: React.FC<RecipeViewProps> = ({ recipe }) => {
         RecipeForDisplayDTO[]
     >(LOCAL_STORAGE_LAST_VIEWED_RECIPES_KEY, []);
 
+    const { mutate: registerRecipeVisit } =
+        chqc.recipe.useRegisterRecipeVisit();
+
     useRunOnce(() => {
         resetSelectedIngredients();
 
@@ -32,12 +35,10 @@ export const RecipeViewTemplate: React.FC<RecipeViewProps> = ({ recipe }) => {
             // Neither await this, nor catch any errors, if the recipe was loaded,
             // this will work too, if it does not, it does not matter the visit is not
             // recorded anyway
-            apiClient.recipe
-                .registerRecipeVisit(
-                    recipeResolved.id.toString(),
-                    user?.id?.toString() ?? null
-                )
-                .catch(() => {});
+            registerRecipeVisit({
+                id: recipeResolved.id.toString(),
+                userId: user?.id?.toString() ?? null
+            });
 
             // For anonymous users, also store the recipe locally so it can be suggested later.
             if (!user?.id) {

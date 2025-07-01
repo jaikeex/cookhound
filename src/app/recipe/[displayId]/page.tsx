@@ -1,5 +1,5 @@
 import React from 'react';
-import apiClient from '@/client/request';
+import { apiClient } from '@/client/request';
 import { RecipeViewTemplate } from '@/client/components';
 import { cookies } from 'next/headers';
 import { JWT_COOKIE_NAME } from '@/common/constants';

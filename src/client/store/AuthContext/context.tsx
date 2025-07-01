@@ -1,14 +1,16 @@
 'use client';
+
 import React, {
     createContext,
+    useCallback,
     useContext,
     useEffect,
-    useMemo,
-    useState
+    useMemo
 } from 'react';
 import type { UserDTO } from '@/common/types';
+import { useQueryClient } from '@tanstack/react-query';
 import { ENV_CONFIG_PUBLIC } from '@/common/constants';
-import apiClient from '@/client/request';
+import { chqc, QUERY_KEYS } from '@/client/request/queryClient';
 
 type AuthContextType = {
     authResolved: boolean;
@@ -34,42 +36,26 @@ type AuthProviderProps = Readonly<{
 }> &
     React.PropsWithChildren<NonNullable<unknown>>;
 
-export const AuthProvider: React.FC<AuthProviderProps> = ({
-    children,
-    user: initialUser,
-    authResolved: initialAuthResolved
-}) => {
-    const [authResolved, setAuthResolved] = useState(
-        initialAuthResolved ?? false
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+    const queryClient = useQueryClient();
+    const { data: user, isLoading } = chqc.auth.useCurrentUser();
+
+    const setUser = useCallback(
+        (newUser: UserDTO | null) => {
+            queryClient.setQueryData(QUERY_KEYS.auth.currentUser, newUser);
+        },
+        [queryClient]
     );
 
-    const [user, setUser] = useState<UserDTO | null | undefined>(
-        initialUser ?? null
-    );
-
-    useEffect(() => {
-        const fetchUser = async () => {
-            // This check is sufficient, no need to check the initial values.
-            if (user && authResolved) {
-                return;
-            }
-
-            const currentUser = await getCurrentUserOrNull();
-            setUser(currentUser);
-            setAuthResolved(true);
-        };
-
-        fetchUser();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    const authResolved = !isLoading;
 
     const contextValue = useMemo(
         () => ({
             authResolved,
-            user: user === undefined ? null : user,
+            user: user ?? null,
             setUser
         }),
-        [authResolved, user]
+        [authResolved, setUser, user]
     );
 
     useEffect(() => {
@@ -81,12 +67,4 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
             {children}
         </AuthContext.Provider>
     );
-};
-
-const getCurrentUserOrNull = async () => {
-    try {
-        return await apiClient.auth.getCurrentUser();
-    } catch (error: unknown) {
-        return null;
-    }
 };

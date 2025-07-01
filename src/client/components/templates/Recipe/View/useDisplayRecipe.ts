@@ -1,48 +1,64 @@
 'use client';
 
-import { recipeApiClient } from '@/client/request/recipe/RecipeApiClient';
+import { chqc, QUERY_KEYS } from '@/client/request/queryClient';
 import {
     useAuth,
     useIngredientSelectStore,
     useLocale,
-    useShoppingListStore,
     useSnackbar
 } from '@/client/store';
+import { useShoppingList } from '@/client/hooks';
 import { revalidateRouteCache } from '@/client/utils';
 import type { RecipeDTO } from '@/common/types/recipe';
 import { useRouter } from 'next/navigation';
 import { useCallback } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 
 export const useDisplayRecipe = (recipe: RecipeDTO) => {
     const { t } = useLocale();
     const { user } = useAuth();
     const { alert } = useSnackbar();
     const router = useRouter();
+    const queryClient = useQueryClient();
 
-    const { createShoppingList } = useShoppingListStore();
+    const { createShoppingList } = useShoppingList();
     const { selectedIngredients } = useIngredientSelectStore();
+
+    const { mutate: rateRecipe } = chqc.recipe.useRateRecipe({
+        onSuccess: async () => {
+            // Invalidate is not sufficient here.
+            queryClient.refetchQueries({
+                queryKey: QUERY_KEYS.recipe.byDisplayId(recipe.displayId)
+            });
+
+            alert({
+                message: t('app.recipe.rated'),
+                variant: 'success'
+            });
+
+            handleMutateRecipeSuccess();
+        },
+        onError: () => {
+            alert({
+                message: t('app.error.default'),
+                variant: 'error'
+            });
+        }
+    });
+
+    const handleMutateRecipeSuccess = useCallback(async () => {
+        await revalidateRouteCache(`/recipe/${recipe.displayId}`);
+        router.refresh();
+    }, [recipe.displayId, router]);
 
     const handleRateRecipe = useCallback(
         async (rating: number) => {
-            try {
-                await recipeApiClient.rateRecipe(recipe.id.toString(), rating);
-                await revalidateRouteCache(`/recipe/${recipe.displayId}`);
-
-                alert({
-                    message: t('app.recipe.rated'),
-                    variant: 'success'
-                });
-
-                // Refresh the server component to get updated data
-                router.refresh();
-            } catch (error: unknown) {
-                alert({
-                    message: t('app.error.default'),
-                    variant: 'error'
-                });
-            }
+            rateRecipe({
+                id: recipe.id.toString(),
+                rating
+            });
         },
-        [recipe.id, recipe.displayId, alert, t, router]
+        [recipe.id, rateRecipe]
     );
 
     const onShoppingListCreate = useCallback(async () => {
@@ -60,7 +76,7 @@ export const useDisplayRecipe = (recipe: RecipeDTO) => {
         if (!user) return;
 
         try {
-            await createShoppingList(user.id, {
+            await createShoppingList({
                 recipeId: recipe.id,
                 ingredients: ingredientsToInclude
             });

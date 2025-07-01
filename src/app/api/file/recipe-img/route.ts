@@ -15,7 +15,7 @@ import { z } from 'zod';
 
 const RecipeImageSchema = z.strictObject({
     fileName: z.string().trim(),
-    bytes: z.instanceof(Uint8Array)
+    bytes: z.array(z.number())
 });
 
 //|=============================================================================================|//

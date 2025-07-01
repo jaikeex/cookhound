@@ -207,39 +207,44 @@ class ApiRequestWrapper {
             );
         }
 
-        //?--------------------------------------------------------------?//
-        //                        RESPONSE HANDLING                       //
-        //?--------------------------------------------------------------?//
+        //?—————————————————————————————————————————————————————————————————————————————————————?//
+        //?                                 RESPONSE HANDLING                                   ?//
+        ///
+        //# This is purposufelly not wrapped in a try-catch block. The only thing that can
+        //# throw here and is not handled is the fetch call. When that fails (see mdn docs below),
+        //# either the connection is gone, or the app is cooked beyond saving and all other
+        //# error handling is pointless anyway. Any errors thrown from here will be caught by
+        //# error boundaries on the client, on the server and middleware they must be handled
+        //# explicitly.
+        //#
+        //# A fetch() promise only rejects when the request fails, for example, because of
+        //# a badly-formed request URL or a network error. A fetch() promise does not reject
+        //# if the server responds with HTTP status codes that indicate errors (404, 504, etc.).
+        //# Instead, a then() handler must check the Response.ok and/or Response.status properties.
+        ///
+        //?—————————————————————————————————————————————————————————————————————————————————————?//
 
         let response: Response | null = null;
 
+        response = await fetch(url.toString(), options);
+
         try {
-            response = await fetch(url.toString(), options);
-
-            try {
-                data = await response.json();
-            } catch (error: unknown) {
-                data = null;
-            }
-
-            if (!response.ok) {
-                // Handle 429 Too Many Requests on client side
-                if (response.status === 429 && typeof window !== 'undefined') {
-                    window.location.href = '/error/too-many-requests';
-                }
-
-                // Handle 404 Not Found on server side (server components)
-                if (response.status === 404 && typeof window === 'undefined') {
-                    redirect('/not-found');
-                }
-
-                throw RequestError.fromFetchError(data, response);
-            }
+            data = await response.json();
         } catch (error: unknown) {
-            // Re-throw notFound() calls and other Next.js redirects
-            if (error && typeof error === 'object' && 'digest' in error) {
-                throw error;
+            data = null;
+        }
+
+        if (!response.ok) {
+            // Handle 429 Too Many Requests on client side
+            if (response.status === 429 && typeof window !== 'undefined') {
+                window.location.href = '/error/too-many-requests';
             }
+
+            // Handle 404 Not Found on server side (server components)
+            if (response.status === 404 && typeof window === 'undefined') {
+                redirect('/not-found');
+            }
+
             throw RequestError.fromFetchError(data, response);
         }
 

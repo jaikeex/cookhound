@@ -1,0 +1,136 @@
+import {
+    useAppQuery,
+    useAppMutation
+} from '@/client/request/queryClient/queryFactories';
+import apiClient from '@/client/request/apiClient';
+import type {
+    ShoppingListOptions,
+    LastViewedRecipesOptions,
+    CreateUserOptions,
+    UpsertShoppingListOptions,
+    UpdateShoppingListOptions,
+    DeleteShoppingListOptions,
+    VerifyEmailOptions,
+    ResendVerificationEmailOptions,
+    SendResetPasswordEmailOptions,
+    ResetPasswordOptions
+} from './types';
+import { USER_QUERY_KEYS } from './types';
+
+class UserQueryClient {
+    /**
+     * Creates a new user.
+     */
+    useCreateUser = (options?: Partial<CreateUserOptions>) =>
+        useAppMutation(apiClient.user.createUser, options);
+
+    /**
+     * Gets the shopping list for a user.
+     *
+     * Key: USER_QUERY_KEYS.shoppingList(userId)
+     * Stale time: default
+     * Retry: 1
+     *
+     * @param userId - The ID of the user.
+     */
+    useShoppingList = (
+        userId: number,
+        options?: Partial<ShoppingListOptions>
+    ) =>
+        useAppQuery(
+            USER_QUERY_KEYS.shoppingList(userId),
+            () => apiClient.user.getShoppingList(userId),
+            {
+                enabled: !!userId,
+                retry: 1,
+                ...options
+            }
+        );
+
+    /**
+     * Upserts the shopping list for a user.
+     */
+    useUpsertShoppingList = (
+        userId: number,
+        options?: Partial<UpsertShoppingListOptions>
+    ) =>
+        useAppMutation(
+            (data) => apiClient.user.upsertShoppingList(userId, data),
+            options
+        );
+
+    /**
+     * Updates the shopping list for a user.
+     */
+    useUpdateShoppingList = (
+        userId: number,
+        options?: Partial<UpdateShoppingListOptions>
+    ) =>
+        useAppMutation(
+            (data) => apiClient.user.updateShoppingList(userId, data),
+            options
+        );
+
+    /**
+     * Deletes the shopping list for a user.
+     */
+    useDeleteShoppingList = (
+        userId: number,
+        options?: Partial<DeleteShoppingListOptions>
+    ) =>
+        useAppMutation(
+            (data) => apiClient.user.deleteShoppingList(userId, data),
+            options
+        );
+
+    /**
+     * Gets the last viewed recipes for a user.
+     *
+     * Key: USER_QUERY_KEYS.lastViewedRecipes(userId)
+     * Stale time: default
+     * Retry: 1
+     *
+     * @param userId - The ID of the user.
+     */
+    useLastViewedRecipes = (
+        userId: number,
+        options?: Partial<LastViewedRecipesOptions>
+    ) =>
+        useAppQuery(
+            USER_QUERY_KEYS.lastViewedRecipes(userId),
+            () => apiClient.user.getUserLastViewedRecipes(userId),
+            {
+                enabled: !!userId,
+                retry: 1,
+                ...options
+            }
+        );
+
+    /**
+     * Verifies an email.
+     */
+    useVerifyEmail = (options?: Partial<VerifyEmailOptions>) =>
+        useAppMutation(apiClient.user.verifyEmail, options);
+
+    /**
+     * Resends a verification email.
+     */
+    useResendVerificationEmail = (
+        options?: Partial<ResendVerificationEmailOptions>
+    ) => useAppMutation(apiClient.user.resendVerificationEmail, options);
+
+    /**
+     * Sends a reset password email.
+     */
+    useSendResetPasswordEmail = (
+        options?: Partial<SendResetPasswordEmailOptions>
+    ) => useAppMutation(apiClient.user.sendResetPasswordEmail, options);
+
+    /**
+     * Resets a password.
+     */
+    useResetPassword = (options?: Partial<ResetPasswordOptions>) =>
+        useAppMutation(apiClient.user.resetPassword, options);
+}
+
+export const userQueryClient = new UserQueryClient();

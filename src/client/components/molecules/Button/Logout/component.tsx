@@ -5,27 +5,39 @@ import type { BaseButtonProps } from '@/client/components';
 import { ButtonBase } from '@/client/components';
 import { classNames } from '@/client/utils';
 import { useRouter } from 'next/navigation';
-import apiClient from '@/client/request';
 import { useAuth, useLocale, useSnackbar } from '@/client/store';
+import { chqc } from '@/client/request/queryClient';
+import { useQueryClient } from '@tanstack/react-query';
 
 type LogoutButtonProps = BaseButtonProps;
 
 export const LogoutButton: React.FC<LogoutButtonProps> = ({ className }) => {
     const router = useRouter();
+    const queryClient = useQueryClient();
     const { setUser } = useAuth();
     const { alert } = useSnackbar();
     const { t } = useLocale();
 
-    const handleClick = useCallback(async () => {
-        await apiClient.auth.logout();
-        setUser(null);
-        alert({
-            message: t('auth.success.logout'),
-            variant: 'success'
-        });
+    const { mutate: logout } = chqc.auth.useLogout({
+        onSuccess: () => {
+            alert({
+                message: t('auth.success.logout'),
+                variant: 'success'
+            });
+            handleLogoutSuccess();
+            queryClient.clear();
+        }
+    });
 
+    const handleLogoutSuccess = useCallback(() => {
+        setUser(null);
         router.push('/');
-    }, [alert, router, setUser, t]);
+    }, [setUser, router]);
+
+    const handleClick = useCallback(async () => {
+        // All mutations expect a payload by definiton.
+        logout(undefined);
+    }, [logout]);
 
     return (
         <ButtonBase

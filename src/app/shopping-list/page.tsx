@@ -1,5 +1,5 @@
 import React from 'react';
-import apiClient from '@/client/request';
+import { apiClient } from '@/client/request';
 import { cookies } from 'next/headers';
 import { ShoppingListTemplate } from '@/client/components/templates/ShoppingList';
 import { JWT_COOKIE_NAME } from '@/common/constants';

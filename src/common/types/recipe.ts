@@ -49,3 +49,13 @@ export type IngredientForCreate = {
     name: string;
     quantity: string | null;
 };
+
+export type RecipeVisitPayload = {
+    id: string;
+    userId: string | null;
+};
+
+export type RecipeRatingPayload = {
+    id: string;
+    rating: number;
+};

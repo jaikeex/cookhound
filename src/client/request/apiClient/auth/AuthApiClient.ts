@@ -1,5 +1,5 @@
-import type { RequestConfig } from '@/client/request/ApiRequestWrapper';
-import { apiRequestWrapper } from '@/client/request/ApiRequestWrapper';
+import type { RequestConfig } from '@/client/request/apiClient/ApiRequestWrapper';
+import { apiRequestWrapper } from '@/client/request/apiClient/ApiRequestWrapper';
 import type { UserDTO, AuthCodePayload, UserForLogin } from '@/common/types';
 
 /**

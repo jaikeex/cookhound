@@ -9,7 +9,6 @@ import {
     Typography
 } from '@/client/components';
 import type { UserDTO, UserForLogin } from '@/common/types';
-import apiClient from '@/client/request';
 import { z } from 'zod';
 import { validateFormData } from '@/client/utils/form';
 
@@ -18,10 +17,12 @@ import { useAuth, useLocale, useSnackbar } from '@/client/store';
 import type { I18nMessage } from '@/client/locales';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { chqc, QUERY_KEYS } from '@/client/request/queryClient';
+import { useQueryClient } from '@tanstack/react-query';
 
-export type LoginTemplateProps = Readonly<{
-    callbackUrl?: string;
-}>;
+//~---------------------------------------------------------------------------------------------~//
+//$                                          VALIDATION                                         $//
+//~---------------------------------------------------------------------------------------------~//
 
 export const loginSchema = z.object({
     email: z
@@ -34,18 +35,42 @@ export const loginSchema = z.object({
     })
 });
 
+//~---------------------------------------------------------------------------------------------~//
+//$                                          COMPONENT                                          $//
+//~---------------------------------------------------------------------------------------------~//
+
+export type LoginTemplateProps = Readonly<{
+    callbackUrl?: string;
+}>;
+
 export const LoginTemplate: React.FC<LoginTemplateProps> = ({
     callbackUrl
 }) => {
-    const formRef = React.useRef<HTMLFormElement>(null);
-
-    const [formErrors, setFormErrors] = useState<LoginFormErrors>({});
-    const [isSubmitting, setIsSubmitting] = useState(false);
-
     const router = useRouter();
+    const queryClient = useQueryClient();
     const { setUser } = useAuth();
     const { alert } = useSnackbar();
     const { t } = useLocale();
+
+    const formRef = React.useRef<HTMLFormElement>(null);
+
+    const [formErrors, setFormErrors] = useState<LoginFormErrors>({});
+
+    const {
+        mutate: login,
+        isPending,
+        error: loginError
+    } = chqc.auth.useLogin({
+        onSuccess: (user) => {
+            queryClient.setQueryData(QUERY_KEYS.auth.currentUser, user);
+            queryClient.invalidateQueries({
+                predicate: (query) =>
+                    query.queryKey[0] !== QUERY_KEYS.auth.currentUser
+            });
+
+            cleanUpAndRedirectAfterLogin(user);
+        }
+    });
 
     /**
      * Cleans up the form and redirects the user to the home page after a successful login.
@@ -62,7 +87,11 @@ export const LoginTemplate: React.FC<LoginTemplateProps> = ({
     );
 
     // Custom hook to handle Google sign-in.
-    const { signInUserWithGoogleOauth, error } = useGoogleSignIn({
+    const {
+        signInUserWithGoogleOauth,
+        error,
+        isPending: isGoogleSignInPending
+    } = useGoogleSignIn({
         onSuccess: cleanUpAndRedirectAfterLogin
     });
 
@@ -80,8 +109,6 @@ export const LoginTemplate: React.FC<LoginTemplateProps> = ({
             const data = new FormData(formElement);
             let formData: UserForLogin;
 
-            setIsSubmitting(true);
-
             try {
                 formData = extractFormData(data);
                 const validationErrors: LoginFormErrors =
@@ -89,45 +116,37 @@ export const LoginTemplate: React.FC<LoginTemplateProps> = ({
 
                 if (Object.keys(validationErrors).length > 0) {
                     setFormErrors(validationErrors);
-                    setIsSubmitting(false);
                     return;
                 }
             } catch (error: unknown) {
                 setFormErrors({ server: 'auth.error.default' });
-                setIsSubmitting(false);
                 return;
             }
 
-            try {
-                setFormErrors({});
-
-                const user = await apiClient.auth.login(formData);
-                cleanUpAndRedirectAfterLogin(user);
-            } catch (error: unknown) {
-                setFormErrors({
-                    server:
-                        error instanceof Error
-                            ? (error.message as I18nMessage)
-                            : 'auth.error.default'
-                });
-            } finally {
-                setIsSubmitting(false);
-            }
+            setFormErrors({});
+            login(formData);
         },
-        [cleanUpAndRedirectAfterLogin]
+        [login]
     );
 
     // Update the form errors whenever the google signin process fails.
     useEffect(() => {
-        if (error) {
-            setFormErrors({ server: error as I18nMessage });
+        if (loginError) {
+            setFormErrors({ server: loginError.message as I18nMessage });
         }
-    }, [error]);
+
+        if (error) {
+            setFormErrors({ server: error.message as I18nMessage });
+        }
+    }, [error, loginError]);
 
     return (
         <div className="flex flex-col items-center w-full max-w-md mx-auto space-y-4">
             <form className="w-full" onSubmit={handleSubmit} ref={formRef}>
-                <LoginForm errors={formErrors} pending={isSubmitting} />
+                <LoginForm
+                    errors={formErrors}
+                    pending={isPending || isGoogleSignInPending}
+                />
             </form>
 
             <Typography variant="body-sm" className="text-center">
@@ -147,6 +166,7 @@ export const LoginTemplate: React.FC<LoginTemplateProps> = ({
             <GoogleSigninButton
                 onClick={signInUserWithGoogleOauth}
                 label={t('auth.form.continue-with-google')}
+                pending={isGoogleSignInPending}
             />
         </div>
     );

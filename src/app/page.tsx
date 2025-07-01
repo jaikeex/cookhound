@@ -1,6 +1,6 @@
 import { FrontPageTemplate } from '@/client/components/templates/Dashboard/FrontPage';
 import { FrontPageSkeleton } from '@/client/components/templates/Dashboard/FrontPage/skeleton';
-import apiClient from '@/client/request';
+import { apiClient } from '@/client/request';
 import { getUserLocale } from '@/client/utils';
 import { JWT_COOKIE_NAME } from '@/common/constants';
 import { cookies, headers } from 'next/headers';

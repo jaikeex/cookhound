@@ -11,3 +11,4 @@ export * from './useRecipeDiscovery';
 export * from './useRunOnce';
 export * from './useScreenSize';
 export * from './useUnsavedChangesWarning';
+export * from './useShoppingList';

@@ -1,5 +1,5 @@
-import type { RequestConfig } from '@/client/request/ApiRequestWrapper';
-import { apiRequestWrapper } from '@/client/request/ApiRequestWrapper';
+import type { RequestConfig } from '@/client/request/apiClient/ApiRequestWrapper';
+import { apiRequestWrapper } from '@/client/request/apiClient/ApiRequestWrapper';
 import type {
     DeleteShoppingListPayload,
     RecipeForDisplayDTO,
@@ -7,6 +7,7 @@ import type {
     ResetPasswordPayload,
     ShoppingListDTO,
     ShoppingListPayload,
+    UserDTO,
     UserForCreatePayload
 } from '@/common/types';
 
@@ -30,8 +31,8 @@ class UserApiClient {
     async createUser(
         data: UserForCreatePayload,
         config?: RequestConfig
-    ): Promise<void> {
-        await apiRequestWrapper.post({ url: '/user', data, ...config });
+    ): Promise<UserDTO> {
+        return await apiRequestWrapper.post({ url: '/users', data, ...config });
     }
 
     /**
@@ -146,7 +147,7 @@ class UserApiClient {
      */
     async verifyEmail(token: string, config?: RequestConfig): Promise<void> {
         await apiRequestWrapper.put({
-            url: '/user/verify-email',
+            url: '/users/verify-email',
             params: { token },
             ...config
         });
@@ -165,7 +166,7 @@ class UserApiClient {
         config?: RequestConfig
     ): Promise<void> {
         await apiRequestWrapper.post({
-            url: '/user/verify-email',
+            url: '/users/verify-email',
             data: { email },
             ...config
         });

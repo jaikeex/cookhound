@@ -2,9 +2,7 @@
 
 import React, { useCallback, useEffect, useState } from 'react';
 import type { UserForCreatePayload } from '@/common/types';
-import apiClient from '@/client/request';
 import { useGoogleSignIn } from '@/client/hooks';
-
 import type { RegisterFormErrors } from '@/client/components';
 import {
     Divider,
@@ -19,15 +17,11 @@ import type { I18nMessage } from '@/client/locales';
 import Link from 'next/link';
 import type { UserDTO } from '@/common/types';
 import { z } from 'zod';
+import { chqc } from '@/client/request/queryClient';
 
-export type RegisterTemplateProps = NonNullable<unknown>;
-
-type UserForCreateFormData = {
-    username: string;
-    email: string;
-    password: string;
-    repeatPassword: string;
-};
+//~---------------------------------------------------------------------------------------------~//
+//$                                          VALIDATION                                         $//
+//~---------------------------------------------------------------------------------------------~//
 
 export const registerSchema = z
     .object({
@@ -36,7 +30,7 @@ export const registerSchema = z
             .regex(/^[a-zA-Z0-9_]*$/, 'auth.error.invalid-characters')
             .min(3, 'auth.error.username-min-length')
             .min(1, 'auth.error.username-required')
-            .max(20, 'auth.error.username-max-length'),
+            .max(40, 'auth.error.username-max-length'),
         email: z
             .string()
             .email('auth.error.email-invalid')
@@ -60,16 +54,45 @@ export const registerSchema = z
         path: ['repeatPassword']
     });
 
+//~---------------------------------------------------------------------------------------------~//
+//$                                          COMPONENT                                          $//
+//~---------------------------------------------------------------------------------------------~//
+
+export type RegisterTemplateProps = NonNullable<unknown>;
+
+type UserForCreateFormData = {
+    username: string;
+    email: string;
+    password: string;
+    repeatPassword: string;
+};
+
 export const RegisterTemplate: React.FC<RegisterTemplateProps> = () => {
-    const formRef = React.useRef<HTMLFormElement>(null);
-
-    const [formErrors, setFormErrors] = useState<RegisterFormErrors>({});
-    const [isSubmitting, setIsSubmitting] = useState(false);
-
     const router = useRouter();
     const { setUser } = useAuth();
     const { alert } = useSnackbar();
     const { t } = useLocale();
+
+    const formRef = React.useRef<HTMLFormElement>(null);
+
+    const [formErrors, setFormErrors] = useState<RegisterFormErrors>({});
+
+    const {
+        mutate: createUser,
+        isPending,
+        error: createUserError
+    } = chqc.user.useCreateUser({
+        onSuccess: (user) => {
+            alert({
+                message: t('auth.success.register'),
+                variant: 'success'
+            });
+
+            cleanUpAndRedirectAfterSubmit(
+                `/auth/verify-email?email=${user?.email}`
+            );
+        }
+    });
 
     /**
      * Cleans up the form and redirects the user to the provided url after a successful registration.
@@ -98,7 +121,11 @@ export const RegisterTemplate: React.FC<RegisterTemplateProps> = () => {
     );
 
     // Custom hook to handle Google sign-in.
-    const { signInUserWithGoogleOauth, error } = useGoogleSignIn({
+    const {
+        signInUserWithGoogleOauth,
+        error: googleSignInError,
+        isPending: isGoogleSignInPending
+    } = useGoogleSignIn({
         onSuccess: handleGoogleSignin
     });
 
@@ -116,8 +143,6 @@ export const RegisterTemplate: React.FC<RegisterTemplateProps> = () => {
             const data = new FormData(formElement);
             let formData: UserForCreateFormData;
 
-            setIsSubmitting(true);
-
             try {
                 formData = extractFormData(data);
                 const validationErrors: RegisterFormErrors =
@@ -125,56 +150,44 @@ export const RegisterTemplate: React.FC<RegisterTemplateProps> = () => {
 
                 if (Object.keys(validationErrors).length > 0) {
                     setFormErrors(validationErrors);
-                    setIsSubmitting(false);
                     return;
                 }
             } catch (error: unknown) {
                 setFormErrors({ server: 'auth.error.default' });
-                setIsSubmitting(false);
                 return;
             }
 
-            try {
-                setFormErrors({});
-                const userForCreate: UserForCreatePayload = {
-                    username: formData.username,
-                    email: formData.email,
-                    password: formData.password
-                };
+            setFormErrors({});
 
-                await apiClient.user.createUser(userForCreate);
-                alert({
-                    message: t('auth.success.register'),
-                    variant: 'success'
-                });
-                cleanUpAndRedirectAfterSubmit(
-                    `/auth/verify-email?email=${formData.email}`
-                );
-            } catch (error: unknown) {
-                setFormErrors({
-                    server:
-                        error instanceof Error
-                            ? (error.message as I18nMessage)
-                            : 'auth.error.default'
-                });
-            } finally {
-                setIsSubmitting(false);
-            }
+            const userForCreate: UserForCreatePayload = {
+                username: formData.username,
+                email: formData.email,
+                password: formData.password
+            };
+
+            createUser(userForCreate);
         },
-        [alert, cleanUpAndRedirectAfterSubmit, t]
+        [createUser]
     );
 
-    // Update the form errors whenever the google signin process fails.
+    // Update the form errors whenever the signin process fails.
     useEffect(() => {
-        if (error) {
-            setFormErrors({ server: error as I18nMessage });
+        if (createUserError) {
+            setFormErrors({ server: createUserError.message as I18nMessage });
         }
-    }, [error]);
+
+        if (googleSignInError) {
+            setFormErrors({ server: googleSignInError.message as I18nMessage });
+        }
+    }, [createUserError, googleSignInError]);
 
     return (
         <div className="flex flex-col items-center w-full max-w-md mx-auto space-y-4">
             <form className="w-full" onSubmit={handleSubmit} ref={formRef}>
-                <RegisterForm errors={formErrors} pending={isSubmitting} />
+                <RegisterForm
+                    errors={formErrors}
+                    pending={isPending || isGoogleSignInPending}
+                />
             </form>
 
             <Typography variant="body-sm" className="text-center">
@@ -188,6 +201,7 @@ export const RegisterTemplate: React.FC<RegisterTemplateProps> = () => {
             <GoogleSigninButton
                 onClick={signInUserWithGoogleOauth}
                 label={t('auth.form.continue-with-google')}
+                pending={isGoogleSignInPending}
             />
         </div>
     );

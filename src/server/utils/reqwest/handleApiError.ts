@@ -45,5 +45,5 @@ export function handleServerError(error: unknown) {
 
     logErrorResponse(response);
 
-    return Response.json(response);
+    return Response.json(response, { status: response.status });
 }

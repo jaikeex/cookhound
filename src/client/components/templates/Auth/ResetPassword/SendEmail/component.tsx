@@ -1,18 +1,22 @@
 'use client';
 
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import type {
     LoginFormErrors,
     SimpleEmailFormErrors
 } from '@/client/components';
 import { SimpleEmailForm, Typography } from '@/client/components';
 import type { ResetPasswordEmailPayload } from '@/common/types';
-import apiClient from '@/client/request';
 import { z } from 'zod';
 import { useLocale } from '@/client/store';
 
 import { validateFormData } from '@/client/utils';
 import type { I18nMessage } from '@/client/locales';
+import { chqc } from '@/client/request/queryClient';
+
+//~---------------------------------------------------------------------------------------------~//
+//$                                          VALIDATION                                         $//
+//~---------------------------------------------------------------------------------------------~//
 
 const sendResetPasswordEmailSchema = z.object({
     email: z
@@ -21,15 +25,30 @@ const sendResetPasswordEmailSchema = z.object({
         .min(1, 'auth.error.email-required')
 });
 
+//~---------------------------------------------------------------------------------------------~//
+//$                                          COMPONENT                                          $//
+//~---------------------------------------------------------------------------------------------~//
+
 export const SendResetPasswordEmailTemplate: React.FC = () => {
+    const { t } = useLocale();
+
     const formRef = React.useRef<HTMLFormElement>(null);
 
     const [formErrors, setFormErrors] = useState<LoginFormErrors>({});
-    const [isSubmitting, setIsSubmitting] = useState(false);
     const [disabled, setDisabled] = React.useState(false);
     const [submitted, setSubmitted] = React.useState(false);
 
-    const { t } = useLocale();
+    const {
+        mutate: sendResetPasswordEmail,
+        error,
+        isPending
+    } = chqc.user.useSendResetPasswordEmail({
+        onSuccess: () => {
+            formRef.current?.reset();
+            disableForm();
+            setSubmitted(true);
+        }
+    });
 
     /**
      * Disables the form for a short period of time to prevent spamming.
@@ -55,8 +74,6 @@ export const SendResetPasswordEmailTemplate: React.FC = () => {
             const data = new FormData(formElement);
             let formData: ResetPasswordEmailPayload;
 
-            setIsSubmitting(true);
-
             try {
                 formData = extractFormData(data);
 
@@ -68,35 +85,25 @@ export const SendResetPasswordEmailTemplate: React.FC = () => {
 
                 if (Object.keys(validationErrors).length > 0) {
                     setFormErrors(validationErrors);
-                    setIsSubmitting(false);
                     return;
                 }
             } catch (error: unknown) {
                 setFormErrors({ server: 'auth.error.default' });
-                setIsSubmitting(false);
                 return;
             }
 
-            try {
-                setFormErrors({});
-                await apiClient.user.sendResetPasswordEmail(formData);
-                formRef.current?.reset();
-                disableForm();
-                setSubmitted(true);
-            } catch (error: unknown) {
-                if (submitted) setSubmitted(false);
-                setFormErrors({
-                    server:
-                        error instanceof Error
-                            ? (error.message as I18nMessage)
-                            : 'auth.error.default'
-                });
-            } finally {
-                setIsSubmitting(false);
-            }
+            setFormErrors({});
+
+            sendResetPasswordEmail(formData);
         },
-        [disableForm, submitted]
+        [sendResetPasswordEmail]
     );
+
+    useEffect(() => {
+        if (error) {
+            setFormErrors({ server: error.message as I18nMessage });
+        }
+    }, [error]);
 
     return (
         <div className="flex flex-col items-center w-full max-w-md mx-auto space-y-4">
@@ -108,7 +115,7 @@ export const SendResetPasswordEmailTemplate: React.FC = () => {
                 <SimpleEmailForm
                     errors={formErrors}
                     disabled={disabled}
-                    pending={isSubmitting}
+                    pending={isPending}
                 />
             </form>
 

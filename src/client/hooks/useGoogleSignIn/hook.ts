@@ -1,13 +1,14 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
 import {
     ENV_CONFIG_PUBLIC,
     GOOGLE_SIGNIN_REDIRECT_URL
 } from '@/common/constants';
-import apiClient from '@/client/request';
 import { useEventListener } from '@/client/hooks';
 import type { UserDTO } from '@/common/types';
+import { chqc, QUERY_KEYS } from '@/client/request/queryClient';
+import { useQueryClient } from '@tanstack/react-query';
 
 type UseGoogleSignInArgs = {
     onSuccess?: (user: UserDTO) => void;
@@ -15,11 +16,22 @@ type UseGoogleSignInArgs = {
 
 type UseGoogleSignInType = (options: UseGoogleSignInArgs) => {
     signInUserWithGoogleOauth: () => void;
-    error: string | null;
+    error: Error | null;
+    isPending: boolean;
 };
 
 export const useGoogleSignIn: UseGoogleSignInType = ({ onSuccess }) => {
-    const [error, setError] = useState<string | null>(null);
+    const queryClient = useQueryClient();
+    const {
+        mutate: loginWithGoogleOauth,
+        error,
+        isPending
+    } = chqc.auth.useLoginWithGoogleOauth({
+        onSuccess: (user) => {
+            onSuccess?.(user);
+            queryClient.setQueryData(QUERY_KEYS.auth.currentUser, user);
+        }
+    });
 
     const signInUserWithGoogleOauth = useCallback(() => {
         window.open(
@@ -35,22 +47,12 @@ export const useGoogleSignIn: UseGoogleSignInType = ({ onSuccess }) => {
                 event.origin === ENV_CONFIG_PUBLIC.ORIGIN &&
                 event.data.authCode
             ) {
-                try {
-                    const user = await apiClient.auth.loginWithGoogleOauth({
-                        code: event.data.authCode
-                    });
-                    onSuccess && onSuccess(user);
-                } catch (error: unknown) {
-                    setError(
-                        error instanceof Error
-                            ? error.message
-                            : 'app.error.default'
-                    );
-                    return;
-                }
+                loginWithGoogleOauth({
+                    code: event.data.authCode
+                });
             }
         },
-        [onSuccess]
+        [loginWithGoogleOauth]
     );
 
     useEventListener<MessageEvent>(
@@ -60,5 +62,5 @@ export const useGoogleSignIn: UseGoogleSignInType = ({ onSuccess }) => {
         false
     );
 
-    return { signInUserWithGoogleOauth, error };
+    return { signInUserWithGoogleOauth, error, isPending };
 };

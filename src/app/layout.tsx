@@ -6,7 +6,8 @@ import {
     LocaleProvider,
     AuthProvider,
     SnackbarProvider,
-    ModalProvider
+    ModalProvider,
+    QueryProvider
 } from '@/client/store';
 import { ThemeProvider } from 'next-themes';
 import {
@@ -18,7 +19,7 @@ import { locales } from '@/client/locales';
 import { classNames } from '@/client/utils';
 import { cookies, headers } from 'next/headers';
 import type { UserDTO } from '@/common/types';
-import apiClient from '@/client/request';
+import { apiClient } from '@/client/request';
 import { getUserLocale } from '@/client/utils';
 import { CONTENT_WRAPPER_ID, MAIN_PAGE_ID } from '@/client/constants';
 import { JWT_COOKIE_NAME } from '@/common/constants';
@@ -94,44 +95,46 @@ export default async function RootLayout({
     return (
         <html lang="en" suppressHydrationWarning>
             <body className={`${kalam.variable} ${openSans.variable}`}>
-                <ThemeProvider
-                    attribute="class"
-                    defaultTheme="dark"
-                    enableSystem={false}
-                    disableTransitionOnChange
-                >
-                    <LocaleProvider
-                        defaultMessages={messages}
-                        defaultLocale={locale}
+                <QueryProvider>
+                    <ThemeProvider
+                        attribute="class"
+                        defaultTheme="dark"
+                        enableSystem={false}
+                        disableTransitionOnChange
                     >
-                        <AuthProvider user={user} authResolved={!!user}>
-                            <SnackbarProvider>
-                                <ModalProvider>
-                                    <ScrollToTop />
-                                    <div
-                                        id={MAIN_PAGE_ID}
-                                        className="flex flex-col typography-base"
-                                    >
-                                        <div className="fixed top-0 left-0 w-screen h-screen page-background z-[-10]" />
-                                        <Suspense fallback={null}>
-                                            <TopNavigation />
-                                        </Suspense>
+                        <LocaleProvider
+                            defaultMessages={messages}
+                            defaultLocale={locale}
+                        >
+                            <AuthProvider user={user} authResolved={!!user}>
+                                <SnackbarProvider>
+                                    <ModalProvider>
+                                        <ScrollToTop />
                                         <div
-                                            id={CONTENT_WRAPPER_ID}
-                                            className={classNames(
-                                                'flex-1 px-2 pt-16 pb-16 md:px-4 md:pt-24',
-                                                'relative'
-                                            )}
+                                            id={MAIN_PAGE_ID}
+                                            className="flex flex-col typography-base"
                                         >
-                                            {children}
+                                            <div className="fixed top-0 left-0 w-screen h-screen page-background z-[-10]" />
+                                            <Suspense fallback={null}>
+                                                <TopNavigation />
+                                            </Suspense>
+                                            <div
+                                                id={CONTENT_WRAPPER_ID}
+                                                className={classNames(
+                                                    'flex-1 px-2 pt-16 pb-16 md:px-4 md:pt-24',
+                                                    'relative'
+                                                )}
+                                            >
+                                                {children}
+                                            </div>
+                                            <BottomNavigation />
                                         </div>
-                                        <BottomNavigation />
-                                    </div>
-                                </ModalProvider>
-                            </SnackbarProvider>
-                        </AuthProvider>
-                    </LocaleProvider>
-                </ThemeProvider>
+                                    </ModalProvider>
+                                </SnackbarProvider>
+                            </AuthProvider>
+                        </LocaleProvider>
+                    </ThemeProvider>
+                </QueryProvider>
             </body>
         </html>
     );

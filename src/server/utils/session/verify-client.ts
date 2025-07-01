@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { UserDTO, UserRole } from '@/common/types';
-import apiClient from '@/client/request';
+import { apiClient } from '@/client/request';
 import {
     ENV_CONFIG_PUBLIC,
     JWT_COOKIE_NAME,

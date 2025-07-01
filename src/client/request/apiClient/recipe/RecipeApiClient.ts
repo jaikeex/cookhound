@@ -1,6 +1,6 @@
 import type { Locale } from '@/client/locales';
-import type { RequestConfig } from '@/client/request/ApiRequestWrapper';
-import { apiRequestWrapper } from '@/client/request/ApiRequestWrapper';
+import type { RequestConfig } from '@/client/request/apiClient/ApiRequestWrapper';
+import { apiRequestWrapper } from '@/client/request/apiClient/ApiRequestWrapper';
 import type {
     RecipeDTO,
     RecipeForCreatePayload,
@@ -22,7 +22,7 @@ class RecipeApiClient {
         id: string,
         userId: string | null,
         config?: RequestConfig
-    ) {
+    ): Promise<void> {
         return await apiRequestWrapper.post({
             url: `/recipes/${id}/visits`,
             data: { userId },

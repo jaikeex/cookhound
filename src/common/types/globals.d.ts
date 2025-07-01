@@ -14,6 +14,11 @@ declare global {
         requestId: string;
         timestamp: string;
     };
+
+    // Utility type that extracts the resolved value of a promise returned by a FN.
+    // If FN does not return a promise, the return type itself is used.
+    type AwaitedReturn<Fn extends (...args: any[]) => any> =
+        ReturnType<Fn> extends Promise<infer R> ? R : ReturnType<Fn>;
 }
 
 export {};

@@ -1,3 +1,1 @@
-import apiClient from './client';
-
-export default apiClient;
+export { default as apiClient } from './apiClient';

@@ -4,11 +4,13 @@ import { ButtonBase } from '@/client/components';
 export type GoogleSigninProps = Readonly<{
     label: string | null;
     onClick: () => void;
+    pending?: boolean;
 }>;
 
 export const GoogleSigninButton: React.FC<GoogleSigninProps> = ({
     label,
-    onClick
+    onClick,
+    pending
 }) => {
     return (
         <ButtonBase
@@ -17,6 +19,7 @@ export const GoogleSigninButton: React.FC<GoogleSigninProps> = ({
             className="normal-case text-sm !bg-white !border !border-gray-300 !text-gray-800 !hover:bg-gray-200"
             textClassName="mr-2"
             textVariant="label"
+            disabled={pending}
         >
             {label ?? 'Sign in with Google'}
         </ButtonBase>

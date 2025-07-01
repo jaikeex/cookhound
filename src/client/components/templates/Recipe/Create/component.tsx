@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
     MobileRecipeViewTemplate,
     RecipeForm,
@@ -13,7 +13,6 @@ import {
 } from '@/client/components/templates/Recipe/View/Desktop';
 import { useScreenSize, useUnsavedChangesWarning } from '@/client/hooks';
 import { useSnackbar, useLocale, useCreateRecipeStore } from '@/client/store';
-import apiClient from '@/client/request';
 import {
     fileToByteArray,
     generateUuid,
@@ -21,7 +20,6 @@ import {
     validateFormData
 } from '@/client/utils';
 import type { I18nMessage } from '@/client/locales';
-import type { AlertPayload } from '@/client/types';
 import type {
     RecipeForCreatePayload,
     Ingredient,
@@ -29,6 +27,8 @@ import type {
 } from '@/common/types';
 import { classNames } from '@/client/utils';
 import { z } from 'zod';
+import { chqc, QUERY_KEYS } from '@/client/request/queryClient';
+import { useQueryClient } from '@tanstack/react-query';
 
 //~---------------------------------------------------------------------------------------------~//
 //$                                           SCHEMA                                            $//
@@ -77,23 +77,107 @@ export const RecipeCreate: React.FC<RecipeCreateProps> = () => {
     const { t, locale } = useLocale();
     const { alert } = useSnackbar();
     const { isTablet, isMobile } = useScreenSize();
+    const queryClient = useQueryClient();
 
     const [changedFields, setChangedFields] = useState<string[]>([]);
 
     const [formErrors, setFormErrors] = useState<RecipeFormErrors>({});
-    const [isSubmitting, setIsSubmitting] = useState(false);
     const { recipeObject, setRecipeObject, updateRecipeObject } =
         useCreateRecipeStore();
 
-    const hasUnsavedChanges = changedFields.length > 0 && !isSubmitting;
+    const formElement = useRef<HTMLFormElement>(null);
+
+    const { mutateAsync: uploadImageMutation, isPending: isUploadingImage } =
+        chqc.file.useUploadRecipeImage();
+
+    const { mutate: createRecipe, isPending } = chqc.recipe.useCreateRecipe({
+        onSuccess: (recipe) => {
+            /**
+             * Invalidate all but targeted queries. These are not yet cached for the new
+             * recipe anyway, and other recipes are not impacted. The queries invalidated
+             * include all lists and searches.
+             * This could have been done by targeting the batch queries directly,
+             * but this seems more future-proof as the targeted queries are unlikely
+             * to change and other searches are likely to be added.
+             */
+            queryClient.invalidateQueries({
+                predicate: (query) =>
+                    query.queryKey[0] === QUERY_KEYS.recipe.namespace &&
+                    query.queryKey[1] !== 'display' &&
+                    query.queryKey[1] !== 'id'
+            });
+
+            alert({
+                message: t('app.recipe.create-success'),
+                variant: 'success'
+            });
+
+            handleCreateRecipeSuccess(recipe);
+        },
+        onError: (error) => {
+            setFormErrors({
+                server: (error?.message as I18nMessage) || 'app.error.default'
+            });
+        }
+    });
+
+    const hasUnsavedChanges = changedFields.length > 0 && !isPending;
     const { allowNavigation, safePush } = useUnsavedChangesWarning({
         hasUnsavedChanges,
         message: t('app.recipe.unsaved-changes-warning')
     });
 
     //|-----------------------------------------------------------------------------------------|//
+    //?                                      UPLOAD IMAGE                                       ?//
+    //|-----------------------------------------------------------------------------------------|//
+
+    const uploadRecipeImage = useCallback(
+        async (data: FormData): Promise<string | null> => {
+            let image_url: string | null = null;
+
+            try {
+                const imageFile = data.get('recipe-image') as File;
+
+                if (imageFile.size > 0) {
+                    const imageBytes = await fileToByteArray(imageFile);
+                    const response = await uploadImageMutation({
+                        bytes: imageBytes,
+                        fileName: `recipe-image-${generateUuid()}`
+                    });
+
+                    image_url = response.objectUrl;
+                }
+            } catch (error: unknown) {
+                alert({
+                    message: t('app.error.image-upload-failed'),
+                    variant: 'error'
+                });
+
+                /**
+                 * Do nothing here. If the upload fails, the recipe can still be created, and the user can
+                 * edit the image in later. Failing the submission risks the user losing their work.
+                 * (which should never happen, but you never know...)
+                 */
+            }
+
+            return image_url;
+        },
+        [alert, t, uploadImageMutation]
+    );
+
+    //|-----------------------------------------------------------------------------------------|//
     //?                                         SUBMIT                                          ?//
     //|-----------------------------------------------------------------------------------------|//
+
+    const handleCreateRecipeSuccess = useCallback(
+        (recipe: RecipeDTO) => {
+            allowNavigation();
+            formElement.current?.reset();
+            setChangedFields([]);
+            safePush(`/recipe/${recipe.displayId}`);
+        },
+        [safePush, allowNavigation, formElement]
+    );
 
     const handleSubmit = useCallback(
         async (event: React.FormEvent<HTMLFormElement>) => {
@@ -103,10 +187,6 @@ export const RecipeCreate: React.FC<RecipeCreateProps> = () => {
             const data = new FormData(formElement);
             let formData: RecipeForCreateFormData;
 
-            // This check is likely overkill, but I like it.
-            if (isSubmitting) return;
-            setIsSubmitting(true);
-
             try {
                 formData = await extractFormData(data);
 
@@ -115,51 +195,29 @@ export const RecipeCreate: React.FC<RecipeCreateProps> = () => {
 
                 if (Object.keys(validationErrors).length > 0) {
                     setFormErrors(validationErrors);
-                    setIsSubmitting(false);
                     return;
                 }
             } catch (error: unknown) {
                 setFormErrors({ server: 'auth.error.default' });
-                setIsSubmitting(false);
                 return;
             }
 
-            try {
-                // If here, the data should be valid
-                setFormErrors({});
+            // If here, the data should be valid
+            setFormErrors({});
 
-                const imageUrl = await uploadImage(data, alert, t);
-                if (imageUrl) {
-                    formData.imageUrl = imageUrl;
-                }
-
-                const recipeForCreate: RecipeForCreatePayload = {
-                    ...formData,
-                    language: locale || 'en'
-                };
-
-                const createdRecipe =
-                    await apiClient.recipe.createRecipe(recipeForCreate);
-
-                alert({
-                    message: t('app.recipe.create-success'),
-                    variant: 'success'
-                });
-
-                if (createdRecipe) {
-                    // Allow navigation and reset the form on successful submission
-                    allowNavigation();
-                    formElement.reset();
-                    setChangedFields([]);
-                    safePush(`/recipe/${createdRecipe.displayId}`);
-                }
-            } catch (error: unknown) {
-                setFormErrors({ server: 'auth.error.default' });
-            } finally {
-                setIsSubmitting(false);
+            const imageUrl = await uploadRecipeImage(data);
+            if (imageUrl) {
+                formData.imageUrl = imageUrl;
             }
+
+            const recipeForCreate: RecipeForCreatePayload = {
+                ...formData,
+                language: locale || 'en'
+            };
+
+            createRecipe(recipeForCreate);
         },
-        [alert, allowNavigation, isSubmitting, locale, safePush, t]
+        [createRecipe, locale, uploadRecipeImage]
     );
 
     //|-----------------------------------------------------------------------------------------|//
@@ -225,11 +283,12 @@ export const RecipeCreate: React.FC<RecipeCreateProps> = () => {
                     'w-full min-w-[240px] md:min-w-[480px] md:w-auto'
                 )}
                 onSubmit={handleSubmit}
+                ref={formElement}
             >
                 <RecipeForm
                     onChange={handleFormChange}
                     errors={formErrors}
-                    pending={isSubmitting}
+                    pending={isPending || isUploadingImage}
                 />
             </form>
 
@@ -321,48 +380,9 @@ const createRecipePlaceholder = (
     authorId: 0
 });
 
-async function uploadImage(
-    data: FormData,
-    alert: (a: AlertPayload) => void,
-    t: (key: I18nMessage) => string
-): Promise<string | null> {
-    let image_url: string | null = null;
-
-    try {
-        const imageFile = data.get('recipe-image') as File;
-
-        if (imageFile.size > 0) {
-            const imageBytes = await fileToByteArray(imageFile);
-            const response = await apiClient.file.uploadRecipeImage({
-                bytes: imageBytes,
-                fileName: `recipe-image-${generateUuid()}`
-            });
-
-            image_url = response.objectUrl;
-        }
-    } catch (error: unknown) {
-        alert({
-            message: t('app.error.image-upload-failed'),
-            variant: 'error'
-        });
-
-        /**
-         * Do nothing here. If the upload fails, the recipe can still be created, and the user can
-         * edit the image in later. Failing the submission risks the user losing their work.
-         * (which should never happen, but you never know...)
-         */
-    }
-
-    return image_url;
-}
-
 async function extractFormData(
     data: FormData
 ): Promise<RecipeForCreateFormData> {
-    //?--------------------------------------------------------------?//
-    //                        HANDLE INGREDIENTS                      //
-    //?--------------------------------------------------------------?//
-
     const ingredientKeys = Array.from(data.keys()).filter((key) =>
         key.startsWith('ingredient-name')
     );
@@ -385,10 +405,6 @@ async function extractFormData(
         })
         .filter((ingredient) => ingredient?.name && ingredient.name.length > 0);
 
-    //?--------------------------------------------------------------?//
-    //                       HANDLE INSTRUCTIONS                      //
-    //?--------------------------------------------------------------?//
-
     const instructionKeys = Array.from(data.keys()).filter((key) =>
         key.startsWith('instruction')
     );
@@ -396,10 +412,6 @@ async function extractFormData(
     const instructions = instructionKeys
         .map((key) => data.get(key) as string)
         .filter((instruction) => instruction.length > 0);
-
-    //?--------------------------------------------------------------?//
-    //                            THE REST...                         //
-    //?--------------------------------------------------------------?//
 
     return {
         title: data.get('title') as string,
