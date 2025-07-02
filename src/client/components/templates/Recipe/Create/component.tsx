@@ -370,7 +370,7 @@ const createRecipePlaceholder = (
     timesRated: 0,
     timesViewed: 0,
     language: 'en',
-    imageUrl: '',
+    imageUrl: '/img/recipe-placeholder.webp',
     title: t('app.recipe.title'),
     portionSize: null,
     time: null,

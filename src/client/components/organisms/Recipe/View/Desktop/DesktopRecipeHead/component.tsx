@@ -2,9 +2,13 @@
 
 import * as React from 'react';
 import type { RecipeDTO } from '@/common/types';
-import { generateImgPlaceholder } from '@/client/utils';
-import { Typography, Tooltip, Rating, RecipeInfo } from '@/client/components';
-import Image from 'next/image';
+import {
+    Typography,
+    Tooltip,
+    Rating,
+    RecipeInfo,
+    RecipeImage
+} from '@/client/components';
 import { useAuth, useLocale } from '@/client/store';
 
 export type DesktopRecipeHeadProps = Readonly<{
@@ -55,19 +59,11 @@ export const DesktopRecipeHead: React.FC<DesktopRecipeHeadProps> = ({
                 />
             </div>
 
-            {recipe.imageUrl ? (
-                <Image
-                    src={recipe.imageUrl}
-                    alt={recipe.title}
-                    className={'object-cover w-full h-48 rounded-md max-w-80'}
-                    width={320}
-                    height={192}
-                    placeholder={'blur'}
-                    blurDataURL={generateImgPlaceholder(80, 80, 80)}
-                />
-            ) : (
-                <div className={'w-full h-48 rounded-md max-w-80'} />
-            )}
+            <RecipeImage
+                src={recipe.imageUrl}
+                alt={recipe.title}
+                className={'max-w-80'}
+            />
         </div>
     );
 };

@@ -34,16 +34,12 @@ export const SearchSuggestionBox: React.FC<SearchSuggestionBoxProps> = ({
             onClick={onSuggestionClick}
             className="flex items-center gap-2 px-4 py-1 text-inherit text-start"
         >
-            {suggestion.imageUrl ? (
-                <Image
-                    src={suggestion.imageUrl}
-                    alt={suggestion.title}
-                    width={24}
-                    height={24}
-                />
-            ) : (
-                <div className="w-6 h-4 bg-gray-200 dark:bg-gray-700 rounded-sm" />
-            )}
+            <Image
+                src={suggestion.imageUrl || '/img/recipe-placeholder.webp'}
+                alt={suggestion.title}
+                width={24}
+                height={24}
+            />
             <Typography variant="body-sm" className="text-ellipsis">
                 {suggestion.title}
             </Typography>

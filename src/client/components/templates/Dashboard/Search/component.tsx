@@ -13,6 +13,7 @@ import { useRecipeDiscovery } from '@/client/hooks';
 import { useRouter } from 'next/navigation';
 import { classNames } from '@/client/utils';
 import { SEARCH_QUERY_SEPARATOR } from '@/common/constants';
+import { useLocale } from '@/client/store';
 
 type SearchTemplateProps = Readonly<{
     initialRecipes: Promise<RecipeForDisplayDTO[]>;
@@ -25,6 +26,7 @@ export const SearchTemplate: React.FC<SearchTemplateProps> = ({
 }) => {
     const resolvedRecipes = use(initialRecipes);
 
+    const { t } = useLocale();
     const router = useRouter();
     const [searchInput, setSearchInput] = useState('');
 
@@ -145,8 +147,8 @@ export const SearchTemplate: React.FC<SearchTemplateProps> = ({
                         'flex flex-col items-center justify-center w-full h-64'
                     )}
                 >
-                    <Typography variant="body" className="text-center">
-                        Našel jsem hovno, zkus něco jinýho.
+                    <Typography variant="heading-md" className="text-center">
+                        {t('app.general.search-no-results')}
                     </Typography>
                 </div>
             )}

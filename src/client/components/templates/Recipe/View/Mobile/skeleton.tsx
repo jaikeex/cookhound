@@ -16,7 +16,9 @@ export const MobileRecipeViewSkeleton: React.FC<
         <div className={`max-w-screen-md mx-auto ${className}`}>
             <div className={'space-y-4'}>
                 {/* Recipe image skeleton */}
-                <SkeletonImage className={'w-full h-48'} />
+                <SkeletonImage
+                    className={'w-full aspect-video mx-auto max-w-[480px]'}
+                />
 
                 {/* Recipe title skeleton */}
                 <SkeletonBox className={'h-8 w-64 mx-auto'} />

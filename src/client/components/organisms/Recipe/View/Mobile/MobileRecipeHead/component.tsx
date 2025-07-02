@@ -2,9 +2,13 @@
 
 import * as React from 'react';
 import type { RecipeDTO } from '@/common/types';
-import { generateImgPlaceholder } from '@/client/utils';
-import { Rating, Tooltip, Typography, RecipeInfo } from '@/client/components';
-import Image from 'next/image';
+import {
+    Rating,
+    Tooltip,
+    Typography,
+    RecipeInfo,
+    RecipeImage
+} from '@/client/components';
 import { useAuth, useLocale } from '@/client/store';
 import { classNames } from '@/client/utils';
 
@@ -24,19 +28,11 @@ export const MobileRecipeHead: React.FC<MobileRecipeHeadProps> = ({
 
     return (
         <React.Fragment>
-            {recipe.imageUrl ? (
-                <Image
-                    src={recipe.imageUrl}
-                    alt={recipe.title}
-                    className={
-                        'object-cover w-full mx-auto rounded-md max-w-[480px] xl:max-w-full aspect-[16/9]'
-                    }
-                    width={320}
-                    height={192}
-                    placeholder={'blur'}
-                    blurDataURL={generateImgPlaceholder(80, 80, 80)}
-                />
-            ) : null}
+            <RecipeImage
+                src={recipe.imageUrl}
+                alt={recipe.title}
+                className={'mx-auto max-w-[480px]'}
+            />
             <Typography variant={'heading-xl'} className={'text-center'}>
                 {recipe.title}
             </Typography>

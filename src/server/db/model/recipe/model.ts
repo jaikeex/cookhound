@@ -328,7 +328,7 @@ class RecipeModel {
         changed: Partial<Recipe>,
         original?: Partial<Recipe>
     ) {
-        await invalidateModelCache('recipe', changed, original ?? undefined);
+        invalidateModelCache('recipe', changed, original ?? undefined);
     }
 }
 

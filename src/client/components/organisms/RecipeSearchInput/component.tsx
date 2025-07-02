@@ -79,11 +79,7 @@ export const RecipeSearchInput: React.FC<RecipeSearchInputProps> = ({
     const lastViewedRecipesQuery = chqc.user.useLastViewedRecipes(
         user?.id ?? 0,
         {
-            enabled:
-                isInputFocused &&
-                !!user?.id &&
-                enableSuggestions &&
-                !preparedQuery
+            enabled: !!user?.id && enableSuggestions && !preparedQuery
         }
     );
 
@@ -91,8 +87,8 @@ export const RecipeSearchInput: React.FC<RecipeSearchInputProps> = ({
         if (isSearchMode && searchRecipesQuery.data !== undefined) {
             return searchRecipesQuery.data.slice(0, 5);
         } else {
-            if (user?.id && lastViewedRecipesQuery.data !== undefined) {
-                return lastViewedRecipesQuery.data.slice(0, 5);
+            if (user?.id) {
+                return lastViewedRecipesQuery.data?.slice(0, 5) ?? [];
             }
 
             if (localLastViewedRecipes !== undefined) {
@@ -113,9 +109,7 @@ export const RecipeSearchInput: React.FC<RecipeSearchInputProps> = ({
     //$                                         UTILITY                                         $//
     //~-----------------------------------------------------------------------------------------~//
 
-    const isLoading = isSearchMode
-        ? searchRecipesQuery.isLoading
-        : lastViewedRecipesQuery.isLoading;
+    const isLoading = isSearchMode ? searchRecipesQuery.isLoading : false;
 
     const error = isSearchMode
         ? ((searchRecipesQuery.error as Error | null)?.message ?? null)

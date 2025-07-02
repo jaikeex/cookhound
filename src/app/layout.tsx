@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react';
+import React from 'react';
 import type { Metadata, Viewport } from 'next';
 import { Kalam, Open_Sans } from 'next/font/google';
 import '@/client/globals.css';
@@ -106,7 +106,10 @@ export default async function RootLayout({
                             defaultMessages={messages}
                             defaultLocale={locale}
                         >
-                            <AuthProvider user={user} authResolved={!!user}>
+                            <AuthProvider
+                                initialUser={user}
+                                authResolved={!!user}
+                            >
                                 <SnackbarProvider>
                                     <ModalProvider>
                                         <ScrollToTop />
@@ -115,9 +118,7 @@ export default async function RootLayout({
                                             className="flex flex-col typography-base"
                                         >
                                             <div className="fixed top-0 left-0 w-screen h-screen page-background z-[-10]" />
-                                            <Suspense fallback={null}>
-                                                <TopNavigation />
-                                            </Suspense>
+                                            <TopNavigation />
                                             <div
                                                 id={CONTENT_WRAPPER_ID}
                                                 className={classNames(

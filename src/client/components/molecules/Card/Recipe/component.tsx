@@ -1,6 +1,5 @@
 import * as React from 'react';
-import Image from 'next/image';
-import { Icon, Typography } from '@/client/components/atoms';
+import { Icon, RecipeImage, Typography } from '@/client/components/atoms';
 import { RecipeInfo } from '@/client/components/molecules/RecipeInfo';
 import { Rating } from '@/client/components/molecules';
 import Link from 'next/link';
@@ -32,12 +31,12 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({
                 href={`/recipe/${displayId}`}
                 className="flex flex-col h-full text-inherit"
             >
-                <Image
+                <RecipeImage
                     src={imageUrl}
                     alt={title}
-                    width={240}
+                    width={280}
                     height={160}
-                    className="flex-shrink-0 object-cover w-full"
+                    className="flex-shrink-0 object-cover w-full aspect-video"
                 />
                 <div className="flex flex-col justify-between h-full p-2 space-y-2">
                     <Typography

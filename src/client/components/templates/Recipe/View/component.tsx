@@ -9,7 +9,8 @@ import { useIngredientSelectStore, useAuth } from '@/client/store';
 import { useRunOnce } from '@/client/hooks';
 import { useLocalStorage } from '@/client/hooks/useLocalStorage';
 import { LOCAL_STORAGE_LAST_VIEWED_RECIPES_KEY } from '@/common/constants';
-import { chqc } from '@/client/request/queryClient';
+import { chqc, QUERY_KEYS } from '@/client/request/queryClient';
+import { useQueryClient } from '@tanstack/react-query';
 
 export type RecipeViewProps = Readonly<{
     recipe: Promise<RecipeDTO>;
@@ -17,6 +18,7 @@ export type RecipeViewProps = Readonly<{
 
 export const RecipeViewTemplate: React.FC<RecipeViewProps> = ({ recipe }) => {
     const recipeResolved = use(recipe);
+    const queryClient = useQueryClient();
     const { resetSelectedIngredients } = useIngredientSelectStore();
     const { user } = useAuth();
 
@@ -25,8 +27,15 @@ export const RecipeViewTemplate: React.FC<RecipeViewProps> = ({ recipe }) => {
         RecipeForDisplayDTO[]
     >(LOCAL_STORAGE_LAST_VIEWED_RECIPES_KEY, []);
 
-    const { mutate: registerRecipeVisit } =
-        chqc.recipe.useRegisterRecipeVisit();
+    const { mutate: registerRecipeVisit } = chqc.recipe.useRegisterRecipeVisit({
+        onSuccess: () => {
+            if (!user?.id) return;
+
+            queryClient.invalidateQueries({
+                queryKey: QUERY_KEYS.user.lastViewedRecipes(user.id)
+            });
+        }
+    });
 
     useRunOnce(() => {
         resetSelectedIngredients();

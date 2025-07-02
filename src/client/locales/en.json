@@ -72,6 +72,7 @@
     "app.general.cancel": "Cancel",
     "app.general.edit": "Edit",
     "app.general.search": "Search",
+    "app.general.search-no-results": "The search did not yield any results. Please try again.",
     "app.shopping-list.edited": "Shopping list updated",
     "app.shopping-list.delete-recipe-shopping-list": "Are you sure you want to delete this recipe from the shopping list?",
     "app.shopping-list.portion-size-tooltip": "Portion size: {{portionSize}}",

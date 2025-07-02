@@ -43,7 +43,7 @@ const log = Logger.getInstance('model-cache');
 //?—————————————————————————————————————————————————————————————————————————————————————————————?//
 
 export const CACHE_TTL = {
-    TTL_1: 60 * 5, // C1 - 5 minutes
+    TTL_1: 60, // C1 - 1 minute
     TTL_2: 60 * 60 * 6 // C2 - 6 hours
 } as const;
 
