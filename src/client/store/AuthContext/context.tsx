@@ -55,10 +55,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
     const contextValue = useMemo(
         () => ({
             authResolved,
-            user: user ?? initialUser,
+            user: user ?? (!isLoading ? initialUser : null),
             setUser
         }),
-        [authResolved, initialUser, setUser, user]
+        [authResolved, initialUser, isLoading, setUser, user]
     );
 
     useEffect(() => {

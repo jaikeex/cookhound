@@ -117,7 +117,7 @@ class RecipeModel {
                     getFrontPageRecipes(minTimesRated, language, limit, offset)
                 );
             },
-            ttl ?? CACHE_TTL.TTL_2
+            ttl ?? CACHE_TTL.TTL_1
         );
 
         return recipes;

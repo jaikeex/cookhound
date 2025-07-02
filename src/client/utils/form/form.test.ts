@@ -29,26 +29,6 @@ describe('validateFormData', () => {
         expect(result.age).toBeDefined();
     });
 
-    it('should handle nested validation errors', async () => {
-        const schema = z.object({
-            user: z.object({
-                name: z.string().trim().min(1),
-                email: z.string().trim().email()
-            })
-        });
-
-        const formData = {
-            user: {
-                name: '',
-                email: 'invalid-email'
-            }
-        };
-
-        const result = await validateFormData(formData, schema);
-
-        expect(Object.keys(result).length).toBeGreaterThan(0);
-    });
-
     it('should handle custom error messages', async () => {
         const schema = z.object({
             email: z

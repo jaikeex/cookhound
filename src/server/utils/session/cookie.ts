@@ -2,7 +2,7 @@ import { JWT_COOKIE_NAME } from '@/common/constants';
 import { ENV_CONFIG_PUBLIC } from '@/common/constants/env';
 import { cookies } from 'next/headers';
 import { createToken, verifyToken } from './jwt';
-import { parse } from 'cookie';
+import { parse, serialize } from 'cookie';
 import type { JwtPayload } from 'jsonwebtoken';
 
 //|=============================================================================================|//
@@ -17,20 +17,24 @@ import type { JwtPayload } from 'jsonwebtoken';
 ///
 //§—————————————————————————————————————————————————————————————————————————————————————————————§//
 
-export const createSession = async (token: string, keepLoggedIn: boolean) => {
+export const createSessionCookie = (token: string, keepLoggedIn: boolean) => {
     const maxAge = keepLoggedIn ? 60 * 60 * 24 * 30 : undefined;
     const secure = ENV_CONFIG_PUBLIC.ENV !== 'development';
 
-    const cookie = {
+    return serialize(JWT_COOKIE_NAME, token, {
         httpOnly: true,
-        sameSite: 'strict' as const,
+        sameSite: 'strict',
         path: '/',
         secure,
         maxAge
-    };
+    });
+};
+
+export const createSession = async (token: string, keepLoggedIn: boolean) => {
+    const cookie = createSessionCookie(token, keepLoggedIn);
 
     const cookieStore = await cookies();
-    cookieStore.set(JWT_COOKIE_NAME, token, cookie);
+    cookieStore.set(JWT_COOKIE_NAME, cookie);
 };
 
 export const deleteSession = async () => {

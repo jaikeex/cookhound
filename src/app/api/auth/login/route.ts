@@ -1,7 +1,5 @@
 import type { NextRequest } from 'next/server';
 import { authService } from '@/server/services/auth/service';
-import { serialize } from 'cookie';
-import { ENV_CONFIG_PUBLIC } from '@/common/constants/env';
 import { AuthErrorForbidden } from '@/server/error';
 import { logRequest, logResponse } from '@/server/logger';
 import { RequestContext } from '@/server/utils/reqwest/context';
@@ -9,6 +7,7 @@ import { handleServerError, validatePayload } from '@/server/utils/reqwest';
 import { UserRole } from '@/common/types';
 import z from 'zod';
 import { ApplicationErrorCode } from '@/server/error/codes';
+import { createSessionCookie } from '@/server/utils/session/cookie';
 
 //|=============================================================================================|//
 //?                                     VALIDATION SCHEMAS                                      ?//
@@ -62,13 +61,10 @@ export async function POST(request: NextRequest) {
                 keepLoggedIn: payload.keepLoggedIn ?? false
             });
 
-            const cookie = serialize('jwt', user.token, {
-                httpOnly: true,
-                secure: ENV_CONFIG_PUBLIC.ENV !== 'development',
-                sameSite: 'strict',
-                maxAge: payload.keepLoggedIn ? 60 * 60 * 24 * 30 : undefined,
-                path: '/'
-            });
+            const cookie = createSessionCookie(
+                user.token,
+                payload.keepLoggedIn ?? false
+            );
 
             const response = Response.json(
                 { ...user.user },

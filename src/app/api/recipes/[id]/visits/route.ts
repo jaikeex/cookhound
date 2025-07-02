@@ -14,7 +14,7 @@ import z from 'zod';
 //|=============================================================================================|//
 
 const RecipeVisitForCreateSchema = z.strictObject({
-    userId: z.coerce.number().int().positive().optional()
+    userId: z.coerce.number().int().positive().optional().nullable()
 });
 
 const RecipeVisitParamsSchema = z.strictObject({
