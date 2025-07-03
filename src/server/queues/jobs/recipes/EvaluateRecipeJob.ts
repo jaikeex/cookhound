@@ -12,6 +12,7 @@ import { InfrastructureErrorCode } from '@/server/error/codes';
 import { RecipeFlagReason } from '@/common/constants';
 import { zodTextFormat } from 'openai/helpers/zod';
 import { z } from 'zod';
+import { revalidateRouteCache } from '@/common/utils';
 
 const log = Logger.getInstance('recipe-evaluation-worker');
 
@@ -19,6 +20,7 @@ type EvaluateRecipeJobData = {
     data: RecipeForEvaluation;
     userId: number;
     recipeId: number;
+    recipeDisplayId: string;
 };
 
 const EvaluationResponse = z.object({
@@ -38,7 +40,7 @@ class EvaluateRecipeJob extends BaseJob<EvaluateRecipeJobData> {
     //|-----------------------------------------------------------------------------------------|//
 
     async handle(job: Job<EvaluateRecipeJobData>) {
-        const { data: recipe, userId, recipeId } = job.data;
+        const { data: recipe, userId, recipeId, recipeDisplayId } = job.data;
 
         log.trace('handle - evaluating recipe', { recipeId, userId });
 
@@ -65,6 +67,8 @@ class EvaluateRecipeJob extends BaseJob<EvaluateRecipeJobData> {
             }
 
             await recipeModel.flagRecipe(recipeId, userId, reason);
+
+            await revalidateRouteCache(`/recipe/${recipeDisplayId}`);
 
             log.notice('handle - recipe rejected and flagged', {
                 recipeId,

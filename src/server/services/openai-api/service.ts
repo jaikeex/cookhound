@@ -30,7 +30,8 @@ class OpenAIApiService {
         await queueManager.addJob(JOB_NAMES.EVALUATE_RECIPE, {
             data: recipeForEvaluation,
             userId: recipe.authorId,
-            recipeId: recipe.id
+            recipeId: recipe.id,
+            recipeDisplayId: recipe.displayId
         });
 
         return;
