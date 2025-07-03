@@ -1,6 +1,5 @@
 import fs from 'fs';
 import path from 'path';
-import util from 'util';
 import { addColors, createLogger, format, transports } from 'winston';
 import 'winston-daily-rotate-file';
 import type { Logger as WinstonLogger, transport } from 'winston';
@@ -334,15 +333,19 @@ export class Logger {
         }
 
         try {
-            const isDev = ENV_CONFIG_PUBLIC.ENV !== 'production';
+            /**
+             * This is a useful tool for debugging, as it makes the log print any appended object
+             * as a beautified json. Leaving it for reference here.
+             */
+            // const isDev = ENV_CONFIG_PUBLIC.ENV !== 'production';
 
-            if (isDev) {
-                return util.inspect(value, {
-                    depth: null,
-                    compact: false,
-                    breakLength: 120
-                });
-            }
+            // if (isDev) {
+            //     return util.inspect(value, {
+            //         depth: null,
+            //         compact: false,
+            //         breakLength: 120
+            //     });
+            // }
 
             return JSON.stringify(value);
         } catch {
