@@ -44,3 +44,4 @@ export * from './search/ReindexRecipesJob';
 //|-----------------------------------------------------------------------------------------|//
 
 export * from './recipes/RegisterRecipeVisitJob';
+export * from './recipes/EvaluateRecipeJob';

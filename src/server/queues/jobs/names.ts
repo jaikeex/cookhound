@@ -33,7 +33,8 @@ export const JOB_NAMES = Object.freeze({
     //?                                      RECIPES                                        ?//
     //|-------------------------------------------------------------------------------------|//
 
-    REGISTER_RECIPE_VISIT: 'register-recipe-visit'
+    REGISTER_RECIPE_VISIT: 'register-recipe-visit',
+    EVALUATE_RECIPE: 'evaluate-recipe'
 });
 
 export const QUEUE_NAMES = Object.freeze({

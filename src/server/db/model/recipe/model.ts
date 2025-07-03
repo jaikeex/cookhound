@@ -1,3 +1,4 @@
+import type { RecipeFlagReason } from '@/common/constants';
 import {
     CACHE_TTL,
     cachePrismaQuery,
@@ -318,6 +319,29 @@ class RecipeModel {
                 }
             }
         });
+    }
+
+    /**
+     * Flag a recipe with the provided reason.
+     *
+     * Write class -> W1
+     */
+    async flagRecipe(
+        recipeId: number,
+        userId: number,
+        reason: RecipeFlagReason
+    ): Promise<void> {
+        log.trace('Flagging a recipe', { recipeId, userId, reason });
+
+        await prisma.recipeFlag.create({
+            data: {
+                recipeId,
+                userId,
+                reason
+            }
+        });
+
+        await this.invalidateRecipeCache({ id: recipeId });
     }
 
     //~=========================================================================================~//

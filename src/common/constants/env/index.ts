@@ -64,7 +64,8 @@ export const ENV_CONFIG_PRIVATE = createConfig(
         GOOGLE_STORAGE_CLIENT_ID: process.env.GOOGLE_STORAGE_CLIENT_ID,
         GOOGLE_STORAGE_BUCKET_RECIPE_IMAGES:
             process.env.GOOGLE_STORAGE_BUCKET_RECIPE_IMAGES,
-        TYPESENSE_API_KEY: process.env.TYPESENSE_API_KEY
+        TYPESENSE_API_KEY: process.env.TYPESENSE_API_KEY,
+        OPENAI_API_KEY: process.env.OPENAI_API_KEY
     },
     'ENV_CONFIG_PRIVATE',
     process.env.NEXT_PUBLIC_ENV !== 'test' && typeof window === 'undefined'

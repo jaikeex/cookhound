@@ -21,17 +21,18 @@ model User {
   emailVerified             Boolean     @default(false)
   emailVerificationToken    String?     @db.Char(36)
   passwordResetToken        String?     @db.Char(36)
-  passwordResetTokenExpires DateTime?   
-  createdAt                 DateTime    @default(now())
-  updatedAt                 DateTime    @updatedAt
-  lastLogin                 DateTime?   
-  lastPasswordReset         DateTime?
+  passwordResetTokenExpires DateTime?   @db.DateTime
+  createdAt                 DateTime    @default(now()) @db.DateTime(3)
+  updatedAt                 DateTime    @updatedAt @db.DateTime(3)
+  lastLogin                 DateTime?   @db.DateTime(3)
+  lastPasswordReset         DateTime?   @db.DateTime(3)
 
   // Relations
   recipes                   Recipe[]    @relation("AuthoredRecipes")
   visitedRecipes            UserVisitedRecipe[]
   ratings                   Rating[]
   shoppingList              ShoppingListIngredient[]
+  flags                     RecipeFlag[]
 
   // Indexes
   @@index([username])
@@ -49,14 +50,14 @@ model Recipe {
   language     String    @db.VarChar(2)
   title        String    @db.VarChar(255)
   notes        String?   @db.Text
-  time         Int?
+  time         Int?      @db.Int
   portionSize  Int?      @db.Int
   imageUrl     String?   @db.VarChar(255)
   rating       Decimal?  @db.Decimal(2, 1)
   timesRated   Int       @default(0)
   timesViewed  Int       @default(0)
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  createdAt    DateTime  @default(now()) @db.DateTime(3)
+  updatedAt    DateTime  @updatedAt @db.DateTime(3)
 
   // Relations
   author       User                @relation("AuthoredRecipes", fields: [authorId], references: [id])
@@ -65,6 +66,7 @@ model Recipe {
   ratings      Rating[]
   shoppingList ShoppingListIngredient[]
   visitedBy    UserVisitedRecipe[]
+  flags        RecipeFlag[]
   
   // Indexes
   @@index([authorId])
@@ -80,7 +82,7 @@ model Recipe {
 
 model Instruction {
   recipeId Int    @db.Int
-  step     Int
+  step     Int    @db.Int
   text     String @db.Text
 
   // Relations
@@ -94,7 +96,7 @@ model Instruction {
 }
 
 model Ingredient {
-  id       Int    @id @default(autoincrement())
+  id       Int    @id @default(autoincrement()) @db.Int
   language String @db.VarChar(2)
   name     String @db.VarChar(50)
 
@@ -109,18 +111,6 @@ model Ingredient {
   @@index([language])
   @@index([name])
   @@map("ingredients")
-}
-
-model Unit {
-  id       Int    @id @default(autoincrement())
-  language String @db.VarChar(2)
-  name     String @db.VarChar(50)
-
-  // Unique constraint
-  @@unique([language, name])
-  @@index([language])
-  @@index([name])
-  @@map("units")
 }
 
 model RecipeIngredient {
@@ -163,12 +153,12 @@ model ShoppingListIngredient {
 }
 
 model Rating {
-  id        Int      @id @default(autoincrement())
+  id        Int      @id @default(autoincrement()) @db.Int
   recipeId  Int      @db.Int
   userId    Int      @db.Int
   rating    Decimal  @db.Decimal(2, 1)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now()) @db.DateTime(3)
+  updatedAt DateTime @updatedAt @db.DateTime(3)
 
   // Relations
   recipe Recipe @relation(fields: [recipeId], references: [id])
@@ -184,7 +174,7 @@ model Rating {
 model UserVisitedRecipe {
   userId    Int      @db.Int
   recipeId  Int      @db.Int
-  visitedAt DateTime @default(now())
+  visitedAt DateTime @default(now()) @db.DateTime(3)
 
   // Relations
   user   User   @relation(fields: [userId], references: [id])
@@ -196,4 +186,25 @@ model UserVisitedRecipe {
   @@index([userId])
   @@index([recipeId])
   @@map("user_visited_recipes")
+}
+
+model RecipeFlag {
+  id         Int       @id @default(autoincrement()) @db.Int
+  userId     Int       @db.Int
+  recipeId   Int       @db.Int
+  reason     String    @db.VarChar(255)
+  resolved   Boolean   @default(false)
+  active     Boolean   @default(true)
+  resolvedAt DateTime? @db.DateTime(3)
+  createdAt  DateTime  @default(now()) @db.DateTime(3)
+
+  // Relations
+  user   User   @relation(fields: [userId], references: [id])
+  recipe Recipe @relation(fields: [recipeId], references: [id])
+
+  // Indexes
+  @@index([userId])
+  @@index([recipeId])
+
+  @@map("recipe_flags")
 }

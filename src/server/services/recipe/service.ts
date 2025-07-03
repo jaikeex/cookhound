@@ -22,6 +22,7 @@ import { SEARCH_QUERY_SEPARATOR } from '@/common/constants';
 import { queueManager } from '@/server/queues/QueueManager';
 import { JOB_NAMES } from '@/server/queues/jobs/names';
 import { ApplicationErrorCode } from '@/server/error/codes';
+import { openaiApiService } from '@/server/services/openai-api/service';
 
 //|=============================================================================================|//
 
@@ -170,6 +171,12 @@ class RecipeService {
         log.notice('createRecipe - success', { recipe });
 
         const recipeDTO = await this.getRecipeById(recipe.id);
+
+        /**
+         * This is the place to call the evaluation. The recipe is created (so it can be flagged),
+         * and the content has passed the deterministic app checks.
+         */
+        openaiApiService.evaluateRecipeContent(recipeDTO);
 
         // Index the recipe.
         try {
