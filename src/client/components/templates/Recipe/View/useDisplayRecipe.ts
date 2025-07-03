@@ -8,7 +8,7 @@ import {
     useSnackbar
 } from '@/client/store';
 import { useShoppingList } from '@/client/hooks';
-import { revalidateRouteCache } from '@/client/utils';
+import { revalidateRouteCache } from '@/common/utils';
 import type { RecipeDTO } from '@/common/types/recipe';
 import { useRouter } from 'next/navigation';
 import { useCallback } from 'react';

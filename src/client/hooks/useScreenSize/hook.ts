@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { BREAKPOINTS } from '@/common/constants';
+import { BREAKPOINTS } from '@/client/constants';
 import { useEventListener } from '@/client/hooks';
 
 export const useScreenSize = () => {

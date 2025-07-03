@@ -8,5 +8,4 @@ export * from './classnames';
 // other
 export * from './fileToByteArray';
 export * from './generateRandomId';
-export * from './revalidateRouteCache';
 export * from './getCookieValue';
