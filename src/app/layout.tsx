@@ -23,6 +23,8 @@ import { apiClient } from '@/client/request';
 import { getUserLocale } from '@/client/utils';
 import { CONTENT_WRAPPER_ID, MAIN_PAGE_ID } from '@/client/constants';
 import { JWT_COOKIE_NAME } from '@/common/constants';
+import { QueryClient, dehydrate } from '@tanstack/react-query';
+import { QUERY_KEYS } from '@/client/request/queryClient';
 
 const openSans = Open_Sans({
     subsets: ['latin'],
@@ -52,6 +54,8 @@ export default async function RootLayout({
 }: Readonly<{
     children: React.ReactNode;
 }>) {
+    const qc = new QueryClient();
+
     //|-----------------------------------------------------------------------------------------|//
     //?                                          LOCALE                                         ?//
     //|-----------------------------------------------------------------------------------------|//
@@ -88,14 +92,22 @@ export default async function RootLayout({
         user = null;
     }
 
+    /**
+     * There is no need to fetch through react-query here. the api client would be called anyway and no
+     * functionality from rq is needed, it would only make the code more cluttered.
+     */
+    qc.setQueryData(QUERY_KEYS.auth.currentUser, user);
+
     //|-----------------------------------------------------------------------------------------|//
     //?                                          RENDER                                         ?//
     //|-----------------------------------------------------------------------------------------|//
 
+    const dehydratedState = dehydrate(qc);
+
     return (
         <html lang="en" suppressHydrationWarning>
             <body className={`${kalam.variable} ${openSans.variable}`}>
-                <QueryProvider>
+                <QueryProvider dehydratedState={dehydratedState}>
                     <ThemeProvider
                         attribute="class"
                         defaultTheme="dark"
@@ -106,10 +118,7 @@ export default async function RootLayout({
                             defaultMessages={messages}
                             defaultLocale={locale}
                         >
-                            <AuthProvider
-                                initialUser={user}
-                                authResolved={!!user}
-                            >
+                            <AuthProvider>
                                 <SnackbarProvider>
                                     <ModalProvider>
                                         <ScrollToTop />

@@ -24,15 +24,15 @@ export const LogoutButton: React.FC<LogoutButtonProps> = ({ className }) => {
                 message: t('auth.success.logout'),
                 variant: 'success'
             });
-            handleLogoutSuccess();
+            setUser(null);
             queryClient.clear();
+            handleLogoutSuccess();
         }
     });
 
     const handleLogoutSuccess = useCallback(() => {
-        setUser(null);
         router.push('/');
-    }, [setUser, router]);
+    }, [router]);
 
     const handleClick = useCallback(async () => {
         // All mutations expect a payload by definiton.

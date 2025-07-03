@@ -20,7 +20,11 @@ class AuthApiClient {
      * - 500: Internal Server Error, if there is another error during authentication.
      */
     async getCurrentUser(config?: RequestConfig): Promise<UserDTO> {
-        return await apiRequestWrapper.get({ url: '/auth/current', ...config });
+        return await apiRequestWrapper.get({
+            url: '/auth/current',
+            ...config,
+            revalidate: 0
+        });
     }
 
     /**

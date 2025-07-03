@@ -3,8 +3,6 @@ import { authQueryClient, AUTH_QUERY_KEYS } from './auth';
 import { recipeQueryClient, RECIPE_QUERY_KEYS } from './recipe';
 import { fileQueryClient } from './file';
 
-export { queryClient } from './queryClient';
-
 /**
  * Unfortunately, this is the best name i came up with to differentiate it enought from the default
  * tanstack query client (which i want to call queryClient because it is the ultimate query client...)

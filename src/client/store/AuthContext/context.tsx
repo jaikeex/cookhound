@@ -30,18 +30,12 @@ export const useAuth = () => {
     return context;
 };
 
-type AuthProviderProps = Readonly<{
-    initialUser: UserDTO | null;
-    authResolved?: boolean;
-}> &
+type AuthProviderProps = Readonly<NonNullable<unknown>> &
     React.PropsWithChildren<NonNullable<unknown>>;
 
-export const AuthProvider: React.FC<AuthProviderProps> = ({
-    initialUser,
-    children
-}) => {
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const queryClient = useQueryClient();
-    const { data: user, isLoading } = chqc.auth.useCurrentUser();
+    const { data: user = null, isLoading } = chqc.auth.useCurrentUser({});
 
     const setUser = useCallback(
         (newUser: UserDTO | null) => {
@@ -50,15 +44,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
         [queryClient]
     );
 
-    const authResolved = !isLoading || !!initialUser;
+    const authResolved = useMemo(
+        () => (user ? true : !isLoading),
+        [isLoading, user]
+    );
 
     const contextValue = useMemo(
         () => ({
             authResolved,
-            user: user ?? (!isLoading ? initialUser : null),
+            user: user ?? null,
             setUser
         }),
-        [authResolved, initialUser, isLoading, setUser, user]
+        [authResolved, setUser, user]
     );
 
     useEffect(() => {
