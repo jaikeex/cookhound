@@ -7,6 +7,7 @@ interface RouteConfig {
 
 export const PROTECTED_ROUTES: RouteConfig[] = [
     { path: '/recipe/create', roles: [UserRole.User, UserRole.Admin] },
+    { path: '/shopping-list', roles: [UserRole.User, UserRole.Admin] },
     { path: '/auth/login', roles: null },
     { path: '/auth/register', roles: null },
     { path: '/auth/logout', roles: [UserRole.User, UserRole.Admin] },

@@ -12,6 +12,7 @@ import type {
     ShoppingListPayload
 } from '@/common/types';
 import { USER_QUERY_KEYS } from '@/client/request/queryClient/user';
+import { usePathname } from 'next/navigation';
 
 /**
  * A catch-all react hook for managing the shopping list.
@@ -20,6 +21,7 @@ export const useShoppingList = () => {
     const { user } = useAuth();
     const userId = user?.id;
     const queryClient = useQueryClient();
+    const pathname = usePathname();
 
     const listKey = useMemo(() => {
         return userId ? USER_QUERY_KEYS.shoppingList(userId) : undefined;
@@ -70,7 +72,7 @@ export const useShoppingList = () => {
         error: queryError,
         refetch
     } = chqc.user.useShoppingList(userId ?? 0, {
-        enabled: !!userId
+        enabled: !!userId && pathname === '/shopping-list'
     });
 
     //~-----------------------------------------------------------------------------------------~//
