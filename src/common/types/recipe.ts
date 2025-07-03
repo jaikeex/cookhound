@@ -1,4 +1,5 @@
 import type { Locale } from '@/client/locales';
+import type { RecipeFlagDTO } from './flags/recipe-flag';
 
 export type RecipeDTO = {
     id: number;
@@ -13,6 +14,7 @@ export type RecipeDTO = {
     notes: string | null;
     imageUrl: string;
     rating: number | null;
+    flags: RecipeFlagDTO[] | null;
     timesRated: number;
     timesViewed: number;
 };

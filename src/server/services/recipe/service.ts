@@ -23,6 +23,7 @@ import { queueManager } from '@/server/queues/QueueManager';
 import { JOB_NAMES } from '@/server/queues/jobs/names';
 import { ApplicationErrorCode } from '@/server/error/codes';
 import { openaiApiService } from '@/server/services/openai-api/service';
+import type { RecipeFlagDTO } from '@/common/types/flags/recipe-flag';
 
 //|=============================================================================================|//
 
@@ -70,11 +71,26 @@ class RecipeService {
             notes: recipe.notes,
             imageUrl: recipe.imageUrl || '',
             rating: recipe.rating ? Number(recipe.rating) : null,
+            flags: null,
             timesRated: recipe.timesRated ?? 0,
             timesViewed: recipe.timesViewed ?? 0,
             ingredients: recipe.ingredients as Ingredient[],
             instructions: recipe.instructions as string[]
         };
+
+        const flags = recipe.flags as unknown as RecipeFlagDTO[];
+
+        if (flags && Array.isArray(flags)) {
+            const activeFlags = flags.filter((flag) => flag.active);
+
+            if (activeFlags.length > 0) {
+                log.warn('getRecipeById - requested recipe with active flags', {
+                    id
+                });
+
+                recipeDTO.flags = activeFlags;
+            }
+        }
 
         log.trace('getRecipeById - success', { id });
 
@@ -113,8 +129,6 @@ class RecipeService {
             );
         }
 
-        log.trace('getRecipeByDisplayId - success', { displayId });
-
         const recipeDTO: RecipeDTO = {
             id: recipe.id,
             displayId: recipe.displayId,
@@ -129,8 +143,28 @@ class RecipeService {
             timesRated: recipe.timesRated ?? 0,
             timesViewed: (recipe.timesViewed ?? 0) + 1, // Include the increment we just made
             ingredients: recipe.ingredients as Ingredient[],
-            instructions: recipe.instructions as string[]
+            instructions: recipe.instructions as string[],
+            flags: null
         };
+
+        const flags = recipe.flags as unknown as RecipeFlagDTO[];
+
+        if (flags && Array.isArray(flags)) {
+            const activeFlags = flags.filter((flag) => flag.active);
+
+            if (activeFlags.length > 0) {
+                log.warn(
+                    'getRecipeByDisplayId - requested recipe with active flags',
+                    {
+                        displayId
+                    }
+                );
+
+                recipeDTO.flags = activeFlags;
+            }
+        }
+
+        log.trace('getRecipeByDisplayId - success', { displayId });
 
         return recipeDTO;
     }

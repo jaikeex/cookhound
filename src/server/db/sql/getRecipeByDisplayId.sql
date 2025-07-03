@@ -33,7 +33,23 @@ SELECT
         FROM instructions i
         WHERE i.recipeId = r.id
         ORDER BY i.step
-    ) AS instructions
+    ) AS instructions,
+    (
+        SELECT JSON_ARRAYAGG(
+            JSON_OBJECT(
+                'id', rf.id,
+                'userId', rf.userId,
+                'reason', rf.reason,
+                'resolved', rf.resolved,
+                'active', rf.active,
+                'resolvedAt', rf.resolvedAt,
+                'createdAt', rf.createdAt
+            )
+        )
+        FROM recipe_flags rf
+        WHERE rf.recipeId = r.id
+        ORDER BY rf.createdAt DESC
+    ) AS flags
 FROM
     recipes r
 WHERE

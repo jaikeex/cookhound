@@ -1,6 +1,9 @@
 import { QUEUE_NAME as EMAILS_QUEUE_NAME } from './emails/constants';
 import { QUEUE_NAME as SEARCH_QUEUE_NAME } from './search/constants';
-import { QUEUE_NAME as RECIPES_QUEUE_NAME } from './recipes/constants';
+import {
+    EVALUATION_QUEUE_NAME,
+    QUEUE_NAME as RECIPES_QUEUE_NAME
+} from './recipes/constants';
 
 //?—————————————————————————————————————————————————————————————————————————————————————————————?//
 //?                                       IMPORTANT INFO                                        ?//
@@ -40,5 +43,6 @@ export const JOB_NAMES = Object.freeze({
 export const QUEUE_NAMES = Object.freeze({
     EMAILS: EMAILS_QUEUE_NAME,
     SEARCH: SEARCH_QUEUE_NAME,
-    RECIPES: RECIPES_QUEUE_NAME
+    RECIPES: RECIPES_QUEUE_NAME,
+    RECIPE_EVALUATION: EVALUATION_QUEUE_NAME
 });

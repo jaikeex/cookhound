@@ -1,7 +1,7 @@
 import { BaseJob } from '@/server/queues/BaseJob';
 import type { RecipeForEvaluation } from '@/server/services/openai-api/types';
 import { JOB_NAMES, QUEUE_NAMES } from '@/server/queues/jobs/names';
-import { QUEUE_OPTIONS } from './constants';
+import { EVALUATION_QUEUE_OPTIONS } from './constants';
 import { queueManager } from '@/server/queues/QueueManager';
 import type { Job } from 'bullmq';
 import { openaiClient } from '@/server/integrations';
@@ -9,10 +9,9 @@ import { Logger } from '@/server/logger';
 import recipeModel from '@/server/db/model/recipe/model';
 import { InfrastructureError } from '@/server/error/server';
 import { InfrastructureErrorCode } from '@/server/error/codes';
-import { RecipeFlagReason } from '@/common/constants';
+import { ENV_CONFIG_PUBLIC, RecipeFlagReason } from '@/common/constants';
 import { zodTextFormat } from 'openai/helpers/zod';
 import { z } from 'zod';
-import { revalidateRouteCache } from '@/common/utils';
 
 const log = Logger.getInstance('recipe-evaluation-worker');
 
@@ -32,8 +31,8 @@ const EvaluationResponse = z.object({
 
 class EvaluateRecipeJob extends BaseJob<EvaluateRecipeJobData> {
     static jobName = JOB_NAMES.EVALUATE_RECIPE;
-    static queueName = QUEUE_NAMES.RECIPES;
-    static queueOptions = QUEUE_OPTIONS;
+    static queueName = QUEUE_NAMES.RECIPE_EVALUATION;
+    static queueOptions = EVALUATION_QUEUE_OPTIONS;
 
     //|-----------------------------------------------------------------------------------------|//
     //?                                       JOB HANDLER                                       ?//
@@ -68,7 +67,17 @@ class EvaluateRecipeJob extends BaseJob<EvaluateRecipeJobData> {
 
             await recipeModel.flagRecipe(recipeId, userId, reason);
 
-            await revalidateRouteCache(`/recipe/${recipeDisplayId}`);
+            const response = await fetch(
+                `${ENV_CONFIG_PUBLIC.API_URL}/revalidate?path=/recipes/display/${recipeDisplayId}`
+            );
+
+            if (!response.ok) {
+                log.warn('handle - failed to revalidate recipe route', {
+                    recipeId,
+                    userId,
+                    response
+                });
+            }
 
             log.notice('handle - recipe rejected and flagged', {
                 recipeId,
