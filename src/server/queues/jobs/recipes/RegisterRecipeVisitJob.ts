@@ -4,9 +4,10 @@ import { Logger } from '@/server/logger';
 import { queueManager } from '@/server/queues/QueueManager';
 import { JOB_NAMES, QUEUE_NAMES } from '@/server/queues/jobs/names';
 import { QUEUE_OPTIONS } from './constants';
-import db from '@/server/db/model';
 import { InfrastructureError } from '@/server/error/server';
 import { InfrastructureErrorCode } from '@/server/error/codes';
+import recipeModel from '@/server/db/model/recipe/model';
+import userModel from '@/server/db/model/user/model';
 
 const log = Logger.getInstance('recipe-visit-worker');
 
@@ -31,12 +32,12 @@ class RegisterRecipeVisitJob extends BaseJob<RecipeVisitJobData> {
                 return;
             }
 
-            await db.recipe.incrementViewCount(recipeId);
+            await recipeModel.incrementViewCount(recipeId);
 
             log.trace('handle - view count incremented', { recipeId });
 
             if (userId) {
-                await db.user.addRecipeToLastViewed(userId, recipeId);
+                await userModel.addRecipeToLastViewed(userId, recipeId);
                 log.trace('handle - added to user last viewed', {
                     recipeId,
                     userId

@@ -45,6 +45,7 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = () => {
             >
                 <Link
                     href={'/recipe/create'}
+                    prefetch={isLoggedin}
                     tabIndex={isLoggedin ? 0 : -1}
                     className={classNames(!isLoggedin && 'link-disabled')}
                 >
@@ -58,6 +59,7 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = () => {
 
             <Link
                 href={'/shopping-list'}
+                prefetch={isLoggedin}
                 tabIndex={isLoggedin ? 0 : -1}
                 className={classNames(!isLoggedin && 'link-disabled')}
             >

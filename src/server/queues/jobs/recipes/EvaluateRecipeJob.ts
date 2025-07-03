@@ -12,6 +12,7 @@ import { InfrastructureErrorCode } from '@/server/error/codes';
 import { ENV_CONFIG_PUBLIC, RecipeFlagReason } from '@/common/constants';
 import { zodTextFormat } from 'openai/helpers/zod';
 import { z } from 'zod';
+import { recipeSearchIndex } from '@/server/search-index/recipeIndex';
 
 const log = Logger.getInstance('recipe-evaluation-worker');
 
@@ -66,6 +67,8 @@ class EvaluateRecipeJob extends BaseJob<EvaluateRecipeJobData> {
             }
 
             await recipeModel.flagRecipe(recipeId, userId, reason);
+
+            recipeSearchIndex.deleteOne(recipeId);
 
             const response = await fetch(
                 `${ENV_CONFIG_PUBLIC.API_URL}/revalidate?path=/recipes/display/${recipeDisplayId}`

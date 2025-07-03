@@ -5,10 +5,22 @@ import type { Locale } from '@/client/locales';
 import { redisClient } from '@/server/integrations';
 import { InfrastructureError } from '@/server/error';
 import { InfrastructureErrorCode } from '@/server/error/codes';
+import { CACHE_TTL } from '@/server/db/model/model-cache';
 
 const log = Logger.getInstance('recipe-index');
 
 const COLLECTION_NAME = 'recipes';
+
+//?—————————————————————————————————————————————————————————————————————————————————————————————?//
+//?                                         ISFLAGGED                                           ?//
+///
+//# There is no need to save all recipe flags to the index. For start, the api should already
+//# manage flagged recipes by deleting them from the index and keeping it up to date, but in case
+//# any flagged recipe slips through, this field exists. Simply record whether the recipe has
+//# any active flags. This is easier for the client to check when rendering lists and any additional
+//# info can always be queried for later.
+///
+//?—————————————————————————————————————————————————————————————————————————————————————————————?//
 
 interface RecipeDocument {
     id: string;
@@ -19,6 +31,7 @@ interface RecipeDocument {
     ingredients: string[];
     instructions: string[];
     rating: number | null;
+    isFlagged: boolean;
     timesRated: number;
     time: number | null;
     portionSize: number | null;
@@ -63,7 +76,7 @@ class RecipeSearchIndex {
     private async cacheSearchQuery<T>(
         cacheKey: string,
         queryFn: () => Promise<T>,
-        ttlInSeconds: number = 3600
+        ttlInSeconds: number = CACHE_TTL.TTL_1
     ): Promise<T> {
         const startTime = Date.now();
 
@@ -150,6 +163,7 @@ class RecipeSearchIndex {
                     { name: 'instructions', type: 'string[]', optional: true },
                     { name: 'rating', type: 'float', optional: true },
                     { name: 'timesRated', type: 'int32', optional: true },
+                    { name: 'isFlagged', type: 'boolean', optional: true },
                     { name: 'time', type: 'int32', optional: true },
                     { name: 'portionSize', type: 'int32', optional: true },
                     { name: 'authorId', type: 'int32' },
@@ -187,6 +201,7 @@ class RecipeSearchIndex {
             ingredients: recipe.ingredients?.map((i) => i.name) ?? [],
             instructions: recipe.instructions ?? [],
             rating: recipe.rating ?? null,
+            isFlagged: recipe.flags?.some((f) => f.active) ?? false,
             timesRated: recipe.timesRated ?? 0,
             time: recipe.time ?? null,
             portionSize: recipe.portionSize ?? null,
@@ -217,6 +232,37 @@ class RecipeSearchIndex {
                 id: recipe.id
             });
             // This should not break the app, so we just log and continue.
+        }
+    }
+
+    //~-----------------------------------------------------------------------------------------~//
+    //$                                       REINDEX ONE                                       $//
+    //~-----------------------------------------------------------------------------------------~//
+
+    async reindexOne(recipe: RecipeDTO): Promise<void> {
+        log.trace('Reindexing single recipe in Typesense', {
+            id: recipe.id,
+            displayId: recipe.displayId
+        });
+
+        try {
+            await this.client
+                .collections(COLLECTION_NAME)
+                .documents(recipe.id.toString())
+                .update(this.mapRecipeToDocument(recipe));
+
+            log.trace('Recipe reindexed successfully in Typesense', {
+                id: recipe.id,
+                displayId: recipe.displayId
+            });
+        } catch (error: unknown) {
+            log.error('Failed to reindex recipe in Typesense', error, {
+                id: recipe.id,
+                displayId: recipe.displayId
+            });
+            throw new InfrastructureError(
+                InfrastructureErrorCode.TYPESENSE_INDEX_UPDATE_FAILED
+            );
         }
     }
 
@@ -256,21 +302,21 @@ class RecipeSearchIndex {
                         operator: 'and'
                     });
 
-                const hits: RecipeForDisplayDTO[] = (
-                    searchResult.hits || []
-                ).map((hit: any) => {
-                    const doc = hit.document as RecipeDocument;
-                    return {
-                        id: doc.id,
-                        displayId: doc.displayId,
-                        title: doc.title,
-                        imageUrl: doc.imageUrl ?? '',
-                        rating: doc.rating ?? null,
-                        timesRated: doc.timesRated ?? 0,
-                        time: doc.time ?? null,
-                        portionSize: doc.portionSize ?? null
-                    };
-                });
+                const hits: RecipeForDisplayDTO[] = (searchResult.hits || [])
+                    .filter((hit: any) => !hit.document.isFlagged)
+                    .map((hit: any) => {
+                        const doc = hit.document as RecipeDocument;
+                        return {
+                            id: doc.id,
+                            displayId: doc.displayId,
+                            title: doc.title,
+                            imageUrl: doc.imageUrl ?? '',
+                            rating: doc.rating ?? null,
+                            timesRated: doc.timesRated ?? 0,
+                            time: doc.time ?? null,
+                            portionSize: doc.portionSize ?? null
+                        };
+                    });
 
                 return hits;
             } catch (error: unknown) {
@@ -282,6 +328,63 @@ class RecipeSearchIndex {
                 );
             }
         });
+    }
+
+    //~-----------------------------------------------------------------------------------------~//
+    //$                                    DELETE ONE DOCUMENT                                  $//
+    //~-----------------------------------------------------------------------------------------~//
+
+    async deleteOne(recipeId: number): Promise<void> {
+        log.trace('Deleting recipe document in Typesense', {
+            id: recipeId
+        });
+
+        try {
+            await this.client
+                .collections(COLLECTION_NAME)
+                .documents(recipeId.toString())
+                .delete();
+        } catch (error: unknown) {
+            log.error('Failed to delete recipe document in Typesense', error, {
+                id: recipeId
+            });
+            throw new InfrastructureError(
+                InfrastructureErrorCode.TYPESENSE_INDEX_UPDATE_FAILED
+            );
+        }
+
+        log.trace('Recipe document deleted successfully in Typesense', {
+            id: recipeId
+        });
+    }
+
+    //~-----------------------------------------------------------------------------------------~//
+    //$                                    DELETE ALL DOCUMENTS                                 $//
+    //~-----------------------------------------------------------------------------------------~//
+
+    async deleteAllDocuments(): Promise<void> {
+        log.info('Deleting all documents in Typesense collection', {
+            collectionName: COLLECTION_NAME
+        });
+
+        try {
+            await this.client.collections(COLLECTION_NAME).delete();
+
+            log.info(
+                'All documents deleted successfully in Typesense collection',
+                {
+                    collectionName: COLLECTION_NAME
+                }
+            );
+        } catch (error: unknown) {
+            log.error(
+                'Failed to delete all documents in Typesense collection',
+                error,
+                {
+                    collectionName: COLLECTION_NAME
+                }
+            );
+        }
     }
 }
 

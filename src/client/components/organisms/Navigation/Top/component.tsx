@@ -81,7 +81,7 @@ export const TopNavigation: React.FC<TopNavigationProps> = () => {
                         text={t('app.general.register-to-create-recipe')}
                         disabled={isLoggedin}
                     >
-                        <Link href={'/recipe/create'}>
+                        <Link href={'/recipe/create'} prefetch={isLoggedin}>
                             <ButtonBase
                                 color="subtle"
                                 icon="plus"
@@ -106,6 +106,7 @@ export const TopNavigation: React.FC<TopNavigationProps> = () => {
                             href={'/shopping-list'}
                             icon="shoppingList"
                             disabled={!isLoggedin || !authResolved}
+                            prefetch={isLoggedin}
                         />
                     </Tooltip>
 

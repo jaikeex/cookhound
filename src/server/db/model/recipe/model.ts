@@ -129,7 +129,7 @@ class RecipeModel {
     //~=========================================================================================~//
 
     /**
-     * Search for recipes by text
+     * Search for recipes by text. Exlcludes recipes with an active flag.
      * Query class -> C1
      */
     async searchManyByText(
@@ -138,7 +138,7 @@ class RecipeModel {
         limit: number,
         offset: number,
         ttl?: number
-    ): Promise<any[]> {
+    ): Promise<searchRecipes.Result[]> {
         const cacheKey = generateCacheKey('recipe', 'search', {
             searchTerm,
             language,
@@ -352,7 +352,7 @@ class RecipeModel {
         changed: Partial<Recipe>,
         original?: Partial<Recipe>
     ) {
-        invalidateModelCache('recipe', changed, original ?? undefined);
+        await invalidateModelCache('recipe', changed, original ?? undefined);
     }
 }
 

@@ -7,6 +7,7 @@ import { prisma } from '@/server/integrations';
 import { recipeSearchIndex } from '@/server/search-index';
 import type { RecipeDTO } from '@/common/types';
 import type { Locale } from '@/client/locales';
+import type { RecipeFlagDTO } from '@/common/types/flags/recipe-flag';
 
 const log = Logger.getInstance('recipe-reindex-job');
 
@@ -34,6 +35,8 @@ class ReindexRecipesJob extends BaseJob {
         let lastId = 0;
         let totalProcessed = 0;
 
+        await recipeSearchIndex.deleteAllDocuments();
+
         // eslint-disable-next-line no-constant-condition
         while (true) {
             const recipes = await prisma.recipe.findMany({
@@ -59,7 +62,8 @@ class ReindexRecipesJob extends BaseJob {
                         orderBy: {
                             step: 'asc'
                         }
-                    }
+                    },
+                    flags: true
                 }
             });
 
@@ -68,6 +72,13 @@ class ReindexRecipesJob extends BaseJob {
             }
 
             for (const recipe of recipes) {
+                if (recipe.flags.some((f) => f.active)) {
+                    log.trace('handle - skipping recipe with active flag', {
+                        recipeId: recipe.id
+                    });
+                    continue;
+                }
+
                 const dto: RecipeDTO = {
                     id: recipe.id,
                     displayId: recipe.displayId,
@@ -79,6 +90,7 @@ class ReindexRecipesJob extends BaseJob {
                     notes: recipe.notes,
                     imageUrl: recipe.imageUrl ?? '',
                     rating: recipe.rating ? Number(recipe.rating) : null,
+                    flags: recipe.flags as unknown as RecipeFlagDTO[] | null,
                     timesRated: recipe.timesRated ?? 0,
                     timesViewed: recipe.timesViewed ?? 0,
                     ingredients: recipe.ingredients.map((ri) => ({

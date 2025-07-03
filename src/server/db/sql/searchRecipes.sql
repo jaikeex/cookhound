@@ -14,9 +14,11 @@ FROM
 LEFT JOIN recipes_ingredients ri ON ri.recipeId = r.id
 LEFT JOIN ingredients i ON i.id = ri.ingredientId
 LEFT JOIN instructions instr ON instr.recipeId = r.id
+LEFT JOIN recipe_flags rf ON rf.recipeId = r.id AND rf.active = true
 /*--------------------------------------------------------------------------------------------------*/
 WHERE
     r.language = ?
+    AND rf.recipeId IS NULL
     AND (
         r.title LIKE CONCAT('%', ?, '%')
         OR r.notes LIKE CONCAT('%', ?, '%')

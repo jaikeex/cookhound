@@ -373,6 +373,7 @@ const createRecipePlaceholder = (
     imageUrl: '/img/recipe-placeholder.webp',
     title: t('app.recipe.title'),
     portionSize: null,
+    flags: [],
     time: null,
     notes: null,
     ingredients: [],

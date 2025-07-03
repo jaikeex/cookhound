@@ -422,6 +422,10 @@ class RecipeService {
             }
         }
 
+        /**
+         * No flag info needed here because the getManyForFrontPage query guarantees that no flagged recipes
+         * are returned to the service.
+         */
         const recipes: RecipeForDisplayDTO[] = results.map((recipe) => ({
             id: recipe.id,
             displayId: recipe.displayId,
@@ -601,12 +605,27 @@ class RecipeService {
              * Fallback to db search if typesense fails. Do not bother with multi-searching here,
              * fetching all from db would be costly with longer lists and seems pointless.
              */
-            results = await db.recipe.searchManyByText(
+            const dbResults = await db.recipe.searchManyByText(
                 queryTerms[0],
                 language,
                 perPage,
                 offset
             );
+
+            /**
+             * No flag info needed here because both typesense and the searchManyByText query guarantees
+             * that no flagged recipes are returned to the service.
+             */
+            results = dbResults.map((recipe) => ({
+                id: recipe.id,
+                displayId: recipe.displayId,
+                title: recipe.title,
+                imageUrl: recipe.imageUrl || '',
+                rating: recipe.rating ? Number(recipe.rating) : null,
+                timesRated: recipe.timesRated ?? 0,
+                time: recipe.time,
+                portionSize: recipe.portionSize
+            }));
         }
 
         //|-------------------------------------------------------------------------------------|//
