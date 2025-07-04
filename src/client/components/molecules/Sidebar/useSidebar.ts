@@ -2,6 +2,7 @@
 
 import { useCallback, useState, useRef } from 'react';
 import {
+    useDisableMobileScroll,
     useOutsideClick,
     useParamsChangeListener,
     usePathnameChangeListener,
@@ -75,7 +76,8 @@ export const useSidebar = (config: SidebarConfig = {}) => {
     const isOpeningRef = useRef(false);
     const isClosingRef = useRef(false);
 
-    const originalBodyOverflow = useRef<string>('');
+    const { disableMobileScroll, enableMobileScroll } =
+        useDisableMobileScroll();
 
     ///=========================================================================================///
     ///                                           ROUTING                                       ///
@@ -133,7 +135,7 @@ export const useSidebar = (config: SidebarConfig = {}) => {
         isClosingRef.current = true;
         toggleSidebarWithAnimation(false);
 
-        document.documentElement.style.overflow = originalBodyOverflow.current;
+        enableMobileScroll();
         document.documentElement.style.overscrollBehavior = 'auto';
 
         setTimeout(() => {
@@ -160,11 +162,12 @@ export const useSidebar = (config: SidebarConfig = {}) => {
         router.back();
     }, [
         toggleSidebarWithAnimation,
+        enableMobileScroll,
         useMobileParams,
         searchParams,
+        paramKey,
         isMobile,
-        router,
-        paramKey
+        router
     ]);
 
     const openSidebar = useCallback(() => {
@@ -172,8 +175,7 @@ export const useSidebar = (config: SidebarConfig = {}) => {
 
         toggleSidebarWithAnimation(true);
 
-        originalBodyOverflow.current = document.documentElement.style.overflow;
-        document.documentElement.style.overflow = 'hidden';
+        disableMobileScroll();
 
         /**
          * This prohibits the browser from reloading when the user swipes down (among other things).
@@ -185,7 +187,7 @@ export const useSidebar = (config: SidebarConfig = {}) => {
         setTimeout(() => {
             isOpeningRef.current = false;
         }, 200);
-    }, [toggleSidebarWithAnimation]);
+    }, [disableMobileScroll, toggleSidebarWithAnimation]);
 
     /**
      * Toggles the state of the sidebar.

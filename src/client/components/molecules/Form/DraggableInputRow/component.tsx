@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback } from 'react';
 import { Icon, IconButton } from '@/client/components';
 import { Reorder, useDragControls } from 'framer-motion';
 import type { PanInfo } from 'framer-motion';
+import { useDisableMobileScroll, useKeyboardOpen } from '@/client/hooks';
 
 type DraggableInputRowProps = Readonly<{
     className?: string;
@@ -30,35 +31,62 @@ export const DraggableInputRow: React.FC<DraggableInputRowProps> = ({
     onRemove,
     onDragEnd
 }) => {
+    const isKeyboardOpen = useKeyboardOpen();
+    const { disableMobileScroll, enableMobileScroll } =
+        useDisableMobileScroll();
     const controls = useDragControls();
-    const originalBodyOverflow = useRef<string>('');
 
     const handleDragStart = useCallback(
         (e: React.PointerEvent) => {
             e.preventDefault(); // Prevents the input texts from being selected.
 
             if (!disableDrag) {
-                // This (together with the handleDragEnd) prevents the body from scrolling when the
-                // drag starts. this is needed expecially for mobile screens, since the screen
-                // scrolling while attempting to drag the input row is pure hell.
-                originalBodyOverflow.current =
-                    document.documentElement.style.overflow;
-                document.documentElement.style.overflow = 'hidden';
+                const activeElement =
+                    document.activeElement as HTMLElement | null;
 
-                controls.start(e);
+                const hadFocus =
+                    !!activeElement &&
+                    (activeElement.tagName === 'INPUT' ||
+                        activeElement.tagName === 'TEXTAREA');
+
+                // Blur any currently focused input before the drag starts, if not done here, the drag can
+                // become stuck if any item is dragged over any other FOCUSED item. Do not ask me why...
+                if (hadFocus) {
+                    activeElement.blur();
+                }
+
+                const startDrag = () => {
+                    // This (together with the handleDragEnd) prevents the body from scrolling when the
+                    // drag starts. this is needed expecially for mobile screens, since the screen
+                    // scrolling while attempting to drag the input row is pure hell.
+                    disableMobileScroll();
+                    controls.start(e);
+                };
+
+                //~This is important
+                // the timeout plays a crucial role, because (for reasons to me unknown), when drag is iniated
+                // while the mobile keyboard is open, the the resulting viewport change causes the entire drag
+                // to be fucked beyond oblivion. This delay was set by trial an error, it is not a bullet proof
+                // solution but it prevents most cases.
+                if (isKeyboardOpen) {
+                    setTimeout(startDrag, 300);
+                } else {
+                    startDrag();
+                }
             }
         },
-        [controls, disableDrag]
+        [controls, disableDrag, disableMobileScroll, isKeyboardOpen]
     );
 
     const handleDragEnd = useCallback(
         (event: PointerEvent, info: PanInfo) => {
-            document.documentElement.style.overflow =
-                originalBodyOverflow.current;
+            enableMobileScroll();
+
+            console.log('handleDragEnd');
 
             onDragEnd?.(event as unknown as PointerEvent, info);
         },
-        [onDragEnd]
+        [enableMobileScroll, onDragEnd]
     );
 
     return (
@@ -70,7 +98,7 @@ export const DraggableInputRow: React.FC<DraggableInputRowProps> = ({
             onDragEnd={handleDragEnd}
         >
             {children}
-            <div className={'flex items-center'}>
+            <div className={'flex items-center gap-1 ml-1'}>
                 <Icon
                     name={'drag'}
                     className={`cursor-move ${disableDrag ? 'opacity-50 pointer-events-none' : 'touch-none'}`}

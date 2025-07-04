@@ -8,6 +8,7 @@ import {
 } from '@/client/components';
 import type { Ingredient } from '@/common/types';
 import { useLocale } from '@/client/store';
+import { useScreenSize } from '@/client/hooks';
 
 type IngredientsListCreateProps = Readonly<{
     onChange?: (value: Ingredient[]) => void;
@@ -17,6 +18,7 @@ export const IngredientsListCreate: React.FC<IngredientsListCreateProps> = ({
     onChange
 }) => {
     const { t } = useLocale();
+    const { isDesktop } = useScreenSize();
 
     // used only for the draggable list - should not be used to determine the order of ingredients
     const [ingredients, setIngredients] = useState<number[]>([0]);
@@ -33,6 +35,11 @@ export const IngredientsListCreate: React.FC<IngredientsListCreateProps> = ({
 
         setIngredientValues((prev) => [...prev, {} as Ingredient]);
 
+        /**
+         * The autofocus on mobile is quite annoying, so it is disabled there for now.
+         */
+        if (!isDesktop) return;
+
         // Focus the new ingredient
         setTimeout(() => {
             const ingredient = document.getElementById(
@@ -40,7 +47,7 @@ export const IngredientsListCreate: React.FC<IngredientsListCreateProps> = ({
             );
             ingredient?.focus();
         }, 0);
-    }, [ingredients.length]);
+    }, [ingredients.length, isDesktop]);
 
     const handleRemoveIngredient = useCallback(
         (key: number) => (index: number) => {

@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { ButtonBase, DraggableList } from '@/client/components';
 import { InstructionRowCreate } from '@/client/components/molecules/InstructionRow';
 import { useLocale } from '@/client/store';
+import { useScreenSize } from '@/client/hooks';
 
 type InstructionsListCreateProps = Readonly<{
     onChange?: (value: string[]) => void;
@@ -13,6 +14,7 @@ export const InstructionsListCreate: React.FC<InstructionsListCreateProps> = ({
     onChange
 }) => {
     const { t } = useLocale();
+    const { isDesktop } = useScreenSize();
 
     // used only for the draggable list - should not be used to determine the order of instructions
     const [instructions, setInstructions] = useState<number[]>([0]);
@@ -29,6 +31,11 @@ export const InstructionsListCreate: React.FC<InstructionsListCreateProps> = ({
 
         setInstructionValues((prev) => [...prev, '']);
 
+        /**
+         * The autofocus on mobile is quite annoying, so it is disabled there for now.
+         */
+        if (!isDesktop) return;
+
         // Focus the new instruction
         setTimeout(() => {
             const instruction = document.getElementById(
@@ -36,7 +43,7 @@ export const InstructionsListCreate: React.FC<InstructionsListCreateProps> = ({
             );
             instruction?.focus();
         }, 0);
-    }, [instructions.length]);
+    }, [instructions.length, isDesktop]);
 
     const handleRemoveInstruction = useCallback(
         (key: number) => (index: number) => {

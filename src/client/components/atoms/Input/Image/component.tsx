@@ -264,7 +264,7 @@ export const ImageInput: React.FC<ImageInputProps> = ({
                     `relative border-gray-300 border-dashed rounded-lg cursor-pointer`,
                     `transition-colors duration-200 ease-in-out`,
                     `bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600`,
-                    `w-full max-w-[480px] xl:max-w-full aspect-[16/9] flex-grow`,
+                    `w-full max-w-[480px] aspect-[16/9] flex-grow`,
                     isDragging && 'bg-gray-200 dark:bg-gray-600'
                 )}
                 onDragOver={handleDragOver}

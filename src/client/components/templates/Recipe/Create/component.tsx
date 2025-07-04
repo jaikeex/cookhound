@@ -278,14 +278,14 @@ export const RecipeCreate: React.FC<RecipeCreateProps> = () => {
     return (
         <div
             className={classNames(
-                'block md:grid grid-cols-5 grid-rows-1',
+                'block md:grid grid-cols-7 grid-rows-1',
                 isSidebarVisible && isMobile ? 'pb-4' : 'pb-0',
                 isSidebarVisible && isTablet ? 'pr-8' : 'pr-0'
             )}
         >
             <form
                 className={classNames(
-                    'col-span-5 overflow-auto xl:col-span-2',
+                    'col-span-7 overflow-auto xl:col-span-3',
                     'w-full min-w-[240px] md:min-w-[480px] md:w-auto'
                 )}
                 onSubmit={handleSubmit}
@@ -357,7 +357,9 @@ export const RecipeCreate: React.FC<RecipeCreateProps> = () => {
             {/*                                   DESKTOP PREVIEW                                   */}
             {/*-------------------------------------------------------------------------------------*/}
 
-            <div className={'hidden col-span-3 px-2 xl:block'}>
+            <div className="hidden 2xl:block col-span-1">&nbsp;</div>
+
+            <div className={'hidden col-span-4 2xl:col-span-3 px-2 xl:block'}>
                 {recipeObject ? (
                     <>
                         <DesktopRecipeViewTemplate

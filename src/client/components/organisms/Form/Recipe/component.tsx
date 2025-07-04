@@ -94,7 +94,7 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({
     );
 
     return (
-        <div className={`px-4 space-y-4 md:px-8 ${className}`}>
+        <div className={`space-y-4 md:px-8 ${className}`}>
             <ImageInput
                 onUpload={handleImageChange}
                 name={'recipe-image'}
