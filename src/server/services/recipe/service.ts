@@ -2,7 +2,8 @@ import type {
     Ingredient,
     RecipeDTO,
     RecipeForCreatePayload,
-    RecipeForDisplayDTO
+    RecipeForDisplayDTO,
+    RecipeTagDTO
 } from '@/common/types';
 import type { RecipeForCreate } from './types';
 import db from '@/server/db/model';
@@ -71,6 +72,7 @@ class RecipeService {
             notes: recipe.notes,
             imageUrl: recipe.imageUrl || '',
             rating: recipe.rating ? Number(recipe.rating) : null,
+            tags: recipe.tags as RecipeTagDTO[],
             flags: null,
             timesRated: recipe.timesRated ?? 0,
             timesViewed: recipe.timesViewed ?? 0,
@@ -140,6 +142,7 @@ class RecipeService {
             notes: recipe.notes,
             imageUrl: recipe.imageUrl || '',
             rating: recipe.rating ? Number(recipe.rating) : null,
+            tags: recipe.tags as RecipeTagDTO[],
             timesRated: recipe.timesRated ?? 0,
             timesViewed: (recipe.timesViewed ?? 0) + 1, // Include the increment we just made
             ingredients: recipe.ingredients as Ingredient[],
@@ -199,7 +202,8 @@ class RecipeService {
             recipe: recipeforCreate,
             authorId: authorId,
             instructions: payload.instructions,
-            ingredients: payload.ingredients
+            ingredients: payload.ingredients,
+            tags: payload.tags ?? []
         });
 
         log.notice('createRecipe - success', { recipe });

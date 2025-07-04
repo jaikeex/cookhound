@@ -197,6 +197,7 @@ class RecipeModel {
         authorId: number;
         instructions: string[];
         ingredients: { name: string; quantity: string | null }[];
+        tags: { id: number }[];
     }): Promise<Recipe> {
         log.trace('Creating recipe', {
             title: data.recipe.title,
@@ -266,6 +267,17 @@ class RecipeModel {
                         }
                     });
                 }
+            }
+
+            log.trace('Creating tags', { recipeId: recipe.id });
+
+            if (data.tags.length > 0) {
+                await tx.recipeTag.createMany({
+                    data: data.tags.map((tag) => ({
+                        recipeId: recipe.id,
+                        tagId: tag.id
+                    }))
+                });
             }
 
             log.trace('Recipe successfully created', { recipeId: recipe.id });

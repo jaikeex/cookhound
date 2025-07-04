@@ -66,6 +66,7 @@ model Recipe {
   ratings      Rating[]
   shoppingList ShoppingListIngredient[]
   visitedBy    UserVisitedRecipe[]
+  tags         RecipeTag[]
   flags        RecipeFlag[]
   
   // Indexes
@@ -207,4 +208,45 @@ model RecipeFlag {
   @@index([recipeId])
 
   @@map("recipe_flags")
+}
+
+model TagCategory {
+  id    Int    @id @default(autoincrement())
+  name  String @unique @db.VarChar(50)
+
+  // Relations
+  tags  Tag[]
+
+  // Indexes
+  @@index([name])
+  @@map("tag_categories")
+}
+
+model Tag {
+  id          Int          @id @default(autoincrement())
+  name        String       @unique @db.VarChar(50)
+  categoryId  Int          @db.Int
+
+  // Relations
+  category    TagCategory  @relation(fields: [categoryId], references: [id])
+  recipes     RecipeTag[]
+
+  // Indexes
+  @@index([categoryId])
+  @@index([name])
+  @@map("tags")
+}
+
+model RecipeTag {
+  recipeId Int @db.Int
+  tagId    Int @db.Int
+
+  // Relations
+  recipe Recipe @relation(fields: [recipeId], references: [id])
+  tag    Tag    @relation(fields: [tagId], references: [id])
+
+  // Composite primary key
+  @@id([recipeId, tagId])
+  @@index([tagId])
+  @@map("recipes_tags")
 }

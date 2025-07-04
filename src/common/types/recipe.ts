@@ -1,5 +1,6 @@
 import type { Locale } from '@/client/locales';
 import type { RecipeFlagDTO } from './flags/recipe-flag';
+import type { RecipeTagDTO } from './tags';
 
 export type RecipeDTO = {
     id: number;
@@ -17,6 +18,7 @@ export type RecipeDTO = {
     flags: RecipeFlagDTO[] | null;
     timesRated: number;
     timesViewed: number;
+    tags: RecipeTagDTO[] | null;
 };
 
 export type RecipeForDisplayDTO = {
@@ -45,6 +47,7 @@ export type RecipeForCreatePayload = {
     portionSize: number | null;
     imageUrl: string | null;
     ingredients: IngredientForCreate[];
+    tags: { id: number }[] | null;
 };
 
 export type IngredientForCreate = {

@@ -11,3 +11,4 @@ tailwind.config.cjs
 vitest.config.mjs
 prettier.config.cjs
 postcss.config.cjs
+prisma/seed.ts

@@ -38,7 +38,8 @@ const RecipeForCreatePayloadSchema = z.strictObject({
     time: z.coerce.number().int().positive().nullable(),
     portionSize: z.coerce.number().int().positive().nullable(),
     imageUrl: z.string().trim().url().nullable(),
-    ingredients: z.array(IngredientForCreateSchema).min(1)
+    ingredients: z.array(IngredientForCreateSchema).min(1),
+    tags: z.array(z.object({ id: z.number() })).nullable()
 });
 
 //|=============================================================================================|//

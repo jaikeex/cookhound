@@ -1,6 +1,7 @@
 import ingredientModel from './ingredient/model';
 import ratingModel from './rating/model';
 import recipeModel from './recipe/model';
+import recipeTagModel from './recipe-tag/model';
 import shoppingListModel from './shopping-list/model';
 import userModel from './user/model';
 
@@ -9,6 +10,7 @@ const dbModel = {
     rating: ratingModel,
     recipe: recipeModel,
     shoppingList: shoppingListModel,
+    recipeTag: recipeTagModel,
     user: userModel
 };
 
