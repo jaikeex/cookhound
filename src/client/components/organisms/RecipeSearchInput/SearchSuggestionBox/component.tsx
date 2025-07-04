@@ -1,13 +1,13 @@
 import React, { type ReactNode } from 'react';
-import Link from 'next/link';
 import { Typography } from '@/client/components';
 import { classNames } from '@/client/utils';
-import Image from 'next/image';
 import type { RecipeForDisplayDTO } from '@/common/types';
+import { SuggestionItem } from '@/client/components/organisms/RecipeSearchInput/SuggestionItem';
 
 export type SearchSuggestionBoxProps = Readonly<{
     suggestions: RecipeForDisplayDTO[];
     isEmpty: boolean;
+    isLoading: boolean;
     error?: string | null;
     className?: string;
     onSuggestionClick?: () => void;
@@ -19,32 +19,13 @@ export const SearchSuggestionBox: React.FC<SearchSuggestionBoxProps> = ({
     suggestions,
     isEmpty,
     error,
+    isLoading,
     className,
     onSuggestionClick,
     title,
     emptyMessage
 }) => {
     const FIXED_CONTENT_HEIGHT = 150; // Equivalent to 5 suggestion items
-
-    const SuggestionItem: React.FC<{
-        readonly suggestion: RecipeForDisplayDTO;
-    }> = ({ suggestion }) => (
-        <Link
-            href={`/recipe/${suggestion.displayId}`}
-            onClick={onSuggestionClick}
-            className="flex items-center gap-2 px-4 py-1 text-inherit text-start"
-        >
-            <Image
-                src={suggestion.imageUrl || '/img/recipe-placeholder.webp'}
-                alt={suggestion.title}
-                width={24}
-                height={24}
-            />
-            <Typography variant="body-sm" className="text-ellipsis">
-                {suggestion.title}
-            </Typography>
-        </Link>
-    );
 
     const renderContent = () => {
         if (error) {
@@ -60,7 +41,7 @@ export const SearchSuggestionBox: React.FC<SearchSuggestionBoxProps> = ({
             );
         }
 
-        if (isEmpty) {
+        if (isEmpty || isLoading) {
             return (
                 <div className="flex items-center justify-center h-full px-4">
                     <Typography
@@ -76,7 +57,11 @@ export const SearchSuggestionBox: React.FC<SearchSuggestionBoxProps> = ({
         return (
             <div className="py-1">
                 {suggestions.map((s) => (
-                    <SuggestionItem key={s.id} suggestion={s} />
+                    <SuggestionItem
+                        key={s.id}
+                        suggestion={s}
+                        onSuggestionClick={onSuggestionClick}
+                    />
                 ))}
             </div>
         );
@@ -86,7 +71,7 @@ export const SearchSuggestionBox: React.FC<SearchSuggestionBoxProps> = ({
         <div
             className={classNames(
                 'absolute left-0 right-0 mt-1 rounded-md shadow-lg top-full z-[9000] sheet',
-                'animate-fade-in',
+                'animate-fade-in overflow-hidden',
                 className
             )}
         >
@@ -97,7 +82,7 @@ export const SearchSuggestionBox: React.FC<SearchSuggestionBoxProps> = ({
 
             {/* Content */}
             <div
-                className="overflow-y-auto"
+                className="overflow-hidden"
                 style={{ height: `${FIXED_CONTENT_HEIGHT}px` }}
             >
                 {renderContent()}

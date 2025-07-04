@@ -297,9 +297,9 @@ class RecipeSearchIndex {
                         query_by: 'title,notes,ingredients,instructions',
                         sort_by: 'rating:desc,timesRated:desc',
                         filter_by: `language:=${language}`,
+                        prefix: true,
                         per_page: limit,
-                        page,
-                        operator: 'and'
+                        page
                     });
 
                 const hits: RecipeForDisplayDTO[] = (searchResult.hits || [])

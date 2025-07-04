@@ -106,8 +106,6 @@ export const SearchTemplate: React.FC<SearchTemplateProps> = ({
     return (
         <div className="flex flex-col max-w-screen-sm gap-4 px-2 mx-auto mt-32 md:max-w-screen-md xl:max-w-screen-lg md:mt-36">
             <Banner
-                defaultSearchValue={initialQuery ?? undefined}
-                searchValue={searchInput ?? undefined}
                 initialQueries={initialQueries}
                 onChange={handleInputChange}
                 onSearch={executeSearch}

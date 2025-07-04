@@ -109,7 +109,8 @@ export const RecipeSearchInput: React.FC<RecipeSearchInputProps> = ({
     //$                                         UTILITY                                         $//
     //~-----------------------------------------------------------------------------------------~//
 
-    const isLoading = isSearchMode ? searchRecipesQuery.isLoading : false;
+    // The use of isFetching is intentional here.
+    const isLoading = isSearchMode ? searchRecipesQuery.isFetching : false;
 
     const error = isSearchMode
         ? ((searchRecipesQuery.error as Error | null)?.message ?? null)
@@ -236,6 +237,7 @@ export const RecipeSearchInput: React.FC<RecipeSearchInputProps> = ({
                 <SearchSuggestionBox
                     suggestions={suggestions}
                     isEmpty={isEmpty}
+                    isLoading={isLoading}
                     error={error}
                     onSuggestionClick={handleSuggestionClick}
                     title={titleElement}

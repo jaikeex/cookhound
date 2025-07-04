@@ -319,6 +319,7 @@ export const RecipeCreate: React.FC<RecipeCreateProps> = () => {
                     <Sidebar
                         position="bottom"
                         className="h-[calc(100vh-12rem)] dark:bg-[#030712] bg-[#d1fae5]"
+                        paramKey="preview"
                         isOpen={isPreviewOpen}
                         onClose={handleClosePreview}
                     >
@@ -342,6 +343,7 @@ export const RecipeCreate: React.FC<RecipeCreateProps> = () => {
                 <Sidebar
                     position="right"
                     hidden={!isTablet}
+                    paramKey="preview"
                     className="w-[calc(100vw-12rem)]"
                     isOpen={isPreviewOpen}
                     onClose={handleClosePreview}
