@@ -5,7 +5,8 @@ import {
     MobileRecipeViewTemplate,
     RecipeForm,
     Sidebar,
-    type RecipeFormErrors
+    type RecipeFormErrors,
+    SidebarHandle
 } from '@/client/components';
 import {
     DesktopRecipeViewSkeleton,
@@ -126,6 +127,11 @@ export const RecipeCreate: React.FC<RecipeCreateProps> = () => {
         hasUnsavedChanges,
         message: t('app.recipe.unsaved-changes-warning')
     });
+
+    const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+
+    const handleOpenPreview = useCallback(() => setIsPreviewOpen(true), []);
+    const handleClosePreview = useCallback(() => setIsPreviewOpen(false), []);
 
     //|-----------------------------------------------------------------------------------------|//
     //?                                      UPLOAD IMAGE                                       ?//
@@ -274,7 +280,7 @@ export const RecipeCreate: React.FC<RecipeCreateProps> = () => {
             className={classNames(
                 'block md:grid grid-cols-5 grid-rows-1',
                 isSidebarVisible && isMobile ? 'pb-4' : 'pb-0',
-                isSidebarVisible && isTablet ? 'pr-16' : 'pr-0'
+                isSidebarVisible && isTablet ? 'pr-8' : 'pr-0'
             )}
         >
             <form
@@ -296,21 +302,25 @@ export const RecipeCreate: React.FC<RecipeCreateProps> = () => {
             {/*                                   MOBILE PREVIEW                                    */}
             {/*-------------------------------------------------------------------------------------*/}
 
+            {isSidebarVisible && isMobile && !isPreviewOpen ? (
+                <SidebarHandle onOpen={handleOpenPreview} />
+            ) : null}
+
             {isSidebarVisible && isMobile ? (
                 <React.Fragment>
                     <div
                         id="preview-handle-background"
                         className={classNames(
-                            'fixed left-0 w-[100dvw] h-20 bottom-12',
+                            'fixed left-0 w-[100dvw] h-12 bottom-0',
                             'bg-gradient-to-t from-[#f0fdf4] via-[#f0fdf4] via-80% to-transparent',
                             'dark:from-[#030712] dark:via-[#030712] dark:via-80% dark:to-transparent'
                         )}
                     />
                     <Sidebar
-                        withHandle
-                        label={t('app.recipe.create-preview')}
                         position="bottom"
                         className="h-[calc(100vh-12rem)] dark:bg-[#030712] bg-[#d1fae5]"
+                        isOpen={isPreviewOpen}
+                        onClose={handleClosePreview}
                     >
                         <MobileRecipeViewTemplate
                             recipe={recipeObject}
@@ -324,15 +334,22 @@ export const RecipeCreate: React.FC<RecipeCreateProps> = () => {
             {/*                                   TABLET PREVIEW                                    */}
             {/*-------------------------------------------------------------------------------------*/}
 
+            {isSidebarVisible && isTablet && !isPreviewOpen ? (
+                <SidebarHandle onOpen={handleOpenPreview} position="right" />
+            ) : null}
+
             {isSidebarVisible && isTablet ? (
                 <Sidebar
-                    withHandle
-                    label={t('app.recipe.create-preview')}
                     position="right"
                     hidden={!isTablet}
                     className="w-[calc(100vw-12rem)]"
+                    isOpen={isPreviewOpen}
+                    onClose={handleClosePreview}
                 >
-                    <DesktopRecipeViewTemplate recipe={recipeObject} />
+                    <DesktopRecipeViewTemplate
+                        recipe={recipeObject}
+                        isPreview={true}
+                    />
                 </Sidebar>
             ) : null}
 
