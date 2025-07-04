@@ -1,13 +1,17 @@
 import { NextResponse } from 'next/server';
-import type { UserDTO, UserRole } from '@/common/types';
-import { apiClient } from '@/client/request';
-import {
-    ENV_CONFIG_PUBLIC,
-    JWT_COOKIE_NAME,
-    PROTECTED_ROUTES
-} from '@/common/constants';
+import { UserRole } from '@/common/types';
+import { ENV_CONFIG_PUBLIC, SESSION_COOKIE_NAME } from '@/common/constants';
 import { MiddlewareError } from '@/server/error';
+import { type ServerSession } from './manager';
+import { redisClient } from '@/server/integrations/redis';
 
+//§—————————————————————————————————————————————————————————————————————————————————————————————§//
+//§                                           NOT USED                                          §//
+///
+//# The middleware and by extension this function as well are currently not in active use.
+//# This code is left here for reference, because i would love to structure future middleware
+//# code the same as this.
+///
 //§—————————————————————————————————————————————————————————————————————————————————————————————§//
 //§                                         CLIENT ONLY                                         §//
 ///
@@ -22,6 +26,24 @@ import { MiddlewareError } from '@/server/error';
 //? stage of development. (2025-06-16)
 ///
 //§—————————————————————————————————————————————————————————————————————————————————————————————§//
+
+interface RouteConfig {
+    path: string;
+    roles: UserRole[] | null;
+}
+
+export const PROTECTED_ROUTES: RouteConfig[] = [
+    { path: '/recipe/create', roles: [UserRole.User, UserRole.Admin] },
+    { path: '/shopping-list', roles: [UserRole.User, UserRole.Admin] },
+    { path: '/auth/login', roles: null },
+    { path: '/auth/register', roles: null },
+    { path: '/auth/google', roles: null },
+    { path: '/auth/verify-email', roles: null }
+];
+
+export const PROTECTED_ROUTES_LIST = PROTECTED_ROUTES.map(
+    (route) => route.path
+);
 
 //~=============================================================================================~//
 //$                                       HELPER FUNCTIONS                                      $//
@@ -97,25 +119,23 @@ export const verifyRouteAccess: MiddlewareStepFunction = async (request) => {
     // From now on, the route is protected.
     //?------------------------------------
 
-    const session = request.cookies.get(JWT_COOKIE_NAME)?.value;
+    const sessionId = request.cookies.get(SESSION_COOKIE_NAME)?.value;
 
     // User is trying to access a protected route without a session.
     // If the route is for bros only, kick them out.
-    if (!session && routeConfig.roles !== null) {
+    if (!sessionId && routeConfig.roles !== null) {
         return redirectToRestrictedWithLogin(pathname);
     }
 
     // If the route is for guests only, let them in.
-    if (!session && routeConfig.roles === null) {
+    if (!sessionId && routeConfig.roles === null) {
         return null;
     }
 
-    let user: UserDTO;
+    let session: ServerSession | null;
 
     try {
-        user = await apiClient.auth.getCurrentUser({
-            headers: { 'Cookie': `jwt=${session}` }
-        });
+        session = await redisClient.get<ServerSession>(sessionId);
     } catch (error: unknown) {
         /**
          * If the getCurrentUser() call fails, the session is not valid (or something else, who cares).
@@ -137,8 +157,9 @@ export const verifyRouteAccess: MiddlewareStepFunction = async (request) => {
     }
 
     if (
+        session &&
         routeConfig.roles &&
-        !routeConfig.roles.includes(user.role as UserRole)
+        !routeConfig.roles.includes(session.userRole as UserRole)
     ) {
         /**
          * The route IS protected AND the role permissions are set.
