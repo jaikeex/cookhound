@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState, useRef, useEffect } from 'react';
+import { useCallback, useState, useRef } from 'react';
 import {
     useOutsideClick,
     useParamsChangeListener,
@@ -78,21 +78,6 @@ export const useSidebar = (config: SidebarConfig = {}) => {
     const originalBodyOverflow = useRef<string>('');
 
     ///=========================================================================================///
-    ///                                           HANDLE                                        ///
-    ///=========================================================================================///
-
-    // This value is used by the sidebar handle to help sync the animation between it and the sidebar.
-    // Technically holds the same info as isSidebarOpen state, but this updates immediately when the
-    // toggling process begins.
-    const [isAnimatingOpen, setIsAnimatingOpen] = useState(false);
-    const [sidebarDimensions, setSidebarDimensions] = useState({
-        width: 480,
-        height: 200
-    });
-
-    const resizeObserverRef = useRef<ResizeObserver | null>(null);
-
-    ///=========================================================================================///
     ///                                           ROUTING                                       ///
     ///=========================================================================================///
 
@@ -129,9 +114,6 @@ export const useSidebar = (config: SidebarConfig = {}) => {
 
     const toggleSidebarWithAnimation = useCallback(
         (open: boolean) => {
-            // Set animation state immediately for handle
-            setIsAnimatingOpen(open);
-
             // Timeout for the state change is needed to prevent flickering when closing the sidebar, since the animation
             // is not instant. The time is purposefully set to 10 ms less than the animation duration to ensure
             // the state change happens before the animation ends and starts the second time.
@@ -152,6 +134,7 @@ export const useSidebar = (config: SidebarConfig = {}) => {
         toggleSidebarWithAnimation(false);
 
         document.documentElement.style.overflow = originalBodyOverflow.current;
+        document.documentElement.style.overscrollBehavior = 'auto';
 
         setTimeout(() => {
             isClosingRef.current = false;
@@ -170,8 +153,9 @@ export const useSidebar = (config: SidebarConfig = {}) => {
         ///
         //?—————————————————————————————————————————————————————————————————————————————————————?//
 
-        if (!useMobileParams || !searchParams.get(paramKey) || !isMobile)
+        if (!useMobileParams || !searchParams.get(paramKey) || !isMobile) {
             return;
+        }
 
         router.back();
     }, [
@@ -190,6 +174,13 @@ export const useSidebar = (config: SidebarConfig = {}) => {
 
         originalBodyOverflow.current = document.documentElement.style.overflow;
         document.documentElement.style.overflow = 'hidden';
+
+        /**
+         * This prohibits the browser from reloading when the user swipes down (among other things).
+         * If this was not set, every time the user would try to close the sidebar by swiping down,
+         * the page would reload instead. Not ideal...
+         */
+        document.documentElement.style.overscrollBehavior = 'contain';
 
         setTimeout(() => {
             isOpeningRef.current = false;
@@ -313,58 +304,15 @@ export const useSidebar = (config: SidebarConfig = {}) => {
     );
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-    //$                                SIDEBAR DIMENSION TRACKING                               $//
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-
-    const handleResize: ResizeObserverCallback = useCallback((entries) => {
-        for (const entry of entries) {
-            const { width, height } = entry.contentRect;
-            setSidebarDimensions({
-                // plus padding
-                width: width + 64,
-                height: height + 128
-            });
-        }
-    }, []);
-
-    //? This might be a good candidate for abstracting into a hook.
-    useEffect(() => {
-        if (typeof window !== 'undefined') {
-            resizeObserverRef.current = new ResizeObserver(handleResize);
-        }
-
-        return () => {
-            if (resizeObserverRef.current) {
-                resizeObserverRef.current.disconnect();
-            }
-        };
-    }, [handleResize]);
-
-    useEffect(() => {
-        const element = contentRef.current;
-        if (element && resizeObserverRef.current) {
-            resizeObserverRef.current.observe(element);
-
-            return () => {
-                if (resizeObserverRef.current && element) {
-                    resizeObserverRef.current.unobserve(element);
-                }
-            };
-        }
-    }, [contentRef, isSidebarOpen]);
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
     //$                                         RETURN                                          $//
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 
     return {
         isSidebarOpen,
-        isAnimatingOpen,
         containerClassName,
         backdropClass,
         contentRef,
-        toggleSidebar,
-        sidebarDimensions
+        toggleSidebar
     };
 };
 

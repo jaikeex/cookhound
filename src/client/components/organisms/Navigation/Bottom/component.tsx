@@ -6,14 +6,22 @@ import { Icon, Tooltip } from '@/client/components';
 import Link from 'next/link';
 import { useAuth, useLocale } from '@/client/store';
 import { BOTTOM_NAVBAR_ID } from '@/client/constants';
+import { usePathname } from 'next/navigation';
+
+const DISABLED_FOR_ROUTES = ['/recipe/create'];
 
 type BottomNavigationProps = Readonly<NonNullable<unknown>>;
 
 export const BottomNavigation: React.FC<BottomNavigationProps> = () => {
     const { authResolved, user } = useAuth();
     const { t } = useLocale();
+    const pathname = usePathname();
 
     const isLoggedin = authResolved && !!user;
+
+    const isDisabled = DISABLED_FOR_ROUTES.includes(pathname);
+
+    if (isDisabled) return null;
 
     return (
         <div

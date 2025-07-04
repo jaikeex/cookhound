@@ -1,10 +1,9 @@
 'use client';
 
 import { classNames } from '@/client/utils';
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef, useCallback } from 'react';
 import { useSidebar } from './useSidebar';
 import { IconButton } from '@/client/components/atoms';
-import { SidebarHandle } from './Handle';
 
 type SidebarProps = Readonly<{
     className?: string;
@@ -12,12 +11,10 @@ type SidebarProps = Readonly<{
     enableOutsideClick?: boolean;
     hidden?: boolean;
     isOpen?: boolean;
-    label?: string;
     onClose?: () => void;
     paramKey?: string;
     position?: 'left' | 'right' | 'top' | 'bottom';
     useMobileParams?: boolean;
-    withHandle?: boolean;
 }> &
     React.PropsWithChildren;
 
@@ -35,21 +32,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
     enableOutsideClick = true,
     hidden = false,
     isOpen,
-    label,
     onClose,
     paramKey,
     position = 'right',
-    useMobileParams = true,
-    withHandle = false
+    useMobileParams = true
 }) => {
     const {
         contentRef,
         toggleSidebar,
         isSidebarOpen,
-        isAnimatingOpen,
         backdropClass,
-        containerClassName,
-        sidebarDimensions
+        containerClassName
     } = useSidebar({
         paramKey,
         useMobileParams,
@@ -70,18 +63,57 @@ export const Sidebar: React.FC<SidebarProps> = ({
         if (!isSidebarOpen && onClose) onClose();
     }, [isSidebarOpen, onClose]);
 
+    const touchStart = useRef<{ x: number; y: number } | null>(null);
+
+    const handleTouchStart = useCallback(
+        (e: React.TouchEvent<HTMLDivElement>) => {
+            const t = e.touches[0];
+            touchStart.current = { x: t.clientX, y: t.clientY };
+        },
+        []
+    );
+
+    const handleTouchMove = useCallback(
+        (e: React.TouchEvent<HTMLDivElement>) => {
+            if (!touchStart.current) return;
+            const t = e.touches[0];
+            const dx = t.clientX - touchStart.current.x;
+            const dy = t.clientY - touchStart.current.y;
+
+            const THRESHOLD = 50;
+
+            switch (position) {
+                case 'bottom':
+                    if (dy > THRESHOLD) {
+                        touchStart.current = null;
+                        toggleSidebar();
+                    }
+                    break;
+                case 'top':
+                    if (dy < -THRESHOLD) {
+                        touchStart.current = null;
+                        toggleSidebar();
+                    }
+                    break;
+                case 'left':
+                    if (dx < -THRESHOLD) {
+                        touchStart.current = null;
+                        toggleSidebar();
+                    }
+                    break;
+                case 'right':
+                    if (dx > THRESHOLD) {
+                        touchStart.current = null;
+                        toggleSidebar();
+                    }
+                    break;
+            }
+        },
+        [toggleSidebar, position]
+    );
+
     return hidden ? null : (
         <React.Fragment>
-            {withHandle ? (
-                <SidebarHandle
-                    onClick={toggleSidebar}
-                    isOpen={isAnimatingOpen}
-                    position={position}
-                    sidebarDimensions={sidebarDimensions}
-                    label={label}
-                    className={hidden ? 'hidden' : ''}
-                />
-            ) : null}
             {isSidebarOpen ? (
                 <React.Fragment>
                     <div
@@ -92,6 +124,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     />
                     <div
                         ref={contentRef}
+                        onTouchStart={handleTouchStart}
+                        onTouchMove={handleTouchMove}
                         className={classNames(
                             'z-50 px-8 py-16 sheet shadow-[-4px_4px_15px_0_rgba(0,0,0,0.3)]',
                             'overflow-auto',
