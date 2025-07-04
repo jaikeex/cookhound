@@ -1,15 +1,8 @@
-import { JWT_COOKIE_NAME } from '@/common/constants';
 import { cookies } from 'next/headers';
-import { verifyToken } from './jwt';
-import { UserRole } from '@/common/types';
-import db from '@/server/db/model';
+import { sessions } from '@/server/utils/session';
+import type { ServerSession } from '@/server/utils/session';
+import { SESSION_COOKIE_NAME } from '@/common/constants/general';
 
-//§—————————————————————————————————————————————————————————————————————————————————————————————§//
-//§                                      UNUSED FUNCTIONS                                       §//
-///
-//# None of these functions is currently in active use. They are kept
-//# here for reference and likely can be freely removed in the future.
-///
 //§—————————————————————————————————————————————————————————————————————————————————————————————§//
 //§                                        SERVER ONLY                                          §//
 ///
@@ -20,64 +13,29 @@ import db from '@/server/db/model';
 ///
 //§—————————————————————————————————————————————————————————————————————————————————————————————§//
 
-export const verifyIsGuest = async (): Promise<boolean> => {
-    const session = (await cookies()).get(JWT_COOKIE_NAME)?.value;
+type VerifyResult =
+    | {
+          isLoggedIn: true;
+          session: ServerSession;
+      }
+    | {
+          isLoggedIn: false;
+          session: null;
+      };
+
+export const verifySessionFromCookie = async (): Promise<VerifyResult> => {
+    const cookieStore = await cookies();
+    const sessionId = cookieStore.get(SESSION_COOKIE_NAME)?.value;
+
+    if (!sessionId) {
+        return { isLoggedIn: false, session: null };
+    }
+
+    const session = await sessions.validateSession(sessionId);
 
     if (!session) {
-        return true;
+        return { isLoggedIn: false, session: null };
     }
 
-    const payload = verifyToken(session);
-
-    const user = await db.user.getOneById(Number(payload?.id));
-
-    if (user) {
-        return false;
-    }
-
-    return true;
-};
-
-export const verifyIsUser = async (): Promise<boolean> => {
-    const session = (await cookies()).get(JWT_COOKIE_NAME)?.value;
-
-    if (!session) {
-        return false;
-    }
-
-    const payload = verifyToken(session);
-
-    const user = await db.user.getOneById(Number(payload?.id));
-
-    if (!user) {
-        return false;
-    }
-
-    if (user.role !== UserRole.User) {
-        return false;
-    }
-
-    return true;
-};
-
-export const verifyIsAdmin = async (): Promise<boolean> => {
-    const session = (await cookies()).get(JWT_COOKIE_NAME)?.value;
-
-    if (!session) {
-        return false;
-    }
-
-    const payload = verifyToken(session);
-
-    const user = await db.user.getOneById(Number(payload?.id));
-
-    if (!user) {
-        return false;
-    }
-
-    if (user.role !== UserRole.Admin) {
-        return false;
-    }
-
-    return true;
+    return { isLoggedIn: true, session };
 };

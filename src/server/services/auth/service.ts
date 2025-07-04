@@ -10,12 +10,11 @@ import {
     AuthErrorUnauthorized,
     ValidationError
 } from '@/server/error';
-import { createToken } from '@/server/utils/session/jwt';
 import { ENV_CONFIG_PRIVATE, ENV_CONFIG_PUBLIC } from '@/common/constants';
 import { userService } from '@/server/services/user/service';
 import db from '@/server/db/model';
 import { Logger } from '@/server/logger';
-import { deleteSession } from '@/server/utils/session';
+import { deleteSessionCookie, sessions } from '@/server/utils/session';
 import { RequestContext } from '@/server/utils/reqwest/context';
 import { ApplicationErrorCode } from '@/server/error/codes';
 
@@ -101,9 +100,11 @@ class AuthService {
 
         await db.user.updateOneById(user.id, { lastLogin: new Date() });
 
-        const token = createToken({
-            id: user.id.toString(),
-            role: user.role as UserRole
+        const token = await sessions.createSession(user.id, {
+            ipAddress: RequestContext.getIp(),
+            userAgent: RequestContext.getUserAgent(),
+            userRole: user.role as UserRole,
+            loginMethod: 'manual'
         });
 
         log.trace('login - success', { email });
@@ -231,9 +232,11 @@ class AuthService {
             });
         }
 
-        const token = createToken({
-            id: user.id.toString(),
-            role: user.role
+        const token = await sessions.createSession(user.id, {
+            ipAddress: RequestContext.getIp(),
+            userAgent: RequestContext.getUserAgent(),
+            userRole: user.role as UserRole,
+            loginMethod: 'manual'
         });
 
         log.trace('loginWithGoogle - success', {
@@ -253,9 +256,12 @@ class AuthService {
      * @returns void.
      * @throws {ServerError} Throws an error with status 500 if there is an error.
      */
-    async logout(): Promise<void> {
+    async logout(sessionId: string): Promise<void> {
         log.trace('logout attempt');
-        deleteSession();
+
+        await sessions.invalidateSession(sessionId);
+        deleteSessionCookie();
+
         log.trace('logout - success');
 
         return;
@@ -277,6 +283,8 @@ class AuthService {
 
         if (!userId) {
             log.trace('getCurrentUser - no token found');
+
+            deleteSessionCookie();
             throw new AuthErrorUnauthorized();
         }
 
@@ -287,7 +295,9 @@ class AuthService {
                 id: userId
             });
 
-            deleteSession();
+            sessions.invalidateAllUserSessions(userId);
+            deleteSessionCookie();
+
             throw new AuthErrorUnauthorized(
                 'auth.error.user-not-found',
                 ApplicationErrorCode.USER_NOT_FOUND
@@ -299,7 +309,9 @@ class AuthService {
                 id: userId
             });
 
-            deleteSession();
+            sessions.invalidateAllUserSessions(userId);
+            deleteSessionCookie();
+
             throw new AuthErrorUnauthorized(
                 'auth.error.email-not-verified',
                 ApplicationErrorCode.EMAIL_NOT_VERIFIED

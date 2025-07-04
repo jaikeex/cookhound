@@ -19,7 +19,15 @@ export async function POST(request: Request) {
         try {
             logRequest(request);
 
-            await authService.logout();
+            const sessionId = RequestContext.getSessionId();
+
+            if (!sessionId) {
+                return Response.json({
+                    message: 'No session found'
+                });
+            }
+
+            await authService.logout(sessionId);
 
             const response = Response.json({
                 message: 'Logged out successfully'

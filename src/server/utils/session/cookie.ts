@@ -1,9 +1,7 @@
-import { JWT_COOKIE_NAME } from '@/common/constants';
 import { ENV_CONFIG_PUBLIC } from '@/common/constants/env';
+import { SESSION_COOKIE_NAME } from '@/common/constants/general';
 import { cookies } from 'next/headers';
-import { createToken, verifyToken } from './jwt';
-import { parse, serialize } from 'cookie';
-import type { JwtPayload } from 'jsonwebtoken';
+import { serialize } from 'cookie';
 
 //|=============================================================================================|//
 
@@ -17,11 +15,14 @@ import type { JwtPayload } from 'jsonwebtoken';
 ///
 //§—————————————————————————————————————————————————————————————————————————————————————————————§//
 
-export const createSessionCookie = (token: string, keepLoggedIn: boolean) => {
+export const createSessionCookie = (
+    sessionId: string,
+    keepLoggedIn: boolean
+) => {
     const maxAge = keepLoggedIn ? 60 * 60 * 24 * 30 : undefined;
     const secure = ENV_CONFIG_PUBLIC.ENV !== 'development';
 
-    return serialize(JWT_COOKIE_NAME, token, {
+    return serialize(SESSION_COOKIE_NAME, sessionId, {
         httpOnly: true,
         sameSite: 'strict',
         path: '/',
@@ -30,56 +31,7 @@ export const createSessionCookie = (token: string, keepLoggedIn: boolean) => {
     });
 };
 
-export const createSession = async (token: string, keepLoggedIn: boolean) => {
-    const cookie = createSessionCookie(token, keepLoggedIn);
-
+export const deleteSessionCookie = async () => {
     const cookieStore = await cookies();
-    cookieStore.set(JWT_COOKIE_NAME, cookie);
-};
-
-export const deleteSession = async () => {
-    const cookieStore = await cookies();
-    cookieStore.delete(JWT_COOKIE_NAME);
-};
-
-export const updateSession = async () => {
-    const session = (await cookies()).get(JWT_COOKIE_NAME)?.value;
-
-    if (!session) return;
-
-    const cookie = parse(session);
-
-    if (!cookie.maxAge) {
-        await createSession(session, false);
-        return;
-    }
-
-    const payload = verifyToken(session);
-
-    const newToken = createToken({
-        id: payload.id,
-        role: payload.role
-    });
-
-    await createSession(newToken, true);
-};
-
-export const parseSession = async (): Promise<JwtPayload | null> => {
-    try {
-        const session = (await cookies()).get(JWT_COOKIE_NAME)?.value;
-
-        if (!session) {
-            return null;
-        }
-
-        const payload = verifyToken(session);
-
-        if (!payload?.id || !payload?.role) {
-            return null;
-        }
-
-        return payload;
-    } catch {
-        return null;
-    }
+    cookieStore.delete(SESSION_COOKIE_NAME);
 };

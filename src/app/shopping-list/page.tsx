@@ -1,22 +1,27 @@
 import React from 'react';
 import { apiClient } from '@/client/request';
-import { cookies } from 'next/headers';
 import { ShoppingListTemplate } from '@/client/components/templates/ShoppingList';
-import { JWT_COOKIE_NAME } from '@/common/constants';
-import { verifyToken } from '@/server/utils/session';
+import { verifySessionFromCookie } from '@/server/utils/session';
+import { redirectToRestrictedWithLogin } from '@/server/utils/reqwest';
 
 export default async function Page() {
-    const cookieStore = await cookies();
-    const token = cookieStore.get(JWT_COOKIE_NAME)?.value;
+    const result = await verifySessionFromCookie();
 
-    if (!token) {
-        throw new Error('No token found');
+    if (!result.isLoggedIn) {
+        redirectToRestrictedWithLogin('/shopping-list');
+        return;
     }
 
-    const { id } = verifyToken(token);
+    const { userId, sessionId } = result.session;
 
-    const shoppingList = await apiClient.user.getShoppingList(Number(id), {
-        headers: { 'Cookie': `${JWT_COOKIE_NAME}=${token}` }
+    const shoppingList = await apiClient.user.getShoppingList(Number(userId), {
+        ...(userId
+            ? {
+                  headers: {
+                      'Cookie': `session=${sessionId}`
+                  }
+              }
+            : {})
     });
 
     return <ShoppingListTemplate initialData={shoppingList} />;

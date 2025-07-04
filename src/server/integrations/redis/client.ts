@@ -1,10 +1,6 @@
 import IORedis from 'ioredis';
 import { ENV_CONFIG_PRIVATE } from '@/common/constants';
-import { Logger } from '@/server/logger';
-import { InfrastructureError } from '@/server/error/server';
 import { InfrastructureErrorCode } from '@/server/error/codes';
-
-const log = Logger.getInstance('redis-client');
 
 class RedisClient {
     private client: IORedis;
@@ -25,8 +21,7 @@ class RedisClient {
             lazyConnect: true // Don't connect immediately
         });
 
-        this.client.on('error', (error: Error) => {
-            log.error('Redis Client Error:', error);
+        this.client.on('error', () => {
             this.isConnected = false;
             this.isConnecting = false;
         });
@@ -34,13 +29,11 @@ class RedisClient {
         this.client.on('connect', () => {
             this.isConnected = true;
             this.isConnecting = false;
-            log.info('Redis client connected');
         });
 
         this.client.on('close', () => {
             this.isConnected = false;
             this.isConnecting = false;
-            log.info('Redis client disconnected');
         });
     }
 
@@ -63,10 +56,13 @@ class RedisClient {
         } catch (error: unknown) {
             this.isConnecting = false;
             this.connectionPromise = null;
-            log.error('Redis connection failed', error);
-            throw new InfrastructureError(
-                InfrastructureErrorCode.REDIS_CONNECTION_FAILED
-            );
+
+            /**
+             * Do not throw any ServerError here. Redis connection failing is a
+             * critical problem and must be addressed asap, using regular Error
+             * here gives additional insurance it will not go unnoticed.
+             */
+            throw new Error(InfrastructureErrorCode.REDIS_CONNECTION_FAILED);
         }
     }
 

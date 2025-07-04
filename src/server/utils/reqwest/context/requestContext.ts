@@ -1,7 +1,9 @@
 import { UserRole } from '@/common/types';
 import { AsyncLocalStorage } from 'async_hooks';
 import { randomUUID } from 'crypto';
-import { deleteSession, parseSession } from '@/server/utils/session/cookie';
+import { cookies } from 'next/headers';
+import { sessions } from '@/server/utils/session/manager';
+import { SESSION_COOKIE_NAME } from '@/common/constants/general';
 
 export const REQUEST_ID_FIELD_NAME = 'requestId';
 export const REQUEST_PATH_FIELD_NAME = 'path';
@@ -14,9 +16,11 @@ export interface RequestContextShape {
     requestId: string;
     requestPath?: string;
     requestMethod?: string;
+    sessionId?: string | null;
     userRole?: UserRole | null;
     userId?: number | null;
-    ip?: string;
+    userAgent?: string | null;
+    ip?: string | null;
 }
 
 const asyncLocalStorage = new AsyncLocalStorage<RequestContextShape>();
@@ -43,10 +47,13 @@ export const RequestContext = {
 
             ctx.requestId = randomUUID();
             ctx.requestMethod = req.method;
+
+            // Do not read these from the session when setting the context up.
+            ctx.userAgent = req.headers.get('user-agent') || null;
             ctx.ip =
                 req?.headers?.get('x-forwarded-for') ||
                 req?.headers?.get('x-real-ip') ||
-                undefined;
+                null;
 
             ///---------------------------------------------------------------------------------///
             ///                                     PATH                                        ///
@@ -66,13 +73,19 @@ export const RequestContext = {
             ///                                     SESSION                                     ///
             ///---------------------------------------------------------------------------------///
 
-            const tokenPayload = await parseSession();
+            const session = (await cookies()).get(SESSION_COOKIE_NAME)?.value;
 
-            if (tokenPayload) {
-                ctx.userId = Number(tokenPayload.id);
-                ctx.userRole = tokenPayload.role;
+            if (session) {
+                const serverSession = await sessions.validateSession(session);
+
+                if (serverSession) {
+                    ctx.userId = serverSession.userId;
+                    ctx.userRole = serverSession.userRole;
+                    ctx.sessionId = serverSession.sessionId;
+                } else {
+                    ctx.userRole = UserRole.Guest;
+                }
             } else {
-                deleteSession();
                 ctx.userRole = UserRole.Guest;
             }
         } catch {
@@ -111,6 +124,14 @@ export const RequestContext = {
         return this.get('requestMethod') ?? undefined;
     },
 
+    getUserAgent(): string | null {
+        return this.get('userAgent') ?? null;
+    },
+
+    getSessionId(): string | null {
+        return this.get('sessionId') ?? null;
+    },
+
     getUserRole(): UserRole | null {
         return this.get('userRole') ?? null;
     },
@@ -147,6 +168,14 @@ export const RequestContext = {
 
     setRequestMethod(value: string) {
         this.set('requestMethod', value);
+    },
+
+    setUserAgent(value: string) {
+        this.set('userAgent', value);
+    },
+
+    setSessionId(value: string) {
+        this.set('sessionId', value);
     },
 
     setUserRole(value: UserRole) {

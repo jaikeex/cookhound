@@ -31,7 +31,7 @@ interface RecipeDocument {
     ingredients: string[];
     instructions: string[];
     rating: number | null;
-    isFlagged: boolean;
+    isFlagged: number;
     timesRated: number;
     time: number | null;
     portionSize: number | null;
@@ -163,7 +163,7 @@ class RecipeSearchIndex {
                     { name: 'instructions', type: 'string[]', optional: true },
                     { name: 'rating', type: 'float', optional: true },
                     { name: 'timesRated', type: 'int32', optional: true },
-                    { name: 'isFlagged', type: 'boolean', optional: true },
+                    { name: 'isFlagged', type: 'int32', optional: true },
                     { name: 'time', type: 'int32', optional: true },
                     { name: 'portionSize', type: 'int32', optional: true },
                     { name: 'authorId', type: 'int32' },
@@ -201,7 +201,7 @@ class RecipeSearchIndex {
             ingredients: recipe.ingredients?.map((i) => i.name) ?? [],
             instructions: recipe.instructions ?? [],
             rating: recipe.rating ?? null,
-            isFlagged: recipe.flags?.some((f) => f.active) ?? false,
+            isFlagged: recipe.flags?.some((f) => f.active) ? 1 : 0,
             timesRated: recipe.timesRated ?? 0,
             time: recipe.time ?? null,
             portionSize: recipe.portionSize ?? null,

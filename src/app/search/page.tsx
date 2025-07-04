@@ -2,9 +2,9 @@ import { FrontPageSkeleton } from '@/client/components/templates/Dashboard/Front
 import { SearchTemplate } from '@/client/components/templates/Dashboard/Search';
 import { apiClient } from '@/client/request';
 import { getUserLocale } from '@/client/utils';
-import { JWT_COOKIE_NAME } from '@/common/constants';
 import { cookies, headers } from 'next/headers';
 import React, { Suspense } from 'react';
+import { SESSION_COOKIE_NAME } from '@/common/constants/general';
 
 export default async function SearchPage({
     searchParams
@@ -17,11 +17,15 @@ export default async function SearchPage({
     const headerList = await headers();
 
     const locale = await getUserLocale(cookieStore, headerList);
-    const token = cookieStore.get(JWT_COOKIE_NAME)?.value;
+    const sessionId = cookieStore.get(SESSION_COOKIE_NAME)?.value;
 
     const recipesForDisplay = searchQuery
         ? apiClient.recipe.searchRecipes(searchQuery, locale, 1, 24, {
-              headers: { 'Cookie': `${JWT_COOKIE_NAME}=${token}` }
+              ...(sessionId
+                  ? {
+                        headers: { 'Cookie': `session=${sessionId}` }
+                    }
+                  : {})
           })
         : Promise.resolve([]);
 

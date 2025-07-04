@@ -22,9 +22,9 @@ import type { UserDTO } from '@/common/types';
 import { apiClient } from '@/client/request';
 import { getUserLocale } from '@/client/utils';
 import { CONTENT_WRAPPER_ID, MAIN_PAGE_ID } from '@/client/constants';
-import { JWT_COOKIE_NAME } from '@/common/constants';
 import { QueryClient, dehydrate } from '@tanstack/react-query';
 import { QUERY_KEYS } from '@/client/request/queryClient';
+import { SESSION_COOKIE_NAME } from '@/common/constants/general';
 
 const openSans = Open_Sans({
     subsets: ['latin'],
@@ -79,14 +79,14 @@ export default async function RootLayout({
             throw new Error('Cannot get user like this in a browser');
         }
 
-        const token = cookieStore.get(JWT_COOKIE_NAME)?.value;
+        const sessionId = cookieStore.get(SESSION_COOKIE_NAME)?.value;
 
-        if (!token) {
+        if (!sessionId) {
             throw new Error('No token found');
         }
 
         user = await apiClient.auth.getCurrentUser({
-            headers: { 'Cookie': `jwt=${token}` }
+            headers: { 'Cookie': `session=${sessionId}` }
         });
     } catch (error: unknown) {
         user = null;
