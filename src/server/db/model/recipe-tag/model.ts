@@ -20,36 +20,47 @@ class RecipeTagModel {
      * Get all recipe tags grouped by category
      * Query class -> C2
      */
-    async getAll(ttl?: number): Promise<TagListDTO[] | null> {
-        log.trace('Getting all recipe tags with categories');
+    async getAll(language: string, ttl?: number): Promise<TagListDTO[] | null> {
+        log.trace('Getting all recipe tags with categories', { language });
 
         const cacheKey = generateCacheKey('recipe-tag', 'findMany', {
-            where: {}
+            where: { language }
         });
 
-        const tags = await cachePrismaQuery(
-            cacheKey,
-            async () => {
-                log.trace('Fetching all recipe tags with categories from db');
-                return prisma.tag.findMany({
-                    include: {
-                        category: true
-                    }
-                });
-            },
-            ttl ?? CACHE_TTL.TTL_2
-        );
+        const tags: AwaitedReturn<typeof prisma.tag.findMany> =
+            await cachePrismaQuery(
+                cacheKey,
+                async () => {
+                    log.trace(
+                        'Fetching all recipe tags with categories from db'
+                    );
+                    return prisma.tag.findMany({
+                        include: {
+                            category: true,
+                            translations: {
+                                where: { language },
+                                select: { name: true }
+                            }
+                        }
+                    } as any);
+                },
+                ttl ?? CACHE_TTL.TTL_2
+            );
 
-        return tags.reduce((acc, tag) => {
+        return tags.reduce((acc: TagListDTO[], tag: any) => {
             const category = tag.category.name as RecipeTagCategory;
             const existingCategory = acc.find(
                 (item) => item.category === category
             );
 
+            const t = tag as any;
+            const translatedName =
+                t.translations?.[0]?.name ?? t.slug ?? t.name;
+
             if (existingCategory) {
                 existingCategory.tags.push({
                     id: tag.id,
-                    name: tag.name,
+                    name: translatedName,
                     categoryId: tag.categoryId
                 });
             } else {
@@ -58,7 +69,7 @@ class RecipeTagModel {
                     tags: [
                         {
                             id: tag.id,
-                            name: tag.name,
+                            name: translatedName,
                             categoryId: tag.categoryId
                         }
                     ]

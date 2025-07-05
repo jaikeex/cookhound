@@ -11,7 +11,8 @@ export async function GET(request: NextRequest) {
         try {
             logRequest(request);
 
-            const tags = await recipeTagService.getAll();
+            const language = request.nextUrl.searchParams.get('lang') || 'en';
+            const tags = await recipeTagService.getAll(language);
 
             const response = Response.json(tags);
 

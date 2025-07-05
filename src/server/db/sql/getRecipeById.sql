@@ -49,7 +49,21 @@ SELECT
         FROM recipe_flags rf
         WHERE rf.recipeId = r.id
         ORDER BY rf.createdAt DESC
-    ) AS flags
+    ) AS flags,
+    (
+        SELECT JSON_ARRAYAGG(
+            JSON_OBJECT(
+                'id', t.id,
+                'name', COALESCE(tr.name, t.slug),
+                'categoryId', t.categoryId
+            )
+        )
+        FROM recipes_tags rt
+        JOIN tags t ON rt.tagId = t.id
+        LEFT JOIN tag_translations tr ON tr.tagId = t.id AND tr.language = r.language
+        WHERE rt.recipeId = r.id
+        ORDER BY COALESCE(tr.name, t.slug)
+    ) AS tags
 FROM
     recipes r
 WHERE

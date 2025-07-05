@@ -224,16 +224,17 @@ model TagCategory {
 
 model Tag {
   id          Int          @id @default(autoincrement())
-  name        String       @unique @db.VarChar(50)
+  slug        String       @unique @db.VarChar(50)
   categoryId  Int          @db.Int
 
   // Relations
   category    TagCategory  @relation(fields: [categoryId], references: [id])
   recipes     RecipeTag[]
+  translations TagTranslation[]
 
   // Indexes
   @@index([categoryId])
-  @@index([name])
+  @@index([slug])
   @@map("tags")
 }
 
@@ -249,4 +250,18 @@ model RecipeTag {
   @@id([recipeId, tagId])
   @@index([tagId])
   @@map("recipes_tags")
+}
+
+model TagTranslation {
+  tagId    Int          @db.Int
+  language String       @db.VarChar(2)
+  name     String       @db.VarChar(50)
+
+  // Relations
+  tag      Tag          @relation(fields: [tagId], references: [id])
+
+  // Composite primary key to ensure single translation per language
+  @@id([tagId, language])
+  @@index([language])
+  @@map("tag_translations")
 }

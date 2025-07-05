@@ -6,10 +6,10 @@ import { Logger } from '@/server/logger';
 const log = Logger.getInstance('recipe-tag-service');
 
 class RecipeTagService {
-    async getAll() {
+    async getAll(language: string) {
         log.trace('Getting all tags with categories');
 
-        const tags = await db.recipeTag.getAll();
+        const tags = await db.recipeTag.getAll(language);
 
         return tags;
     }
