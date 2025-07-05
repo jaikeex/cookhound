@@ -2,7 +2,7 @@
 
 import React from 'react';
 import type { RecipeTagDTO } from '@/common/types';
-import { Typography, Tag } from '@/client/components';
+import { Typography, TagList } from '@/client/components';
 import { classNames } from '@/client/utils';
 import { useScreenSize } from '@/client/hooks';
 import { useLocale } from '@/client/store';
@@ -34,16 +34,7 @@ export const TagSelectionBox: React.FC<TagSelectionBoxProps> = ({
             </Typography>
 
             {tags.length > 0 ? (
-                <div className="flex flex-wrap gap-2">
-                    {tags.map((tag) => (
-                        <Tag
-                            key={tag.id}
-                            name={tag.name}
-                            size={isMobile ? 'xs' : 'sm'}
-                            categoryId={tag.categoryId}
-                        />
-                    ))}
-                </div>
+                <TagList tags={tags} size={isMobile ? 'xs' : 'sm'} />
             ) : (
                 <Typography variant="body-sm" className="italic text-gray-500">
                     {t('app.recipe.tags.no-tags-selected')}

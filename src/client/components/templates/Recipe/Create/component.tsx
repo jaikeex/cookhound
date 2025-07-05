@@ -360,9 +360,7 @@ export const RecipeCreate: React.FC<RecipeCreateProps> = () => {
             {/*                                   DESKTOP PREVIEW                                   */}
             {/*-------------------------------------------------------------------------------------*/}
 
-            <div className="hidden 2xl:block col-span-1">&nbsp;</div>
-
-            <div className={'hidden col-span-4 2xl:col-span-3 px-2 xl:block'}>
+            <div className={'hidden col-span-4 px-2 xl:block'}>
                 {recipeObject ? (
                     <>
                         <DesktopRecipeViewTemplate

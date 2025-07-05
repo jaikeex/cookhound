@@ -7,7 +7,8 @@ import {
     Tooltip,
     Typography,
     RecipeInfo,
-    RecipeImage
+    RecipeImage,
+    TagList
 } from '@/client/components';
 import { useAuth, useLocale } from '@/client/store';
 import { classNames } from '@/client/utils';
@@ -36,6 +37,13 @@ export const MobileRecipeHead: React.FC<MobileRecipeHeadProps> = ({
             <Typography variant={'heading-xl'} className={'text-center'}>
                 {recipe.title}
             </Typography>
+
+            <TagList
+                tags={recipe.tags ?? []}
+                size="xs"
+                className="justify-center mt-2"
+            />
+
             <div
                 className={classNames(
                     'flex items-center justify-center',

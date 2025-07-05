@@ -4,6 +4,7 @@ import React from 'react';
 import type { TypographyVariant } from '@/client/components';
 import { Icon, Typography } from '@/client/components';
 import { useLocale } from '@/client/store';
+import { classNames } from '@/client/utils';
 
 type RecipeInfoSize = 'sm' | 'md';
 
@@ -23,6 +24,7 @@ const classConfig = {
 };
 
 type RecipeInfoProps = Readonly<{
+    className?: string;
     portionSize?: number | null;
     time?: number | null;
     typographyVariant?: TypographyVariant;
@@ -31,6 +33,7 @@ type RecipeInfoProps = Readonly<{
 }>;
 
 export const RecipeInfo: React.FC<RecipeInfoProps> = ({
+    className,
     portionSize,
     time,
     typographyVariant = 'body-sm',
@@ -40,7 +43,13 @@ export const RecipeInfo: React.FC<RecipeInfoProps> = ({
     const { t } = useLocale();
 
     return (
-        <div className={`flex items-center ${classConfig.gap[size]}`}>
+        <div
+            className={classNames(
+                'flex items-center',
+                classConfig.gap[size],
+                className
+            )}
+        >
             {portionSize ? (
                 <div
                     className={`flex items-center ${classConfig.innerGap[size]}`}

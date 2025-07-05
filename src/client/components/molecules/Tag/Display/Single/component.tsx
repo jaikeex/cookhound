@@ -45,7 +45,7 @@ const classConfig = {
             iconMargin: 'ml-1'
         },
         sm: {
-            dimensions: 'py-1 px-2',
+            dimensions: 'py-0.5 px-2',
             text: 'text-sm',
             icon: 14,
             iconMargin: 'ml-1'

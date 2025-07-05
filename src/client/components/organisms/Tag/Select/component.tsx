@@ -1,6 +1,6 @@
 'use client';
 
-import { ButtonBase, Tag, TagSelectionModal } from '@/client/components';
+import { ButtonBase, TagList, TagSelectionModal } from '@/client/components';
 import { chqc } from '@/client/request/queryClient';
 import { useLocale, useModal } from '@/client/store';
 import { classNames } from '@/client/utils';
@@ -73,16 +73,7 @@ export const TagSelection: React.FC<TagSelectionProps> = ({
                 readOnly
             />
 
-            <div className="flex flex-wrap items-center justify-center gap-2 w-full">
-                {selectedTags.map((tag) => (
-                    <Tag
-                        size="sm"
-                        key={tag.id}
-                        name={tag.name}
-                        categoryId={tag.categoryId}
-                    />
-                ))}
-            </div>
+            <TagList tags={selectedTags} size="sm" className="justify-center" />
 
             <ButtonBase onClick={openTagSelectionModal} color="subtle" outlined>
                 {t('app.recipe.select-tags')}

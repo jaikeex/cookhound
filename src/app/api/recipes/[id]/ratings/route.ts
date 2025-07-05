@@ -17,7 +17,7 @@ import { z } from 'zod';
 //|=============================================================================================|//
 
 const RatingForCreateSchema = z.strictObject({
-    rating: z.coerce.number().int().min(1).max(5)
+    rating: z.coerce.number().min(1).max(5)
 });
 
 const RatingParamsSchema = z.strictObject({
