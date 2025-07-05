@@ -9,12 +9,13 @@ import {
     InstructionsListCreate,
     NumberInput,
     Submit,
+    TagSelection,
     Textarea,
     TextInput,
     Typography
 } from '@/client/components';
 import { useAuth, useLocale } from '@/client/store';
-import type { Ingredient } from '@/common/types';
+import type { Ingredient, RecipeTagDTO } from '@/common/types';
 import type { I18nMessage } from '@/client/locales';
 // import { useFormStatus } from 'react-dom';
 
@@ -93,8 +94,15 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({
         []
     );
 
+    const handleTagSelection = useCallback(
+        (tags: RecipeTagDTO[]) => {
+            onChange && onChange('tags', tags);
+        },
+        [onChange]
+    );
+
     return (
-        <div className={`space-y-4 md:px-8 ${className}`}>
+        <div className={`space-y-4 md:px-8 overflow-x-hidden ${className}`}>
             <ImageInput
                 onUpload={handleImageChange}
                 name={'recipe-image'}
@@ -170,6 +178,8 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({
                 name={'notes'}
                 onChange={handleInputChange('notes')}
             />
+
+            <TagSelection onConfirm={handleTagSelection} />
 
             <Submit
                 className="min-w-40 !mt-6 mx-auto w-full"

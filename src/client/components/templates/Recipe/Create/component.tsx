@@ -62,6 +62,7 @@ type RecipeForCreateFormData = {
     notes: string | null;
     ingredients: Omit<Ingredient, 'id'>[];
     instructions: string[];
+    tags: { id: number }[] | null;
 };
 
 //~---------------------------------------------------------------------------------------------~//
@@ -395,6 +396,7 @@ const createRecipePlaceholder = (
     title: t('app.recipe.title'),
     portionSize: null,
     flags: [],
+    tags: [],
     time: null,
     notes: null,
     ingredients: [],
@@ -435,6 +437,22 @@ async function extractFormData(
         .map((key) => data.get(key) as string)
         .filter((instruction) => instruction.length > 0);
 
+    // Parse tags from hidden input (JSON encoded array of ids)
+    const tagsRaw = (data.get('tags') as string | null) ?? null;
+    let tags: { id: number }[] | null = null;
+
+    if (tagsRaw) {
+        try {
+            const ids = JSON.parse(tagsRaw) as number[];
+            if (Array.isArray(ids) && ids.length > 0) {
+                tags = ids.map((id) => ({ id }));
+            }
+        } catch {
+            // Ignore the error. This can only fail from parsing which should never happen. If it does,
+            // let the recipe throught with empty tags, the user can edit them in afterwards.
+        }
+    }
+
     return {
         title: data.get('title') as string,
         portionSize: parseInt(data.get('portionSize') as string) || null,
@@ -442,6 +460,7 @@ async function extractFormData(
         imageUrl: null,
         notes: data.get('notes') as string,
         ingredients,
-        instructions
+        instructions,
+        tags
     };
 }

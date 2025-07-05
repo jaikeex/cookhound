@@ -156,7 +156,7 @@ const ModalWrapper: React.FC<ModalWrapperProps> = ({
             <motion.div
                 variants={modalVariants}
                 className={classNames(
-                    'relative z-10 overflow-y-auto rounded-md py-8 px-10',
+                    'relative z-10 overflow-y-auto rounded-md py-8 px-6',
                     'max-h-[95dvh] max-w-[95dvw] md:max-h-[80dvh] md:max-w-[80dvw] ',
                     'bg-teal-50 dark:bg-[#222233]'
                 )}

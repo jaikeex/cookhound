@@ -13,5 +13,7 @@ export type TagListDTO = {
 export type RecipeTagDTO = {
     id: number;
     name: string;
-    categoryId: number;
+    categoryId: CategoryId;
 };
+
+export type CategoryId = 1 | 2 | 3 | 4 | 5 | 6;

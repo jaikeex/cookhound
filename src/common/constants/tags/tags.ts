@@ -1,3 +1,16 @@
+/**
+ * Maps the category names to defined translation strings. This is kept here instead of with the locales
+ * to provide fast matching to existing titles and for general convenience.
+ */
+export const CATEGORY_TRANSLATIONS = {
+    cuisine: 'app.recipe.tags.category.cuisine',
+    difficulty: 'app.recipe.tags.category.difficulty',
+    season: 'app.recipe.tags.category.season',
+    definedBy: 'app.recipe.tags.category.definedBy',
+    type: 'app.recipe.tags.category.type',
+    diet: 'app.recipe.tags.category.diet'
+} as const satisfies Record<string, string>;
+
 export const RECIPE_CATEGORY_TAGS = {
     cuisine: [
         'american',

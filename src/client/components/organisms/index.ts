@@ -6,3 +6,4 @@ export * from './Navigation';
 export * from './RecipeSearchInput';
 export * from './Recipe';
 export * from './ShoppingList';
+export * from './Tag';
