@@ -8,10 +8,13 @@ import {
 import { prisma } from '@/server/integrations';
 import { Logger } from '@/server/logger';
 import type { Prisma, Recipe } from '@prisma/client';
-import { getRecipeById } from '@prisma/client/sql';
-import { getRecipeByDisplayId } from '@prisma/client/sql';
-import { getFrontPageRecipes } from '@prisma/client/sql';
-import { searchRecipes } from '@prisma/client/sql';
+import {
+    getRecipeByDisplayId,
+    getRecipeById,
+    getFrontPageRecipes,
+    getManyRecipes,
+    searchRecipes
+} from '@prisma/client/sql';
 
 //|=============================================================================================|//
 
@@ -74,6 +77,43 @@ class RecipeModel {
         );
 
         return recipe[0] ?? null;
+    }
+
+    async getMany(
+        language: string,
+        limit: number,
+        offset: number,
+        ttl?: number
+    ): Promise<getManyRecipes.Result[]> {
+        const cacheKey = generateCacheKey('recipe', 'findMany', {
+            language,
+            limit,
+            offset
+        });
+
+        log.trace('Getting many recipes', {
+            language,
+            limit,
+            offset
+        });
+
+        const recipes = await cachePrismaQuery(
+            cacheKey,
+            async () => {
+                log.trace('Fetching many recipes from db', {
+                    language,
+                    limit,
+                    offset
+                });
+
+                return prisma.$queryRawTyped(
+                    getManyRecipes(language, limit, offset)
+                );
+            },
+            ttl ?? CACHE_TTL.TTL_1
+        );
+
+        return recipes;
     }
 
     //~=========================================================================================~//
