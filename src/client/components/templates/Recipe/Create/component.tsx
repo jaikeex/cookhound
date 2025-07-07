@@ -20,7 +20,7 @@ import {
     lowerCaseFirstLetter,
     validateFormData
 } from '@/client/utils';
-import type { I18nMessage } from '@/client/locales';
+import type { I18nMessage, Locale } from '@/client/locales';
 import type {
     RecipeForCreatePayload,
     Ingredient,
@@ -237,7 +237,8 @@ export const RecipeCreate: React.FC<RecipeCreateProps> = () => {
 
             if (name === 'ingredients' && value) {
                 newValue = value.map((ingredient: Ingredient) => ({
-                    ...ingredient,
+                    quantity: ingredient.quantity || null,
+                    id: null,
                     name: lowerCaseFirstLetter(ingredient.name)
                 }));
             }
@@ -260,8 +261,8 @@ export const RecipeCreate: React.FC<RecipeCreateProps> = () => {
     //|-----------------------------------------------------------------------------------------|//
 
     useEffect(() => {
-        setRecipeObject(createRecipePlaceholder(t));
-    }, [setRecipeObject, t]);
+        setRecipeObject(createRecipePlaceholder(locale, t));
+    }, [setRecipeObject, locale, t]);
 
     /**
      * This could be done by simply checking if the recipeObject fields are not empty.
@@ -382,6 +383,7 @@ export const RecipeCreate: React.FC<RecipeCreateProps> = () => {
 //~---------------------------------------------------------------------------------------------~//
 
 const createRecipePlaceholder = (
+    language: Locale,
     t: (key: I18nMessage) => string
 ): RecipeDTO => ({
     id: 0,
@@ -389,7 +391,7 @@ const createRecipePlaceholder = (
     rating: null,
     timesRated: 0,
     timesViewed: 0,
-    language: 'en',
+    language: language,
     imageUrl: '/img/recipe-placeholder.webp',
     title: t('app.recipe.title'),
     portionSize: null,

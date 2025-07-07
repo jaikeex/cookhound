@@ -1,6 +1,9 @@
-import type { UseQueryOptions } from '@tanstack/react-query';
+import type {
+    UseMutationOptions,
+    UseQueryOptions
+} from '@tanstack/react-query';
 import type { RequestError } from '@/client/error';
-import type { TagListDTO } from '@/common/types';
+import type { RecipeDTO, RecipeTagDTO, TagListDTO } from '@/common/types';
 
 //~---------------------------------------------------------------------------------------------~//
 //$                                            KEYS                                             $//
@@ -24,4 +27,9 @@ export type TagListOptions = Omit<
         ReturnType<typeof TAG_QUERY_KEYS.list>
     >,
     'queryKey' | 'queryFn'
+>;
+
+export type TagSuggestionsOptions = Omit<
+    UseMutationOptions<RecipeTagDTO[], RequestError, RecipeDTO>,
+    'mutationFn'
 >;

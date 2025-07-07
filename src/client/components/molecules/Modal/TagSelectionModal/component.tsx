@@ -4,10 +4,11 @@ import React, { useCallback, useState } from 'react';
 import type { RecipeTagDTO, TagListDTO } from '@/common/types';
 import type { ModalProps } from '@/client/components/molecules/Modal/types';
 import { ButtonBase, Loader, TagSelectionList } from '@/client/components';
-import { useLocale } from '@/client/store';
+import { useCreateRecipeStore, useLocale, useSnackbar } from '@/client/store';
 import { TagSelectionBox } from '@/client/components';
 import type { RequestError } from '@/client/error';
 import { RECIPE_TAG_CATEGORY_LIMITS_BY_ID } from '@/common/constants';
+import { chqc } from '@/client/request/queryClient';
 
 type TagSelectionModalProps = Readonly<{
     initialTags?: RecipeTagDTO[];
@@ -29,6 +30,32 @@ export const TagSelectionModal: React.FC<TagSelectionModalProps> = ({
     error
 }) => {
     const { t } = useLocale();
+    const { alert } = useSnackbar();
+
+    const {
+        recipeObject,
+        incrementSuggestions,
+        getRemainingsuggestions,
+        canSuggest
+    } = useCreateRecipeStore();
+
+    const { mutate: suggestTags, isPending: isSuggesting } =
+        chqc.tag.useSuggestions({
+            onSuccess: (tags) => {
+                setSelectedTags(
+                    tags.sort((a, b) => a.categoryId - b.categoryId)
+                );
+
+                incrementSuggestions();
+
+                alert({
+                    message: t('app.recipe.suggest-limit-countdown', {
+                        remaining: getRemainingsuggestions()
+                    }),
+                    variant: 'info'
+                });
+            }
+        });
 
     const [selectedTags, setSelectedTags] =
         useState<RecipeTagDTO[]>(initialTags);
@@ -65,6 +92,29 @@ export const TagSelectionModal: React.FC<TagSelectionModalProps> = ({
         });
     }, []);
 
+    const handleSuggest = useCallback(() => {
+        if (!recipeObject) return;
+
+        if (!canSuggest()) {
+            alert({
+                message: t('app.recipe.suggest-limit-countdown', {
+                    remaining: getRemainingsuggestions()
+                }),
+                variant: 'info'
+            });
+            return;
+        }
+
+        suggestTags(recipeObject);
+    }, [
+        recipeObject,
+        suggestTags,
+        alert,
+        t,
+        canSuggest,
+        getRemainingsuggestions
+    ]);
+
     const handleApply = useCallback(() => {
         onApply?.(selectedTags);
         close?.();
@@ -79,7 +129,12 @@ export const TagSelectionModal: React.FC<TagSelectionModalProps> = ({
 
     return (
         <div className="flex flex-col w-full h-full max-h-[85dvh] md:max-h-[70dvh] max-w-[90dvh] md:max-w-[80dvh] xl:max-w-[70dvh]">
-            <TagSelectionBox className="min-h-[66px]" tags={selectedTags} />
+            <TagSelectionBox
+                className="min-h-[70px]"
+                tags={selectedTags}
+                onSuggest={handleSuggest}
+                isLoading={isSuggesting}
+            />
 
             <TagSelectionList
                 tagLists={tagLists ?? []}

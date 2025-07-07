@@ -10,3 +10,12 @@ export const SEARCH_QUERY_SEPARATOR = '|';
 export const LOCAL_STORAGE_LAST_VIEWED_RECIPES_KEY = 'lastViewedRecipes';
 
 export const SESSION_COOKIE_NAME = 'session';
+
+/**
+ * Maximum number of tag suggestions allowed per recipe creation session.
+ * There is a rate limit on the route, but as it is currently designed, it would redirect the user
+ * to the error page (which is not desired from a form) and there is really not a good way to prevent it
+ * from here (unless the apiClient is reworked, which i did not want to do when writing this). This allows
+ * to bypass that mechanic, and also give user feedback about remaining attempts.
+ */
+export const MAX_SUGGESTIONS = 10;

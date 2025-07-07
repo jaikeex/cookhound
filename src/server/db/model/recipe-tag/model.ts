@@ -5,7 +5,12 @@ import {
     cachePrismaQuery,
     generateCacheKey
 } from '@/server/db/model/model-cache';
-import type { RecipeTagCategory, TagListDTO } from '@/common/types';
+import type {
+    RecipeTagCategory,
+    RecipeTagDTO,
+    TagListDTO,
+    CategoryId
+} from '@/common/types';
 
 //|=============================================================================================|//
 
@@ -27,41 +32,37 @@ class RecipeTagModel {
             where: { language }
         });
 
-        const tags: AwaitedReturn<typeof prisma.tag.findMany> =
-            await cachePrismaQuery(
-                cacheKey,
-                async () => {
-                    log.trace(
-                        'Fetching all recipe tags with categories from db'
-                    );
-                    return prisma.tag.findMany({
-                        include: {
-                            category: true,
-                            translations: {
-                                where: { language },
-                                select: { name: true }
-                            }
+        const tags = await cachePrismaQuery(
+            cacheKey,
+            async () => {
+                log.trace('Fetching all recipe tags with categories from db');
+                return prisma.tag.findMany({
+                    include: {
+                        category: true,
+                        translations: {
+                            where: { language },
+                            select: { name: true }
                         }
-                    } as any);
-                },
-                ttl ?? CACHE_TTL.TTL_2
-            );
+                    }
+                });
+            },
+            ttl ?? CACHE_TTL.TTL_2
+        );
 
-        return tags.reduce((acc: TagListDTO[], tag: any) => {
+        return tags.reduce((acc: TagListDTO[], tag) => {
             const category = tag.category.name as RecipeTagCategory;
             const existingCategory = acc.find(
                 (item) => item.category === category
             );
 
-            const t = tag as any;
             const translatedName =
-                t.translations?.[0]?.name ?? t.slug ?? t.name;
+                tag.translations?.[0]?.name ?? tag.slug ?? tag.slug;
 
             if (existingCategory) {
                 existingCategory.tags.push({
                     id: tag.id,
                     name: translatedName,
-                    categoryId: tag.categoryId
+                    categoryId: tag.categoryId as CategoryId
                 });
             } else {
                 acc.push({
@@ -70,13 +71,36 @@ class RecipeTagModel {
                         {
                             id: tag.id,
                             name: translatedName,
-                            categoryId: tag.categoryId
+                            categoryId: tag.categoryId as CategoryId
                         }
                     ]
                 });
             }
             return acc;
         }, [] as TagListDTO[]);
+    }
+
+    async getManyBySlugs(
+        slugs: string[],
+        language: string
+    ): Promise<RecipeTagDTO[]> {
+        log.trace('Getting tags by slugs', { slugs, language });
+
+        const tags = await prisma.tag.findMany({
+            where: { slug: { in: slugs } },
+            include: {
+                translations: {
+                    where: { language },
+                    select: { name: true }
+                }
+            }
+        });
+
+        return tags.map((tag) => ({
+            id: tag.id,
+            name: tag.translations?.[0]?.name ?? tag.slug,
+            categoryId: tag.categoryId as CategoryId
+        }));
     }
 }
 

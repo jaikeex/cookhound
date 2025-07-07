@@ -81,9 +81,6 @@ export const DraggableInputRow: React.FC<DraggableInputRowProps> = ({
     const handleDragEnd = useCallback(
         (event: PointerEvent, info: PanInfo) => {
             enableMobileScroll();
-
-            console.log('handleDragEnd');
-
             onDragEnd?.(event as unknown as PointerEvent, info);
         },
         [enableMobileScroll, onDragEnd]
