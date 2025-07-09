@@ -35,7 +35,6 @@ class ReindexRecipesJob extends BaseJob {
         await recipeSearchIndex.deleteAllDocuments();
 
         for (const language of languages) {
-            let lastId = 0;
             let totalProcessed = 0;
 
             // eslint-disable-next-line no-constant-condition
@@ -43,7 +42,7 @@ class ReindexRecipesJob extends BaseJob {
                 const recipes = await recipeModel.getMany(
                     language,
                     BATCH_SIZE,
-                    totalProcessed === 0 ? lastId : lastId + 1
+                    totalProcessed
                 );
 
                 if (recipes.length === 0) {
@@ -105,10 +104,10 @@ class ReindexRecipesJob extends BaseJob {
                 }
 
                 totalProcessed += recipes.length;
-                lastId = recipes[recipes.length - 1].id ?? 0;
             }
 
             log.notice('Recipe re-index job finished', {
+                language,
                 totalProcessed
             });
         }

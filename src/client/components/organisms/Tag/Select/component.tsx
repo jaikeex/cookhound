@@ -75,7 +75,12 @@ export const TagSelection: React.FC<TagSelectionProps> = ({
 
             <TagList tags={selectedTags} size="sm" className="justify-center" />
 
-            <ButtonBase onClick={openTagSelectionModal} color="subtle" outlined>
+            <ButtonBase
+                onClick={openTagSelectionModal}
+                color="subtle"
+                outlined
+                className="w-full"
+            >
                 {t('app.recipe.select-tags')}
             </ButtonBase>
         </div>

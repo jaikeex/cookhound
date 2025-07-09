@@ -7,7 +7,7 @@ import { ButtonBase, Loader, TagSelectionList } from '@/client/components';
 import { useCreateRecipeStore, useLocale, useSnackbar } from '@/client/store';
 import { TagSelectionBox } from '@/client/components';
 import type { RequestError } from '@/client/error';
-import { RECIPE_TAG_CATEGORY_LIMITS_BY_ID } from '@/common/constants';
+import { MAX_TAGS, RECIPE_TAG_CATEGORY_LIMITS_BY_ID } from '@/common/constants';
 import { chqc } from '@/client/request/queryClient';
 
 type TagSelectionModalProps = Readonly<{
@@ -60,37 +60,44 @@ export const TagSelectionModal: React.FC<TagSelectionModalProps> = ({
     const [selectedTags, setSelectedTags] =
         useState<RecipeTagDTO[]>(initialTags);
 
-    const toggleTag = useCallback((tag: RecipeTagDTO) => {
-        setSelectedTags((prev) => {
-            const alreadySelected = prev.some((t) => t.id === tag.id);
+    const toggleTag = useCallback(
+        (tag: RecipeTagDTO) => {
+            setSelectedTags((prev) => {
+                const alreadySelected = prev.some((t) => t.id === tag.id);
 
-            // If tag already selected just deselect it
-            if (alreadySelected) {
-                return prev.filter((t) => t.id !== tag.id);
-            }
+                // If tag already selected just deselect it
+                if (alreadySelected) {
+                    return prev.filter((t) => t.id !== tag.id);
+                }
 
-            const categoryLimit =
-                RECIPE_TAG_CATEGORY_LIMITS_BY_ID[
-                    tag.categoryId as keyof typeof RECIPE_TAG_CATEGORY_LIMITS_BY_ID
-                ] ?? Infinity;
+                if (selectedTags.length >= MAX_TAGS) {
+                    return prev;
+                }
 
-            const currentlySelectedInCategory = getSelectedCountForCategory(
-                prev,
-                tag.categoryId
-            );
+                const categoryLimit =
+                    RECIPE_TAG_CATEGORY_LIMITS_BY_ID[
+                        tag.categoryId as keyof typeof RECIPE_TAG_CATEGORY_LIMITS_BY_ID
+                    ] ?? Infinity;
 
-            // Simply prevent adding if category limit is reached
-            if (currentlySelectedInCategory >= categoryLimit) {
-                return prev;
-            }
+                const currentlySelectedInCategory = getSelectedCountForCategory(
+                    prev,
+                    tag.categoryId
+                );
 
-            const sortedTags = [...prev, tag].sort(
-                (a, b) => a.categoryId - b.categoryId
-            );
+                // Simply prevent adding if category limit is reached
+                if (currentlySelectedInCategory >= categoryLimit) {
+                    return prev;
+                }
 
-            return sortedTags;
-        });
-    }, []);
+                const sortedTags = [...prev, tag].sort(
+                    (a, b) => a.categoryId - b.categoryId
+                );
+
+                return sortedTags;
+            });
+        },
+        [selectedTags]
+    );
 
     const handleSuggest = useCallback(() => {
         if (!recipeObject) return;

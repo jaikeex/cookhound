@@ -6,6 +6,7 @@ import { Typography, TagList, ButtonBase, Loader } from '@/client/components';
 import { classNames } from '@/client/utils';
 import { useScreenSize } from '@/client/hooks';
 import { useLocale } from '@/client/store';
+import { MAX_TAGS } from '@/common/constants';
 
 type TagSelectionBoxProps = Readonly<{
     className?: string;
@@ -13,8 +14,6 @@ type TagSelectionBoxProps = Readonly<{
     onSuggest?: () => void;
     isLoading?: boolean;
 }>;
-
-const MAX_TAGS = 10;
 
 export const TagSelectionBox: React.FC<TagSelectionBoxProps> = ({
     className,

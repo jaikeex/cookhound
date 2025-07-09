@@ -205,7 +205,7 @@ export const useSidebar = (config: SidebarConfig = {}) => {
             if (useMobileParams && isMobile) {
                 const params = new URLSearchParams(searchParams);
                 params.set(paramKey, 'true');
-                router.push(`?${params.toString()}`);
+                router.push(`?${params.toString()}`, { scroll: false });
             }
         }
     }, [

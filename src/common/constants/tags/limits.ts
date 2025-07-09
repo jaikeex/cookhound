@@ -17,3 +17,5 @@ export const RECIPE_TAG_CATEGORY_LIMITS_BY_NAME = {
 } as const;
 
 export type RecipeTagCategoryLimitMap = typeof RECIPE_TAG_CATEGORY_LIMITS_BY_ID;
+
+export const MAX_TAGS = 10;

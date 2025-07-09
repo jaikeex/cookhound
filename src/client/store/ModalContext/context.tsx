@@ -5,6 +5,7 @@ import React, {
     useCallback,
     useContext,
     useMemo,
+    useRef,
     useState
 } from 'react';
 import ReactDOM from 'react-dom';
@@ -12,6 +13,10 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { classNames } from '@/client/utils';
 import { IconButton } from '@/client/components';
 import { generateRandomId } from '@/client/utils';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useParamsChangeListener } from '@/client/hooks';
+
+const MODAL_PARAM_KEY = 'modal';
 
 //~=============================================================================================~//
 //$                                            TYPES                                            $//
@@ -57,11 +62,56 @@ type ModalProviderProps = React.PropsWithChildren<NonNullable<unknown>>;
 export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
     const [modals, setModals] = useState<Modal[]>([]);
 
-    const closeModal = useCallback((id: string) => {
-        setModals((current) => current.filter((m) => m.id !== id));
-    }, []);
+    const router = useRouter();
+    const searchParams = useSearchParams();
 
-    const closeAll = useCallback(() => setModals([]), []);
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+    //$                                        ROUTER                                           $//
+    ///
+    //# What follows is a somewhat simplified implementation of the same routing logic that
+    //# the sidebar uses. Opening a modal pushes new query params into the url, in order for
+    //# the browser back navigation to simply close the modal without changing the page.
+    //# This (unlike sidebar's version) is enabled for both mobile and desktop screens.
+    ///
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+
+    /**
+     * This ref is used as a lock to ensure router.back() is only called ONCE per
+     * modal-closing cycle. Without it, closeModal → router.back() triggers a
+     * params change which could call closeAll(), resulting in a second
+     * router.back() invocation and therefore navigating back multiple pages.
+     */
+    const isNavigatingBackRef = useRef(false);
+
+    const closeModal = useCallback(
+        (id: string) => {
+            setModals((current) => {
+                const newModals = current.filter((m) => m.id !== id);
+
+                // If this was the last open modal, navigate back to clear the query param state
+                if (
+                    newModals.length === 0 &&
+                    searchParams.get(MODAL_PARAM_KEY) &&
+                    !isNavigatingBackRef.current
+                ) {
+                    isNavigatingBackRef.current = true;
+                    router.back();
+                }
+
+                return newModals;
+            });
+        },
+        [router, searchParams]
+    );
+
+    const closeAll = useCallback(() => {
+        setModals([]);
+
+        if (searchParams.get(MODAL_PARAM_KEY) && !isNavigatingBackRef.current) {
+            isNavigatingBackRef.current = true;
+            router.back();
+        }
+    }, [router, searchParams]);
 
     const openModal = useCallback(
         (content: React.ReactNode | ModalRenderer, options?: ModalOptions) => {
@@ -74,15 +124,52 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
 
             setModals((current) => [...current, { id, renderer, options }]);
 
+            if (!searchParams.get(MODAL_PARAM_KEY)) {
+                const params = new URLSearchParams(searchParams);
+                params.set(MODAL_PARAM_KEY, id);
+                router.push(`?${params.toString()}`, { scroll: false });
+            }
+
             return id;
         },
-        []
+        [router, searchParams]
     );
 
     const handleClose = useCallback(
         (id: string) => () => closeModal(id),
         [closeModal]
     );
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+    //$                              URL PARAM CHANGE LISTENER                                 $//
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+
+    const handleParamsChange = useCallback(() => {
+        const hasParam = searchParams.get(MODAL_PARAM_KEY);
+
+        // Case 1: URL contains the param but no modal is open → remove the param.
+        if (hasParam && modals.length === 0) {
+            const currentUrl = new URL(window.location.href);
+            currentUrl.searchParams.delete(MODAL_PARAM_KEY);
+            router.replace(currentUrl.pathname + (currentUrl.search || ''));
+        }
+
+        // Case 2: URL no longer contains the param while a modal is open → close all modals.
+        if (!hasParam && modals.length > 0) {
+            closeAll();
+        }
+
+        // Reset the navigation lock once the URL param state reflects reality
+        if (!hasParam) {
+            isNavigatingBackRef.current = false;
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [modals, searchParams]);
+
+    useParamsChangeListener({
+        key: MODAL_PARAM_KEY,
+        onChange: handleParamsChange
+    });
 
     const value = useMemo(
         () => ({ openModal, closeModal, closeAll }),
@@ -156,7 +243,7 @@ const ModalWrapper: React.FC<ModalWrapperProps> = ({
             <motion.div
                 variants={modalVariants}
                 className={classNames(
-                    'relative z-10 overflow-y-auto rounded-md py-8 px-6',
+                    'relative z-10 overflow-y-auto rounded-md py-8 px-2 md:px-6',
                     'max-h-[95dvh] max-w-[95dvw] md:max-h-[80dvh] md:max-w-[80dvw] ',
                     'bg-teal-50 dark:bg-[#222233]'
                 )}
