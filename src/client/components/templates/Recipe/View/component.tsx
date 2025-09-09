@@ -11,6 +11,7 @@ import { useLocalStorage } from '@/client/hooks/useLocalStorage';
 import { LOCAL_STORAGE_LAST_VIEWED_RECIPES_KEY } from '@/common/constants';
 import { chqc, QUERY_KEYS } from '@/client/request/queryClient';
 import { useQueryClient } from '@tanstack/react-query';
+import { FlaggedTemplate } from '@/client/components/templates/Error/Flagged';
 
 export type RecipeViewProps = Readonly<{
     recipe: Promise<RecipeDTO>;
@@ -21,6 +22,8 @@ export const RecipeViewTemplate: React.FC<RecipeViewProps> = ({ recipe }) => {
     const queryClient = useQueryClient();
     const { resetSelectedIngredients } = useIngredientSelectStore();
     const { user } = useAuth();
+
+    const isFlagged = recipeResolved.flags?.some((flag) => flag.active);
 
     // Fuck vscode coloring fails
     const { setValue: setLastViewedRecipes } = useLocalStorage<
@@ -73,6 +76,10 @@ export const RecipeViewTemplate: React.FC<RecipeViewProps> = ({ recipe }) => {
             }
         }
     }, [recipeResolved?.id]);
+
+    if (isFlagged) {
+        return <FlaggedTemplate />;
+    }
 
     return (
         <React.Fragment>

@@ -110,6 +110,8 @@
     "app.recipe.error.title-required": "Title is required",
     "app.recipe.error.ingredients-required": "Ingredients are required",
     "app.recipe.error.instructions-required": "Instructions are required",
+    "app.recipe.error.flagged": "Recipe flagged",
+    "app.recipe.error.flagged-description": "The content of this recipe has been flagged as inappropriate. If you believe this is an error, please contact the administrator.",
     "app.recipe.create-preview": "Preview",
     "app.recipe.rated": "Recipe rated successfully",
     "app.recipe.search.placeholder": "Search for a recipe",

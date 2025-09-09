@@ -380,6 +380,7 @@ class RecipeModel {
      */
     async flagRecipe(
         recipeId: number,
+        recipeDisplayId: string,
         userId: number,
         reason: RecipeFlagReason
     ): Promise<void> {
@@ -393,7 +394,9 @@ class RecipeModel {
             }
         });
 
-        await this.invalidateRecipeCache({ id: recipeId });
+        await this.invalidateRecipeCache({
+            displayId: recipeDisplayId
+        });
     }
 
     //~=========================================================================================~//

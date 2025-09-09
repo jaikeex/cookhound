@@ -52,6 +52,7 @@ class EvaluateRecipeJob extends BaseJob<EvaluateRecipeJobData> {
                     recipeId,
                     userId
                 });
+
                 return;
             }
 
@@ -66,7 +67,12 @@ class EvaluateRecipeJob extends BaseJob<EvaluateRecipeJobData> {
                 return;
             }
 
-            await recipeModel.flagRecipe(recipeId, userId, reason);
+            await recipeModel.flagRecipe(
+                recipeId,
+                recipeDisplayId,
+                userId,
+                reason
+            );
 
             recipeSearchIndex.deleteOne(recipeId);
 
