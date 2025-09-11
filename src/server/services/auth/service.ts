@@ -117,7 +117,8 @@ class AuthService {
             createdAt: user.createdAt.toISOString(),
             role: user.role as UserRole,
             status: user.status as Status,
-            lastLogin: user.lastLogin?.toISOString() || null
+            lastLogin: user.lastLogin?.toISOString() || null,
+            lastVisitedAt: user.lastVisitedAt?.toISOString() || null
         };
 
         return { token, user: userResponse };
@@ -218,7 +219,8 @@ class AuthService {
                 createdAt: dbUser.createdAt.toISOString(),
                 role: dbUser.role as UserRole,
                 status: dbUser.status as Status,
-                lastLogin: dbUser.lastLogin?.toISOString() ?? null
+                lastLogin: dbUser.lastLogin?.toISOString() ?? null,
+                lastVisitedAt: dbUser.lastVisitedAt?.toISOString() ?? null
             };
         } else {
             log.info('loginWithGoogle - creating new user', {
@@ -318,6 +320,8 @@ class AuthService {
             );
         }
 
+        db.user.updateOneById(user.id, { lastVisitedAt: new Date() });
+
         log.trace('getCurrentUser - success', {
             id: userId
         });
@@ -330,7 +334,8 @@ class AuthService {
             createdAt: user.createdAt.toISOString(),
             role: user.role as UserRole,
             status: user.status as Status,
-            lastLogin: user.lastLogin?.toISOString() || null
+            lastLogin: user.lastLogin?.toISOString() || null,
+            lastVisitedAt: user.lastVisitedAt?.toISOString() || null
         };
     }
 }

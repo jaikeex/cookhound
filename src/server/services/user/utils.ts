@@ -10,6 +10,7 @@ export function createUserDTO(user: UserFromDB): UserDTO {
         status: user.status as Status,
         avatarUrl: user.avatarUrl,
         createdAt: user.createdAt.toISOString(),
-        lastLogin: user.lastLogin?.toISOString() || null
+        lastLogin: user.lastLogin?.toISOString() || null,
+        lastVisitedAt: user.lastVisitedAt?.toISOString() || null
     };
 }

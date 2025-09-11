@@ -324,6 +324,15 @@ class UserModel {
             lastLogin: user.lastLogin
                 ? new Date(user.lastLogin)
                 : user.lastLogin,
+            lastVisitedAt: user.lastVisitedAt
+                ? new Date(user.lastVisitedAt)
+                : user.lastVisitedAt,
+            lastPasswordReset: user.lastPasswordReset
+                ? new Date(user.lastPasswordReset)
+                : user.lastPasswordReset,
+            passwordResetTokenExpires: user.passwordResetTokenExpires
+                ? new Date(user.passwordResetTokenExpires)
+                : user.passwordResetTokenExpires,
             updatedAt: user.updatedAt
                 ? new Date(user.updatedAt)
                 : user.updatedAt

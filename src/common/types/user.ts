@@ -7,6 +7,7 @@ export type UserDTO = {
     avatarUrl: string | null;
     createdAt: string;
     lastLogin: string | null;
+    lastVisitedAt: string | null;
 };
 
 export type UserForCreatePayload = {

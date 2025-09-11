@@ -24,6 +24,7 @@ model User {
   passwordResetTokenExpires DateTime?   @db.DateTime
   createdAt                 DateTime    @default(now()) @db.DateTime(3)
   updatedAt                 DateTime    @updatedAt @db.DateTime(3)
+  lastVisitedAt             DateTime?   @db.DateTime(3)
   lastLogin                 DateTime?   @db.DateTime(3)
   lastPasswordReset         DateTime?   @db.DateTime(3)
 
