@@ -36,6 +36,18 @@ class UserApiClient {
     }
 
     /**
+     * Gets a user by calling `GET /api/users/{id}`.
+     *
+     * @param id - The ID of the user.
+     * @param config - Optional fetch request configuration.
+     * @returns A promise that resolves when the user is fetched.
+     * @throws {Error} Throws an error if the request fails.
+     */
+    async getUserById(id: number, config?: RequestConfig): Promise<UserDTO> {
+        return await apiRequestWrapper.get({ url: `/users/${id}`, ...config });
+    }
+
+    /**
      * Gets the shopping list by calling `GET /api/users/{id}/shopping-list`.
      *
      * @param config - Optional fetch request configuration.

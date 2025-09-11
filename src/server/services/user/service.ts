@@ -173,7 +173,31 @@ class UserService {
     }
 
     //~-----------------------------------------------------------------------------------------~//
-    //$                                       GET SHOPPING LIST                                  $//
+    //$                                           GET BY ID                                     $//
+    //~-----------------------------------------------------------------------------------------~//
+
+    async getUserById(id: number): Promise<UserDTO> {
+        log.trace('getUserById - attempt', { id });
+
+        const user = await db.user.getOneById(id);
+
+        if (!user) {
+            log.warn('getUserById - user not found', { id });
+            throw new NotFoundError(
+                'app.error.not-found',
+                ApplicationErrorCode.USER_NOT_FOUND
+            );
+        }
+
+        const userResponse: UserDTO = createUserDTO(user);
+
+        log.trace('getUserById - success', { id });
+
+        return userResponse;
+    }
+
+    //~-----------------------------------------------------------------------------------------~//
+    //$                                       GET SHOPPING LIST                                 $//
     //~-----------------------------------------------------------------------------------------~//
 
     async getShoppingList(userId: number): Promise<ShoppingListDTO[]> {

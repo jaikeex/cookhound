@@ -22,6 +22,8 @@ const USER_NAMESPACE_QUERY_KEY = 'user';
 
 export const USER_QUERY_KEYS = Object.freeze({
     namespace: USER_NAMESPACE_QUERY_KEY,
+    userById: (userId: number) =>
+        [USER_NAMESPACE_QUERY_KEY, userId, 'user-by-id'] as const,
     shoppingList: (userId: number) =>
         [USER_NAMESPACE_QUERY_KEY, userId, 'shopping-list'] as const,
     lastViewedRecipes: (userId: number) =>
@@ -55,6 +57,16 @@ export type LastViewedRecipesOptions = Omit<
 export type CreateUserOptions = Omit<
     UseMutationOptions<UserDTO, RequestError, UserForCreatePayload>,
     'mutationFn'
+>;
+
+export type GetUserByIdOptions = Omit<
+    UseQueryOptions<
+        UserDTO,
+        RequestError,
+        UserDTO,
+        ReturnType<typeof USER_QUERY_KEYS.userById>
+    >,
+    'queryKey' | 'queryFn'
 >;
 
 export type UpsertShoppingListOptions = Omit<

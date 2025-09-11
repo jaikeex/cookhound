@@ -13,7 +13,8 @@ import type {
     VerifyEmailOptions,
     ResendVerificationEmailOptions,
     SendResetPasswordEmailOptions,
-    ResetPasswordOptions
+    ResetPasswordOptions,
+    GetUserByIdOptions
 } from './types';
 import { USER_QUERY_KEYS } from './types';
 
@@ -23,6 +24,16 @@ class UserQueryClient {
      */
     useCreateUser = (options?: Partial<CreateUserOptions>) =>
         useAppMutation(apiClient.user.createUser, options);
+
+    /**
+     * Gets a user by their ID.
+     */
+    useGetUserById = (userId: number, options?: Partial<GetUserByIdOptions>) =>
+        useAppQuery(
+            USER_QUERY_KEYS.userById(userId),
+            () => apiClient.user.getUserById(userId),
+            { enabled: !!userId, ...options }
+        );
 
     /**
      * Gets the shopping list for a user.
