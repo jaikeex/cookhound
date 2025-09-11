@@ -4,6 +4,7 @@ export * from './Form';
 export * from './IngredientRow';
 export * from './InstructionRow';
 export * from './Instructions';
+export * from './Menu';
 export * from './List';
 export * from './Modal';
 export * from './Popup';
