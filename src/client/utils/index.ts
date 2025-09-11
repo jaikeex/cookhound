@@ -4,8 +4,8 @@ export * from './locale';
 export * from './object';
 export * from './string';
 export * from './classnames';
+export * from './user';
 
-// other
 export * from './fileToByteArray';
 export * from './generateRandomId';
 export * from './getCookieValue';
