@@ -1,12 +1,15 @@
 'use client';
 
 import React, { useCallback, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { classNames } from '@/client/utils';
 import { TabButton } from '@/client/components';
+import { useParamsChangeListener } from '@/client/hooks/routingListeners';
 
 export type TabContent = {
     title: string;
     content: React.ReactNode;
+    param?: string;
 };
 
 export type TabsProps = Readonly<{
@@ -15,6 +18,8 @@ export type TabsProps = Readonly<{
     className?: string;
     onTabChange?: (tabIndex: number) => void;
     tabs: TabContent[];
+    enableNavigation?: boolean;
+    paramKey?: string;
 }> &
     React.PropsWithChildren;
 
@@ -23,19 +28,99 @@ export const Tabs: React.FC<TabsProps> = ({
     onTabChange,
     tabs,
     buttonRowClassName,
-    className
+    className,
+    enableNavigation = false,
+    paramKey = 'tab'
 }) => {
-    const [currentTab, setCurrentTab] = useState<number>(activeTab);
+    const router = useRouter();
+    const searchParams = useSearchParams();
 
     const tabWidth = 100 / tabs.length;
+
+    const resolveTabFromParam = useCallback(
+        (urlParam: string | null): number => {
+            if (!urlParam || !enableNavigation) return activeTab;
+
+            const tabIndex = tabs.findIndex((tab) => tab.param === urlParam);
+            if (!isNaN(tabIndex) && tabIndex !== -1) return tabIndex;
+
+            /**
+             * This should never be invoked, but seemed correct to try and handle and should also somewhat guard against
+             * potential misuse later.
+             */
+            const parsedIndex = parseInt(urlParam, 10);
+            if (
+                !isNaN(parsedIndex) &&
+                parsedIndex >= 0 &&
+                parsedIndex < tabs.length
+            ) {
+                return parsedIndex;
+            }
+
+            return activeTab;
+        },
+        [tabs, activeTab, enableNavigation]
+    );
+
+    const getInitialTab = useCallback(() => {
+        if (!enableNavigation) return activeTab;
+        return resolveTabFromParam(searchParams.get(paramKey));
+    }, [
+        enableNavigation,
+        activeTab,
+        resolveTabFromParam,
+        searchParams,
+        paramKey
+    ]);
+
+    const [currentTab, setCurrentTab] = useState<number>(getInitialTab);
+
+    const updateUrlParam = useCallback(
+        (index: number) => {
+            if (!enableNavigation) return;
+
+            const currentUrl = new URL(window.location.href);
+            const tab = tabs[index];
+            const paramValue = tab.param || index.toString();
+
+            currentUrl.searchParams.set(paramKey, paramValue);
+            router.replace(currentUrl.pathname + currentUrl.search, {
+                scroll: false
+            });
+        },
+        [enableNavigation, router, paramKey, tabs]
+    );
 
     const handleTabChange = useCallback(
         (index: number) => () => {
             setCurrentTab(index);
+            updateUrlParam(index);
             onTabChange && onTabChange(index);
         },
-        [onTabChange]
+        [onTabChange, updateUrlParam]
     );
+
+    const handleParamChange = useCallback(() => {
+        if (!enableNavigation) return;
+
+        const urlParam = searchParams.get(paramKey);
+        const newTabIndex = resolveTabFromParam(urlParam);
+
+        if (newTabIndex !== currentTab) {
+            setCurrentTab(newTabIndex);
+        }
+    }, [
+        enableNavigation,
+        searchParams,
+        paramKey,
+        resolveTabFromParam,
+        currentTab
+    ]);
+
+    useParamsChangeListener({
+        key: paramKey,
+        onChange: enableNavigation ? handleParamChange : undefined
+    });
 
     return (
         <div className={classNames(className)}>
