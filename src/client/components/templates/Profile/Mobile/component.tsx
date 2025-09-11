@@ -1,16 +1,22 @@
 import React from 'react';
 import type { ProfileNavigationItem } from '@/client/types/core';
 import type { TabContent } from '@/client/components';
-import { Tabs } from '@/client/components';
+import { ProfileHeadMobile, Tabs } from '@/client/components';
+import type { UserDTO } from '@/common/types';
+import { classNames } from '@/client/utils';
 
 export type MobileRecipeViewProps = Readonly<{
     className?: string;
     items: ProfileNavigationItem[];
+    user: UserDTO;
+    isCurrentUser: boolean;
 }>;
 
 export const MobileProfileTemplate: React.FC<MobileRecipeViewProps> = ({
     className,
-    items
+    items,
+    user,
+    isCurrentUser
 }) => {
     const tabs: TabContent[] = items.map((item) => ({
         title: item.label,
@@ -19,8 +25,9 @@ export const MobileProfileTemplate: React.FC<MobileRecipeViewProps> = ({
     }));
 
     return (
-        <div className={className}>
-            <Tabs tabs={tabs} enableNavigation />
+        <div className={classNames(className)}>
+            <ProfileHeadMobile user={user} isCurrentUser={isCurrentUser} />
+            <Tabs tabs={tabs} enableNavigation className="mt-4" />
         </div>
     );
 };

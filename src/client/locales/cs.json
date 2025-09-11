@@ -84,6 +84,7 @@
     "app.profile.dashboard": "Info",
     "app.profile.recipes": "Recepty",
     "app.profile.cookbooks": "Kuchařky",
+    "app.profile.account-age": "Stáří účtu",
     "app.recipe.title": "Název receptu",
     "app.recipe.ingredients": "Ingredience",
     "app.recipe.instructions": "Postup",

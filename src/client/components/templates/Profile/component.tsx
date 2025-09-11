@@ -1,6 +1,6 @@
 'use client';
 
-import { useLocale } from '@/client/store';
+import { useAuth, useLocale } from '@/client/store';
 import React, { use } from 'react';
 import { DesktopProfileTemplate } from './Desktop';
 import { MobileProfileTemplate } from './Mobile';
@@ -13,12 +13,17 @@ type ProfileProps = Readonly<{
 
 export const ProfileTemplate: React.FC<ProfileProps> = ({ user }) => {
     const userResolved = use(user);
-    const { t } = useLocale();
 
-    console.log(userResolved);
+    const { t } = useLocale();
+    const { authResolved, user: currentUser } = useAuth();
+
+    const isCurrentUser = authResolved && currentUser?.id === userResolved.id;
 
     const profileNavigationItems: ProfileNavigationItem[] = [
-        { param: `dashboard`, label: t('app.profile.dashboard') },
+        ...(isCurrentUser
+            ? [{ param: `dashboard`, label: t('app.profile.dashboard') }]
+            : []),
+
         { param: `recipes`, label: t('app.profile.recipes') },
         { param: `cookbooks`, label: t('app.profile.cookbooks') }
     ];
@@ -28,10 +33,14 @@ export const ProfileTemplate: React.FC<ProfileProps> = ({ user }) => {
             <DesktopProfileTemplate
                 className={'hidden md:block'}
                 items={profileNavigationItems}
+                user={userResolved}
+                isCurrentUser={isCurrentUser}
             />
             <MobileProfileTemplate
                 className={'md:hidden'}
                 items={profileNavigationItems}
+                user={userResolved}
+                isCurrentUser={isCurrentUser}
             />
         </React.Fragment>
     );

@@ -3,6 +3,7 @@ export * from './Form';
 export * from './IngredientsList';
 export * from './InstructionsList';
 export * from './Navigation';
+export * from './Profile';
 export * from './RecipeSearchInput';
 export * from './Recipe';
 export * from './ShoppingList';
