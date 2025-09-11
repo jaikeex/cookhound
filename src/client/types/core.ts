@@ -6,3 +6,8 @@ export type AlertPayload = {
     message: string;
     variant: SnackbarVariant;
 };
+
+export type ProfileNavigationItem = {
+    param: string;
+    label: string;
+};
