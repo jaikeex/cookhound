@@ -27,5 +27,6 @@ export const icons = {
     starHalf: iconsSvg.StarHalfIcon,
     sun: iconsSvg.SunIcon,
     time: iconsSvg.TimeIcon,
+    threeDots: iconsSvg.ThreeDotsIcon,
     upload: iconsSvg.UploadIcon
 };

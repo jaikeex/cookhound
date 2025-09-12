@@ -21,6 +21,7 @@ import StarIcon from './star.svg';
 import StarFullIcon from './star-full.svg';
 import StarHalfIcon from './star-half.svg';
 import SunIcon from './sun.svg';
+import ThreeDotsIcon from './three-dots.svg';
 import UploadIcon from './upload.svg';
 
 export const basicSvg = {
@@ -47,5 +48,6 @@ export const basicSvg = {
     StarFullIcon,
     StarHalfIcon,
     SunIcon,
+    ThreeDotsIcon,
     UploadIcon
 };
