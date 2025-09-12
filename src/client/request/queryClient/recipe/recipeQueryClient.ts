@@ -14,7 +14,11 @@ import type {
     SearchRecipesInfiniteOptions,
     CreateRecipeOptions,
     RateRecipeOptions,
-    RegisterRecipeVisitOptions
+    RegisterRecipeVisitOptions,
+    UserSearchRecipesOptions,
+    UserRecipesOptions,
+    UserSearchRecipesInfiniteOptions,
+    UserRecipesInfiniteOptions
 } from './types';
 import { RECIPE_QUERY_KEYS } from './types';
 
@@ -198,6 +202,161 @@ class RecipeQueryClient {
                 return allPages.length + 1;
             },
             enabled: Boolean(query && language && perPage),
+            ...options
+        });
+
+    /**
+     * Searches for recipes by user (non-infinite).
+     *
+     * Key: RECIPE_QUERY_KEYS.userSearchRecipes(userId, query, language, batch, perPage)
+     * Stale time: default
+     * Retry: 1
+     * Placeholder data: Keep previous
+     */
+    useUserSearchRecipes = (
+        userId: string,
+        query: string,
+        language: Locale,
+        batch: number,
+        perPage: number,
+        options?: Partial<UserSearchRecipesOptions>
+    ) =>
+        useAppQuery(
+            RECIPE_QUERY_KEYS.userSearchRecipes(
+                userId,
+                query,
+                language,
+                batch,
+                perPage
+            ),
+            () =>
+                apiClient.recipe.searchUserRecipes(
+                    userId,
+                    query,
+                    language,
+                    batch,
+                    perPage
+                ),
+            {
+                enabled: Boolean(
+                    userId && query && language && batch > 0 && perPage
+                ),
+                retry: 1,
+                placeholderData: keepPreviousData,
+                ...options
+            }
+        );
+
+    /**
+     * Searches for recipes by user (infinite).
+     *
+     * Key: RECIPE_QUERY_KEYS.userSearchRecipesInfinite(userId, query, language, perPage)
+     * Stale time: default
+     */
+    useUserSearchRecipesInfinite = (
+        userId: string,
+        query: string,
+        language: Locale,
+        perPage: number,
+        maxBatches?: number,
+        options?: Partial<UserSearchRecipesInfiniteOptions>
+    ) =>
+        useInfiniteQuery({
+            queryKey: [
+                ...RECIPE_QUERY_KEYS.userSearchRecipesInfinite(
+                    userId,
+                    query,
+                    language,
+                    perPage
+                )
+            ],
+            initialPageParam: 1,
+            queryFn: ({ pageParam }) =>
+                apiClient.recipe.searchUserRecipes(
+                    userId,
+                    query,
+                    language,
+                    Number(pageParam ?? 1),
+                    perPage
+                ),
+            getNextPageParam: (lastPage, allPages) => {
+                if (lastPage.length < perPage) return null;
+                if (maxBatches !== undefined && allPages.length >= maxBatches)
+                    return null;
+                return allPages.length + 1;
+            },
+            enabled: Boolean(userId && query && language && perPage),
+            ...options
+        });
+
+    /**
+     * Gets a paginated list of recipes by user (non-infinite).
+     *
+     * Key: RECIPE_QUERY_KEYS.userRecipes(userId, language, batch, perPage)
+     * Stale time: default
+     * Retry: 1
+     * Placeholder data: Keep previous
+     */
+    useUserRecipes = (
+        userId: string,
+        language: Locale,
+        batch: number,
+        perPage: number,
+        options?: Partial<UserRecipesOptions>
+    ) =>
+        useAppQuery(
+            RECIPE_QUERY_KEYS.userRecipes(userId, language, batch, perPage),
+            () =>
+                apiClient.recipe.getUserRecipes(
+                    userId,
+                    language,
+                    batch,
+                    perPage
+                ),
+            {
+                enabled: Boolean(userId && language && batch > 0 && perPage),
+                retry: 1,
+                placeholderData: keepPreviousData,
+                ...options
+            }
+        );
+
+    /**
+     * Gets a paginated list of recipes by user (infinite).
+     *
+     * Key: RECIPE_QUERY_KEYS.userRecipesInfinite(userId, language, perPage)
+     * Stale time: default
+     */
+    useUserRecipesInfinite = (
+        userId: string,
+        language: Locale,
+        perPage: number,
+        maxBatches?: number,
+        options?: Partial<UserRecipesInfiniteOptions>
+    ) =>
+        useInfiniteQuery({
+            queryKey: [
+                ...RECIPE_QUERY_KEYS.userRecipesInfinite(
+                    userId,
+                    language,
+                    perPage
+                )
+            ],
+            initialPageParam: 1,
+            queryFn: ({ pageParam }) =>
+                apiClient.recipe.getUserRecipes(
+                    userId,
+                    language,
+                    Number(pageParam ?? 1),
+                    perPage
+                ),
+            getNextPageParam: (lastPage, allPages) => {
+                if (lastPage.length < perPage) return null;
+                if (maxBatches !== undefined && allPages.length >= maxBatches)
+                    return null;
+                return allPages.length + 1;
+            },
+            enabled: Boolean(userId && language && perPage),
             ...options
         });
 

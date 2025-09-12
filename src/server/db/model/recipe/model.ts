@@ -13,7 +13,9 @@ import {
     getRecipeById,
     getFrontPageRecipes,
     getManyRecipes,
-    searchRecipes
+    searchRecipes,
+    getUserRecipes,
+    searchUserRecipes
 } from '@prisma/client/sql';
 
 //|=============================================================================================|//
@@ -116,6 +118,47 @@ class RecipeModel {
         return recipes;
     }
 
+    async getManyForUser(
+        userId: number,
+        language: string,
+        limit: number,
+        offset: number,
+        ttl?: number
+    ): Promise<getUserRecipes.Result[]> {
+        const cacheKey = generateCacheKey('recipe', 'findManyForUser', {
+            userId,
+            language,
+            limit,
+            offset
+        });
+
+        log.trace('Getting many recipes for user', {
+            userId,
+            language,
+            limit,
+            offset
+        });
+
+        const recipes = await cachePrismaQuery(
+            cacheKey,
+            async () => {
+                log.trace('Fetching many recipes for user from db', {
+                    userId,
+                    language,
+                    limit,
+                    offset
+                });
+
+                return prisma.$queryRawTyped(
+                    getUserRecipes(userId, language, limit, offset)
+                );
+            },
+            ttl ?? CACHE_TTL.TTL_1
+        );
+
+        return recipes;
+    }
+
     //~=========================================================================================~//
     //$                                 FRONT PAGE COLLECTION                                   $//
     //~=========================================================================================~//
@@ -205,6 +248,64 @@ class RecipeModel {
 
                 return prisma.$queryRawTyped(
                     searchRecipes(
+                        language,
+                        searchTerm,
+                        searchTerm,
+                        searchTerm,
+                        searchTerm,
+                        limit,
+                        offset
+                    )
+                );
+            },
+            ttl ?? CACHE_TTL.TTL_1
+        );
+
+        return recipes;
+    }
+
+    /**
+     * Search for recipes by text for a specific user. Includes recipes with active flags and their flag information.
+     * Query class -> C1
+     */
+    async searchManyByTextForUser(
+        userId: number,
+        searchTerm: string,
+        language: string,
+        limit: number,
+        offset: number,
+        ttl?: number
+    ): Promise<searchUserRecipes.Result[]> {
+        const cacheKey = generateCacheKey('recipe', 'searchForUser', {
+            userId,
+            searchTerm,
+            language,
+            limit,
+            offset
+        });
+
+        log.trace('Searching recipes for user', {
+            userId,
+            searchTerm,
+            language,
+            limit,
+            offset
+        });
+
+        const recipes = await cachePrismaQuery(
+            cacheKey,
+            async () => {
+                log.trace('Fetching searched recipes for user from db', {
+                    userId,
+                    searchTerm,
+                    language,
+                    limit,
+                    offset
+                });
+
+                return prisma.$queryRawTyped(
+                    searchUserRecipes(
+                        userId,
                         language,
                         searchTerm,
                         searchTerm,

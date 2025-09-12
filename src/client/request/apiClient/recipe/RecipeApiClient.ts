@@ -116,6 +116,58 @@ class RecipeApiClient {
     }
 
     /**
+     * Gets a paginated list of recipes by user by calling `GET /api/recipes/user/{userId}`.
+     *
+     * @param userId - The ID of the user to fetch recipes for.
+     * @param language - The language of the recipes to fetch.
+     * @param batch - The batch number to fetch.
+     * @param perPage - The number of recipes per page.
+     * @param config - Optional fetch request configuration.
+     * @returns A promise that resolves to the paginated list of recipes.
+     * @throws {Error} Throws an error if the request fails.
+     */
+    async getUserRecipes(
+        userId: string,
+        language: Locale,
+        batch: number,
+        perPage: number,
+        config?: RequestConfig
+    ): Promise<RecipeForDisplayDTO[]> {
+        return await apiRequestWrapper.get({
+            url: `/recipes/user/${userId}`,
+            params: { language, batch, perPage },
+            ...config
+        });
+    }
+
+    /**
+     * Searches for recipes by user by calling `GET /api/recipes/user/{userId}/search`.
+     *
+     * @param userId - The ID of the user to search for.
+     * @param query - The query to search for.
+     * @param language - The language of the recipes to search for.
+     * @param batch - The batch number to fetch.
+     * @param perPage - The number of recipes per page.
+     * @param config - Optional fetch request configuration.
+     * @returns A promise that resolves to the search results.
+     * @throws {Error} Throws an error if the request fails.
+     */
+    async searchUserRecipes(
+        userId: string,
+        query: string,
+        language: Locale,
+        batch: number,
+        perPage: number,
+        config?: RequestConfig
+    ): Promise<RecipeForDisplayDTO[]> {
+        return await apiRequestWrapper.get({
+            url: `/recipes/user/${userId}/search`,
+            params: { query, language, batch, perPage },
+            ...config
+        });
+    }
+
+    /**
      * Creates a new recipe by calling `POST /api/recipes`.
      *
      * @param recipe - The recipe data for creation.

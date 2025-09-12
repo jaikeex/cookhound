@@ -59,6 +59,66 @@ export const RECIPE_QUERY_KEYS = Object.freeze({
             language,
             perPage,
             'infinite'
+        ] as const,
+
+    userRecipes: (
+        userId: string,
+        language: Locale,
+        batch: number,
+        perPage: number
+    ) =>
+        [
+            RECIPE_NAMESPACE_QUERY_KEY,
+            'user',
+            userId,
+            language,
+            batch,
+            perPage
+        ] as const,
+
+    userRecipesInfinite: (userId: string, language: Locale, perPage: number) =>
+        [
+            RECIPE_NAMESPACE_QUERY_KEY,
+            'user',
+            userId,
+            language,
+            perPage,
+            'infinite'
+        ] as const,
+
+    userSearchRecipes: (
+        userId: string,
+        query: string,
+        language: Locale,
+        batch: number,
+        perPage: number
+    ) =>
+        [
+            RECIPE_NAMESPACE_QUERY_KEY,
+            'user',
+            userId,
+            'search',
+            query,
+            language,
+            batch,
+            perPage
+        ] as const,
+
+    userSearchRecipesInfinite: (
+        userId: string,
+        query: string,
+        language: Locale,
+        perPage: number
+    ) =>
+        [
+            RECIPE_NAMESPACE_QUERY_KEY,
+            'user',
+            userId,
+            'search',
+            query,
+            language,
+            perPage,
+            'infinite'
         ] as const
 });
 
@@ -118,6 +178,48 @@ export type SearchRecipesOptions = Omit<
 >;
 
 export type SearchRecipesInfiniteOptions = Omit<
+    UseInfiniteQueryOptions<
+        RecipeForDisplayDTO[],
+        RequestError,
+        RecipeForDisplayDTO[],
+        QueryKey,
+        number
+    >,
+    'queryKey' | 'queryFn' | 'initialPageParam' | 'getNextPageParam'
+>;
+
+export type UserRecipesOptions = Omit<
+    UseQueryOptions<
+        RecipeForDisplayDTO[],
+        RequestError,
+        RecipeForDisplayDTO[],
+        ReturnType<typeof RECIPE_QUERY_KEYS.userRecipes>
+    >,
+    'queryKey' | 'queryFn'
+>;
+
+export type UserRecipesInfiniteOptions = Omit<
+    UseInfiniteQueryOptions<
+        RecipeForDisplayDTO[],
+        RequestError,
+        RecipeForDisplayDTO[],
+        QueryKey,
+        number
+    >,
+    'queryKey' | 'queryFn' | 'initialPageParam' | 'getNextPageParam'
+>;
+
+export type UserSearchRecipesOptions = Omit<
+    UseQueryOptions<
+        RecipeForDisplayDTO[],
+        RequestError,
+        RecipeForDisplayDTO[],
+        ReturnType<typeof RECIPE_QUERY_KEYS.userSearchRecipes>
+    >,
+    'queryKey' | 'queryFn'
+>;
+
+export type UserSearchRecipesInfiniteOptions = Omit<
     UseInfiniteQueryOptions<
         RecipeForDisplayDTO[],
         RequestError,

@@ -647,6 +647,121 @@ class RecipeService {
 
         return paginatedResults;
     }
+
+    //~-----------------------------------------------------------------------------------------~//
+    //$                                 USER RECIPES FETCH                                      $//
+    //~-----------------------------------------------------------------------------------------~//
+
+    async getUserRecipes(
+        userId: number,
+        language: Locale,
+        batch: number,
+        perPage: number = 24
+    ): Promise<RecipeForDisplayDTO[]> {
+        log.trace('getUserRecipes - attempt', {
+            userId,
+            language,
+            batch,
+            perPage
+        });
+
+        if (perPage <= 0 || perPage > 100) {
+            log.warn('getFrontPageRecipes - invalid perPage requested', {
+                perPage
+            });
+            throw new ValidationError(
+                undefined,
+                ApplicationErrorCode.VALIDATION_FAILED
+            );
+        }
+
+        const offset = (batch - 1) * perPage;
+
+        const recipes = await db.recipe.getManyForUser(
+            userId,
+            language,
+            perPage,
+            offset
+        );
+
+        if (!recipes || !Array.isArray(recipes) || recipes.length === 0) {
+            log.info('getUserRecipes - no recipes found');
+            return [];
+        }
+
+        const results = recipes.map((recipe) => ({
+            id: recipe.id ?? 0,
+            displayId: recipe.displayId ?? '',
+            title: recipe.title ?? '',
+            imageUrl: recipe.imageUrl || '',
+            rating: recipe.rating ? Number(recipe.rating) : null,
+            timesRated: recipe.timesRated ?? 0,
+            time: recipe.time ?? 0,
+            portionSize: recipe.portionSize,
+            flags: recipe.flags as RecipeFlagDTO[] | null
+        }));
+
+        return results;
+    }
+
+    //~-----------------------------------------------------------------------------------------~//
+    //$                                   USER RECIPES SEARCH                                   $//
+    //~-----------------------------------------------------------------------------------------~//
+
+    async searchUserRecipes(
+        userId: number,
+        query: string,
+        language: Locale,
+        batch: number,
+        perPage: number = 24
+    ): Promise<RecipeForDisplayDTO[]> {
+        log.trace('searchUserRecipes - attempt', {
+            userId,
+            query,
+            language,
+            batch,
+            perPage
+        });
+
+        if (perPage <= 0 || perPage > 100) {
+            log.warn('searchUserRecipes - invalid perPage requested', {
+                perPage
+            });
+            throw new ValidationError(
+                undefined,
+                ApplicationErrorCode.VALIDATION_FAILED
+            );
+        }
+
+        const offset = (batch - 1) * perPage;
+
+        const recipes = await db.recipe.searchManyByTextForUser(
+            userId,
+            query,
+            language,
+            perPage,
+            offset
+        );
+
+        if (!recipes || !Array.isArray(recipes) || recipes.length === 0) {
+            log.info('searchUserRecipes - no recipes found');
+            return [];
+        }
+
+        const results = recipes.map((recipe) => ({
+            id: recipe.id ?? 0,
+            displayId: recipe.displayId ?? '',
+            title: recipe.title ?? '',
+            imageUrl: recipe.imageUrl || '',
+            rating: recipe.rating ? Number(recipe.rating) : null,
+            timesRated: recipe.timesRated ?? 0,
+            time: recipe.time ?? 0,
+            portionSize: recipe.portionSize,
+            flags: recipe.flags as RecipeFlagDTO[] | null
+        }));
+
+        return results;
+    }
 }
 
 export const recipeService = new RecipeService();
