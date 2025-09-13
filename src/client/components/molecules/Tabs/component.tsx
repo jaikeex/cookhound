@@ -154,7 +154,7 @@ export const Tabs: React.FC<TabsProps> = ({
                     }}
                 />
             </div>
-            <div className={'px-2 mt-3'}>{tabs[currentTab].content}</div>
+            <div className={'mt-3'}>{tabs[currentTab].content}</div>
         </div>
     );
 };

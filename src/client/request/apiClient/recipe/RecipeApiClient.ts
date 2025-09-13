@@ -187,6 +187,25 @@ class RecipeApiClient {
     }
 
     /**
+     * Updates a recipe by calling `PUT /api/recipes/{id}`.
+     *
+     * @param id - The ID of the recipe to update.
+     * @param recipe - The recipe data for update.
+     * @param config - Optional fetch request configuration.
+     */
+    async updateRecipe(
+        id: string,
+        recipe: Partial<RecipeForCreatePayload>,
+        config?: RequestConfig
+    ): Promise<RecipeDTO> {
+        return await apiRequestWrapper.put({
+            url: `/recipes/${id}`,
+            data: recipe,
+            ...config
+        });
+    }
+
+    /**
      * Deletes a recipe by calling `DELETE /api/recipes/{id}`.
      *
      * @param id - The ID of the recipe to delete.

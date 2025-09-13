@@ -19,9 +19,11 @@ import type {
     UserRecipesOptions,
     UserSearchRecipesInfiniteOptions,
     UserRecipesInfiniteOptions,
-    DeleteRecipeOptions
+    DeleteRecipeOptions,
+    UpdateRecipeOptions
 } from './types';
 import { RECIPE_QUERY_KEYS } from './types';
+import type { RecipeForCreatePayload } from '@/common/types/recipe';
 
 class RecipeQueryClient {
     /**
@@ -366,6 +368,21 @@ class RecipeQueryClient {
      */
     useCreateRecipe = (options?: Partial<CreateRecipeOptions>) =>
         useAppMutation(apiClient.recipe.createRecipe, options);
+
+    /**
+     * Updates a recipe.
+     */
+    useUpdateRecipe = (options?: Partial<UpdateRecipeOptions>) =>
+        useAppMutation(
+            ({
+                id,
+                recipe
+            }: {
+                id: string;
+                recipe: Partial<RecipeForCreatePayload>;
+            }) => apiClient.recipe.updateRecipe(id, recipe),
+            options
+        );
 
     /**
      * Deletes a recipe.

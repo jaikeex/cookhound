@@ -1,3 +1,5 @@
+'use client';
+
 import { useCallback, useMemo, useState } from 'react';
 import type { RecipeForDisplayDTO } from '@/common/types';
 import { useLocale } from '@/client/store/I18nContext';

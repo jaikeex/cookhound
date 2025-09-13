@@ -235,6 +235,15 @@ export type CreateRecipeOptions = Omit<
     'mutationFn'
 >;
 
+export type UpdateRecipeOptions = Omit<
+    UseMutationOptions<
+        RecipeDTO,
+        RequestError,
+        { id: string; recipe: Partial<RecipeForCreatePayload> }
+    >,
+    'mutationFn'
+>;
+
 export type DeleteRecipeOptions = Omit<
     UseMutationOptions<unknown, RequestError, number>,
     'mutationFn'

@@ -10,6 +10,7 @@ import type { I18nMessage } from '@/client/locales';
 
 type ImageInputProps = Readonly<{
     className?: string;
+    defaultImageUrl?: string;
     maxHeight?: number;
     maxSize?: number;
     maxWidth?: number;
@@ -22,6 +23,7 @@ const INPUT_ID = 'dropzone-file';
 
 export const ImageInput: React.FC<ImageInputProps> = ({
     className,
+    defaultImageUrl,
     maxHeight = 1920,
     maxSize = 2 * 1024 * 1024,
     maxWidth = 1920,
@@ -34,7 +36,9 @@ export const ImageInput: React.FC<ImageInputProps> = ({
     //|-----------------------------------------------------------------------------------------|//
 
     const [isDragging, setIsDragging] = useState(false);
-    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(
+        defaultImageUrl ?? null
+    );
     const { alert, clearAlerts } = useSnackbar();
     const { t } = useLocale();
     const { openModal } = useModal();

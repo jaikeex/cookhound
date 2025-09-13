@@ -21,7 +21,7 @@ export const MobileProfileTemplate: React.FC<MobileRecipeViewProps> = ({
     const tabs: TabContent[] = items.map((item) => ({
         title: item.label,
         param: item.param,
-        content: <div>{item.label}</div>
+        content: item.content
     }));
 
     return (

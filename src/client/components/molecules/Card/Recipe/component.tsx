@@ -3,16 +3,7 @@ import { Icon, RecipeImage, Typography } from '@/client/components/atoms';
 import { RecipeInfo } from '@/client/components/molecules/RecipeInfo';
 import { Rating } from '@/client/components/molecules';
 import Link from 'next/link';
-
-type RecipeCardProps = Readonly<{
-    displayId: string;
-    title: string;
-    imageUrl: string;
-    time: number;
-    rating: number | null;
-    portionSize: number | null;
-    index?: number;
-}>;
+import type { RecipeCardProps } from '@/client/components/molecules/Card/types';
 
 export const RecipeCard: React.FC<RecipeCardProps> = ({
     displayId,

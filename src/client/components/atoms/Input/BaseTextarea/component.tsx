@@ -5,13 +5,15 @@ import { classNames } from '@/client/utils';
 
 export type BaseTextareaProps = Readonly<{
     className?: string;
+    defaultValue?: string | null;
     minRows?: number;
     maxRows?: number;
 }> &
-    React.TextareaHTMLAttributes<HTMLTextAreaElement>;
+    Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'defaultValue'>;
 
 export const BaseTextarea: React.FC<BaseTextareaProps> = ({
     className,
+    defaultValue,
     minRows = 2,
     maxRows,
     onInput,
@@ -61,6 +63,7 @@ export const BaseTextarea: React.FC<BaseTextareaProps> = ({
     return (
         <textarea
             {...props}
+            defaultValue={defaultValue ?? undefined}
             ref={textareaRef}
             onInput={handleInput}
             className={classNames(

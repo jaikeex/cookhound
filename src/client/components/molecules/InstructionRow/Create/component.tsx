@@ -6,6 +6,7 @@ import { useCreateRecipeStore } from '@/client/store/app-store/useCreateRecipeSt
 
 type InstructionRowCreateProps = Readonly<{
     className?: string;
+    defaultInstruction?: string | null;
     dragIndex: number;
     index: number;
     onAddInstruction?: () => void;
@@ -15,13 +16,16 @@ type InstructionRowCreateProps = Readonly<{
 
 export const InstructionRowCreate: React.FC<InstructionRowCreateProps> = ({
     className,
+    defaultInstruction,
     dragIndex,
     index,
     onAddInstruction,
     onChange,
     onRemove
 }) => {
-    const [instruction, setInstruction] = useState<string>('');
+    const [instruction, setInstruction] = useState<string>(
+        defaultInstruction ?? ''
+    );
     const { recipeObject } = useCreateRecipeStore();
 
     const disableHandling =
@@ -66,6 +70,7 @@ export const InstructionRowCreate: React.FC<InstructionRowCreateProps> = ({
             disableDrag={disableHandling}
         >
             <BaseTextarea
+                defaultValue={defaultInstruction}
                 id={`instruction-${index}`}
                 name={`instruction-${index}`}
                 placeholder={index === 0 ? 'Předehřej troubu na 180°C' : ''}

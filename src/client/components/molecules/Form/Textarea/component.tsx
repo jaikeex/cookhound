@@ -5,14 +5,16 @@ import { classNames } from '@/client/utils';
 import { BaseTextarea } from '@/client/components/atoms/Input/BaseTextarea/component';
 
 export type TextareaProps = Readonly<{
+    defaultValue?: string | null;
     onChange?: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
     onKeyDown?: (event: React.KeyboardEvent<HTMLTextAreaElement>) => void;
     placeholder?: string;
 }> &
-    FormInputProps;
+    Omit<FormInputProps, 'defaultValue'>;
 
 export const Textarea: React.FC<TextareaProps> = ({
     className,
+    defaultValue,
     disabled,
     error,
     id,
@@ -26,6 +28,7 @@ export const Textarea: React.FC<TextareaProps> = ({
         <div className={classNames('w-full relative', className)}>
             <InputLabel htmlFor={id} text={label} disabled={disabled} />
             <BaseTextarea
+                defaultValue={defaultValue}
                 placeholder={placeholder}
                 className={className}
                 id={id}

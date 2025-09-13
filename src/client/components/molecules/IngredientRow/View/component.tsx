@@ -75,9 +75,9 @@ export const IngredientRowView: React.FC<IngredientRowViewProps> = ({
             onClick={handleRowClick}
         >
             <div
-                className={`flex items-center ${checked ? '[&>p]:text-gray-300 [&>p]:dark:text-gray-600' : ''} justify-between w-full`}
+                className={`flex items-center ${checked ? '[&>p]:text-gray-300 [&>p]:dark:text-gray-600' : ''}  w-full`}
             >
-                <Typography variant={typographyVariant}>
+                <Typography variant={typographyVariant} className={`font-bold`}>
                     {ingredient.name}
                 </Typography>
                 {ingredient.quantity && ingredient.name ? (
@@ -86,6 +86,9 @@ export const IngredientRowView: React.FC<IngredientRowViewProps> = ({
                             variant={typographyVariant}
                             className={`font-bold`}
                         >
+                            &nbsp;&nbsp;&nbsp;&ndash;&nbsp;&nbsp;&nbsp;
+                        </Typography>
+                        <Typography variant={typographyVariant}>
                             {ingredient.quantity}
                         </Typography>
                     </React.Fragment>

@@ -9,17 +9,21 @@ import React, { useCallback, useState } from 'react';
 
 type TagSelectionProps = Readonly<{
     className?: string;
+    defaultTags?: RecipeTagDTO[] | null;
     onConfirm?: (tags: RecipeTagDTO[]) => void;
 }>;
 
 export const TagSelection: React.FC<TagSelectionProps> = ({
     className,
+    defaultTags,
     onConfirm
 }) => {
     const { locale, t } = useLocale();
     const { openModal } = useModal();
 
-    const [selectedTags, setSelectedTags] = useState<RecipeTagDTO[]>([]);
+    const [selectedTags, setSelectedTags] = useState<RecipeTagDTO[]>(
+        defaultTags ?? []
+    );
 
     const { data: tagLists, isLoading, error } = chqc.tag.useTags(locale);
 

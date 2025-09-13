@@ -5,12 +5,14 @@ import { classNames } from '@/client/utils';
 
 export type NumberInputProps = Readonly<{
     allowDecimals?: boolean;
+    defaultValue?: number | null;
     max?: number;
 }> &
-    Omit<FormInputProps, 'type'>;
+    Omit<FormInputProps, 'type' | 'defaultValue'>;
 
 export const NumberInput: React.FC<NumberInputProps> = ({
     className,
+    defaultValue,
     disabled,
     error,
     id,
@@ -39,6 +41,7 @@ export const NumberInput: React.FC<NumberInputProps> = ({
             <InputLabel htmlFor={id} text={label} disabled={disabled} />
             <BaseInput
                 type={'number'}
+                defaultValue={defaultValue}
                 className={className}
                 id={id}
                 name={name}

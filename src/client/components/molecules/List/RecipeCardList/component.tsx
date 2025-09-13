@@ -5,6 +5,7 @@ import { useInfinityScroll } from '@/client/hooks';
 import type { RecipeForDisplayDTO } from '@/common/types';
 import { classNames } from '@/client/utils';
 import * as React from 'react';
+import { RecipeWithHandling } from '@/client/components/molecules';
 
 type RecipeCardListProps = Readonly<{
     className?: string;
@@ -12,6 +13,7 @@ type RecipeCardListProps = Readonly<{
     hasMore: boolean;
     isLoading?: boolean;
     recipes: RecipeForDisplayDTO[];
+    withHandling?: boolean;
 }>;
 
 export const RecipeCardList: React.FC<RecipeCardListProps> = ({
@@ -19,13 +21,16 @@ export const RecipeCardList: React.FC<RecipeCardListProps> = ({
     loadMore,
     hasMore,
     isLoading,
-    recipes
+    recipes,
+    withHandling = false
 }) => {
     const { sentinelRef } = useInfinityScroll({
         loadMore,
         hasMore,
         isLoading
     });
+
+    const RecipeCardComponent = withHandling ? RecipeWithHandling : RecipeCard;
 
     return (
         <React.Fragment>
@@ -36,8 +41,9 @@ export const RecipeCardList: React.FC<RecipeCardListProps> = ({
                 )}
             >
                 {recipes.map((recipe, index) => (
-                    <RecipeCard
+                    <RecipeCardComponent
                         key={`${recipe.id}-${index}`}
+                        id={recipe.id}
                         displayId={recipe.displayId}
                         title={recipe.title}
                         imageUrl={recipe.imageUrl}

@@ -5,6 +5,7 @@ import { BaseInput } from '@/client/components';
 import { DraggableInputRow } from '@/client/components/molecules/Form/DraggableInputRow';
 import type { Ingredient } from '@/common/types';
 import { useCreateRecipeStore } from '@/client/store/app-store/useCreateRecipeStore';
+import { useLocale } from '@/client/store';
 
 type IngredientRowCreateProps = Readonly<{
     className?: string;
@@ -13,6 +14,7 @@ type IngredientRowCreateProps = Readonly<{
     onAddIngredient?: () => void;
     onChange?: (ingredient: Ingredient) => void;
     onRemove?: (index: number) => void;
+    defaultIngredient?: Ingredient;
 }>;
 
 export const IngredientRowCreate: React.FC<IngredientRowCreateProps> = ({
@@ -21,9 +23,15 @@ export const IngredientRowCreate: React.FC<IngredientRowCreateProps> = ({
     index,
     onAddIngredient,
     onChange,
-    onRemove
+    onRemove,
+    defaultIngredient
 }) => {
-    const [ingredient, setIngredient] = useState<Ingredient>({} as Ingredient);
+    const { t } = useLocale();
+
+    const [ingredient, setIngredient] = useState<Ingredient>(
+        defaultIngredient ?? ({} as Ingredient)
+    );
+
     const { recipeObject } = useCreateRecipeStore();
 
     const disableHandling =
@@ -80,7 +88,6 @@ export const IngredientRowCreate: React.FC<IngredientRowCreateProps> = ({
         },
         [ingredient, onChange]
     );
-
     useEffect(() => {
         if (ingredient.name || ingredient.quantity) {
             onChange && onChange(ingredient);
@@ -98,20 +105,27 @@ export const IngredientRowCreate: React.FC<IngredientRowCreateProps> = ({
             disableDrag={disableHandling}
         >
             <BaseInput
-                className={'w-1/4'}
-                id={`ingredient-quantity-${index}`}
-                name={`ingredient-quantity-${index}`}
-                placeholder={index === 0 ? '200 g' : ''}
-                onChange={handleQuantityChange}
-                onKeyDown={handleQuantityKeyPress}
-            />
-
-            <BaseInput
+                defaultValue={defaultIngredient?.name}
                 id={`ingredient-name-${index}`}
                 name={`ingredient-name-${index}`}
-                placeholder={index === 0 ? 'Cibule' : ''}
+                placeholder={
+                    index === 0 ? t('app.recipe.ingredient-placeholder') : ''
+                }
                 onChange={handleNameChange}
                 onKeyDown={handleNameKeyPress}
+            />
+            <BaseInput
+                className={'w-1/4'}
+                defaultValue={defaultIngredient?.quantity}
+                id={`ingredient-quantity-${index}`}
+                name={`ingredient-quantity-${index}`}
+                placeholder={
+                    index === 0
+                        ? t('app.recipe.ingredient-quantity-placeholder')
+                        : ''
+                }
+                onChange={handleQuantityChange}
+                onKeyDown={handleQuantityKeyPress}
             />
         </DraggableInputRow>
     );

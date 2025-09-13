@@ -6,6 +6,8 @@ import {
     invalidateCacheByPattern,
     invalidateModelCache
 } from '@/server/db/model/model-cache';
+import { NotFoundError } from '@/server/error';
+import { ApplicationErrorCode } from '@/server/error/codes';
 import { prisma } from '@/server/integrations';
 import { Logger } from '@/server/logger';
 import type { Prisma, Recipe } from '@prisma/client';
@@ -441,21 +443,125 @@ class RecipeModel {
     /**
      * Update a recipe by id
      * Write class -> W1
+     *
+     *? IMPORTANT: Passing any of the relation fields REPLACES the existing relations. The previous records
+     *? are deleted and recreated in the same manner as when creating a new recipe. Omitting a relation
+     *? field leaves that relation untouched.
      */
     async updateOneById(
         id: number,
-        data: Prisma.RecipeUpdateInput
+        data: Prisma.RecipeUpdateInput & {
+            instructions?: string[];
+            ingredients?: { name: string; quantity: string | null }[];
+            tags?: { id: number }[];
+        }
     ): Promise<Recipe> {
         log.trace('Updating recipe by id', { id });
 
-        const recipe = await prisma.recipe.update({
-            where: { id },
-            data
+        // Extract relation data so we can treat them separately.
+        // Everything left in `recipeData` can be passed directly to Prisma.
+        const { instructions, ingredients, tags, ...recipeData } =
+            data as typeof data & Record<string, unknown>;
+
+        const originalRecipe = await prisma.recipe.findUnique({
+            where: { id }
         });
 
-        await this.invalidateRecipeCache(recipe);
+        if (!originalRecipe) {
+            log.warn('updateOneById – recipe not found', { id });
+            throw new NotFoundError(
+                'app.error.not-found',
+                ApplicationErrorCode.RECIPE_NOT_FOUND
+            );
+        }
 
-        return recipe;
+        const updatedRecipe = await prisma.$transaction(async (tx) => {
+            if (Object.keys(recipeData).length > 0) {
+                await tx.recipe.update({ where: { id }, data: recipeData });
+            }
+
+            if (instructions !== undefined) {
+                await tx.instruction.deleteMany({ where: { recipeId: id } });
+
+                if (instructions.length > 0) {
+                    await tx.instruction.createMany({
+                        data: instructions.map((text, index) => ({
+                            recipeId: id,
+                            step: index + 1,
+                            text
+                        }))
+                    });
+                }
+            }
+
+            if (ingredients !== undefined) {
+                await tx.recipeIngredient.deleteMany({
+                    where: { recipeId: id }
+                });
+
+                const language =
+                    (recipeData as any).language ??
+                    originalRecipe.language ??
+                    'en';
+
+                for (let i = 0; i < ingredients.length; i++) {
+                    const ingredientData = ingredients[i];
+
+                    let ingredient = await tx.ingredient.findFirst({
+                        where: {
+                            name: ingredientData.name,
+                            language
+                        }
+                    });
+
+                    if (!ingredient) {
+                        ingredient = await tx.ingredient.create({
+                            data: {
+                                name: ingredientData.name,
+                                language
+                            }
+                        });
+                    }
+
+                    await tx.recipeIngredient.create({
+                        data: {
+                            recipeId: id,
+                            ingredientId: ingredient.id,
+                            quantity: ingredientData.quantity,
+                            ingredientOrder: i + 1
+                        }
+                    });
+                }
+            }
+
+            if (tags !== undefined) {
+                await tx.recipeTag.deleteMany({ where: { recipeId: id } });
+
+                if (tags.length > 0) {
+                    await tx.recipeTag.createMany({
+                        data: tags.map((tag) => ({
+                            recipeId: id,
+                            tagId: tag.id
+                        }))
+                    });
+                }
+            }
+
+            return (await tx.recipe.findUnique({
+                where: { id },
+                include: {
+                    ingredients: { include: { ingredient: true } },
+                    instructions: true
+                }
+            })) as Recipe;
+        });
+
+        await this.invalidateRecipeCache(
+            updatedRecipe,
+            originalRecipe ?? undefined
+        );
+
+        return updatedRecipe;
     }
 
     /**

@@ -10,6 +10,24 @@ import { usePathname } from 'next/navigation';
 
 const DISABLED_FOR_ROUTES = ['/recipe/create'];
 
+/**
+ * Check if the current pathname should disable the bottom navigation
+ *
+ * @param pathname - Current pathname
+ * @returns true if navigation should be disabled
+ */
+const isNavigationDisabled = (pathname: string): boolean => {
+    if (DISABLED_FOR_ROUTES.includes(pathname)) {
+        return true;
+    }
+
+    if (pathname.match(/^\/recipe\/[^/]+\/edit$/)) {
+        return true;
+    }
+
+    return false;
+};
+
 type BottomNavigationProps = Readonly<NonNullable<unknown>>;
 
 export const BottomNavigation: React.FC<BottomNavigationProps> = () => {
@@ -19,7 +37,7 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = () => {
 
     const isLoggedin = authResolved && !!user;
 
-    const isDisabled = DISABLED_FOR_ROUTES.includes(pathname);
+    const isDisabled = isNavigationDisabled(pathname);
 
     if (isDisabled) return null;
 

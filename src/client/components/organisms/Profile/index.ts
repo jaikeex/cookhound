@@ -1,1 +1,2 @@
-export * from './Mobile';
+export * from './Head';
+export * from './Body';

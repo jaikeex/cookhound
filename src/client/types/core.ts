@@ -10,4 +10,7 @@ export type AlertPayload = {
 export type ProfileNavigationItem = {
     param: string;
     label: string;
+    content: React.ReactNode | null;
 };
+
+export type RecipeFormMode = 'create' | 'edit';

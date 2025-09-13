@@ -1,5 +1,5 @@
 import React from 'react';
-import { Icon } from '@/client/components';
+import { Icon, Loader } from '@/client/components';
 import type { IconName } from '@/client/types';
 import { classNames } from '@/client/utils';
 
@@ -8,6 +8,7 @@ export type IconButtonProps = Readonly<{
     disabled?: boolean;
     icon: IconName;
     iconClassName?: string;
+    loading?: boolean;
     onClick?: () => void;
     size?: number;
     tabIndex?: number;
@@ -18,6 +19,7 @@ export const IconButton: React.FC<IconButtonProps> = ({
     disabled,
     icon,
     iconClassName,
+    loading,
     onClick = () => {},
     size,
     tabIndex
@@ -32,9 +34,13 @@ export const IconButton: React.FC<IconButtonProps> = ({
             tabIndex={tabIndex}
             type={'button'}
             onClick={onClick}
-            disabled={disabled}
+            disabled={disabled || loading}
         >
-            <Icon name={icon} size={size} className={iconClassName} />
+            {loading ? (
+                <Loader size="sm" className={iconClassName} />
+            ) : (
+                <Icon name={icon} size={size} className={iconClassName} />
+            )}
         </button>
     );
 };

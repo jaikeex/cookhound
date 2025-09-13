@@ -10,6 +10,7 @@ export * from './useKeyboardOpen';
 export * from './useLocalStorage';
 export * from './useOutsideClick';
 export * from './useRecipeDiscovery';
+export * from './useRecipeFormController/hook';
 export * from './useRunOnce';
 export * from './useScreenSize';
 export * from './useUnsavedChangesWarning';

@@ -11,6 +11,7 @@ import {
 } from '@/client/components';
 import { IngredientsListView } from '@/client/components/organisms/IngredientsList';
 import { useAuth, useLocale } from '@/client/store';
+import { classNames } from '@/client/utils';
 
 export type MobileRecipeBodyProps = Readonly<{
     isPreview?: boolean;
@@ -90,5 +91,13 @@ export const MobileRecipeBody: React.FC<MobileRecipeBodyProps> = ({
         }
     ];
 
-    return <Tabs tabs={tabs} buttonRowClassName={'sticky top-14 z-10'} />;
+    return (
+        <Tabs
+            tabs={tabs}
+            buttonRowClassName={classNames(
+                'sticky z-10',
+                isPreview ? '' : 'sticky top-14 '
+            )}
+        />
+    );
 };

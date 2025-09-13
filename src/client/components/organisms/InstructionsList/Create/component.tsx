@@ -7,20 +7,35 @@ import { useLocale } from '@/client/store';
 import { useScreenSize } from '@/client/hooks';
 
 type InstructionsListCreateProps = Readonly<{
+    defaultInstructions?: string[] | null;
     onChange?: (value: string[]) => void;
 }>;
 
 export const InstructionsListCreate: React.FC<InstructionsListCreateProps> = ({
+    defaultInstructions,
     onChange
 }) => {
     const { t } = useLocale();
     const { isDesktop } = useScreenSize();
 
     // used only for the draggable list - should not be used to determine the order of instructions
-    const [instructions, setInstructions] = useState<number[]>([0]);
+    const [instructions, setInstructions] = useState<number[]>(() =>
+        defaultInstructions && defaultInstructions.length > 0
+            ? defaultInstructions.map((_, idx) => idx)
+            : [0]
+    );
 
     // used to store the actual instruction values in the correct order
-    const [instructionValues, setInstructionValues] = useState<string[]>([]);
+    const [instructionValues, setInstructionValues] = useState<string[]>(
+        () => defaultInstructions ?? []
+    );
+
+    useEffect(() => {
+        if (!defaultInstructions) return;
+
+        setInstructions(defaultInstructions.map((_, idx) => idx));
+        setInstructionValues(defaultInstructions);
+    }, [defaultInstructions]);
 
     const handleAddInstruction = useCallback(() => {
         setInstructions((prev) => {
@@ -78,6 +93,7 @@ export const InstructionsListCreate: React.FC<InstructionsListCreateProps> = ({
                         dragIndex={key}
                         key={key}
                         index={index}
+                        defaultInstruction={defaultInstructions?.[index]}
                         onAddInstruction={handleAddInstruction}
                         onRemove={handleRemoveInstruction(key)}
                         onChange={handleRowChange(index)}

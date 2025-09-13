@@ -15,15 +15,18 @@ import {
     Typography
 } from '@/client/components';
 import { useAuth, useLocale } from '@/client/store';
-import type { Ingredient, RecipeTagDTO } from '@/common/types';
+import type { Ingredient, RecipeDTO, RecipeTagDTO } from '@/common/types';
 import type { I18nMessage } from '@/client/locales';
+import type { RecipeFormMode } from '@/client/types/core';
 // import { useFormStatus } from 'react-dom';
 
 type RecipeFormProps = Readonly<{
     className?: string;
     errors?: RecipeFormErrors;
+    mode: RecipeFormMode;
     onChange?: (name: string, value: any) => void;
     pending?: boolean;
+    defaultValues?: RecipeDTO | null;
 }>;
 
 export type RecipeFormErrors = {
@@ -37,7 +40,9 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({
     className,
     errors,
     onChange,
-    pending
+    pending,
+    defaultValues,
+    mode
 }) => {
     // This hook call does nothing at the moment as it only works with react server actions.
     // It is left here for reference and to possibly inspire another solution in the future :D
@@ -107,9 +112,20 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({
                 onUpload={handleImageChange}
                 name={'recipe-image'}
                 showPreview
+                defaultImageUrl={defaultValues?.imageUrl}
             />
 
+            {/* Hidden field to preserve the default imageUrl when no new image is uploaded */}
+            {defaultValues?.imageUrl && (
+                <input
+                    type="hidden"
+                    name="imageUrl"
+                    value={defaultValues.imageUrl}
+                />
+            )}
+
             <TextInput
+                defaultValue={defaultValues?.title}
                 id={'recipe-title'}
                 label={t('app.recipe.title')}
                 name={'title'}
@@ -123,6 +139,7 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({
             <div className={'flex flex-col gap-4 md:grid md:grid-cols-2'}>
                 <NumberInput
                     className={'mt-auto'}
+                    defaultValue={defaultValues?.portionSize}
                     id={'recipe-portionSize'}
                     label={t('app.recipe.servings')}
                     name={'portionSize'}
@@ -132,6 +149,7 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({
                     onKeyDown={handleInputKeyPress('recipe-time')}
                 />
                 <NumberInput
+                    defaultValue={defaultValues?.time}
                     id={'recipe-time'}
                     label={t('app.recipe.preparation-time')}
                     name={'time'}
@@ -154,7 +172,10 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({
                 />
             </div>
 
-            <IngredientsListCreate onChange={handleIngredientsChange} />
+            <IngredientsListCreate
+                onChange={handleIngredientsChange}
+                defaultIngredients={defaultValues?.ingredients}
+            />
 
             <Divider />
 
@@ -168,24 +189,35 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({
                 />
             </div>
 
-            <InstructionsListCreate onChange={handleInstructionsChange} />
+            <InstructionsListCreate
+                defaultInstructions={defaultValues?.instructions}
+                onChange={handleInstructionsChange}
+            />
 
             <Divider />
 
             <Textarea
+                defaultValue={defaultValues?.notes}
                 id={'notes'}
                 label={t('app.recipe.notes')}
                 name={'notes'}
                 onChange={handleInputChange('notes')}
             />
 
-            <TagSelection onConfirm={handleTagSelection} />
+            <TagSelection
+                defaultTags={defaultValues?.tags}
+                onConfirm={handleTagSelection}
+            />
 
             <Submit
                 className="min-w-40 !mt-6 mx-auto w-full"
                 disabled={pending || !isLoggedin}
                 pending={pending}
-                label={t('app.recipe.create')}
+                label={
+                    mode === 'create'
+                        ? t('app.recipe.create')
+                        : t('app.recipe.update')
+                }
             />
 
             {errors?.server ? (

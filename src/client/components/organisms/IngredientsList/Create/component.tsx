@@ -11,20 +11,35 @@ import { useLocale } from '@/client/store';
 import { useScreenSize } from '@/client/hooks';
 
 type IngredientsListCreateProps = Readonly<{
+    defaultIngredients?: Ingredient[] | null;
     onChange?: (value: Ingredient[]) => void;
 }>;
 
 export const IngredientsListCreate: React.FC<IngredientsListCreateProps> = ({
+    defaultIngredients,
     onChange
 }) => {
     const { t } = useLocale();
     const { isDesktop } = useScreenSize();
 
     // used only for the draggable list - should not be used to determine the order of ingredients
-    const [ingredients, setIngredients] = useState<number[]>([0]);
+    const [ingredients, setIngredients] = useState<number[]>(() =>
+        defaultIngredients && defaultIngredients.length > 0
+            ? defaultIngredients.map((_, idx) => idx)
+            : [0]
+    );
 
     // used to store the actual ingredient values in the correct order
-    const [ingredientValues, setIngredientValues] = useState<Ingredient[]>([]);
+    const [ingredientValues, setIngredientValues] = useState<Ingredient[]>(
+        () => defaultIngredients ?? []
+    );
+
+    useEffect(() => {
+        if (!defaultIngredients) return;
+
+        setIngredients(defaultIngredients.map((_, idx) => idx));
+        setIngredientValues(defaultIngredients);
+    }, [defaultIngredients]);
 
     const handleAddIngredient = useCallback(() => {
         setIngredients((prev) => {
@@ -82,6 +97,7 @@ export const IngredientsListCreate: React.FC<IngredientsListCreateProps> = ({
                         dragIndex={key}
                         key={key}
                         index={index}
+                        defaultIngredient={defaultIngredients?.[index]}
                         onAddIngredient={handleAddIngredient}
                         onRemove={handleRemoveIngredient(key)}
                         onChange={handleRowChange(index)}

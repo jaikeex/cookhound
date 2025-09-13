@@ -10,6 +10,7 @@ export type TextInputProps = Readonly<{
 
 export const TextInput: React.FC<TextInputProps> = ({
     className,
+    defaultValue,
     disabled,
     error,
     id,
@@ -24,6 +25,7 @@ export const TextInput: React.FC<TextInputProps> = ({
             <InputLabel htmlFor={id} text={label} disabled={disabled} />
             <BaseInput
                 type={'text'}
+                defaultValue={defaultValue}
                 placeholder={placeholder}
                 className={className}
                 id={id}

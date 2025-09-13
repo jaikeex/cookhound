@@ -6,6 +6,7 @@ import { DesktopProfileTemplate } from './Desktop';
 import { MobileProfileTemplate } from './Mobile';
 import type { ProfileNavigationItem } from '@/client/types/core';
 import type { UserDTO } from '@/common/types';
+import { Recipes } from '@/client/components';
 
 type ProfileProps = Readonly<{
     user: Promise<UserDTO>;
@@ -21,11 +22,31 @@ export const ProfileTemplate: React.FC<ProfileProps> = ({ user }) => {
 
     const profileNavigationItems: ProfileNavigationItem[] = [
         ...(isCurrentUser
-            ? [{ param: `dashboard`, label: t('app.profile.dashboard') }]
+            ? [
+                  {
+                      param: `dashboard`,
+                      label: t('app.profile.dashboard'),
+                      content: null
+                  }
+              ]
             : []),
 
-        { param: `recipes`, label: t('app.profile.recipes') },
-        { param: `cookbooks`, label: t('app.profile.cookbooks') }
+        {
+            param: `recipes`,
+            label: t('app.profile.recipes'),
+            content: (
+                <Recipes
+                    isCurrentUser={isCurrentUser}
+                    recipes={[]}
+                    userId={userResolved.id}
+                />
+            )
+        },
+        {
+            param: `cookbooks`,
+            label: t('app.profile.cookbooks'),
+            content: null
+        }
     ];
 
     return (

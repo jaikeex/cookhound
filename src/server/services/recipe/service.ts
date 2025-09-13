@@ -1,14 +1,16 @@
-import type {
-    Ingredient,
-    RecipeDTO,
-    RecipeForCreatePayload,
-    RecipeForDisplayDTO,
-    RecipeTagDTO
+import {
+    UserRole,
+    type Ingredient,
+    type RecipeDTO,
+    type RecipeForCreatePayload,
+    type RecipeForDisplayDTO,
+    type RecipeTagDTO
 } from '@/common/types';
 import type { RecipeForCreate } from './types';
 import db from '@/server/db/model';
 import type { Locale } from '@/client/locales';
 import {
+    AuthErrorForbidden,
     AuthErrorUnauthorized,
     NotFoundError,
     ValidationError
@@ -236,11 +238,77 @@ class RecipeService {
     }
 
     //~-----------------------------------------------------------------------------------------~//
+    //$                                         UPDATE                                          $//
+    //~-----------------------------------------------------------------------------------------~//
+
+    async updateRecipe(
+        recipeId: number,
+        payload: Partial<RecipeForCreatePayload>
+    ): Promise<RecipeDTO> {
+        log.trace('updateRecipe - attempt', { recipeId, payload });
+
+        const currentUserId = RequestContext.getUserId();
+
+        if (!currentUserId) {
+            log.warn('updateRecipe - anonymous call');
+            throw new AuthErrorUnauthorized();
+        }
+
+        const recipe = await this.getRecipeById(recipeId);
+
+        if (!recipe) {
+            log.warn('updateRecipe - recipe not found', { recipeId });
+            throw new NotFoundError(
+                'app.error.not-found',
+                ApplicationErrorCode.RECIPE_NOT_FOUND
+            );
+        }
+
+        if (
+            recipe.authorId !== currentUserId &&
+            RequestContext.getUserRole() !== UserRole.Admin
+        ) {
+            log.warn('updateRecipe - recipe not found', { recipeId });
+            throw new AuthErrorForbidden(
+                'app.error.bad-request',
+                ApplicationErrorCode.RECIPE_ACCESS_DENIED
+            );
+        }
+
+        const { instructions, ingredients, tags, ...recipeData } = payload;
+
+        const updateInput = {
+            ...recipeData,
+            instructions,
+            ingredients,
+            tags: tags === null ? [] : tags
+        } as Parameters<typeof db.recipe.updateOneById>[1];
+
+        await db.recipe.updateOneById(recipeId, updateInput);
+
+        const recipeDTO = await this.getRecipeById(recipeId);
+
+        // The recipe was successfully updated, and needs to be evaluated again.
+        openaiApiService.evaluateRecipeContent(recipeDTO);
+
+        log.trace('updateRecipe - success', { recipeId });
+
+        return recipeDTO;
+    }
+
+    //~-----------------------------------------------------------------------------------------~//
     //$                                         DELETE                                          $//
     //~-----------------------------------------------------------------------------------------~//
 
     async deleteRecipe(recipeId: number): Promise<void> {
         log.trace('deleteRecipe - attempt', { recipeId });
+
+        const currentUserId = RequestContext.getUserId();
+
+        if (!currentUserId) {
+            log.warn('deleteRecipe - anonymous call');
+            throw new AuthErrorUnauthorized();
+        }
 
         const recipe = await this.getRecipeById(recipeId);
 
@@ -249,6 +317,17 @@ class RecipeService {
             throw new NotFoundError(
                 'app.error.not-found',
                 ApplicationErrorCode.RECIPE_NOT_FOUND
+            );
+        }
+
+        if (
+            currentUserId !== recipe.authorId &&
+            RequestContext.getUserRole() !== UserRole.Admin
+        ) {
+            log.warn('deleteRecipe - recipe not found', { recipeId });
+            throw new AuthErrorForbidden(
+                'app.error.bad-request',
+                ApplicationErrorCode.RECIPE_ACCESS_DENIED
             );
         }
 
