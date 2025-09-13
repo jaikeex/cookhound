@@ -34,7 +34,9 @@ const MAX_BATCHES = 5;
  */
 export const useRecipeDiscovery = (
     initialRecipes: RecipeForDisplayDTO[],
-    initialQuery: string | string[] = ''
+    initialQuery: string | string[] = '',
+    // When provided, all list/search operations will be scoped to the given user.
+    userId?: string
 ) => {
     const { locale } = useLocale();
 
@@ -55,24 +57,40 @@ export const useRecipeDiscovery = (
     //$                                         QUERIES                                         $//
     //~-----------------------------------------------------------------------------------------~//
 
-    const listInfiniteQuery = chqc.recipe.useRecipeListInfinite(
-        locale,
-        PER_PAGE,
-        MAX_BATCHES,
-        {
-            enabled: !isSearchMode
-        }
-    );
+    const listInfiniteQuery = userId
+        ? chqc.recipe.useUserRecipesInfinite(
+              userId,
+              locale,
+              PER_PAGE,
+              MAX_BATCHES,
+              {
+                  enabled: !isSearchMode && Boolean(userId)
+              }
+          )
+        : chqc.recipe.useRecipeListInfinite(locale, PER_PAGE, MAX_BATCHES, {
+              enabled: !isSearchMode
+          });
 
-    const searchInfiniteQuery = chqc.recipe.useSearchRecipesInfinite(
-        queryString,
-        locale,
-        PER_PAGE,
-        MAX_BATCHES,
-        {
-            enabled: isSearchMode
-        }
-    );
+    const searchInfiniteQuery = userId
+        ? chqc.recipe.useUserSearchRecipesInfinite(
+              userId,
+              queryString,
+              locale,
+              PER_PAGE,
+              MAX_BATCHES,
+              {
+                  enabled: isSearchMode && Boolean(userId)
+              }
+          )
+        : chqc.recipe.useSearchRecipesInfinite(
+              queryString,
+              locale,
+              PER_PAGE,
+              MAX_BATCHES,
+              {
+                  enabled: isSearchMode
+              }
+          );
 
     /**
      * Select the active query depending on the mode above.
