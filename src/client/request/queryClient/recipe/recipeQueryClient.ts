@@ -18,7 +18,8 @@ import type {
     UserSearchRecipesOptions,
     UserRecipesOptions,
     UserSearchRecipesInfiniteOptions,
-    UserRecipesInfiniteOptions
+    UserRecipesInfiniteOptions,
+    DeleteRecipeOptions
 } from './types';
 import { RECIPE_QUERY_KEYS } from './types';
 
@@ -365,6 +366,12 @@ class RecipeQueryClient {
      */
     useCreateRecipe = (options?: Partial<CreateRecipeOptions>) =>
         useAppMutation(apiClient.recipe.createRecipe, options);
+
+    /**
+     * Deletes a recipe.
+     */
+    useDeleteRecipe = (options?: Partial<DeleteRecipeOptions>) =>
+        useAppMutation(apiClient.recipe.deleteRecipe, options);
 
     /**
      * Rates a recipe.

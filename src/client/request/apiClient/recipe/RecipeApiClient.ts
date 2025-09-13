@@ -187,6 +187,19 @@ class RecipeApiClient {
     }
 
     /**
+     * Deletes a recipe by calling `DELETE /api/recipes/{id}`.
+     *
+     * @param id - The ID of the recipe to delete.
+     * @param config - Optional fetch request configuration.
+     */
+    async deleteRecipe(id: number, config?: RequestConfig) {
+        return await apiRequestWrapper.delete({
+            url: `/recipes/${id}`,
+            ...config
+        });
+    }
+
+    /**
      * Rates a recipe by calling `POST /api/recipes/{id}/ratings`.
      *
      * @param id - The ID of the recipe to rate.

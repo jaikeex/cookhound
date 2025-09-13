@@ -3,6 +3,7 @@ import {
     CACHE_TTL,
     cachePrismaQuery,
     generateCacheKey,
+    invalidateCacheByPattern,
     invalidateModelCache
 } from '@/server/db/model/model-cache';
 import { prisma } from '@/server/integrations';
@@ -500,6 +501,35 @@ class RecipeModel {
         });
     }
 
+    /**
+     * Delete a recipe by id
+     *
+     * Write class -> W1
+     */
+    async deleteOneById(id: number): Promise<void> {
+        log.trace('Deleting recipe by id', { id });
+
+        // Use a transaction to ensure that all dependent records are removed
+        // before the actual recipe is deleted, foreign key constraints will fail otherwise.
+        await prisma.$transaction(async (tx) => {
+            await Promise.all([
+                tx.instruction.deleteMany({ where: { recipeId: id } }),
+                tx.recipeIngredient.deleteMany({ where: { recipeId: id } }),
+                tx.shoppingListIngredient.deleteMany({
+                    where: { recipeId: id }
+                }),
+                tx.rating.deleteMany({ where: { recipeId: id } }),
+                tx.userVisitedRecipe.deleteMany({ where: { recipeId: id } }),
+                tx.recipeTag.deleteMany({ where: { recipeId: id } }),
+                tx.recipeFlag.deleteMany({ where: { recipeId: id } })
+            ]);
+
+            await tx.recipe.delete({ where: { id } });
+        });
+
+        await this.invalidateRecipeCacheAll();
+    }
+
     //~=========================================================================================~//
     //$                                      PRIVATE METHODS                                    $//
     //~=========================================================================================~//
@@ -509,6 +539,10 @@ class RecipeModel {
         original?: Partial<Recipe>
     ) {
         await invalidateModelCache('recipe', changed, original ?? undefined);
+    }
+
+    private async invalidateRecipeCacheAll() {
+        await invalidateCacheByPattern('prisma:recipe:*');
     }
 }
 

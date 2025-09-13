@@ -18,7 +18,7 @@ const log = Logger.getInstance('model-cache');
 //#   C3 (frequently updated or must be real-time) -> no cache (TTL = 0)
 //#
 //# WRITE CLASSIFICATION:
-//#   W1 (must be real-time data)                  -> invalidate related cache
+//#   W1 (must be immediately visible)             -> invalidate related cache
 //#   W2 (mildly stale OK data)                    -> do not invalidate the cache
 //#   W3 (newly created data)                      -> invalidate related cache
 //#

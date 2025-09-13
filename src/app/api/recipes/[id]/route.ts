@@ -55,3 +55,40 @@ export async function GET(request: NextRequest) {
         }
     });
 }
+
+/**
+ * Handles DELETE requests to `/api/recipes/{id}` to delete a specific recipe.
+ *
+ * @returns A JSON response with a message indicating that the recipe has been deleted.
+ *
+ * - 200: Success, with a message indicating that the recipe has been deleted.
+ * - 400: Bad Request, if the recipe ID is not a number.
+ * - 500: Internal Server Error, if there is another error during the deletion process.
+ */
+export async function DELETE(request: NextRequest) {
+    return RequestContext.run(request, async () => {
+        try {
+            logRequest(request);
+
+            const id = request.nextUrl.pathname.split('/').pop();
+
+            if (!id || isNaN(Number(id))) {
+                throw new ValidationError(
+                    'app.error.bad-request',
+                    ApplicationErrorCode.MISSING_FIELD
+                );
+            }
+
+            await recipeService.deleteRecipe(Number(id));
+
+            const response = Response.json({
+                message: 'Recipe deleted successfully'
+            });
+
+            logResponse(response);
+            return response;
+        } catch (error: unknown) {
+            return handleServerError(error);
+        }
+    });
+}

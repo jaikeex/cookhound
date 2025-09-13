@@ -235,6 +235,11 @@ export type CreateRecipeOptions = Omit<
     'mutationFn'
 >;
 
+export type DeleteRecipeOptions = Omit<
+    UseMutationOptions<unknown, RequestError, number>,
+    'mutationFn'
+>;
+
 export type RateRecipeOptions = Omit<
     UseMutationOptions<unknown, RequestError, RecipeRatingPayload>,
     'mutationFn'

@@ -236,6 +236,37 @@ class RecipeService {
     }
 
     //~-----------------------------------------------------------------------------------------~//
+    //$                                         DELETE                                          $//
+    //~-----------------------------------------------------------------------------------------~//
+
+    async deleteRecipe(recipeId: number): Promise<void> {
+        log.trace('deleteRecipe - attempt', { recipeId });
+
+        const recipe = await this.getRecipeById(recipeId);
+
+        if (!recipe) {
+            log.warn('deleteRecipe - recipe not found', { recipeId });
+            throw new NotFoundError(
+                'app.error.not-found',
+                ApplicationErrorCode.RECIPE_NOT_FOUND
+            );
+        }
+
+        await db.recipe.deleteOneById(recipeId);
+
+        try {
+            await recipeSearchIndex.deleteOne(recipeId);
+        } catch (error: unknown) {
+            log.warn('deleteRecipe - failed to delete recipe in Typesense', {
+                error,
+                recipeId
+            });
+        }
+
+        log.trace('deleteRecipe - success', { recipeId });
+    }
+
+    //~-----------------------------------------------------------------------------------------~//
     //$                                      REGISTER VISIT                                     $//
     //~-----------------------------------------------------------------------------------------~//
 
