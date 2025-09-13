@@ -8,7 +8,9 @@ import ChevronDoubleDownIcon from './chevron-double-down.svg';
 import ChevronDoubleLeftIcon from './chevron-double-left.svg';
 import ChevronDoubleRightIcon from './chevron-double-right.svg';
 import CloseIcon from './close.svg';
+import DeleteIcon from './delete.svg';
 import DragIcon from './drag.svg';
+import EditIcon from './edit.svg';
 import ErrorIcon from './error.svg';
 import ExitIcon from './exit.svg';
 import HomeIcon from './home.svg';
@@ -35,7 +37,9 @@ export const basicSvg = {
     ChevronDoubleLeftIcon,
     ChevronDoubleRightIcon,
     CloseIcon,
+    DeleteIcon,
     DragIcon,
+    EditIcon,
     ErrorIcon,
     ExitIcon,
     HomeIcon,
