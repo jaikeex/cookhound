@@ -14,6 +14,7 @@ import ReactDOM from 'react-dom';
 import { generateRandomId } from '@/client/utils';
 
 const AUTO_DISMISS = 4000;
+const MAX_SNACKBARS = 3;
 
 type SnackbarContextType = {
     alert: (a: AlertPayload) => void;
@@ -64,7 +65,10 @@ export const SnackbarProvider: React.FC<SnackbarProviderProps> = ({
             id: generateRandomId(5)
         };
 
-        setActiveAlerts((alerts) => [newAlert, ...alerts]);
+        setActiveAlerts((alerts) => {
+            const newAlerts = [newAlert, ...alerts];
+            return newAlerts.slice(0, MAX_SNACKBARS);
+        });
     }, []);
 
     const removeAlert = useCallback(
@@ -84,14 +88,24 @@ export const SnackbarProvider: React.FC<SnackbarProviderProps> = ({
         <SnackbarContext.Provider value={value}>
             {children}
             {typeof window !== 'undefined' &&
-                activeAlerts.map((alertObj) =>
+                activeAlerts.map((alertObj, index) =>
                     ReactDOM.createPortal(
-                        <Snackbar
+                        <div
                             key={alertObj.id}
-                            variant={alertObj.variant}
-                            message={alertObj.message}
-                            onClose={removeAlert(alertObj.id)}
-                        />,
+                            style={{
+                                position: 'fixed',
+                                top: `${16 + index * 70}px`, // 16px initial offset + 70px per snackbar
+                                left: 0,
+                                right: 0,
+                                zIndex: 2000 - index
+                            }}
+                        >
+                            <Snackbar
+                                variant={alertObj.variant}
+                                message={alertObj.message}
+                                onClose={removeAlert(alertObj.id)}
+                            />
+                        </div>,
                         document.body
                     )
                 )}
