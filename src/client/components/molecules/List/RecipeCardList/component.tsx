@@ -3,15 +3,15 @@
 import { Loader, RecipeCard } from '@/client/components';
 import { useInfinityScroll } from '@/client/hooks';
 import type { RecipeForDisplayDTO } from '@/common/types';
-import { classNames } from '@/client/utils';
 import * as React from 'react';
 import { RecipeWithHandling } from '@/client/components/molecules';
+import { GRID_COLS } from '@/client/constants';
 
 export type RecipeCardListGridColumns = {
-    sm: number;
-    md: number;
-    lg: number;
-    xl: number;
+    sm: (typeof GRID_COLS)[keyof typeof GRID_COLS];
+    md: (typeof GRID_COLS)[keyof typeof GRID_COLS];
+    lg: (typeof GRID_COLS)[keyof typeof GRID_COLS];
+    xl: (typeof GRID_COLS)[keyof typeof GRID_COLS];
 };
 
 type RecipeCardListProps = Readonly<{
@@ -26,7 +26,12 @@ type RecipeCardListProps = Readonly<{
 
 export const RecipeCardList: React.FC<RecipeCardListProps> = ({
     className,
-    cols = { sm: 2, md: 3, lg: 4, xl: 4 },
+    cols = {
+        sm: GRID_COLS[2],
+        md: GRID_COLS[3],
+        lg: GRID_COLS[4],
+        xl: GRID_COLS[4]
+    },
     loadMore,
     hasMore,
     isLoading,
@@ -41,14 +46,15 @@ export const RecipeCardList: React.FC<RecipeCardListProps> = ({
 
     const RecipeCardComponent = withHandling ? RecipeWithHandling : RecipeCard;
 
+    // If you ask why this is necessary... it's hydration... it's always hydration...
+    const baseClasses = `grid ${cols.sm} gap-4 md:${cols.md} lg:${cols.lg} xl:${cols.xl}`;
+    const finalClassName = className
+        ? `${baseClasses} ${className}`
+        : baseClasses;
+
     return (
         <React.Fragment>
-            <div
-                className={classNames(
-                    `grid grid-cols-${cols.sm} gap-4 md:grid-cols-${cols.md} xl:grid-cols-${cols.lg}`,
-                    className
-                )}
-            >
+            <div className={finalClassName}>
                 {recipes.map((recipe, index) => (
                     <RecipeCardComponent
                         key={`${recipe.id}-${index}`}

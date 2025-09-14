@@ -8,9 +8,15 @@ export type AlertPayload = {
 };
 
 export type ProfileNavigationItem = {
-    param: string;
+    param: ProfileTab;
     label: string;
     content: React.ReactNode | null;
 };
 
 export type RecipeFormMode = 'create' | 'edit';
+
+export enum ProfileTab {
+    Dashboard = 'dashboard',
+    Recipes = 'recipes',
+    Cookbooks = 'cookbooks'
+}
