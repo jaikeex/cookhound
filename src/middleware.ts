@@ -2,9 +2,9 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { MiddlewareError } from '@/server/error';
 
 // This needs to be imported explicitly from the verify-client.ts file. NOT the barrel file.
+// Note to self two months after: If only i had written here why the fuck is that needed...
 import { verifyRouteAccess } from '@/server/utils/session/verify-client';
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function middleware(request: NextRequest) {
     // DEFAULT RESPONSE
     let response = NextResponse.next();

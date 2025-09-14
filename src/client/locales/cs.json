@@ -65,6 +65,7 @@
     "app.general.home": "Domů",
     "app.general.upload-image": "Klikněte nebo přetáhněte obrázek",
     "app.general.register-to-create-recipe": "Pouze registrovaní uživatelé mohou vytvářet recepty",
+    "app.general.register-to-use-shopping-list": "Pouze registrovaní uživatelé mohou používat nákupní seznam",
     "app.general.resend-email": "Znovu odeslat e-mail",
     "app.general.cookbooks": "Kuchařky",
     "app.general.shopping-list": "Seznam",

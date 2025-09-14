@@ -127,7 +127,9 @@ export default async function RootLayout({
                                             className="flex flex-col typography-base"
                                         >
                                             <div className="fixed top-0 left-0 w-screen h-screen page-background z-[-10]" />
+                                            {/* DO NOT CHANGE THE ORDER OF THESE COMPONENTS */}
                                             <TopNavigation />
+                                            <BottomNavigation />
                                             <div
                                                 id={CONTENT_WRAPPER_ID}
                                                 className={classNames(
@@ -137,7 +139,6 @@ export default async function RootLayout({
                                             >
                                                 {children}
                                             </div>
-                                            <BottomNavigation />
                                         </div>
                                     </ModalProvider>
                                 </SnackbarProvider>

@@ -16,7 +16,11 @@ export const NotFoundTemplate: React.FC<NotFoundTemplateProps> = () => {
     }, []);
 
     useEffect(() => {
-        eventBus.emit(Event.NOT_FOUND, undefined);
+        eventBus.emit(Event.NOT_FOUND_OPENED, undefined);
+
+        return () => {
+            eventBus.emit(Event.NOT_FOUND_CLOSED, undefined);
+        };
     }, []);
 
     return (

@@ -14,12 +14,9 @@ export default async function Page({ params }: RecipePageParams) {
     const paramsResolved = await params;
     const recipeDisplayId = paramsResolved.displayId;
 
-    const recipe = await apiClient.recipe.getRecipeByDisplayId(
-        recipeDisplayId,
-        {
-            revalidate: 3600
-        }
-    );
+    const recipe = apiClient.recipe.getRecipeByDisplayId(recipeDisplayId, {
+        revalidate: 3600
+    });
 
     return <RecipeViewTemplate recipe={recipe} />;
 }

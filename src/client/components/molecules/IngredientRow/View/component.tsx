@@ -3,7 +3,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import type { Ingredient } from '@/common/types';
 import type { TypographyVariant } from '@/client/components';
-import { Typography } from '@/client/components';
+import { Icon, Typography } from '@/client/components';
 import { classNames } from '@/client/utils';
 
 //~---------------------------------------------------------------------------------------------~//
@@ -77,21 +77,32 @@ export const IngredientRowView: React.FC<IngredientRowViewProps> = ({
             <div
                 className={`flex items-center ${checked ? '[&>p]:text-gray-300 [&>p]:dark:text-gray-600' : ''}  w-full`}
             >
-                <Typography variant={typographyVariant} className={`font-bold`}>
+                <Typography
+                    variant={typographyVariant}
+                    className={`font-bold w-fit`}
+                >
                     {ingredient.name}
                 </Typography>
                 {ingredient.quantity && ingredient.name ? (
                     <React.Fragment>
                         <Typography
                             variant={typographyVariant}
-                            className={`font-bold`}
+                            className={`font-bold align-middle mx-2`}
                         >
-                            &nbsp;&nbsp;&nbsp;&ndash;&nbsp;&nbsp;&nbsp;
+                            &ndash;
                         </Typography>
                         <Typography variant={typographyVariant}>
                             {ingredient.quantity}
                         </Typography>
                     </React.Fragment>
+                ) : null}
+
+                {checked ? (
+                    <Icon
+                        name="checkmark"
+                        size={20}
+                        className={`ml-auto mr-[1px] text-green-500 dark:text-green-500 opacity-80 dark:opacity-70`}
+                    />
                 ) : null}
             </div>
         </div>

@@ -43,16 +43,18 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = () => {
 
     const isDisabled = isNavigationDisabled(pathname);
 
-    useAppEventListener(Event.NOT_FOUND, () => setIsNotfound(true));
+    useAppEventListener(Event.NOT_FOUND_OPENED, () => setIsNotfound(true));
+    useAppEventListener(Event.NOT_FOUND_CLOSED, () => setIsNotfound(false));
 
-    if (isDisabled || isNotfound) return null;
+    if (!authResolved || isDisabled || isNotfound) return null;
 
     return (
         <div
             id={BOTTOM_NAVBAR_ID}
             className={classNames(
-                `block md:hidden fixed bottom-0 left-0 right-0 h-14 px-2 py-4 bg-[#f0fdf4] dark:bg-[#021812]`,
-                `flex [&>*]:w-full items-center justify-between border-t border-gray-300 dark:border-gray-800`
+                `block md:hidden z-20 fixed bottom-0 left-0 right-0 h-14 px-2 py-4 bg-[#f0fdf4] dark:bg-[#021812]`,
+                `flex [&>*]:w-full items-center justify-between border-t border-gray-300 dark:border-gray-800`,
+                isNotfound ? 'hidden' : ''
             )}
         >
             <Link href={'/'}>
@@ -89,18 +91,24 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = () => {
                 </Link>
             </Tooltip>
 
-            <Link
-                href={'/shopping-list'}
-                prefetch={isLoggedin}
-                tabIndex={isLoggedin ? 0 : -1}
-                className={classNames(!isLoggedin && 'link-disabled')}
+            <Tooltip
+                text={t('app.general.register-to-use-shopping-list')}
+                disabled={isLoggedin}
+                position={'top-end'}
             >
-                <Icon
-                    name="shoppingList"
-                    label={t('app.general.shopping-list')}
-                    disabled={!isLoggedin}
-                />
-            </Link>
+                <Link
+                    href={'/shopping-list'}
+                    prefetch={isLoggedin}
+                    tabIndex={isLoggedin ? 0 : -1}
+                    className={classNames(!isLoggedin && 'link-disabled')}
+                >
+                    <Icon
+                        name="shoppingList"
+                        label={t('app.general.shopping-list')}
+                        disabled={!isLoggedin}
+                    />
+                </Link>
+            </Tooltip>
         </div>
     );
 };

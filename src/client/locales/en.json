@@ -65,6 +65,7 @@
     "app.general.home": "Home",
     "app.general.upload-image": "Click to upload or drag and drop",
     "app.general.register-to-create-recipe": "Only registered users can create recipes",
+    "app.general.register-to-use-shopping-list": "Only registered users can use the shopping list",
     "app.general.resend-email": "Resend Email",
     "app.general.cookbooks": "Cookbooks",
     "app.general.shopping-list": "Shopping list",

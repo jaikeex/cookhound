@@ -40,9 +40,10 @@ export const TopNavigation: React.FC<TopNavigationProps> = () => {
     const handleCloseSidebar = useCallback(() => setIsSidebarOpen(false), []);
     const handleSearchClick = useCallback(() => {}, []);
 
-    useAppEventListener(Event.NOT_FOUND, () => setIsNotfound(true));
+    useAppEventListener(Event.NOT_FOUND_OPENED, () => setIsNotfound(true));
+    useAppEventListener(Event.NOT_FOUND_CLOSED, () => setIsNotfound(false));
 
-    if (isNotfound) return null;
+    if (!authResolved || isNotfound) return null;
 
     return (
         <div
@@ -51,7 +52,8 @@ export const TopNavigation: React.FC<TopNavigationProps> = () => {
                 'fixed top-0 left-0 right-0 z-20 flex items-center justify-between w-full p-4 h-14',
                 pathname === '/' || pathname === '/search'
                     ? 'backdrop-blur-sm bg-white/50 dark:bg-black/50'
-                    : 'bg-[#d1fae5] dark:bg-[#030712]'
+                    : 'bg-[#d1fae5] dark:bg-[#030712]',
+                isNotfound ? 'hidden' : ''
             )}
         >
             <Link

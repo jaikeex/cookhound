@@ -8,7 +8,19 @@ import { useOutsideClick } from '@/client/hooks';
 type TooltipProps = Readonly<{
     className?: string;
     disabled?: boolean;
-    position?: 'top' | 'bottom' | 'left' | 'right';
+    position?:
+        | 'top'
+        | 'bottom'
+        | 'left'
+        | 'right'
+        | 'top-start'
+        | 'top-end'
+        | 'bottom-start'
+        | 'bottom-end'
+        | 'left-start'
+        | 'left-end'
+        | 'right-start'
+        | 'right-end';
     text: string;
     visible?: boolean;
     targetRef?: React.RefObject<HTMLElement | null>;
@@ -20,7 +32,15 @@ const classConfig = {
         top: 'left-1/2 transform -translate-x-1/2 bottom-full mb-2',
         bottom: 'left-1/2 transform -translate-x-1/2 top-full mt-2',
         left: 'right-full top-1/2 transform -translate-y-1/2 mr-2',
-        right: 'left-full top-1/2 transform -translate-y-1/2 ml-2'
+        right: 'left-full top-1/2 transform -translate-y-1/2 ml-2',
+        'top-start': 'left-0 bottom-full mb-2',
+        'top-end': 'right-0 bottom-full mb-2',
+        'bottom-start': 'left-0 top-full mt-2',
+        'bottom-end': 'right-0 top-full mt-2',
+        'left-start': 'right-full top-0 mr-2',
+        'left-end': 'right-full bottom-0 mr-2',
+        'right-start': 'left-full top-0 ml-2',
+        'right-end': 'left-full bottom-0 ml-2'
     }
 };
 
@@ -131,6 +151,52 @@ export const Tooltip: React.FC<TooltipProps> = ({
                         left: targetRect.right + 8,
                         top: targetRect.top + targetRect.height / 2,
                         transform: 'translateY(-50%)'
+                    };
+                case 'top-start':
+                    return {
+                        left: targetRect.left,
+                        top: targetRect.top - 8,
+                        transform: 'translateY(-100%)'
+                    };
+                case 'top-end':
+                    return {
+                        left: targetRect.right,
+                        top: targetRect.top - 8,
+                        transform: 'translateX(-100%) translateY(-100%)'
+                    };
+                case 'bottom-start':
+                    return {
+                        left: targetRect.left,
+                        top: targetRect.bottom + 8
+                    };
+                case 'bottom-end':
+                    return {
+                        left: targetRect.right,
+                        top: targetRect.bottom + 8,
+                        transform: 'translateX(-100%)'
+                    };
+                case 'left-start':
+                    return {
+                        left: targetRect.left - 8,
+                        top: targetRect.top,
+                        transform: 'translateX(-100%)'
+                    };
+                case 'left-end':
+                    return {
+                        left: targetRect.left - 8,
+                        top: targetRect.bottom,
+                        transform: 'translateX(-100%) translateY(-100%)'
+                    };
+                case 'right-start':
+                    return {
+                        left: targetRect.right + 8,
+                        top: targetRect.top
+                    };
+                case 'right-end':
+                    return {
+                        left: targetRect.right + 8,
+                        top: targetRect.bottom,
+                        transform: 'translateY(-100%)'
                     };
                 default:
                     return {
