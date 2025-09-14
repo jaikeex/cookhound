@@ -2,20 +2,14 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { MiddlewareError } from '@/server/error';
 
 // This needs to be imported explicitly from the verify-client.ts file. NOT the barrel file.
-// import { verifyRouteAccess } from '@/server/utils/session/verify-client';
-
-/**
- *§ THE MIDDLEWARE IS CURRENTLY NOT IN ACTIVE USE
- *§
- *§ The code is left here for reference because i like this construction and would like to use it again
- *§ if i find a use for the middleware. Once node.js middleware is stable i will definitely have stuff
- *§ to write here...
- */
+import { verifyRouteAccess } from '@/server/utils/session/verify-client';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function middleware(request: NextRequest) {
     // DEFAULT RESPONSE
     let response = NextResponse.next();
+
+    console.log('middleware');
 
     try {
         //?—————————————————————————————————————————————————————————————————————————————————————————?//
@@ -33,7 +27,8 @@ export async function middleware(request: NextRequest) {
         //#  (3) If the function returns null, the middleware continues without modifying the response.
         ///
         //?—————————————————————————————————————————————————————————————————————————————————————————?//
-        // response = (await verifyRouteAccess(request)) ?? response;
+
+        response = (await verifyRouteAccess(request)) ?? response;
     } catch (error: unknown) {
         if (error instanceof MiddlewareError && error?.response) {
             response = error.response;
@@ -54,5 +49,6 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
+    runtime: 'nodejs',
     matcher: ['/((?!api|_next/static|_next/image|favicon.ico|abc).*)']
 };

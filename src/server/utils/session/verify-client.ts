@@ -1,31 +1,9 @@
 import { NextResponse } from 'next/server';
-import { UserRole } from '@/common/types';
-import { ENV_CONFIG_PUBLIC, SESSION_COOKIE_NAME } from '@/common/constants';
+import { type UserRole } from '@/common/types';
+import { ENV_CONFIG_PUBLIC } from '@/common/constants';
 import { MiddlewareError } from '@/server/error';
 import { type ServerSession } from './manager';
-import { redisClient } from '@/server/integrations/redis';
-
-//§—————————————————————————————————————————————————————————————————————————————————————————————§//
-//§                                           NOT USED                                          §//
-///
-//# The middleware and by extension this function as well are currently not in active use.
-//# This code is left here for reference, because i would love to structure future middleware
-//# code the same as this.
-///
-//§—————————————————————————————————————————————————————————————————————————————————————————————§//
-//§                                         CLIENT ONLY                                         §//
-///
-//# These functions should only be used on the client side and in the middleware.
-//#
-//# Using them on the server is inefficient and unnecessary, since the server can use all the
-//# necessary tools directly. The same can't be done in the middleware, since node.js packages
-//# can't be imported for some reason. The jwt verification must use node:crypto, so that path
-//# is closed.
-//#
-//? NOTE to me: Apparently the support fore node in next middleware is now in the canary
-//? stage of development. (2025-06-16)
-///
-//§—————————————————————————————————————————————————————————————————————————————————————————————§//
+import { verifySessionFromCookie } from './verify-server';
 
 interface RouteConfig {
     path: string;
@@ -33,11 +11,10 @@ interface RouteConfig {
 }
 
 export const PROTECTED_ROUTES: RouteConfig[] = [
-    { path: '/recipe/create', roles: [UserRole.User, UserRole.Admin] },
-    { path: '/shopping-list', roles: [UserRole.User, UserRole.Admin] },
+    { path: '/recipe/create', roles: [] },
+    { path: '/shopping-list', roles: [] },
     { path: '/auth/login', roles: null },
     { path: '/auth/register', roles: null },
-    { path: '/auth/google', roles: null },
     { path: '/auth/verify-email', roles: null }
 ];
 
@@ -90,6 +67,23 @@ function redirectToRestrictedWithLogin(pathname: string) {
     );
 }
 
+function assertValidRouteConfig(
+    route: RouteConfig
+): asserts route is RouteConfig {
+    if (!route.path) {
+        throw new MiddlewareError(
+            'RouteConfig.path is missing',
+            NextResponse.next()
+        );
+    }
+    if (route.roles !== null && !Array.isArray(route.roles)) {
+        throw new MiddlewareError(
+            'RouteConfig.roles must be an array or null',
+            NextResponse.next()
+        );
+    }
+}
+
 //~=============================================================================================~//
 //$                                     MIDDLEWARE FUNCTION                                     $//
 //~=============================================================================================~//
@@ -115,40 +109,44 @@ export const verifyRouteAccess: MiddlewareStepFunction = async (request) => {
     const routeConfig = getRouteConfig(pathname);
     if (!routeConfig) return null;
 
+    assertValidRouteConfig(routeConfig);
+
+    const requiresAuth = routeConfig.roles !== null;
+    const requiresRoleTest =
+        requiresAuth && routeConfig.roles && routeConfig.roles.length > 0;
+
     //?------------------------------------
     // From now on, the route is protected.
     //?------------------------------------
 
-    const sessionId = request.cookies.get(SESSION_COOKIE_NAME)?.value;
+    let isLoggedIn: boolean;
+    let session: ServerSession | null;
+
+    try {
+        const result = await verifySessionFromCookie();
+
+        isLoggedIn = result.isLoggedIn;
+        session = result.session;
+    } catch (error: unknown) {
+        return redirectToRestrictedWithLogin(pathname);
+    }
 
     // User is trying to access a protected route without a session.
     // If the route is for bros only, kick them out.
-    if (!sessionId && routeConfig.roles !== null) {
+    if ((!isLoggedIn || !session) && requiresAuth) {
         return redirectToRestrictedWithLogin(pathname);
     }
 
     // If the route is for guests only, let them in.
-    if (!sessionId && routeConfig.roles === null) {
+    if ((!isLoggedIn || !session) && !requiresAuth) {
         return null;
-    }
-
-    let session: ServerSession | null;
-
-    try {
-        session = await redisClient.get<ServerSession>(sessionId);
-    } catch (error: unknown) {
-        /**
-         * If the getCurrentUser() call fails, the session is not valid (or something else, who cares).
-         * That's the same as trying to access a protected route without a sesssion token so GTFO.
-         */
-        return redirectToRestrictedWithLogin(pathname);
     }
 
     //?--------------------------------------------------------------------------------
     // From now on, the route is protected and the user is logged in and authenticated.
     //?--------------------------------------------------------------------------------
 
-    if (routeConfig.roles === null) {
+    if (!requiresAuth) {
         /**
          * Null value here means that the route is for guests only. the user is authenticated here
          * so they are sent to root.
@@ -158,8 +156,8 @@ export const verifyRouteAccess: MiddlewareStepFunction = async (request) => {
 
     if (
         session &&
-        routeConfig.roles &&
-        !routeConfig.roles.includes(session.userRole as UserRole)
+        requiresRoleTest &&
+        !routeConfig.roles?.includes(session.userRole as UserRole)
     ) {
         /**
          * The route IS protected AND the role permissions are set.
