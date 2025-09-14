@@ -23,7 +23,7 @@ export const useShoppingList = () => {
     const queryClient = useQueryClient();
     const pathname = usePathname();
 
-    const listKey = useMemo(() => {
+    const listQueryKey = useMemo(() => {
         return userId ? USER_QUERY_KEYS.shoppingList(userId) : undefined;
     }, [userId]);
 
@@ -36,7 +36,7 @@ export const useShoppingList = () => {
     >(null);
 
     const startEditing = useCallback((current: ShoppingListDTO[]) => {
-        // Work on a deep-cloned copy so we never mutate the cached data.
+        // Always work on a deep-cloned copy.
         setEditingShoppingList(deepClone(current));
     }, []);
 
@@ -80,29 +80,122 @@ export const useShoppingList = () => {
     //~-----------------------------------------------------------------------------------------~//
 
     const upsertMutation = chqc.user.useUpsertShoppingList(userId ?? 0, {
-        onSuccess: (updated) => {
-            if (listKey) {
-                queryClient.setQueryData(listKey, updated);
+        onMutate: async (payload) => {
+            // The following code deals with optimistically updating the ui while trying not to fuck everything up.
+            if (!listQueryKey) return { previous: null } as const;
+
+            //§ Cancel outgoing fetches so they don’t mess up the optimistic update - THIS IS IMPORTANT
+            await queryClient.cancelQueries({ queryKey: listQueryKey });
+
+            const previous =
+                queryClient.getQueryData<ShoppingListDTO[]>(listQueryKey);
+
+            // If there is no payload or previous data, just return rollback context
+            if (!payload || !previous) return { previous } as const;
+
+            // Build the optimistic version of the list here
+            const next = previous.map((entry) => {
+                if (entry.recipe.id !== payload.recipeId) return entry;
+
+                const updatedIngredients = entry.ingredients.map((ing) => {
+                    const update = payload.ingredients.find(
+                        (u) => u.id === ing.id
+                    );
+                    return update
+                        ? {
+                              ...ing,
+                              marked: update.marked,
+                              quantity: update.quantity
+                          }
+                        : ing;
+                });
+
+                return { ...entry, ingredients: updatedIngredients };
+            });
+
+            queryClient.setQueryData(listQueryKey, next);
+
+            // Provide rollback context
+            return { previous } as const;
+        },
+
+        //§ NEVER overwrite the cache here with possibly stale server response
+        onSuccess: () => {
+            if (listQueryKey) {
+                // Refetch once to ensure the cache is in sync with the server
+                queryClient.invalidateQueries({ queryKey: listQueryKey });
+            }
+        },
+
+        // Rollback everything on error
+        onError: (_err, _payload, ctx) => {
+            const context = ctx as
+                | { previous?: ShoppingListDTO[] | null }
+                | undefined;
+
+            if (listQueryKey && context?.previous) {
+                queryClient.setQueryData(listQueryKey, context.previous);
             }
         }
     });
 
+    // Update mutation – simpler optimistic path handled in onMutate (same pattern as above)
     const updateMutation = chqc.user.useUpdateShoppingList(userId ?? 0, {
-        onSuccess: (updated) => {
-            if (listKey) {
-                queryClient.setQueryData(listKey, updated);
+        onMutate: async (payload) => {
+            // The following code deals with optimistically updating the ui while trying not to fuck everything up.
+            // Same pattern and priciples as above apply here
+            if (!listQueryKey) return { previous: null } as const;
+
+            //§ Cancel outgoing fetches so they don’t mess up the optimistic update - THIS IS IMPORTANT
+            await queryClient.cancelQueries({ queryKey: listQueryKey });
+
+            const previous =
+                queryClient.getQueryData<ShoppingListDTO[]>(listQueryKey);
+
+            // If there is no payload or previous data, just return rollback context
+            if (!payload || !previous) return { previous } as const;
+
+            // Merge the update into the cache optimistically
+            const next = previous.map((entry) => {
+                if (entry.recipe.id !== payload.recipeId) return entry;
+
+                const updatedIngredients = entry.ingredients.map((ing) => {
+                    const update = payload.ingredients.find(
+                        (u) => u.id === ing.id
+                    );
+                    return update ? { ...ing, ...update } : ing;
+                });
+
+                return { ...entry, ingredients: updatedIngredients };
+            });
+
+            queryClient.setQueryData(listQueryKey, next);
+            return { previous } as const;
+        },
+        onSuccess: () => {
+            if (listQueryKey) {
+                queryClient.invalidateQueries({ queryKey: listQueryKey });
+            }
+        },
+        onError: (_err, _payload, ctx) => {
+            const context = ctx as
+                | { previous?: ShoppingListDTO[] | null }
+                | undefined;
+
+            if (listQueryKey && context?.previous) {
+                queryClient.setQueryData(listQueryKey, context.previous);
             }
         }
     });
 
     const deleteMutation = chqc.user.useDeleteShoppingList(userId ?? 0, {
         onMutate: async (payload) => {
-            if (!listKey) return { previous: null };
+            if (!listQueryKey) return { previous: null };
 
-            await queryClient.cancelQueries({ queryKey: listKey });
+            await queryClient.cancelQueries({ queryKey: listQueryKey });
 
             const previous =
-                queryClient.getQueryData<ShoppingListDTO[]>(listKey);
+                queryClient.getQueryData<ShoppingListDTO[]>(listQueryKey);
 
             let next: ShoppingListDTO[] = [];
             if (
@@ -115,7 +208,7 @@ export const useShoppingList = () => {
                 );
             }
 
-            queryClient.setQueryData(listKey, next);
+            queryClient.setQueryData(listQueryKey, next);
 
             return { previous } as {
                 previous: ShoppingListDTO[] | undefined | null;
@@ -125,13 +218,17 @@ export const useShoppingList = () => {
             const ctx = context as
                 | { previous?: ShoppingListDTO[] | null }
                 | undefined;
-            if (listKey && ctx?.previous) {
-                queryClient.setQueryData(listKey, ctx.previous);
+
+            if (listQueryKey && ctx?.previous) {
+                queryClient.setQueryData(listQueryKey, ctx.previous);
             }
         }
     });
 
-    const isMutating = updateMutation.isPending || deleteMutation.isPending;
+    const isMutating =
+        upsertMutation.isPending ||
+        updateMutation.isPending ||
+        deleteMutation.isPending;
 
     const mutationError =
         upsertMutation.error || updateMutation.error || deleteMutation.error;
@@ -143,11 +240,11 @@ export const useShoppingList = () => {
     // Manually seeds the cache (typically from SSR data).
     const initialize = useCallback(
         (list: ShoppingListDTO[]) => {
-            if (listKey) {
-                queryClient.setQueryData(listKey, list);
+            if (listQueryKey) {
+                queryClient.setQueryData(listQueryKey, list);
             }
         },
-        [queryClient, listKey]
+        [queryClient, listQueryKey]
     );
 
     const refreshShoppingList = useCallback(async () => {
@@ -181,63 +278,52 @@ export const useShoppingList = () => {
         [updateMutation]
     );
 
+    //? Guard against double-clicks on the same ingredient while a mutation is in flight by keeping a Set of pending toggles.
+    const [pendingToggles, setPendingToggles] = useState<Set<string>>(
+        new Set()
+    );
+
     const markIngredient = useCallback(
         async (recipeId: number, ingredientId: number) => {
-            if (!listKey) return;
+            if (!listQueryKey) return;
 
-            const prev =
-                queryClient.getQueryData<ShoppingListDTO[]>(listKey) ?? null;
-            if (!prev) return;
+            const toggleKey = `${recipeId}-${ingredientId}`;
+            if (pendingToggles.has(toggleKey)) return; // ignore rapid repeat
 
-            const optimistic = prev.map((entry) => {
-                if (entry.recipe.id !== recipeId) return entry;
-
-                const ingredient = entry.ingredients.find(
-                    (ing) => ing.id === ingredientId
-                );
-
-                if (!ingredient) return entry;
-
-                return {
-                    ...entry,
-                    ingredients: entry.ingredients.map((ing) =>
-                        ing.id === ingredientId
-                            ? { ...ing, marked: !ing.marked }
-                            : ing
-                    )
-                };
-            });
-
-            queryClient.setQueryData(listKey, optimistic);
-
-            const recipe = prev.find((entry) => entry.recipe.id === recipeId);
-
-            if (!recipe) return;
-
-            const ingredient = recipe.ingredients.find(
-                (ing) => ing.id === ingredientId
-            );
-
-            if (!ingredient) return;
+            setPendingToggles((prev) => new Set(prev).add(toggleKey));
 
             const payload: ShoppingListPayload = {
                 recipeId,
                 ingredients: [
                     {
-                        id: ingredient.id,
-                        marked: !ingredient.marked,
-                        quantity: ingredient.quantity
+                        id: ingredientId,
+                        // The optimistic update flips the value, so a simple invert here is everything thats needed.
+                        marked: !(
+                            queryClient
+                                .getQueryData<ShoppingListDTO[]>(listQueryKey)
+                                ?.find((e) => e.recipe.id === recipeId)
+                                ?.ingredients.find((i) => i.id === ingredientId)
+                                ?.marked ?? false
+                        ),
+                        quantity:
+                            queryClient
+                                .getQueryData<ShoppingListDTO[]>(listQueryKey)
+                                ?.find((e) => e.recipe.id === recipeId)
+                                ?.ingredients.find((i) => i.id === ingredientId)
+                                ?.quantity ?? null
                     }
                 ]
             };
 
-            try {
-                await upsertMutation.mutateAsync(payload);
-            } catch {
-                queryClient.setQueryData(listKey, prev);
-            }
+            await upsertMutation.mutateAsync(payload).finally(() => {
+                setPendingToggles((prev) => {
+                    const next = new Set(prev);
+                    next.delete(toggleKey);
+                    return next;
+                });
+            });
         },
-        [upsertMutation, queryClient, listKey]
+        [upsertMutation, listQueryKey, queryClient, pendingToggles]
     );
 
     //~-----------------------------------------------------------------------------------------~//
