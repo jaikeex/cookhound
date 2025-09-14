@@ -9,8 +9,6 @@ export async function middleware(request: NextRequest) {
     // DEFAULT RESPONSE
     let response = NextResponse.next();
 
-    console.log('middleware');
-
     try {
         //?—————————————————————————————————————————————————————————————————————————————————————————?//
         //?                     MOST MIDDLEWARE CODE SHOULD BE CALLED FROM HERE                     ?//
