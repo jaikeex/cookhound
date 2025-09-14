@@ -2,6 +2,7 @@
 
 import React from 'react';
 import {
+    ErrorList,
     FormCheckbox,
     PasswordInput,
     Submit,
@@ -20,7 +21,7 @@ export type LoginFormErrors = {
 };
 
 export type LoginFormProps = Readonly<{
-    errors?: LoginFormErrors;
+    errors: LoginFormErrors;
     pending?: boolean;
 }>;
 
@@ -31,6 +32,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({ errors, pending }) => {
 
     const { t } = useLocale();
 
+    const errorsToDisplay = Object.values(errors).map((error) => t(error));
+
     return (
         <div className="base-form">
             <TextInput
@@ -38,21 +41,23 @@ export const LoginForm: React.FC<LoginFormProps> = ({ errors, pending }) => {
                 id="email"
                 name="email"
                 disabled={pending}
-                error={t(errors?.email)}
             />
+
             <PasswordInput
                 label={t('auth.form.password')}
                 id="password"
                 name="password"
                 disabled={pending}
-                error={t(errors?.password)}
             />
+
             <FormCheckbox
                 label={t('auth.form.keep-logged-in')}
                 id="keep-logged-in"
                 name="keep-logged-in"
                 disabled={pending}
             />
+
+            <ErrorList errors={errorsToDisplay} className="self-start" />
 
             <Submit
                 className="min-w-40 !mt-6 mx-auto"

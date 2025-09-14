@@ -1,4 +1,5 @@
 export * from './DraggableInputRow';
+export * from './ErrorList';
 export * from './FormCheckbox';
 export * from './NumberInput';
 export * from './PasswordInput';

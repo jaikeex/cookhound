@@ -2,6 +2,7 @@
 
 import React from 'react';
 import {
+    ErrorList,
     PasswordInput,
     Submit,
     TextInput,
@@ -34,6 +35,8 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
 
     const { t } = useLocale();
 
+    const errorsToDisplay = Object.values(errors).map((error) => t(error));
+
     return (
         <div className="base-form">
             <TextInput
@@ -41,29 +44,30 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
                 id="username"
                 name="username"
                 disabled={pending}
-                error={t(errors?.username)}
             />
+
             <TextInput
                 label={t('auth.form.email')}
                 id="email"
                 name="email"
                 disabled={pending}
-                error={t(errors?.email)}
             />
+
             <PasswordInput
                 label={t('auth.form.password')}
                 id="password"
                 name="password"
                 disabled={pending}
-                error={t(errors?.password)}
             />
+
             <PasswordInput
                 label={t('auth.form.repeat-password')}
                 id="repeat-password"
                 name="repeat-password"
                 disabled={pending}
-                error={t(errors?.repeatPassword)}
             />
+
+            <ErrorList errors={errorsToDisplay} className="self-start" />
 
             <Submit
                 className="min-w-40 !mt-6 mx-auto"
