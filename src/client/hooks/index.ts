@@ -1,4 +1,5 @@
 export * from './routingListeners';
+export * from './useAppEventListener';
 export * from './useCheckScrollbarExistence';
 export * from './useCooldown';
 export * from './useDebounce';
