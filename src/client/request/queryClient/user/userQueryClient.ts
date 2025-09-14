@@ -14,7 +14,8 @@ import type {
     ResendVerificationEmailOptions,
     SendResetPasswordEmailOptions,
     ResetPasswordOptions,
-    GetUserByIdOptions
+    GetUserByIdOptions,
+    UpdateUserByIdOptions
 } from './types';
 import { USER_QUERY_KEYS } from './types';
 
@@ -115,6 +116,15 @@ class UserQueryClient {
                 retry: 1,
                 ...options
             }
+        );
+
+    /**
+     * Updates a user by their ID.
+     */
+    useUpdateUserById = (options?: Partial<UpdateUserByIdOptions>) =>
+        useAppMutation(
+            ({ userId, data }) => apiClient.user.updateUserById(userId, data),
+            options
         );
 
     /**

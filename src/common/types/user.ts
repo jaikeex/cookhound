@@ -10,6 +10,11 @@ export type UserForGoogleCreatePayload = {
     avatarUrl: string;
 };
 
+export type UserForUpdatePayload = {
+    username: string;
+    avatarUrl: string;
+};
+
 export type UserForLogin = {
     email: string;
     password: string;

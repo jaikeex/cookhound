@@ -10,3 +10,8 @@ export type UploadRecipeImageOptions = Omit<
     UseMutationOptions<FileUploadResponse, RequestError, FileForUpload>,
     'mutationFn'
 >;
+
+export type UploadAvatarImageOptions = Omit<
+    UseMutationOptions<FileUploadResponse, RequestError, FileForUpload>,
+    'mutationFn'
+>;

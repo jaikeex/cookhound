@@ -29,6 +29,29 @@ class GoogleApiService {
         return response;
     }
 
+    async uploadAvatarImage(fileName: string, data: number[] | BodyInit) {
+        const bucket = ENV_CONFIG_PRIVATE.GOOGLE_STORAGE_BUCKET_AVATAR_IMAGES;
+
+        // Convert array of numbers to Buffer if needed
+        const binaryData = Array.isArray(data) ? Buffer.from(data) : data;
+
+        log.trace('uploadAvatarImage - uploading avatar image to bucket', {
+            fileName,
+            bucket
+        });
+
+        const response = await googleApiClient
+            .getStorageService()
+            .upload(fileName, binaryData, bucket, 'image/webp');
+
+        log.trace('uploadAvatarImage - upload finished', {
+            fileName,
+            status: response.status
+        });
+
+        return response;
+    }
+
     async writeLogsToGoogleCloud(logs: LogEntry[]) {
         //?—————————————————————————————————————————————————————————————————————————————————————?//
         //?                                      LOG NAME                                       ?//

@@ -1,6 +1,9 @@
 import { useAppMutation } from '@/client/request/queryClient/queryFactories';
 import apiClient from '@/client/request/apiClient';
-import type { UploadRecipeImageOptions } from './types';
+import type {
+    UploadAvatarImageOptions,
+    UploadRecipeImageOptions
+} from './types';
 
 class FileQueryClient {
     /**
@@ -8,6 +11,12 @@ class FileQueryClient {
      */
     useUploadRecipeImage = (options?: Partial<UploadRecipeImageOptions>) =>
         useAppMutation(apiClient.file.uploadRecipeImage, options);
+
+    /**
+     * Uploads a avatar image.
+     */
+    useUploadAvatarImage = (options?: Partial<UploadAvatarImageOptions>) =>
+        useAppMutation(apiClient.file.uploadAvatarImage, options);
 }
 
 export const fileQueryClient = new FileQueryClient();

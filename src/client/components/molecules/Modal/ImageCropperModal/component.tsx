@@ -13,6 +13,7 @@ export type ImageCropperModalProps = Readonly<{
     file: File;
     onComplete: (cropped: File) => void;
     onCancel?: () => void;
+    circularCrop?: boolean;
 }> &
     ModalProps;
 
@@ -20,7 +21,8 @@ export const ImageCropperModal: React.FC<ImageCropperModalProps> = ({
     file,
     onComplete,
     onCancel,
-    close
+    close,
+    circularCrop = false
 }) => {
     const { alert } = useSnackbar();
     const { t } = useLocale();
@@ -63,7 +65,7 @@ export const ImageCropperModal: React.FC<ImageCropperModalProps> = ({
             const initialCroppedPercentage = 0.8;
 
             const width = img.width * initialCroppedPercentage;
-            const height = (9 * width) / 16;
+            const height = circularCrop ? width : (9 * width) / 16;
 
             const initialCrop = {
                 unit: 'px' as const,
@@ -75,7 +77,7 @@ export const ImageCropperModal: React.FC<ImageCropperModalProps> = ({
 
             setCrop(initialCrop);
         },
-        []
+        [circularCrop]
     );
 
     const getCroppedFile = useCallback(
@@ -144,7 +146,8 @@ export const ImageCropperModal: React.FC<ImageCropperModalProps> = ({
 
             <ReactCrop
                 crop={crop}
-                aspect={16 / 9}
+                aspect={circularCrop ? 1 / 1 : 16 / 9}
+                circularCrop={circularCrop}
                 onChange={handleCropChange}
                 keepSelection
                 className=" max-h-[50dvh] rounded overflow-hidden"

@@ -417,6 +417,41 @@ class UserService {
     }
 
     //~-----------------------------------------------------------------------------------------~//
+    //$                                     UPDATE ONE BY ID                                    $//
+    //~-----------------------------------------------------------------------------------------~//
+
+    async updateOneById(
+        userId: number,
+        payload: Partial<UserForCreatePayload>
+    ): Promise<UserDTO> {
+        log.trace('updateOneById - attempt', { userId, payload });
+
+        if (
+            RequestContext.getUserId() !== userId &&
+            RequestContext.getUserRole() !== UserRole.Admin
+        ) {
+            log.warn('updateOneById - user not found');
+            throw new AuthErrorUnauthorized();
+        }
+
+        const user = await db.user.updateOneById(userId, payload);
+
+        if (!user) {
+            log.warn('updateOneById - user not found');
+            throw new NotFoundError(
+                'app.error.not-found',
+                ApplicationErrorCode.USER_NOT_FOUND
+            );
+        }
+
+        log.trace('updateOneById - success', { userId, payload });
+
+        const userResponse = createUserDTO(user);
+
+        return userResponse;
+    }
+
+    //~-----------------------------------------------------------------------------------------~//
     //$                                       VERIFY EMAIL                                      $//
     //~-----------------------------------------------------------------------------------------~//
 

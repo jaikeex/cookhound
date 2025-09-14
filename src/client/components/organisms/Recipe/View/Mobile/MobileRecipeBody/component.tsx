@@ -95,7 +95,7 @@ export const MobileRecipeBody: React.FC<MobileRecipeBodyProps> = ({
         <Tabs
             tabs={tabs}
             buttonRowClassName={classNames(
-                'sticky z-10',
+                'z-10',
                 isPreview ? '' : 'sticky top-14 '
             )}
         />

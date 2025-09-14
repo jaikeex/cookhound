@@ -6,7 +6,8 @@ import type {
     DeleteShoppingListPayload,
     RecipeForDisplayDTO,
     ResetPasswordEmailPayload,
-    ResetPasswordPayload
+    ResetPasswordPayload,
+    UserForUpdatePayload
 } from '@/common/types';
 import type {
     UseQueryOptions,
@@ -81,6 +82,15 @@ export type UpdateShoppingListOptions = Omit<
 
 export type DeleteShoppingListOptions = Omit<
     UseMutationOptions<void, RequestError, DeleteShoppingListPayload>,
+    'mutationFn'
+>;
+
+export type UpdateUserByIdOptions = Omit<
+    UseMutationOptions<
+        UserDTO,
+        RequestError,
+        { userId: number; data: UserForUpdatePayload }
+    >,
     'mutationFn'
 >;
 

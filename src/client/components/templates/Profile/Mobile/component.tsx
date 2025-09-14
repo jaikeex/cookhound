@@ -27,7 +27,12 @@ export const MobileProfileTemplate: React.FC<MobileRecipeViewProps> = ({
     return (
         <div className={classNames(className)}>
             <ProfileHeadMobile user={user} isCurrentUser={isCurrentUser} />
-            <Tabs tabs={tabs} enableNavigation className="mt-4" />
+            <Tabs
+                tabs={tabs}
+                enableNavigation
+                className="mt-4"
+                buttonRowClassName="sticky top-14 z-10"
+            />
         </div>
     );
 };

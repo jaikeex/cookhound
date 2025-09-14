@@ -11,7 +11,8 @@ import {
     createRecipePlaceholder,
     fileToByteArray,
     lowerCaseFirstLetter,
-    validateFormData
+    validateFormData,
+    generateUuid
 } from '@/client/utils';
 import type {
     Ingredient,
@@ -99,7 +100,7 @@ export const useRecipeFormController = ({
                     const imageBytes = await fileToByteArray(imageFile);
                     const response = await uploadImageMutation({
                         bytes: imageBytes,
-                        fileName: `recipe-image-${crypto.randomUUID()}`
+                        fileName: `recipe-image-${generateUuid()}`
                     });
 
                     image_url = response.objectUrl;

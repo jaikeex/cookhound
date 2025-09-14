@@ -9,6 +9,8 @@ import {
     Typography
 } from '@/client/components';
 import type { UserDTO } from '@/common/types';
+import { useLocale } from '@/client/store/I18nContext';
+import Link from 'next/link';
 
 type LoggedInMenuContentProps = Readonly<{
     user: UserDTO;
@@ -17,6 +19,8 @@ type LoggedInMenuContentProps = Readonly<{
 export const LoggedInMenuContent: React.FC<LoggedInMenuContentProps> = ({
     user
 }) => {
+    const { t } = useLocale();
+
     return (
         <React.Fragment>
             <Avatar
@@ -32,11 +36,14 @@ export const LoggedInMenuContent: React.FC<LoggedInMenuContentProps> = ({
             <div className="flex flex-col items-center h-full gap-6 mt-8">
                 <ThemeSwitcher stretch />
 
-                <div className="flex flex-col items-center gap-4">
+                <Link
+                    href={`/user/${user.id}`}
+                    className="flex flex-col items-center gap-4"
+                >
                     <ButtonBase className="mx-auto w-52">
-                        Change Avatar
+                        {t('app.general.my-account')}
                     </ButtonBase>
-                </div>
+                </Link>
 
                 <LogoutButton />
             </div>

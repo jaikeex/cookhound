@@ -8,7 +8,8 @@ import type {
     ShoppingListDTO,
     ShoppingListPayload,
     UserDTO,
-    UserForCreatePayload
+    UserForCreatePayload,
+    UserForUpdatePayload
 } from '@/common/types';
 
 /**
@@ -138,6 +139,27 @@ class UserApiClient {
     ): Promise<RecipeForDisplayDTO[]> {
         return await apiRequestWrapper.get({
             url: `/users/${userId}/last-viewed`,
+            ...config
+        });
+    }
+
+    /**
+     * Updates a user by calling `PUT /api/users/{id}`.
+     *
+     * @param id - The ID of the user.
+     * @param data - The user data to update.
+     * @param config - Optional fetch request configuration.
+     * @returns A promise that resolves when the user is updated.
+     * @throws {Error} Throws an error if the request fails.
+     */
+    async updateUserById(
+        id: number,
+        data: UserForUpdatePayload,
+        config?: RequestConfig
+    ): Promise<UserDTO> {
+        return await apiRequestWrapper.put({
+            url: `/users/${id}`,
+            data,
             ...config
         });
     }

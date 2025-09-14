@@ -3,14 +3,16 @@
 import React, { useCallback, useState } from 'react';
 import { classNames } from '@/client/utils';
 import { convertImgToWebP, verifyImgSize } from '@/client/utils';
-import { Icon, ImageCropperModal } from '@/client/components';
+import { Icon, ImageCropperModal, Loader } from '@/client/components';
 import { useLocale, useSnackbar, useModal } from '@/client/store';
 import Image from 'next/image';
 import type { I18nMessage } from '@/client/locales';
 
 type ImageInputProps = Readonly<{
     className?: string;
+    circularCrop?: boolean;
     defaultImageUrl?: string;
+    loading?: boolean;
     maxHeight?: number;
     maxSize?: number;
     maxWidth?: number;
@@ -23,7 +25,9 @@ const INPUT_ID = 'dropzone-file';
 
 export const ImageInput: React.FC<ImageInputProps> = ({
     className,
+    circularCrop = false,
     defaultImageUrl,
+    loading = false,
     maxHeight = 1920,
     maxSize = 2 * 1024 * 1024,
     maxWidth = 1920,
@@ -201,10 +205,11 @@ export const ImageInput: React.FC<ImageInputProps> = ({
                     // eslint-disable-next-line react/jsx-no-bind
                     onComplete={handleComplete}
                     close={close}
+                    circularCrop={circularCrop}
                 />
             );
         },
-        [handleFileUpload]
+        [handleFileUpload, circularCrop]
     );
 
     const openCropperModal = useCallback(
@@ -254,6 +259,9 @@ export const ImageInput: React.FC<ImageInputProps> = ({
     //?                                           JSX                                           ?//
     //|-----------------------------------------------------------------------------------------|//
 
+    const textShadow =
+        '-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000, 0 0 3px #000';
+
     return (
         <div
             className={classNames(
@@ -265,10 +273,12 @@ export const ImageInput: React.FC<ImageInputProps> = ({
                 htmlFor={INPUT_ID}
                 className={classNames(
                     `flex flex-col items-center justify-center border-2`,
-                    `relative border-gray-300 border-dashed rounded-lg cursor-pointer`,
+                    `relative border-gray-300 border-dashed cursor-pointer`,
                     `transition-colors duration-200 ease-in-out`,
                     `bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600`,
-                    `w-full max-w-[480px] aspect-[16/9] flex-grow`,
+                    circularCrop
+                        ? `w-full max-w-[140px] aspect-square rounded-full`
+                        : `w-full max-w-[480px] aspect-[16/9] flex-grow rounded-lg`,
                     isDragging && 'bg-gray-200 dark:bg-gray-600'
                 )}
                 onDragOver={handleDragOver}
@@ -281,31 +291,56 @@ export const ImageInput: React.FC<ImageInputProps> = ({
                         height={1440}
                         src={previewUrl}
                         alt="Preview"
-                        className="absolute top-0 left-0 z-0 object-cover w-full h-full rounded-lg"
+                        className={classNames(
+                            'absolute top-0 left-0 z-0 object-cover w-full h-full',
+                            circularCrop ? 'rounded-full' : 'rounded-lg'
+                        )}
                     />
                 )}
 
-                <div className="z-10 flex flex-col items-center justify-center pt-5 pb-6">
-                    <Icon
-                        name="upload"
-                        size={24}
-                        className={'text-gray-500 dark:text-gray-400'}
-                    />
+                {loading ? (
+                    <Loader size="lg" className={'text-white'} />
+                ) : (
+                    <div className="z-10 flex flex-col items-center justify-center pt-5 pb-6">
+                        <Icon
+                            name="upload"
+                            size={24}
+                            className={'text-white'}
+                            style={{
+                                filter: 'drop-shadow(-1px -1px 0 #000) drop-shadow(1px -1px 0 #000) drop-shadow(-1px 1px 0 #000) drop-shadow(1px 1px 0 #000) drop-shadow(0 0 3px #000)'
+                            }}
+                        />
 
-                    {isDragging ? (
-                        <p className="mt-2 mb-1 text-sm font-semibold text-gray-500 dark:text-gray-400">
-                            Drop here
-                        </p>
-                    ) : (
-                        <p className="mt-2 mb-1 text-sm font-semibold text-gray-500 dark:text-gray-400">
-                            {t('app.general.upload-image')}
-                        </p>
-                    )}
+                        {isDragging ? (
+                            <p
+                                className="mt-2 mb-1 text-sm font-semibold text-white"
+                                style={{
+                                    textShadow: textShadow
+                                }}
+                            >
+                                Drop here
+                            </p>
+                        ) : (
+                            <p
+                                className={`mt-2 mb-1 text-sm font-semibold text-white ${circularCrop ? 'text-center text-xs' : ''}`}
+                                style={{
+                                    textShadow: textShadow
+                                }}
+                            >
+                                {t('app.general.upload-image')}
+                            </p>
+                        )}
 
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                        (MAX. 2560x1440)
-                    </p>
-                </div>
+                        <p
+                            className="text-xs text-white"
+                            style={{
+                                textShadow: textShadow
+                            }}
+                        >
+                            (MAX. 2560x1440)
+                        </p>
+                    </div>
+                )}
 
                 <input
                     id={INPUT_ID}

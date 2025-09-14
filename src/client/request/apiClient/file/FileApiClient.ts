@@ -24,6 +24,25 @@ class FileApiClient {
             ...config
         });
     }
+
+    /**
+     * Uploads a avatar image by calling `POST /api/file/avatar-img`.
+     *
+     * @param data - The avatar image data to upload.
+     * @param config - Optional fetch request configuration.
+     * @returns A promise that resolves to the avatar image upload response.
+     * @throws {Error} Throws an error if the request fails.
+     */
+    async uploadAvatarImage(
+        data: FileForUpload,
+        config?: RequestConfig
+    ): Promise<FileUploadResponse> {
+        return await apiRequestWrapper.post({
+            url: '/file/avatar-img',
+            data: data,
+            ...config
+        });
+    }
 }
 
 export const fileApiClient = new FileApiClient();
