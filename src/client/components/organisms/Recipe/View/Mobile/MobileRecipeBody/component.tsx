@@ -37,7 +37,7 @@ export const MobileRecipeBody: React.FC<MobileRecipeBodyProps> = ({
                     <IngredientsListView
                         key={`${recipe.id}-ingredients-list-view-mobile`}
                         ingredients={recipe.ingredients}
-                        className={'pt-4'}
+                        className={'py-4'}
                         variant={'mobile'}
                     />
 

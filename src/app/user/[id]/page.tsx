@@ -25,7 +25,6 @@ export default async function UserProfilePage({
     const sessionId = cookieStore.get(SESSION_COOKIE_NAME)?.value;
 
     const user = apiClient.user.getUserById(id, {
-        revalidate: 3600,
         ...(sessionId
             ? {
                   headers: { 'Cookie': `session=${sessionId}` }
