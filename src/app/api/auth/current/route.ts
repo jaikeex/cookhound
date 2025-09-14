@@ -12,8 +12,8 @@ import { handleServerError } from '@/server/utils/reqwest';
  * response on failure.
  *
  * - 200: Success, with user object.
- * - 401: Unauthorized, if JWT is missing or invalid.
- * - 404: Not Found, if user from JWT does not exist.
+ * - 401: Unauthorized, if session is missing or invalid.
+ * - 404: Not Found, if user from session does not exist.
  */
 export async function GET(request: Request) {
     return RequestContext.run(request, async () => {

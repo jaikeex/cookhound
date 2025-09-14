@@ -15,8 +15,8 @@ class AuthApiClient {
      * - 200: Success, with user object.
      *
      * @throws {Error} Throws an error if the request fails.
-     * - 401: Unauthorized, if JWT is missing or invalid.
-     * - 404: Not Found, if user from JWT does not exist.
+     * - 401: Unauthorized, if session is missing or invalid.
+     * - 404: Not Found, if user from session does not exist.
      * - 500: Internal Server Error, if there is another error during authentication.
      */
     async getCurrentUser(config?: RequestConfig): Promise<UserDTO> {

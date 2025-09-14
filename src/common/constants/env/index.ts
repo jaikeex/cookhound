@@ -51,9 +51,6 @@ export const ENV_CONFIG_PRIVATE = createConfig(
         GOOGLE_SMTP_USERNAME: process.env.GOOGLE_SMTP_USERNAME,
         GOOGLE_SMTP_PASSWORD: process.env.GOOGLE_SMTP_PASSWORD,
         LOG_DIR: process.env.LOG_DIR,
-        JWT_SECRET: process.env.JWT_SECRET,
-        JWT_TOKEN_DURATION_DAYS: process.env.JWT_TOKEN_DURATION_DAYS,
-        JWT_ISSUER: process.env.JWT_ISSUER,
         GOOGLE_API_PROJECT_ID: process.env.GOOGLE_API_PROJECT_ID,
         GOOGLE_LOGGING_WRITE_CREDENTIALS:
             process.env.GOOGLE_LOGGING_WRITE_CREDENTIALS,
