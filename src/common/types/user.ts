@@ -1,15 +1,3 @@
-export type UserDTO = {
-    id: number;
-    username: string;
-    email: string;
-    role: UserRole;
-    status: Status;
-    avatarUrl: string | null;
-    createdAt: string;
-    lastLogin: string | null;
-    lastVisitedAt: string | null;
-};
-
 export type UserForCreatePayload = {
     username: string;
     email: string;
@@ -27,6 +15,8 @@ export type UserForLogin = {
     password: string;
     keepLoggedIn: boolean;
 };
+
+export type UserVisibilityGroup = 'public' | 'self' | 'admin';
 
 export enum UserRole {
     Guest = 'guest',

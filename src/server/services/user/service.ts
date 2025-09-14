@@ -18,8 +18,8 @@ import {
     ValidationError
 } from '@/server/error';
 import { type UserForGoogleCreate, type UserForLocalCreate } from './types';
-import { createUserDTO } from './utils';
-import db from '@/server/db/model';
+import { createUserDTO, getUserDataPermissionGroups } from './utils';
+import db, { getUserSelect } from '@/server/db/model';
 import { Logger } from '@/server/logger';
 import { RequestContext } from '@/server/utils/reqwest/context';
 import { ApplicationErrorCode } from '@/server/error/codes';
@@ -179,7 +179,10 @@ class UserService {
     async getUserById(id: number): Promise<UserDTO> {
         log.trace('getUserById - attempt', { id });
 
-        const user = await db.user.getOneById(id);
+        const groups = getUserDataPermissionGroups(id);
+        const select = getUserSelect(groups);
+
+        const user = await db.user.getOneByIdWithSelect(id, select);
 
         if (!user) {
             log.warn('getUserById - user not found', { id });
@@ -189,7 +192,7 @@ class UserService {
             );
         }
 
-        const userResponse: UserDTO = createUserDTO(user);
+        const userResponse = createUserDTO(user);
 
         log.trace('getUserById - success', { id });
 

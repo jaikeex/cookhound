@@ -5,6 +5,10 @@ import recipeTagModel from './recipe-tag/model';
 import shoppingListModel from './shopping-list/model';
 import userModel from './user/model';
 
+//|---------------------------------------------------------------------------------------------|//
+//?                                           MODELS                                            ?//
+//|---------------------------------------------------------------------------------------------|//
+
 const dbModel = {
     ingredient: ingredientModel,
     rating: ratingModel,
@@ -15,3 +19,11 @@ const dbModel = {
 };
 
 export default dbModel;
+
+//|---------------------------------------------------------------------------------------------|//
+//?                                         PROJECTIONS                                         ?//
+//|---------------------------------------------------------------------------------------------|//
+
+import { USER_SELECT, getUserSelect } from './user/projections';
+
+export { USER_SELECT, getUserSelect };

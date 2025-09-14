@@ -66,6 +66,37 @@ class UserModel {
     }
 
     /**
+     * Cached user lookup by ID with column projection
+     * Query class -> C2
+     */
+    async getOneByIdWithSelect(
+        id: number,
+        select: Prisma.UserSelect,
+        ttl?: number
+    ): Promise<User | null> {
+        const cacheKey = generateCacheKey('user', 'findUnique', {
+            where: { id },
+            select
+        });
+
+        log.trace('Getting user by id with select', { id, select });
+
+        const user = await cachePrismaQuery(
+            cacheKey,
+            async () => {
+                log.trace('Fetching user from db by id with select', {
+                    id,
+                    select
+                });
+                return prisma.user.findUnique({ where: { id }, select });
+            },
+            ttl ?? CACHE_TTL.TTL_2
+        );
+
+        return this.reviveUserDates(user as User | null);
+    }
+
+    /**
      * Cached user lookup by username
      * Query class -> C2
      */

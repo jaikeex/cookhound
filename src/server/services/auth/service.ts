@@ -1,4 +1,4 @@
-import type { Status, UserDTO, UserRole } from '@/common/types/user';
+import type { Status, UserDTO, UserRole } from '@/common/types';
 import type {
     UserForLogin,
     AuthResponse,
@@ -17,6 +17,7 @@ import { Logger } from '@/server/logger';
 import { deleteSessionCookie, sessions } from '@/server/utils/session';
 import { RequestContext } from '@/server/utils/reqwest/context';
 import { ApplicationErrorCode } from '@/server/error/codes';
+import { createUserDTO } from '@/server/services/user/utils';
 
 //|=============================================================================================|//
 
@@ -38,10 +39,10 @@ class AuthService {
     /**
      * Authenticates a user with their email and password.
      * It validates credentials, and on success, updates the last login time
-     * and returns a JWT and user data.
+     * and returns a session and user data.
      *
      * @param payload - The user's login credentials.
-     * @returns A promise that resolves to an object containing the JWT and user data.
+     * @returns A promise that resolves to an object containing the session and user data.
      * @throws {ServerError} Throws an error with status 400 if email or password are not provided.
      * @throws {ServerError} Throws an error with status 401 for invalid credentials.
      * @throws {ServerError} Throws an error with status 403 if the user's email is not verified.
@@ -134,7 +135,7 @@ class AuthService {
      * and then either finds an existing user or creates a new one.
      *
      * @param payload - The payload containing the Google OAuth authorization code.
-     * @returns A promise that resolves to an object containing the JWT and user data.
+     * @returns A promise that resolves to an object containing the session and user data.
      * @throws {ServerError} Throws an error with status 400 if the Google OAuth code is missing.
      * @throws {ServerError} Throws an error with status 401 if the access token is missing.
      * @throws {ServerError} Throws an error with status 401 if the user info is missing.
@@ -253,7 +254,7 @@ class AuthService {
     //~-----------------------------------------------------------------------------------------~//
 
     /**
-     * Logs out the currently authenticated user by deleting the JWT cookie.
+     * Logs out the currently authenticated user by deleting the session.
      *
      * @returns void.
      * @throws {ServerError} Throws an error with status 500 if there is an error.
@@ -274,7 +275,7 @@ class AuthService {
     //~-----------------------------------------------------------------------------------------~//
 
     /**
-     * Retrieves the currently authenticated user based on the JWT cookie.
+     * Retrieves the currently authenticated user based on the session ID.
      *
      * @returns A promise that resolves to the authenticated user's data.
      * @throws {ServerError} Throws an error with status 401 if the user is not authenticated.
@@ -326,17 +327,9 @@ class AuthService {
             id: userId
         });
 
-        return {
-            id: user.id,
-            email: user.email,
-            username: user.username,
-            avatarUrl: user.avatarUrl,
-            createdAt: user.createdAt.toISOString(),
-            role: user.role as UserRole,
-            status: user.status as Status,
-            lastLogin: user.lastLogin?.toISOString() || null,
-            lastVisitedAt: user.lastVisitedAt?.toISOString() || null
-        };
+        const userResponse = createUserDTO(user);
+
+        return userResponse;
     }
 }
 
