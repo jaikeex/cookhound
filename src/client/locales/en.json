@@ -102,6 +102,8 @@
     "app.recipe.tags.category.definedBy": "Main ingredients",
     "app.recipe.tags.category.type": "Type",
     "app.recipe.tags.category.diet": "Other",
+    "app.recipe.not-yet-rated": "Not yet rated",
+    "app.recipe.you-can-rate-again-in": "You can rate this recipe again in {{seconds}} seconds",
     "app.recipe.servings": "Servings",
     "app.recipe.preparation-time": "Preparation time (in minutes)",
     "app.recipe.minutes-short": "min",

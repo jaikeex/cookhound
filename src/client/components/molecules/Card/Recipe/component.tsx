@@ -38,20 +38,27 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({
                     </Typography>
                     <div className="flex items-center justify-between gap-2 mt-auto">
                         <RecipeInfo time={time} size="sm" />
-                        <Rating
-                            rating={rating}
-                            disabled
-                            size="sm"
-                            className="flex-shrink-0 hidden md:block"
-                        />
-                        <div className="flex items-center gap-1 md:hidden">
-                            <Typography variant="label">{rating}</Typography>
-                            <Icon
-                                name="starFull"
-                                size={16}
-                                className="text-yellow-500"
-                            />
-                        </div>
+
+                        {rating ? (
+                            <React.Fragment>
+                                <Rating
+                                    rating={rating}
+                                    disabled
+                                    size="sm"
+                                    className="flex-shrink-0 hidden md:block"
+                                />
+                                <div className="flex items-center gap-1 md:hidden">
+                                    <Typography variant="label">
+                                        {rating}
+                                    </Typography>
+                                    <Icon
+                                        name="starFull"
+                                        size={16}
+                                        className="text-yellow-500"
+                                    />
+                                </div>
+                            </React.Fragment>
+                        ) : null}
                     </div>
                 </div>
             </Link>

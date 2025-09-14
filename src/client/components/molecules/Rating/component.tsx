@@ -3,9 +3,10 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { classNames } from '@/client/utils';
 import type { StarState } from '@/client/components';
-import { Star, Tooltip } from '@/client/components';
+import { Star, Tooltip, Typography } from '@/client/components';
 import { generateStars } from '@/client/components/molecules/Rating/utils';
-import { useCooldown } from '@/client/hooks';
+import { useCooldown, useScreenSize } from '@/client/hooks';
+import { useLocale, useSnackbar } from '@/client/store';
 
 export type RatingSize = 'sm' | 'md' | 'lg';
 
@@ -39,9 +40,15 @@ export const Rating: React.FC<RatingProps> = ({
     rating,
     size = 'md'
 }) => {
+    const { t } = useLocale();
+    const { alert } = useSnackbar();
+    const { isMobile } = useScreenSize();
+
     const [isHovered, setIsHovered] = useState(false);
     const [isPulsing, setIsPulsing] = useState(false);
     const [isTooltipVisible, setIsTooltipVisible] = useState(false);
+
+    const hasRating = rating !== null;
 
     const { startCooldown, isOnCooldown, remainingTime } = useCooldown(
         cooldown ?? 0,
@@ -78,6 +85,17 @@ export const Rating: React.FC<RatingProps> = ({
 
     const handleClick = useCallback(
         (event: React.MouseEvent<HTMLDivElement>) => {
+            if (isOnCooldown && isMobile) {
+                alert({
+                    message: t('app.recipe.you-can-rate-again-in', {
+                        seconds: remainingTime
+                            ? Math.round(remainingTime / 1000)
+                            : 0
+                    }),
+                    variant: 'info'
+                });
+            }
+
             if (!onClick || isOnCooldown || isSubmitting.current) return;
 
             isSubmitting.current = true;
@@ -107,7 +125,16 @@ export const Rating: React.FC<RatingProps> = ({
                 setIsPulsing(false);
             }, 1000);
         },
-        [onClick, isOnCooldown, startCooldown, cooldown]
+        [
+            onClick,
+            isOnCooldown,
+            startCooldown,
+            cooldown,
+            isMobile,
+            alert,
+            remainingTime,
+            t
+        ]
     );
 
     useEffect(() => {
@@ -119,7 +146,7 @@ export const Rating: React.FC<RatingProps> = ({
     }, [rating, isPulsing]);
 
     return (
-        <div className={className}>
+        <div className={classNames('relative', className)}>
             <div
                 ref={ref}
                 className={classNames(
@@ -128,7 +155,7 @@ export const Rating: React.FC<RatingProps> = ({
                     (disabled || isOnCooldown) && 'opacity-80'
                 )}
                 onMouseLeave={handleMouseLeave}
-                onClick={disabled || isOnCooldown ? undefined : handleClick}
+                onClick={disabled ? undefined : handleClick}
                 onMouseEnter={handleMouseEnter}
             >
                 {stars.map((star, index) => (
@@ -139,7 +166,11 @@ export const Rating: React.FC<RatingProps> = ({
                         state={star}
                         iconSize={iconSize}
                         fill={stars[index] !== 'empty' ? fill : 'silver'}
-                        className={classConfig.starSize[size]}
+                        className={classNames(
+                            classConfig.starSize[size],
+                            !hasRating &&
+                                (isHovered ? 'opacity-100' : 'opacity-80')
+                        )}
                         pulse={
                             isPulsing && isHovered && stars[index] !== 'empty'
                         }
@@ -153,17 +184,21 @@ export const Rating: React.FC<RatingProps> = ({
             </div>
 
             <Tooltip
-                text={`You can rate this recipe again in ${
-                    remainingTime ? Math.round(remainingTime / 1000) : 0
-                } seconds`}
-                className={'w-36 max-w-36'}
+                text={`${t('app.recipe.you-can-rate-again-in', {
+                    seconds: remainingTime
+                        ? Math.round(remainingTime / 1000)
+                        : 0
+                })}`}
+                className={'w-36 max-w-36 hidden md:block'}
                 visible={isOnCooldown && isTooltipVisible}
                 targetRef={ref}
             />
 
-            {/*{rating === null ? (*/}
-            {/*    <Typography variant={'body-sm'}>Not yet rated</Typography>*/}
-            {/*) : null}*/}
+            {!hasRating ? (
+                <Typography variant={'body-sm'} className="w-fit mx-auto mt-1">
+                    {t('app.recipe.not-yet-rated')}
+                </Typography>
+            ) : null}
         </div>
     );
 };

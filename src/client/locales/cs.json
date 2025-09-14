@@ -102,6 +102,8 @@
     "app.recipe.tags.category.definedBy": "Hlavní ingredience",
     "app.recipe.tags.category.type": "Druh jídla",
     "app.recipe.tags.category.diet": "Ostatní",
+    "app.recipe.not-yet-rated": "Zatím nehodnoceno",
+    "app.recipe.you-can-rate-again-in": "Znovu můžete tento recept ohodnotit za {{seconds}} sekund",
     "app.recipe.servings": "Porce",
     "app.recipe.preparation-time": "Čas přípravy (v minutách)",
     "app.recipe.minutes-short": "min",
