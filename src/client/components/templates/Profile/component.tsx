@@ -36,6 +36,7 @@ export const ProfileTemplate: React.FC<ProfileProps> = ({ user }) => {
             label: t('app.profile.recipes'),
             content: (
                 <Recipes
+                    cols={{ sm: 2, md: 2, lg: 3, xl: 4 }}
                     isCurrentUser={isCurrentUser}
                     recipes={[]}
                     userId={userResolved.id}

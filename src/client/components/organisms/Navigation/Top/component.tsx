@@ -43,7 +43,7 @@ export const TopNavigation: React.FC<TopNavigationProps> = () => {
     useAppEventListener(Event.NOT_FOUND_OPENED, () => setIsNotfound(true));
     useAppEventListener(Event.NOT_FOUND_CLOSED, () => setIsNotfound(false));
 
-    if (!authResolved || isNotfound) return null;
+    if (isNotfound) return null;
 
     return (
         <div

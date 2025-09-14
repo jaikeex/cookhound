@@ -128,6 +128,7 @@
     "app.recipe.error.flagged": "Recipe flagged",
     "app.recipe.error.flagged-description": "The content of this recipe has been flagged as inappropriate. If you believe this is an error, please contact the administrator.",
     "app.recipe.create-preview": "Preview",
+    "app.recipe.edit-success": "Recipe updated successfully",
     "app.recipe.rated": "Recipe rated successfully",
     "app.recipe.search.placeholder": "Search for a recipe",
     "app.recipe.search-suggestions.title": "Search suggestions",

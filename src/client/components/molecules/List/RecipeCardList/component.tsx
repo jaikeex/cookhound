@@ -7,8 +7,16 @@ import { classNames } from '@/client/utils';
 import * as React from 'react';
 import { RecipeWithHandling } from '@/client/components/molecules';
 
+export type RecipeCardListGridColumns = {
+    sm: number;
+    md: number;
+    lg: number;
+    xl: number;
+};
+
 type RecipeCardListProps = Readonly<{
     className?: string;
+    cols?: RecipeCardListGridColumns;
     loadMore: () => void;
     hasMore: boolean;
     isLoading?: boolean;
@@ -18,6 +26,7 @@ type RecipeCardListProps = Readonly<{
 
 export const RecipeCardList: React.FC<RecipeCardListProps> = ({
     className,
+    cols = { sm: 2, md: 3, lg: 4, xl: 4 },
     loadMore,
     hasMore,
     isLoading,
@@ -36,7 +45,7 @@ export const RecipeCardList: React.FC<RecipeCardListProps> = ({
         <React.Fragment>
             <div
                 className={classNames(
-                    'grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-4',
+                    `grid grid-cols-${cols.sm} gap-4 md:grid-cols-${cols.md} xl:grid-cols-${cols.lg}`,
                     className
                 )}
             >

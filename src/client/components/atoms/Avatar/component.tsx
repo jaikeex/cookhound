@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import Image from 'next/image';
 
@@ -7,11 +9,12 @@ import Image from 'next/image';
 
 const config = {
     wrapperSize: {
-        sm: 'h-6 w-6',
-        md: 'h-8 w-8',
-        lg: 'h-10 w-10',
-        xl: 'h-16 w-16',
-        xxl: 'h-24 w-24'
+        sm: { classes: 'h-6 w-6', size: 96 },
+        md: { classes: 'h-8 w-8', size: 96 },
+        lg: { classes: 'h-10 w-10', size: 96 },
+        xl: { classes: 'h-16 w-16', size: 96 },
+        xxl: { classes: 'h-24 w-24', size: 96 },
+        xxxl: { classes: 'h-36 w-36', size: 144 }
     }
 };
 
@@ -44,14 +47,15 @@ export const Avatar: React.FC<AvatarProps> = ({
 
     return (
         <div
-            className={`rounded-full overflow-hidden ${config.wrapperSize[size]} ${className}`}
+            className={`rounded-full overflow-hidden ${config.wrapperSize[size].classes} ${className || ''}`}
         >
             <Image
                 src={url}
                 alt={alt || 'avatar'}
-                width={96}
-                height={96}
+                width={config.wrapperSize[size].size}
+                height={config.wrapperSize[size].size}
                 className={imgClassName}
+                priority={false}
             />
         </div>
     );

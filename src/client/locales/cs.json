@@ -128,6 +128,7 @@
     "app.recipe.error.flagged": "Recept byl označen jako nevhodný",
     "app.recipe.error.flagged-description": "Obsah tohoto receptu byl vyhodnocen jako nevhodný. Pokud si myslíte, že jde o chybu, kontaktujte prosím správce.",
     "app.recipe.create-preview": "Náhled",
+    "app.recipe.edit-success": "Recept byl úspěšně upraven",
     "app.recipe.rated": "Vaše hodnocení bylo uloženo",
     "app.recipe.search.placeholder": "Hledat recepty",
     "app.recipe.search-suggestions.title": "Návrhy vyhledávání",
