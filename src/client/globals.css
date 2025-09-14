@@ -45,6 +45,18 @@
         @apply gap-1.5 [&>span]:text-2xl translate-y-1.5 [&>img]:w-12 [&>img]:h-12;
     }
 
+    .logo-md {
+        @apply gap-2 [&>span]:text-3xl translate-y-2 [&>img]:w-16 [&>img]:h-16;
+    }
+
+    .logo-lg {
+        @apply gap-2.5 [&>span]:text-4xl translate-y-2.5 [&>img]:w-20 [&>img]:h-20;
+    }
+
+    .logo-xl {
+        @apply gap-3 [&>span]:text-5xl translate-y-3 [&>img]:w-24 [&>img]:h-24;
+    }
+
     /* ----------------------------------------------------------- */
     /* ---------------------- FORM ELEMENTS ---------------------- */
     /* ----------------------------------------------------------- */

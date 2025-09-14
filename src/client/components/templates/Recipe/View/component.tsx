@@ -1,6 +1,6 @@
 'use client';
 
-import React, { use } from 'react';
+import React from 'react';
 import { DesktopRecipeViewTemplate } from './Desktop';
 import { MobileRecipeViewTemplate } from './Mobile';
 import type { RecipeDTO } from '@/common/types';
@@ -14,16 +14,15 @@ import { useQueryClient } from '@tanstack/react-query';
 import { FlaggedTemplate } from '@/client/components/templates/Error/Flagged';
 
 export type RecipeViewProps = Readonly<{
-    recipe: Promise<RecipeDTO>;
+    recipe: RecipeDTO;
 }>;
 
 export const RecipeViewTemplate: React.FC<RecipeViewProps> = ({ recipe }) => {
-    const recipeResolved = use(recipe);
     const queryClient = useQueryClient();
     const { resetSelectedIngredients } = useIngredientSelectStore();
     const { user } = useAuth();
 
-    const isFlagged = recipeResolved.flags?.some((flag) => flag.active);
+    const isFlagged = recipe.flags?.some((flag) => flag.active);
 
     // Fuck vscode coloring fails
     const { setValue: setLastViewedRecipes } = useLocalStorage<
@@ -43,26 +42,26 @@ export const RecipeViewTemplate: React.FC<RecipeViewProps> = ({ recipe }) => {
     useRunOnce(() => {
         resetSelectedIngredients();
 
-        if (recipeResolved?.id) {
+        if (recipe?.id) {
             // Neither await this, nor catch any errors, if the recipe was loaded,
             // this will work too, if it does not, it does not matter the visit is not
             // recorded anyway
             registerRecipeVisit({
-                id: recipeResolved.id.toString(),
+                id: recipe.id.toString(),
                 userId: user?.id?.toString() ?? null
             });
 
             // For anonymous users, also store the recipe locally so it can be suggested later.
             if (!user?.id) {
                 const lightweight: RecipeForDisplayDTO = {
-                    id: recipeResolved.id,
-                    displayId: recipeResolved.displayId,
-                    title: recipeResolved.title,
-                    imageUrl: recipeResolved.imageUrl,
-                    rating: recipeResolved.rating,
-                    timesRated: recipeResolved.timesRated,
-                    time: recipeResolved.time,
-                    portionSize: recipeResolved.portionSize
+                    id: recipe.id,
+                    displayId: recipe.displayId,
+                    title: recipe.title,
+                    imageUrl: recipe.imageUrl,
+                    rating: recipe.rating,
+                    timesRated: recipe.timesRated,
+                    time: recipe.time,
+                    portionSize: recipe.portionSize
                 };
 
                 // Ensure uniqueness (newest first) and limit to 5 entries.
@@ -75,7 +74,7 @@ export const RecipeViewTemplate: React.FC<RecipeViewProps> = ({ recipe }) => {
                 });
             }
         }
-    }, [recipeResolved?.id]);
+    }, [recipe?.id]);
 
     if (isFlagged) {
         return <FlaggedTemplate />;
@@ -83,12 +82,9 @@ export const RecipeViewTemplate: React.FC<RecipeViewProps> = ({ recipe }) => {
 
     return (
         <React.Fragment>
-            <MobileRecipeViewTemplate
-                recipe={recipeResolved}
-                className={'md:hidden'}
-            />
+            <MobileRecipeViewTemplate recipe={recipe} className={'md:hidden'} />
             <DesktopRecipeViewTemplate
-                recipe={recipeResolved}
+                recipe={recipe}
                 className={'hidden md:block'}
             />
         </React.Fragment>

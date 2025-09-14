@@ -1,6 +1,6 @@
 import { RequestError } from '@/client/error';
 import { ENV_CONFIG_PUBLIC } from '@/common/constants';
-import { redirect } from 'next/navigation';
+import { notFound } from 'next/navigation';
 
 /**
  * A type alias for a URL string that must start with a forward slash.
@@ -242,7 +242,7 @@ class ApiRequestWrapper {
 
             // Handle 404 Not Found on server side (server components)
             if (response.status === 404 && typeof window === 'undefined') {
-                redirect('/not-found');
+                notFound();
             }
 
             throw RequestError.fromFetchError(data, response);

@@ -18,12 +18,16 @@ import { NavMenu } from './Menu';
 import { TOP_NAVBAR_ID } from '@/client/constants';
 import { classNames } from '@/client/utils';
 import { usePathname } from 'next/navigation';
+import { Event } from '@/client/events';
+import { useAppEventListener } from '@/client/hooks';
 
 type TopNavigationProps = Readonly<NonNullable<unknown>>;
 
 export const TopNavigation: React.FC<TopNavigationProps> = () => {
     const { t } = useLocale();
     const { authResolved, user } = useAuth();
+
+    const [isNotfound, setIsNotfound] = useState<boolean>(false);
 
     const pathname = usePathname();
 
@@ -35,6 +39,10 @@ export const TopNavigation: React.FC<TopNavigationProps> = () => {
     const handleOpenSidebar = useCallback(() => setIsSidebarOpen(true), []);
     const handleCloseSidebar = useCallback(() => setIsSidebarOpen(false), []);
     const handleSearchClick = useCallback(() => {}, []);
+
+    useAppEventListener(Event.NOT_FOUND, () => setIsNotfound(true));
+
+    if (isNotfound) return null;
 
     return (
         <div

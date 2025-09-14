@@ -1,17 +1,28 @@
 'use client';
 
-import { ButtonBase, Typography } from '@/client/components';
+import { ButtonBase, Logo, Typography } from '@/client/components';
+import { eventBus, Event } from '@/client/events';
 import { useLocale } from '@/client/store';
-import Link from 'next/link';
 import * as React from 'react';
+import { useCallback, useEffect } from 'react';
 
 type NotFoundTemplateProps = Readonly<NonNullable<unknown>>;
 
 export const NotFoundTemplate: React.FC<NotFoundTemplateProps> = () => {
     const { t } = useLocale();
 
+    const handleNavigateHome = useCallback(() => {
+        window.location.href = '/';
+    }, []);
+
+    useEffect(() => {
+        eventBus.emit(Event.NOT_FOUND, undefined);
+    }, []);
+
     return (
         <div className="flex flex-col items-center min-h-screen pt-10 text-center">
+            <Logo className="logo-md mb-8" />
+
             <Typography variant="heading-lg" className="mb-4">
                 {t('app.error.not-found')}
             </Typography>
@@ -21,11 +32,13 @@ export const NotFoundTemplate: React.FC<NotFoundTemplateProps> = () => {
             >
                 {t('app.error.not-found.description')}
             </Typography>
-            <Link href={'/'} className="mx-auto">
-                <ButtonBase className="mx-auto w-52" color="primary">
-                    {t('app.general.home')}
-                </ButtonBase>
-            </Link>
+            <ButtonBase
+                className="mx-auto w-52"
+                color="primary"
+                onClick={handleNavigateHome}
+            >
+                {t('app.general.home')}
+            </ButtonBase>
         </div>
     );
 };

@@ -1,12 +1,14 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { classNames } from '@/client/utils';
 import { Icon, Tooltip } from '@/client/components';
 import Link from 'next/link';
 import { useAuth, useLocale } from '@/client/store';
 import { BOTTOM_NAVBAR_ID } from '@/client/constants';
 import { usePathname } from 'next/navigation';
+import { Event } from '@/client/events';
+import { useAppEventListener } from '@/client/hooks';
 
 const DISABLED_FOR_ROUTES = ['/recipe/create'];
 
@@ -35,11 +37,15 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = () => {
     const { t } = useLocale();
     const pathname = usePathname();
 
+    const [isNotfound, setIsNotfound] = useState<boolean>(false);
+
     const isLoggedin = authResolved && !!user;
 
     const isDisabled = isNavigationDisabled(pathname);
 
-    if (isDisabled) return null;
+    useAppEventListener(Event.NOT_FOUND, () => setIsNotfound(true));
+
+    if (isDisabled || isNotfound) return null;
 
     return (
         <div
