@@ -51,6 +51,19 @@ export const RecipeFormShell: React.FC<RecipeFormShellProps> = ({
     mode
 }) => {
     const { t } = useLocale();
+    /**
+     * This memo is imporant to prevent the edit form fields from resetting when the form remounts.
+     * The main source of mounts are url changes, and there are two ways that can happen: TahSelectionModal
+     * and preview Sidebar openings.
+     */
+    const initialDefaultValuesRef = React.useRef<RecipeDTO | null>(null);
+
+    if (initialDefaultValuesRef.current === null) {
+        initialDefaultValuesRef.current =
+            mode === 'edit' ? (recipeObject ?? defaultValues) : null;
+    }
+
+    const effectiveDefaultValues = initialDefaultValuesRef.current;
 
     return (
         <div
@@ -72,7 +85,7 @@ export const RecipeFormShell: React.FC<RecipeFormShellProps> = ({
                     onChange={handleFormChange}
                     errors={formErrors}
                     pending={isPending || isUploadingImage}
-                    defaultValues={mode === 'edit' ? defaultValues : null}
+                    defaultValues={effectiveDefaultValues}
                     mode={mode}
                 />
             </form>

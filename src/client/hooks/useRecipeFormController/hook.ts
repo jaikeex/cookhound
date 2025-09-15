@@ -139,8 +139,6 @@ export const useRecipeFormController = ({
             });
 
             allowNavigation();
-            formRef.current?.reset();
-            setChangedFields([]);
             safePush(`/recipe/${recipe.displayId}`);
         },
         [alert, allowNavigation, isEdit, queryClient, safePush, t]
@@ -203,9 +201,9 @@ export const useRecipeFormController = ({
 
             if (name === 'ingredients' && value) {
                 newValue = value.map((ingredient: Ingredient) => ({
-                    quantity: ingredient.quantity || null,
+                    quantity: ingredient?.quantity || null,
                     id: null,
-                    name: lowerCaseFirstLetter(ingredient.name)
+                    name: lowerCaseFirstLetter(ingredient?.name)
                 }));
             }
 
@@ -260,16 +258,34 @@ export const useRecipeFormController = ({
 
     useEffect(() => {
         if (isEdit && initialRecipe) {
-            setRecipeObject(initialRecipe);
+            // If the recipe in the store is different from the one for this page,
+            // update the store. This handles navigating between different edit pages.
+            if (recipeObject?.id !== initialRecipe.id) {
+                setRecipeObject(initialRecipe);
+                setChangedFields([]);
+            }
         } else if (!isEdit) {
-            setRecipeObject(
-                createRecipePlaceholder(
-                    locale,
-                    t as unknown as (key: string) => string
-                )
-            );
+            // On the create page, if the store holds a real recipe from a previous
+            // session (identifiable by it having an ID), reset it.
+            if (recipeObject === null || recipeObject.id) {
+                setRecipeObject(
+                    createRecipePlaceholder(
+                        locale,
+                        t as unknown as (key: string) => string
+                    )
+                );
+                setChangedFields([]);
+            }
         }
-    }, [initialRecipe, isEdit, locale, setRecipeObject, t]);
+    }, [
+        initialRecipe,
+        isEdit,
+        locale,
+        setRecipeObject,
+        t,
+        recipeObject?.id,
+        recipeObject
+    ]);
 
     return controllerReturn;
 };
