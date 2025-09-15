@@ -9,7 +9,7 @@ export const setLocaleCookie = async (locale: string): Promise<void> => {
     cookieStore.set('locale', locale, {
         path: '/',
         maxAge: 60 * 60 * 24 * 365,
-        secure: true,
+        secure: ENV_CONFIG_PUBLIC.ENV === 'production',
         sameSite: 'strict',
         domain: ENV_CONFIG_PUBLIC.COOKIE_DOMAIN
     });
