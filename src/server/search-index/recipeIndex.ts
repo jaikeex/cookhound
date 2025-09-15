@@ -30,6 +30,7 @@ interface RecipeDocument {
     notes: string | null;
     ingredients: string[];
     instructions: string[];
+    tags: string[];
     rating: number | null;
     isFlagged: number;
     timesRated: number;
@@ -161,6 +162,7 @@ class RecipeSearchIndex {
                     { name: 'notes', type: 'string', optional: true },
                     { name: 'ingredients', type: 'string[]', optional: true },
                     { name: 'instructions', type: 'string[]', optional: true },
+                    { name: 'tags', type: 'string[]', optional: true },
                     { name: 'rating', type: 'float', optional: true },
                     { name: 'timesRated', type: 'int32', optional: true },
                     { name: 'isFlagged', type: 'int32', optional: true },
@@ -200,6 +202,7 @@ class RecipeSearchIndex {
             notes: recipe.notes ?? '',
             ingredients: recipe.ingredients?.map((i) => i.name) ?? [],
             instructions: recipe.instructions ?? [],
+            tags: recipe.tags?.map((t) => t.name) ?? [],
             rating: recipe.rating ?? null,
             isFlagged: recipe.flags?.some((f) => f.active) ? 1 : 0,
             timesRated: recipe.timesRated ?? 0,
@@ -294,7 +297,7 @@ class RecipeSearchIndex {
                     .documents()
                     .search({
                         q: query,
-                        query_by: 'title,notes,ingredients,instructions',
+                        query_by: 'title,notes,ingredients,instructions,tags',
                         sort_by: 'rating:desc,timesRated:desc',
                         filter_by: `language:=${language}`,
                         prefix: true,
