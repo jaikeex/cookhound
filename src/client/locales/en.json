@@ -9,6 +9,7 @@
     "auth.form.keep-logged-in": "Keep me logged in",
     "auth.form.continue-with-google": "Continue with Google",
     "auth.form.forgot-password": "Forgot your password?",
+    "auth.form.reset-password": "Reset password",
     "auth.form.not-registered": "Don't have an account?",
     "auth.form.already-registered": "Already have an account?",
     "auth.form.reset-password.email-prompt": "Enter your email address and we'll send you a link to reset your password.",

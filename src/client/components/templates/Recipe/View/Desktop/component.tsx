@@ -26,7 +26,7 @@ export const DesktopRecipeViewTemplate: React.FC<DesktopRecipeViewProps> = ({
 
     return (
         <div
-            className={`max-w-screen-md px-4 mx-auto 3xl:max-w-screen-lg ${className}`}
+            className={`px-2 mx-auto max-w-screen-sm md:max-w-screen-md 3xl:max-w-screen-lg ${className}`}
             ref={ref}
         >
             <div className={'space-y-4'}>

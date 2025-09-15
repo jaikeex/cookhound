@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import {
     MobileRecipeViewTemplate,
@@ -11,6 +13,7 @@ import {
 import { classNames } from '@/client/utils';
 import type { RecipeDTO } from '@/common/types';
 import type { RecipeFormMode } from '@/client/types/core';
+import { useLocale } from '@/client/store';
 
 export type RecipeFormShellProps = Readonly<{
     recipeObject: RecipeDTO | null;
@@ -47,10 +50,12 @@ export const RecipeFormShell: React.FC<RecipeFormShellProps> = ({
     handleClosePreview,
     mode
 }) => {
+    const { t } = useLocale();
+
     return (
         <div
             className={classNames(
-                'block md:grid grid-cols-7 grid-rows-1',
+                'block md:grid grid-cols-7 grid-rows-1 max-w-screen-xl mx-auto',
                 isSidebarVisible && isMobile ? 'pb-4' : 'pb-0',
                 isSidebarVisible && isTablet ? 'pr-8' : 'pr-0'
             )}
@@ -77,7 +82,10 @@ export const RecipeFormShell: React.FC<RecipeFormShellProps> = ({
             {/*-------------------------------------------------------------------------------------*/}
 
             {isSidebarVisible && isMobile && !isPreviewOpen ? (
-                <SidebarHandle onOpen={handleOpenPreview} />
+                <SidebarHandle
+                    onOpen={handleOpenPreview}
+                    label={t('app.recipe.create-preview')}
+                />
             ) : null}
 
             {isSidebarVisible && isMobile ? (
@@ -112,7 +120,11 @@ export const RecipeFormShell: React.FC<RecipeFormShellProps> = ({
             {/*-------------------------------------------------------------------------------------*/}
 
             {isSidebarVisible && isTablet && !isPreviewOpen ? (
-                <SidebarHandle onOpen={handleOpenPreview} position="right" />
+                <SidebarHandle
+                    onOpen={handleOpenPreview}
+                    position="right"
+                    label={t('app.recipe.create-preview')}
+                />
             ) : null}
 
             {isSidebarVisible && isTablet ? (

@@ -1,6 +1,14 @@
 import React from 'react';
 import { SendResetPasswordEmailTemplate } from '@/client/components';
 
-export default async function Page() {
-    return <SendResetPasswordEmailTemplate />;
+type ResetPasswordPageParams = {
+    readonly searchParams: Promise<{ email: string }>;
+};
+
+export default async function Page({ searchParams }: ResetPasswordPageParams) {
+    const searchParamsResolved = await searchParams;
+
+    return (
+        <SendResetPasswordEmailTemplate email={searchParamsResolved.email} />
+    );
 }

@@ -12,6 +12,7 @@ export type SimpleEmailFormErrors = {
 };
 
 export type SimpleEmailFormProps = Readonly<{
+    defaultEmail?: string | null;
     disabled: boolean;
     errors: SimpleEmailFormErrors;
     submitLabel?: string;
@@ -19,6 +20,7 @@ export type SimpleEmailFormProps = Readonly<{
 }>;
 
 export const SimpleEmailForm: React.FC<SimpleEmailFormProps> = ({
+    defaultEmail,
     disabled,
     errors,
     submitLabel,
@@ -36,6 +38,7 @@ export const SimpleEmailForm: React.FC<SimpleEmailFormProps> = ({
                 label={t('auth.form.email')}
                 id="email"
                 name="email"
+                defaultValue={defaultEmail ?? undefined}
                 disabled={pending || disabled}
                 error={t(errors?.email)}
             />

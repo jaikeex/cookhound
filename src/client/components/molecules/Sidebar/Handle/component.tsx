@@ -2,10 +2,12 @@
 
 import React, { useMemo, useRef, useCallback } from 'react';
 import { classNames } from '@/client/utils';
+import { Typography } from '@/client/components/atoms';
 
 export type SidebarHandleProps = Readonly<{
     onOpen: () => void;
     position?: 'left' | 'right' | 'top' | 'bottom';
+    label?: string;
     className?: string;
 }>;
 
@@ -38,6 +40,7 @@ const classConfig = {
 export const SidebarHandle: React.FC<SidebarHandleProps> = ({
     onOpen,
     position = 'bottom',
+    label,
     className
 }) => {
     const touchStartY = useRef<number | null>(null);
@@ -116,22 +119,44 @@ export const SidebarHandle: React.FC<SidebarHandleProps> = ({
         [position, className]
     );
 
-    return (
-        <button
-            type="button"
-            aria-label="Open preview"
-            onClick={handleClick}
-            onTouchStart={handleTouchStart}
-            onTouchMove={handleTouchMove}
-            className={buttonClassName}
-        >
-            {/* Decorative grab-bar */}
-            <span
+    const content = useMemo(() => {
+        if (label) {
+            return (
+                <Typography
+                    as="span"
+                    variant="label"
+                    className={classNames(
+                        'whitespace-nowrap',
+                        position === 'left' && 'rotate-90',
+                        position === 'right' && '-rotate-90'
+                    )}
+                >
+                    {label.toUpperCase()}
+                </Typography>
+            );
+        }
+
+        return (
+            <Typography
+                as="span"
                 className={classNames(
                     'block rounded-full bg-gray-400 dark:bg-gray-500',
                     classConfig[position].bar
                 )}
             />
+        );
+    }, [label, position]);
+
+    return (
+        <button
+            type="button"
+            aria-label={label ?? 'Open preview'}
+            onClick={handleClick}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            className={buttonClassName}
+        >
+            {content}
         </button>
     );
 };

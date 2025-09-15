@@ -22,6 +22,7 @@ import type {
 import type { I18nMessage } from '@/client/locales';
 import type { RecipeFormErrors } from '@/client/components';
 import type { RecipeFormMode } from '@/client/types/core';
+import { revalidateRouteCache } from '@/common/utils';
 
 export interface UseRecipeFormControllerProps {
     //When in edit mode, this existing recipe will pre-fill the form.
@@ -122,7 +123,9 @@ export const useRecipeFormController = ({
     //~-----------------------------------------------------------------------------------------~//
 
     const handleSubmitSuccess = useCallback(
-        (recipe: RecipeDTO) => {
+        async (recipe: RecipeDTO) => {
+            await revalidateRouteCache(`/recipe/${recipe.displayId}`);
+
             queryClient.invalidateQueries({
                 predicate: (query) =>
                     query.queryKey[0] === QUERY_KEYS.recipe.namespace

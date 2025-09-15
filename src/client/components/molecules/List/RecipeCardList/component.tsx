@@ -54,6 +54,8 @@ export const RecipeCardList: React.FC<RecipeCardListProps> = ({
 
     return (
         <React.Fragment>
+            {/* these classes are added dynamically, they need to exist at build time for tailwind compiler to register them */}
+            <span className="hidden lg:grid-cols-3 xl:grid-cols-3" />
             <div className={finalClassName}>
                 {recipes.map((recipe, index) => (
                     <RecipeCardComponent

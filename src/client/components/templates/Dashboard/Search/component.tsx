@@ -104,7 +104,7 @@ export const SearchTemplate: React.FC<SearchTemplateProps> = ({
     );
 
     return (
-        <div className="flex flex-col max-w-screen-sm gap-4 px-2 mx-auto mt-32 md:max-w-screen-md xl:max-w-screen-lg md:mt-36">
+        <div className="page-wrapper flex flex-col gap-4 mt-32 md:mt-36">
             <Banner
                 initialQueries={initialQueries}
                 onChange={handleInputChange}

@@ -135,12 +135,13 @@ export const useSidebar = (config: SidebarConfig = {}) => {
         isClosingRef.current = true;
         toggleSidebarWithAnimation(false);
 
-        enableMobileScroll();
-        document.documentElement.style.overscrollBehavior = 'auto';
+        const delay = isMobile ? 300 : 150; // match animation durations
 
         setTimeout(() => {
+            enableMobileScroll();
+            document.documentElement.style.overscrollBehavior = 'auto';
             isClosingRef.current = false;
-        }, 200);
+        }, delay);
 
         //?—————————————————————————————————————————————————————————————————————————————————————?//
         //?                                   MOBILE PARAMS                                     ?//

@@ -14,6 +14,10 @@ import { validateFormData } from '@/client/utils';
 import type { I18nMessage } from '@/client/locales';
 import { chqc } from '@/client/request/queryClient';
 
+export type SendResetPasswordEmailTemplateProps = Readonly<{
+    email: string;
+}>;
+
 //~---------------------------------------------------------------------------------------------~//
 //$                                          VALIDATION                                         $//
 //~---------------------------------------------------------------------------------------------~//
@@ -29,7 +33,9 @@ const sendResetPasswordEmailSchema = z.object({
 //$                                          COMPONENT                                          $//
 //~---------------------------------------------------------------------------------------------~//
 
-export const SendResetPasswordEmailTemplate: React.FC = () => {
+export const SendResetPasswordEmailTemplate: React.FC<
+    SendResetPasswordEmailTemplateProps
+> = ({ email }) => {
     const { t } = useLocale();
 
     const formRef = React.useRef<HTMLFormElement>(null);
@@ -116,6 +122,7 @@ export const SendResetPasswordEmailTemplate: React.FC = () => {
                     errors={formErrors}
                     disabled={disabled}
                     pending={isPending}
+                    defaultEmail={email}
                 />
             </form>
 

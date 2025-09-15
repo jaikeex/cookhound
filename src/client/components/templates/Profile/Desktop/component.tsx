@@ -15,18 +15,22 @@ export type DesktopRecipeViewProps = Readonly<{
     items: ProfileNavigationItem[];
     user: UserDTO;
     isCurrentUser: boolean;
+    initialTab?: ProfileTab | null;
 }>;
 
 export const DesktopProfileTemplate: React.FC<DesktopRecipeViewProps> = ({
     className,
     items,
     user,
-    isCurrentUser
+    isCurrentUser,
+    initialTab = ProfileTab.Dashboard
 }) => {
     const { id } = useParams();
     const searchParams = useSearchParams();
 
-    const [tab, setTab] = useState<ProfileTab>(ProfileTab.Dashboard);
+    const [tab, setTab] = useState<ProfileTab>(
+        initialTab ?? ProfileTab.Dashboard
+    );
 
     useParamsChangeListener({
         key: 'tab',
@@ -41,12 +45,7 @@ export const DesktopProfileTemplate: React.FC<DesktopRecipeViewProps> = ({
     }));
 
     return (
-        <div
-            className={classNames(
-                'max-w-screen-sm gap-4 px-4 mx-auto md:max-w-screen-md lg:max-w-screen-lg',
-                className
-            )}
-        >
+        <div className={classNames('page-wrapper gap-4 px-4', className)}>
             <ProfileHeadDesktop user={user} isCurrentUser={isCurrentUser} />
             <Divider className="mt-4 mb-2" />
 

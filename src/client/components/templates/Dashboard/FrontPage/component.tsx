@@ -36,7 +36,7 @@ export const FrontPageTemplate: React.FC<FrontPageProps> = ({
     );
 
     return (
-        <div className="flex flex-col max-w-screen-sm gap-4 px-2 mx-auto mt-32 md:max-w-screen-md lg:max-w-screen-lg md:mt-36">
+        <div className="page-wrapper flex flex-col gap-4 mt-32 md:mt-36">
             <Banner
                 onChange={handleInputChange}
                 onSearch={executeSearch}

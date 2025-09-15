@@ -63,14 +63,35 @@ export const Sidebar: React.FC<SidebarProps> = ({
         if (!isSidebarOpen && onClose) onClose();
     }, [isSidebarOpen, onClose]);
 
-    const touchStart = useRef<{ x: number; y: number } | null>(null);
+    /**
+     * Stores initial gesture coordinates together with scroll information.
+     * The scroll info is later used to decide whether the close gesture should be
+     * recognised, the intention is to only allow it when the user is already at
+     * the edge of the scroll area.
+     */
+    const touchStart = useRef<{
+        x: number;
+        y: number;
+        scrollTop: number;
+        scrollHeight: number;
+        clientHeight: number;
+    } | null>(null);
 
     const handleTouchStart = useCallback(
         (e: React.TouchEvent<HTMLDivElement>) => {
             const t = e.touches[0];
-            touchStart.current = { x: t.clientX, y: t.clientY };
+
+            // Capture scroll metrics to later decide if the swipe should close the sidebar.
+            const scrollable = contentRef.current;
+            touchStart.current = {
+                x: t.clientX,
+                y: t.clientY,
+                scrollTop: scrollable?.scrollTop ?? 0,
+                scrollHeight: scrollable?.scrollHeight ?? 0,
+                clientHeight: scrollable?.clientHeight ?? 0
+            };
         },
-        []
+        [contentRef]
     );
 
     const handleTouchMove = useCallback(
@@ -83,18 +104,29 @@ export const Sidebar: React.FC<SidebarProps> = ({
             const THRESHOLD = 50;
 
             switch (position) {
-                case 'bottom':
-                    if (dy > THRESHOLD) {
+                /**
+                 * For vertical sidebars only allow the closing gesture when the user is already at the scroll boundary.
+                 */
+                case 'bottom': {
+                    const atTop = (touchStart.current?.scrollTop ?? 0) <= 0;
+                    if (dy > THRESHOLD && atTop) {
                         touchStart.current = null;
                         toggleSidebar();
                     }
                     break;
-                case 'top':
-                    if (dy < -THRESHOLD) {
+                }
+                case 'top': {
+                    const start = touchStart.current;
+                    const atBottom =
+                        start &&
+                        start.scrollTop + start.clientHeight >=
+                            start.scrollHeight - 1; // tolerate rounding
+                    if (dy < -THRESHOLD && atBottom) {
                         touchStart.current = null;
                         toggleSidebar();
                     }
                     break;
+                }
                 case 'left':
                     if (dx < -THRESHOLD) {
                         touchStart.current = null;

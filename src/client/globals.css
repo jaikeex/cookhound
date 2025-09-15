@@ -11,6 +11,10 @@
         @apply inset-0 z-[-1] bg-[#f0fdf4] dark:bg-[#030712];
     }
 
+    .page-wrapper {
+        @apply px-2 mx-auto max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg 3xl:max-w-screen-xl;
+    }
+
     .base-button {
         @apply flex items-center justify-center rounded font-semibold disabled:cursor-not-allowed transition duration-150
         disabled:opacity-50 disabled:bg-gray-400 dark:disabled:bg-gray-600 disabled:hover:bg-gray-400 dark:disabled:hover:bg-gray-600;

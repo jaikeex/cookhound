@@ -9,6 +9,7 @@
     "auth.form.keep-logged-in": "Zůstat přihlášen",
     "auth.form.continue-with-google": "Přihlásit se přes Google",
     "auth.form.forgot-password": "Zapomněli jste heslo?",
+    "auth.form.reset-password": "Změnit heslo",
     "auth.form.not-registered": "Ještě nemáte účet?",
     "auth.form.already-registered": "Již máte účet?",
     "auth.form.reset-password.email-prompt": "Zadejte e-mailovou adresu, na kterou vám pošleme instrukce pro obnovení hesla.",
