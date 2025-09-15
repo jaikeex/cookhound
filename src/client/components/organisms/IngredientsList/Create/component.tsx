@@ -25,7 +25,7 @@ export const IngredientsListCreate: React.FC<IngredientsListCreateProps> = ({
     // used only for the draggable list - should not be used to determine the order of ingredients
     const [ingredients, setIngredients] = useState<number[]>(() =>
         defaultIngredients && defaultIngredients.length > 0
-            ? defaultIngredients.map((_, idx) => idx)
+            ? defaultIngredients?.map((_, idx) => idx)
             : [0]
     );
 
@@ -58,7 +58,7 @@ export const IngredientsListCreate: React.FC<IngredientsListCreateProps> = ({
         // Focus the new ingredient
         setTimeout(() => {
             const ingredient = document.getElementById(
-                'ingredient-quantity-' + ingredients.length
+                'ingredient-name-' + ingredients.length
             );
             ingredient?.focus();
         }, 0);
@@ -89,15 +89,36 @@ export const IngredientsListCreate: React.FC<IngredientsListCreateProps> = ({
         onChange && onChange(ingredientValues);
     }, [ingredientValues, onChange]);
 
+    const handleReorder = useCallback(
+        (newOrder: number[]) => {
+            // Reorder the ingredient keys first
+            setIngredients(newOrder);
+
+            // Then reorder the actual ingredient values to keep them in sync
+            setIngredientValues((prevValues) => {
+                // Map the previous key -> value for quick lookup
+                const keyToValue = new Map<number, Ingredient>();
+                ingredients.forEach((key, idx) => {
+                    keyToValue.set(key, prevValues[idx]);
+                });
+
+                return newOrder.map(
+                    (key) => keyToValue.get(key) ?? ({} as Ingredient)
+                );
+            });
+        },
+        [ingredients]
+    );
+
     return (
         <React.Fragment>
-            <DraggableList onReorder={setIngredients} values={ingredients}>
+            <DraggableList onReorder={handleReorder} values={ingredients}>
                 {ingredients.map((key, index) => (
                     <IngredientRowCreate
                         dragIndex={key}
                         key={key}
                         index={index}
-                        defaultIngredient={defaultIngredients?.[index]}
+                        defaultIngredient={ingredientValues[index]}
                         onAddIngredient={handleAddIngredient}
                         onRemove={handleRemoveIngredient(key)}
                         onChange={handleRowChange(index)}

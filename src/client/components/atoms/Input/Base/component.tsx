@@ -5,7 +5,7 @@ import { classNames } from '@/client/utils';
 
 export type BaseInputProps = Readonly<{
     className?: string;
-    defaultValue?: string | null;
+    defaultValue?: string | number | null;
     ref?: React.RefObject<HTMLInputElement> | null;
 }> &
     Omit<React.InputHTMLAttributes<HTMLInputElement>, 'ref' | 'defaultValue'>;

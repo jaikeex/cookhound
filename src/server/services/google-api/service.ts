@@ -9,8 +9,8 @@ class GoogleApiService {
     async uploadRecipeImage(fileName: string, data: number[] | BodyInit) {
         const bucket = ENV_CONFIG_PRIVATE.GOOGLE_STORAGE_BUCKET_RECIPE_IMAGES;
 
-        // Convert array of numbers to Buffer if needed
-        const binaryData = Array.isArray(data) ? Buffer.from(data) : data;
+        // Convert array of numbers to Uint8Array if needed
+        const binaryData = Array.isArray(data) ? new Uint8Array(data) : data;
 
         log.trace('uploadRecipeImage - uploading recipe image to bucket', {
             fileName,
@@ -32,8 +32,8 @@ class GoogleApiService {
     async uploadAvatarImage(fileName: string, data: number[] | BodyInit) {
         const bucket = ENV_CONFIG_PRIVATE.GOOGLE_STORAGE_BUCKET_AVATAR_IMAGES;
 
-        // Convert array of numbers to Buffer if needed
-        const binaryData = Array.isArray(data) ? Buffer.from(data) : data;
+        // Convert array of numbers to Uint8Array if needed
+        const binaryData = Array.isArray(data) ? new Uint8Array(data) : data;
 
         log.trace('uploadAvatarImage - uploading avatar image to bucket', {
             fileName,

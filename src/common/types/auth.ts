@@ -1,4 +1,4 @@
-import type { UserDTO } from './user';
+import type { UserDTO } from './dto';
 
 export type AuthResponse = {
     token: string;

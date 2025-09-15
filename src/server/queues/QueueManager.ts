@@ -424,7 +424,13 @@ export class QueueManager {
 
         const queueOptions: QueueOptions = {
             ...options,
-            connection: this.redis!,
+            connection: {
+                host: ENV_CONFIG_PRIVATE.REDIS_HOST,
+                port: Number(ENV_CONFIG_PRIVATE.REDIS_PORT),
+                password: ENV_CONFIG_PRIVATE.REDIS_PASSWORD || undefined,
+                maxRetriesPerRequest: null,
+                enableReadyCheck: true
+            },
             defaultJobOptions: {
                 removeOnComplete: true,
                 removeOnFail: 100,
@@ -499,13 +505,27 @@ export class QueueManager {
                 }
             },
             {
-                connection: this.redis,
+                connection: {
+                    host: ENV_CONFIG_PRIVATE.REDIS_HOST,
+                    port: Number(ENV_CONFIG_PRIVATE.REDIS_PORT),
+                    password: ENV_CONFIG_PRIVATE.REDIS_PASSWORD || undefined,
+                    maxRetriesPerRequest: null,
+                    enableReadyCheck: true
+                },
                 // Use the concurrency defined on the queue worker if available, 1 otherwise.
                 concurrency: def.concurrency ?? 1
             }
         );
 
-        const events = new QueueEvents(queue.name, { connection: this.redis! });
+        const events = new QueueEvents(queue.name, {
+            connection: {
+                host: ENV_CONFIG_PRIVATE.REDIS_HOST,
+                port: Number(ENV_CONFIG_PRIVATE.REDIS_PORT),
+                password: ENV_CONFIG_PRIVATE.REDIS_PASSWORD || undefined,
+                maxRetriesPerRequest: null,
+                enableReadyCheck: true
+            }
+        });
 
         /**
          * Attach logging events to the worker.

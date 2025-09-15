@@ -41,21 +41,21 @@ export const IngredientRowCreate: React.FC<IngredientRowCreateProps> = ({
         onRemove && onRemove(index);
     }, [index, onRemove]);
 
-    const handleQuantityKeyPress = useCallback(
+    const handleNameKeyPress = useCallback(
         (e: React.KeyboardEvent<HTMLInputElement>) => {
             if (e.key === 'Enter') {
                 e.preventDefault(); // Prevent form submission
-                const nameInput = document.getElementById(
-                    `ingredient-name-${index}`
+                const quantityInput = document.getElementById(
+                    `ingredient-quantity-${index}`
                 );
 
-                nameInput?.focus();
+                quantityInput?.focus();
             }
         },
         [index]
     );
 
-    const handleNameKeyPress = useCallback(
+    const handleQuantityKeyPress = useCallback(
         (e: React.KeyboardEvent<HTMLInputElement>) => {
             if (e.key === 'Enter') {
                 e.preventDefault(); // Prevent form submission
