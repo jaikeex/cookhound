@@ -21,6 +21,7 @@ export type RequestConfig = {
     headers?: HeadersInit;
     /** Optional revalidation time for the request. */
     revalidate?: number;
+    cache?: 'no-store' | 'force-cache' | 'only-if-cached';
 };
 
 /**
@@ -179,6 +180,10 @@ class ApiRequestWrapper {
 
         if (config.revalidate) {
             options.next = { revalidate: config.revalidate };
+        }
+
+        if (config.cache) {
+            options.cache = config.cache;
         }
 
         if (config.headers) {

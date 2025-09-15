@@ -426,12 +426,17 @@ class RecipeModel {
 
             log.trace('Recipe successfully created', { recipeId: recipe.id });
 
+            await this.invalidateUserRecipeCache(data.authorId);
+
             return (await tx.recipe.findUnique({
                 where: { id: recipe.id },
                 include: {
                     ingredients: {
                         include: {
                             ingredient: true
+                        },
+                        orderBy: {
+                            ingredientOrder: 'asc'
                         }
                     },
                     instructions: true
@@ -550,16 +555,20 @@ class RecipeModel {
             return (await tx.recipe.findUnique({
                 where: { id },
                 include: {
-                    ingredients: { include: { ingredient: true } },
+                    ingredients: {
+                        include: { ingredient: true },
+                        orderBy: { ingredientOrder: 'asc' }
+                    },
                     instructions: true
                 }
             })) as Recipe;
         });
 
-        await this.invalidateRecipeCache(
-            updatedRecipe,
-            originalRecipe ?? undefined
-        );
+        await this.invalidateUserRecipeCache(originalRecipe.authorId);
+
+        await this.invalidateRecipeCache({
+            displayId: originalRecipe.displayId
+        });
 
         return updatedRecipe;
     }
@@ -649,6 +658,12 @@ class RecipeModel {
 
     private async invalidateRecipeCacheAll() {
         await invalidateCacheByPattern('prisma:recipe:*');
+    }
+
+    private async invalidateUserRecipeCache(userId: number) {
+        await invalidateCacheByPattern(
+            `prisma:recipe:findManyForUser:${userId}`
+        );
     }
 }
 

@@ -1,23 +1,27 @@
 'use client';
 
 import { useAuth, useLocale } from '@/client/store';
-import React, { use, useEffect } from 'react';
+import React, { use } from 'react';
 import { DesktopProfileTemplate } from './Desktop';
 import { MobileProfileTemplate } from './Mobile';
 import { ProfileTab, type ProfileNavigationItem } from '@/client/types/core';
 import type { UserDTO } from '@/common/types';
-import { Recipes } from '@/client/components';
+import { ProfileBodyInfo, Recipes } from '@/client/components';
 import { ComingSoon } from '@/client/components';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { GRID_COLS } from '@/client/constants';
+import { useRunOnce } from '@/client/hooks';
 
 type ProfileProps = Readonly<{
+    initialTab?: ProfileTab | null;
     user: Promise<UserDTO>;
 }>;
 
-export const ProfileTemplate: React.FC<ProfileProps> = ({ user }) => {
+export const ProfileTemplate: React.FC<ProfileProps> = ({
+    user,
+    initialTab = null
+}) => {
     const userResolved = use(user);
-    const searchParams = useSearchParams();
     const router = useRouter();
 
     const { t } = useLocale();
@@ -31,7 +35,7 @@ export const ProfileTemplate: React.FC<ProfileProps> = ({ user }) => {
                   {
                       param: ProfileTab.Dashboard,
                       label: t('app.profile.dashboard'),
-                      content: null
+                      content: <ProfileBodyInfo user={userResolved} />
                   }
               ]
             : []),
@@ -60,14 +64,13 @@ export const ProfileTemplate: React.FC<ProfileProps> = ({ user }) => {
         }
     ];
 
-    useEffect(() => {
-        const tab = searchParams.get('tab');
+    useRunOnce(() => {
         const currentUrl = new URL(window.location.href);
 
         /**
          * If the URL doesn't have a tab, set it to the default tab.
          */
-        if (!tab) {
+        if (!initialTab) {
             currentUrl.searchParams.set(
                 'tab',
                 isCurrentUser ? ProfileTab.Dashboard : ProfileTab.Recipes
@@ -81,7 +84,7 @@ export const ProfileTemplate: React.FC<ProfileProps> = ({ user }) => {
         /**
          * If the user is not the current user and the tab is dashboard, set it to recipes.
          */
-        if (tab === ProfileTab.Dashboard && !isCurrentUser) {
+        if (initialTab === ProfileTab.Dashboard && !isCurrentUser) {
             router.replace('/user/recipes', {
                 scroll: false
             });
@@ -92,7 +95,6 @@ export const ProfileTemplate: React.FC<ProfileProps> = ({ user }) => {
                 scroll: false
             });
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     return (
@@ -102,6 +104,7 @@ export const ProfileTemplate: React.FC<ProfileProps> = ({ user }) => {
                 items={profileNavigationItems}
                 user={userResolved}
                 isCurrentUser={isCurrentUser}
+                initialTab={initialTab}
             />
             <MobileProfileTemplate
                 className={'md:hidden'}

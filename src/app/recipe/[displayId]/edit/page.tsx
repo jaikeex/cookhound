@@ -46,7 +46,7 @@ export default async function Page({ params }: RecipePageParams) {
     const recipe = await apiClient.recipe.getRecipeByDisplayId(
         recipeDisplayId,
         {
-            revalidate: 3600,
+            cache: 'no-store',
             ...(sessionId
                 ? {
                       headers: { 'Cookie': `session=${sessionId}` }
