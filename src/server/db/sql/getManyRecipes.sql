@@ -1,78 +1,78 @@
 SELECT
     r.id,
-    r.displayId,
+    r.display_id AS "displayId",
     r.title,
     r.language,
-    r.authorId,
+    r.author_id AS "authorId",
     r.time,
-    r.portionSize,
+    r.portion_size AS "portionSize",
     r.notes,
-    r.imageUrl,
+    r.image_url AS "imageUrl",
     r.rating,
-    r.timesRated,
-    r.timesViewed,
-    r.createdAt,
-    r.updatedAt,
+    r.times_rated AS "timesRated",
+    r.times_viewed AS "timesViewed",
+    r.created_at AS "createdAt",
+    r.updated_at AS "updatedAt",
     (
-        SELECT JSON_ARRAYAGG(
-            JSON_OBJECT(
+        SELECT jsonb_agg(
+            jsonb_build_object(
                 'id', i.id,
                 'name', i.name,
                 'quantity', ri.quantity
             )
+            ORDER BY ri.ingredient_order
         )
         FROM recipes_ingredients ri
-        JOIN ingredients i ON ri.ingredientId = i.id
-        WHERE ri.recipeId = r.id
-        ORDER BY ri.ingredientOrder
+        JOIN ingredients i ON ri.ingredient_id = i.id
+        WHERE ri.recipe_id = r.id
     ) AS ingredients,
     (
-        SELECT JSON_ARRAYAGG(
+        SELECT jsonb_agg(
             i.text
+            ORDER BY i.step 
         )
         FROM instructions i
-        WHERE i.recipeId = r.id
-        ORDER BY i.step
+        WHERE i.recipe_id = r.id
     ) AS instructions,
     (
-        SELECT JSON_ARRAYAGG(
-            JSON_OBJECT(
+        SELECT jsonb_agg(
+            jsonb_build_object(
                 'id', rf.id,
-                'userId', rf.userId,
+                'userId', rf.user_id,
                 'reason', rf.reason,
                 'resolved', rf.resolved,
                 'active', rf.active,
-                'resolvedAt', rf.resolvedAt,
-                'createdAt', rf.createdAt
+                'resolvedAt', rf.resolved_at,
+                'createdAt', rf.created_at
             )
+            ORDER BY rf.created_at DESC
         )
         FROM recipe_flags rf
-        WHERE rf.recipeId = r.id
-        ORDER BY rf.createdAt DESC
+        WHERE rf.recipe_id = r.id
     ) AS flags,
     (
-        SELECT JSON_ARRAYAGG(
-            JSON_OBJECT(
+        SELECT jsonb_agg(
+            jsonb_build_object(
                 'id', t.id,
                 'name', COALESCE(tr.name, t.slug),
-                'categoryId', t.categoryId
+                'categoryId', t.category_id
             )
+            ORDER BY COALESCE(tr.name, t.slug)
         )
         FROM recipes_tags rt
-        JOIN tags t ON rt.tagId = t.id
-        LEFT JOIN tag_translations tr ON tr.tagId = t.id AND tr.language = r.language
-        WHERE rt.recipeId = r.id
-        ORDER BY COALESCE(tr.name, t.slug)
+        JOIN tags t ON rt.tag_id = t.id
+        LEFT JOIN tag_translations tr ON tr.tag_id = t.id AND tr.language = r.language
+        WHERE rt.recipe_id = r.id
     ) AS tags
 FROM
     recipes r
 /*--------------------------------------------------------------------------------------------------*/
-LEFT JOIN recipe_flags rf ON rf.recipeId = r.id AND rf.active = true
+LEFT JOIN recipe_flags rf ON rf.recipe_id = r.id AND rf.active = true
 /*--------------------------------------------------------------------------------------------------*/
 WHERE
-    r.language = ?
-    AND rf.recipeId IS NULL
+    r.language = $1
+    AND rf.recipe_id IS NULL
 ORDER BY
     r.rating DESC,
-    r.createdAt DESC
-LIMIT ? OFFSET ?;
+    r.created_at DESC
+LIMIT  $2 OFFSET $3;

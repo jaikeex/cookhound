@@ -1,67 +1,65 @@
 datasource db {
-  url               = env("DATABASE_URL")
-  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
-  provider          = "mysql"
+  url      = env("DATABASE_URL")
+  provider = "postgresql"
 }
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["typedSql"]
 }
 
 model User {
-  id                        Int         @id @default(autoincrement())
-  username                  String      @db.VarChar(128) @unique
-  email                     String      @unique @db.VarChar(255)
-  passwordHash              String?     @db.Char(110)
-  authType                  String      @default("local") @db.VarChar(50)
-  role                      String      @default("user") @db.VarChar(50)
-  status                    String      @default("active") @db.VarChar(50)
-  avatarUrl                 String?     @db.VarChar(255)
-  emailVerified             Boolean     @default(false)
-  emailVerificationToken    String?     @db.Char(36)
-  passwordResetToken        String?     @db.Char(36)
-  passwordResetTokenExpires DateTime?   @db.DateTime
-  createdAt                 DateTime    @default(now()) @db.DateTime(3)
-  updatedAt                 DateTime    @updatedAt @db.DateTime(3)
-  lastVisitedAt             DateTime?   @db.DateTime(3)
-  lastLogin                 DateTime?   @db.DateTime(3)
-  lastPasswordReset         DateTime?   @db.DateTime(3)
+  id                        Int       @id @default(autoincrement())
+  username                  String    @unique @db.VarChar(128)
+  email                     String    @unique @db.VarChar(255)
+  passwordHash              String?   @map("password_hash") @db.VarChar(110)
+  authType                  String    @default("local") @map("auth_type") @db.VarChar(50)
+  role                      String    @default("user") @db.VarChar(50)
+  status                    String    @default("active") @db.VarChar(50)
+  avatarUrl                 String?   @map("avatar_url") @db.VarChar(255)
+  emailVerified             Boolean   @default(false) @map("email_verified")
+  emailVerificationToken    String?   @map("email_verification_token") @db.VarChar(36)
+  passwordResetToken        String?   @map("password_reset_token") @db.VarChar(36)
+  passwordResetTokenExpires DateTime? @map("password_reset_token_expires") @db.Timestamp
+  createdAt                 DateTime  @default(now()) @map("created_at") @db.Timestamp(3)
+  updatedAt                 DateTime  @updatedAt @map("updated_at") @db.Timestamp(3)
+  lastVisitedAt             DateTime? @map("last_visited_at") @db.Timestamp(3)
+  lastLogin                 DateTime? @map("last_login") @db.Timestamp(3)
+  lastPasswordReset         DateTime? @map("last_password_reset") @db.Timestamp(3)
 
   // Relations
-  recipes                   Recipe[]    @relation("AuthoredRecipes")
-  visitedRecipes            UserVisitedRecipe[]
-  ratings                   Rating[]
-  shoppingList              ShoppingListIngredient[]
-  flags                     RecipeFlag[]
+  recipes        Recipe[]                 @relation("AuthoredRecipes")
+  visitedRecipes UserVisitedRecipe[]
+  ratings        Rating[]
+  shoppingList   ShoppingListIngredient[]
+  flags          RecipeFlag[]
 
   // Indexes
   @@index([username])
   @@index([email])
   @@index([emailVerificationToken])
   @@index([passwordResetToken])
-
-  @@map("users")  
+  @@map("users")
 }
- 
+
 model Recipe {
-  id           Int       @id @default(autoincrement())
-  displayId    String    @unique @db.Char(36)
-  authorId     Int       @db.Int
-  language     String    @db.VarChar(2)
-  title        String    @db.VarChar(255)
-  notes        String?   @db.Text
-  time         Int?      @db.Int
-  portionSize  Int?      @db.Int
-  imageUrl     String?   @db.VarChar(255)
-  rating       Decimal?  @db.Decimal(2, 1)
-  timesRated   Int       @default(0)
-  timesViewed  Int       @default(0)
-  createdAt    DateTime  @default(now()) @db.DateTime(3)
-  updatedAt    DateTime  @updatedAt @db.DateTime(3)
+  id          Int      @id @default(autoincrement())
+  displayId   String   @unique @map("display_id") @db.VarChar(36)
+  authorId    Int      @map("author_id")
+  language    String   @db.VarChar(2)
+  title       String   @db.VarChar(255)
+  notes       String?  @map("notes") @db.Text
+  time        Int?     @map("time")
+  portionSize Int?     @map("portion_size")
+  imageUrl    String?  @map("image_url") @db.VarChar(255)
+  rating      Decimal? @db.Decimal(2, 1)
+  timesRated  Int      @default(0) @map("times_rated")
+  timesViewed Int      @default(0) @map("times_viewed")
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamp(3)
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamp(3)
 
   // Relations
-  author       User                @relation("AuthoredRecipes", fields: [authorId], references: [id])
+  author       User                     @relation("AuthoredRecipes", fields: [authorId], references: [id])
   instructions Instruction[]
   ingredients  RecipeIngredient[]
   ratings      Rating[]
@@ -69,7 +67,7 @@ model Recipe {
   visitedBy    UserVisitedRecipe[]
   tags         RecipeTag[]
   flags        RecipeFlag[]
-  
+
   // Indexes
   @@index([authorId])
   @@index([displayId])
@@ -83,12 +81,12 @@ model Recipe {
 }
 
 model Instruction {
-  recipeId Int    @db.Int
-  step     Int    @db.Int
+  recipeId Int    @map("recipe_id")
+  step     Int
   text     String @db.Text
 
   // Relations
-  recipe   Recipe @relation(fields: [recipeId], references: [id])
+  recipe Recipe @relation(fields: [recipeId], references: [id])
 
   // Composite primary key
   @@id([recipeId, step])
@@ -98,17 +96,16 @@ model Instruction {
 }
 
 model Ingredient {
-  id       Int    @id @default(autoincrement()) @db.Int
+  id       Int    @id @default(autoincrement())
   language String @db.VarChar(2)
   name     String @db.VarChar(50)
 
   // Relations
-  recipes  RecipeIngredient[]
+  recipes       RecipeIngredient[]
   shoppingLists ShoppingListIngredient[]
 
   // Unique constraint
   @@unique([language, name], name: "unique_ingredient_language_name")
-
   // Indexes
   @@index([language])
   @@index([name])
@@ -116,15 +113,14 @@ model Ingredient {
 }
 
 model RecipeIngredient {
-  recipeId        Int     @db.Int
-  ingredientId    Int     @db.Int
+  recipeId        Int     @map("recipe_id")
+  ingredientId    Int     @map("ingredient_id")
   quantity        String? @db.VarChar(256)
-  ingredientOrder Int     @db.Int
+  ingredientOrder Int     @map("ingredient_order")
 
   // Relations
   recipe     Recipe     @relation(fields: [recipeId], references: [id])
   ingredient Ingredient @relation(fields: [ingredientId], references: [id])
-
 
   // Composite primary key
   @@id([recipeId, ingredientId])
@@ -134,12 +130,12 @@ model RecipeIngredient {
 }
 
 model ShoppingListIngredient {
-  userId          Int     @db.Int
-  recipeId        Int     @db.Int
-  ingredientId    Int     @db.Int
+  userId          Int     @map("user_id")
+  recipeId        Int     @map("recipe_id")
+  ingredientId    Int     @map("ingredient_id")
   quantity        String? @db.VarChar(256)
   marked          Boolean @default(false)
-  ingredientOrder Int     @db.Int
+  ingredientOrder Int     @map("ingredient_order")
 
   // Relations
   user       User       @relation(fields: [userId], references: [id])
@@ -155,12 +151,12 @@ model ShoppingListIngredient {
 }
 
 model Rating {
-  id        Int      @id @default(autoincrement()) @db.Int
-  recipeId  Int      @db.Int
-  userId    Int      @db.Int
+  id        Int      @id @default(autoincrement())
+  recipeId  Int      @map("recipe_id")
+  userId    Int      @map("user_id")
   rating    Decimal  @db.Decimal(2, 1)
-  createdAt DateTime @default(now()) @db.DateTime(3)
-  updatedAt DateTime @updatedAt @db.DateTime(3)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamp(3)
 
   // Relations
   recipe Recipe @relation(fields: [recipeId], references: [id])
@@ -174,9 +170,9 @@ model Rating {
 }
 
 model UserVisitedRecipe {
-  userId    Int      @db.Int
-  recipeId  Int      @db.Int
-  visitedAt DateTime @default(now()) @db.DateTime(3)
+  userId    Int      @map("user_id")
+  recipeId  Int      @map("recipe_id")
+  visitedAt DateTime @default(now()) @map("visited_at") @db.Timestamp(3)
 
   // Relations
   user   User   @relation(fields: [userId], references: [id])
@@ -191,14 +187,14 @@ model UserVisitedRecipe {
 }
 
 model RecipeFlag {
-  id         Int       @id @default(autoincrement()) @db.Int
-  userId     Int       @db.Int
-  recipeId   Int       @db.Int
+  id         Int       @id @default(autoincrement())
+  userId     Int       @map("user_id")
+  recipeId   Int       @map("recipe_id")
   reason     String    @db.VarChar(255)
   resolved   Boolean   @default(false)
   active     Boolean   @default(true)
-  resolvedAt DateTime? @db.DateTime(3)
-  createdAt  DateTime  @default(now()) @db.DateTime(3)
+  resolvedAt DateTime? @map("resolved_at") @db.Timestamp(3)
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamp(3)
 
   // Relations
   user   User   @relation(fields: [userId], references: [id])
@@ -207,16 +203,15 @@ model RecipeFlag {
   // Indexes
   @@index([userId])
   @@index([recipeId])
-
   @@map("recipe_flags")
 }
 
 model TagCategory {
-  id    Int    @id @default(autoincrement())
-  name  String @unique @db.VarChar(50)
+  id   Int    @id @default(autoincrement())
+  name String @unique @db.VarChar(50)
 
   // Relations
-  tags  Tag[]
+  tags Tag[]
 
   // Indexes
   @@index([name])
@@ -224,13 +219,13 @@ model TagCategory {
 }
 
 model Tag {
-  id          Int          @id @default(autoincrement())
-  slug        String       @unique @db.VarChar(50)
-  categoryId  Int          @db.Int
+  id         Int    @id @default(autoincrement())
+  slug       String @unique @db.VarChar(50)
+  categoryId Int    @map("category_id")
 
   // Relations
-  category    TagCategory  @relation(fields: [categoryId], references: [id])
-  recipes     RecipeTag[]
+  category     TagCategory      @relation(fields: [categoryId], references: [id])
+  recipes      RecipeTag[]
   translations TagTranslation[]
 
   // Indexes
@@ -240,8 +235,8 @@ model Tag {
 }
 
 model RecipeTag {
-  recipeId Int @db.Int
-  tagId    Int @db.Int
+  recipeId Int @map("recipe_id")
+  tagId    Int @map("tag_id")
 
   // Relations
   recipe Recipe @relation(fields: [recipeId], references: [id])
@@ -254,12 +249,12 @@ model RecipeTag {
 }
 
 model TagTranslation {
-  tagId    Int          @db.Int
-  language String       @db.VarChar(2)
-  name     String       @db.VarChar(50)
+  tagId    Int    @map("tag_id")
+  language String @db.VarChar(2)
+  name     String @db.VarChar(50)
 
   // Relations
-  tag      Tag          @relation(fields: [tagId], references: [id])
+  tag Tag @relation(fields: [tagId], references: [id])
 
   // Composite primary key to ensure single translation per language
   @@id([tagId, language])

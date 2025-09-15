@@ -64,7 +64,6 @@ const initializeStore = () =>
  *   during search-param navigations (modals and sidebars!!) (or hmr) reuses the same instance.
  */
 function getStore() {
-    console.log('getStore');
     if (typeof window === 'undefined') {
         // ❄️  Server – fresh store per render for safety.
         return initializeStore();

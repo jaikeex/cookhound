@@ -1,22 +1,22 @@
 SELECT
     r.id,
-    r.displayId,
+    r.display_id AS "displayId",
     r.title,
-    r.imageUrl,
+    r.image_url AS "imageUrl",
     r.rating,
-    r.timesRated,
+    r.times_rated AS "timesRated",
     r.time,
-    r.portionSize,
-    r.createdAt
+    r.portion_size AS "portionSize",
+    r.created_at
 FROM
     recipes r
 /*--------------------------------------------------------------------------------------------------*/
-LEFT JOIN recipe_flags rf ON rf.recipeId = r.id AND rf.active = true
+LEFT JOIN recipe_flags rf ON rf.recipe_id = r.id AND rf.active = true
 /*--------------------------------------------------------------------------------------------------*/
 WHERE
-    r.timesRated >= ? AND r.language = ?
-    AND rf.recipeId IS NULL
+    r.times_rated >= $1 AND r.language = $2
+    AND rf.recipe_id IS NULL
 ORDER BY
     r.rating DESC,
-    r.createdAt DESC
-LIMIT ? OFFSET ?; 
+    r.created_at DESC
+LIMIT  $3 OFFSET $4; 

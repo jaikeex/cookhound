@@ -1,52 +1,52 @@
 SELECT
     DISTINCT r.id,
-    r.displayId,
+    r.display_id AS "displayId",
     r.title,
-    r.imageUrl,
+    r.image_url AS "imageUrl",
     r.rating,
-    r.timesRated,
+    r.times_rated AS "timesRated",
     r.time,
-    r.portionSize,
-    r.createdAt,
+    r.portion_size AS "portionSize",
+    r.created_at AS "createdAt",
     CASE 
         WHEN EXISTS (
             SELECT 1 
             FROM recipe_flags rf_check 
-            WHERE rf_check.recipeId = r.id AND rf_check.active = true
+            WHERE rf_check.recipe_id = r.id AND rf_check.active = true
         ) THEN (
-            SELECT JSON_ARRAYAGG(
-                JSON_OBJECT(
+            SELECT jsonb_agg(
+                jsonb_build_object(
                     'id', rf_flags.id,
-                    'userId', rf_flags.userId,
+                    'userId', rf_flags.user_id,
                     'reason', rf_flags.reason,
                     'resolved', rf_flags.resolved,
                     'active', rf_flags.active,
-                    'resolvedAt', rf_flags.resolvedAt,
-                    'createdAt', rf_flags.createdAt
+                    'resolvedAt', rf_flags.resolved_at,
+                    'createdAt', rf_flags.created_at
                 )
+                ORDER BY rf_flags.created_at DESC
             )
             FROM recipe_flags rf_flags
-            WHERE rf_flags.recipeId = r.id AND rf_flags.active = true
-            ORDER BY rf_flags.createdAt DESC
+            WHERE rf_flags.recipe_id = r.id AND rf_flags.active = true
         )
         ELSE NULL
     END AS flags
 FROM
     recipes r
 /*--------------------------------------------------------------------------------------------------*/
-LEFT JOIN recipes_ingredients ri ON ri.recipeId = r.id
-LEFT JOIN ingredients i ON i.id = ri.ingredientId
-LEFT JOIN instructions instr ON instr.recipeId = r.id
+LEFT JOIN recipes_ingredients ri ON ri.recipe_id = r.id
+LEFT JOIN ingredients i ON i.id = ri.ingredient_id
+LEFT JOIN instructions instr ON instr.recipe_id = r.id
 /*--------------------------------------------------------------------------------------------------*/
 WHERE
-    r.authorId = ?
-    AND r.language = ?
+    r.author_id = $1
+    AND r.language = $2
     AND (
-        r.title LIKE CONCAT('%', ?, '%')
-        OR r.notes LIKE CONCAT('%', ?, '%')
-        OR i.name LIKE CONCAT('%', ?, '%')
-        OR instr.text LIKE CONCAT('%', ?, '%')
+        r.title ILIKE '%' || $3 || '%'
+        OR r.notes ILIKE '%' || $3 || '%'
+        OR i.name ILIKE '%' || $3 || '%'
+        OR instr.text ILIKE '%' || $3 || '%'
     )
 ORDER BY
-    r.createdAt DESC
-LIMIT ? OFFSET ?;
+    r.created_at DESC
+LIMIT $4 OFFSET $5;

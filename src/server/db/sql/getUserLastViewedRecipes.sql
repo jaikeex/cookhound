@@ -1,18 +1,18 @@
 SELECT
     r.id,
-    r.displayId,
+    r.display_id AS "displayId",
     r.title,
-    r.imageUrl,
+    r.image_url AS "imageUrl",
     r.rating,
-    r.timesRated,
+    r.times_rated AS "timesRated",
     r.time,
-    r.portionSize
+    r.portion_size AS "portionSize"
 FROM
     user_visited_recipes uvr
 JOIN
-    recipes r ON uvr.recipeId = r.id
+    recipes r ON uvr.recipe_id = r.id
 WHERE
-    uvr.userId = ?
+    uvr.user_id = $1
 ORDER BY
-    uvr.visitedAt DESC
-LIMIT ?; 
+    uvr.visited_at DESC
+LIMIT $2; 

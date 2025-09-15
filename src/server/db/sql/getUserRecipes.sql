@@ -1,41 +1,41 @@
 SELECT
     r.id,
-    r.displayId,
+    r.display_id AS "displayId",
     r.title,
-    r.imageUrl,
+    r.image_url AS "imageUrl",
     r.rating,
-    r.timesRated,
+    r.times_rated AS "timesRated",
     r.time,
-    r.portionSize,
-    r.createdAt,
+    r.portion_size AS "portionSize",
+    r.created_at,
     CASE 
         WHEN EXISTS (
             SELECT 1 
             FROM recipe_flags rf 
-            WHERE rf.recipeId = r.id AND rf.active = true
+            WHERE rf.recipe_id = r.id AND rf.active = true
         ) THEN (
-            SELECT JSON_ARRAYAGG(
-                JSON_OBJECT(
+            SELECT jsonb_agg(
+                jsonb_build_object(
                     'id', rf.id,
-                    'userId', rf.userId,
+                    'userId', rf.user_id,
                     'reason', rf.reason,
                     'resolved', rf.resolved,
                     'active', rf.active,
-                    'resolvedAt', rf.resolvedAt,
-                    'createdAt', rf.createdAt
+                    'resolvedAt', rf.resolved_at,
+                    'createdAt', rf.created_at
                 )
+                ORDER BY rf.created_at DESC
             )
             FROM recipe_flags rf
-            WHERE rf.recipeId = r.id AND rf.active = true
-            ORDER BY rf.createdAt DESC
+            WHERE rf.recipe_id = r.id AND rf.active = true
         )
         ELSE NULL
     END AS flags
 FROM
     recipes r
 WHERE
-    r.authorId = ?
-    AND r.language = ?
+    r.author_id = $1
+    AND r.language = $2
 ORDER BY
-    r.createdAt DESC
-LIMIT ? OFFSET ?;
+    r.created_at DESC
+LIMIT $3 OFFSET $4;

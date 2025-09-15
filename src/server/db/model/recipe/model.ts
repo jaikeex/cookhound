@@ -250,15 +250,7 @@ class RecipeModel {
                 });
 
                 return prisma.$queryRawTyped(
-                    searchRecipes(
-                        language,
-                        searchTerm,
-                        searchTerm,
-                        searchTerm,
-                        searchTerm,
-                        limit,
-                        offset
-                    )
+                    searchRecipes(language, searchTerm, limit, offset)
                 );
             },
             ttl ?? CACHE_TTL.TTL_1
@@ -310,9 +302,6 @@ class RecipeModel {
                     searchUserRecipes(
                         userId,
                         language,
-                        searchTerm,
-                        searchTerm,
-                        searchTerm,
                         searchTerm,
                         limit,
                         offset
