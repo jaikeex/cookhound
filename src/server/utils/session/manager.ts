@@ -4,6 +4,10 @@ import { randomUUID } from 'crypto';
 import type { Logger as LoggerType } from '@/server/logger';
 import { InfrastructureError, ValidationError } from '@/server/error';
 import { InfrastructureErrorCode } from '@/server/error/codes';
+import {
+    ONE_HOUR_IN_SECONDS,
+    ONE_MONTH_IN_SECONDS
+} from '@/common/constants/time';
 
 //~=============================================================================================~//
 //$                                            TYPES                                            $//
@@ -59,13 +63,13 @@ async function getLogger(): Promise<LoggerType> {
 //~=============================================================================================~//
 
 class SessionManager {
-    private static readonly SESSION_TTL = 60 * 60 * 24 * 30; // 30 days
+    private static readonly SESSION_TTL = ONE_MONTH_IN_SECONDS;
 
     /**
      * Determines what is considered a single "active" sitting of the user. Once this time passes,
      * any furter manipulations with the session will update the ttl accordingly.
      */
-    private static readonly ACTIVITY_WINDOW = 60 * 60; // 1 hour
+    private static readonly ACTIVITY_WINDOW = ONE_HOUR_IN_SECONDS; // 1 hour
 
     private getSessionKey(sessionId: string): string {
         return `${SESSION_KEY_PREFIX}:${sessionId}`;

@@ -10,12 +10,12 @@ import type { ViewPortVariant } from '@/client/types';
 
 const classConfig = {
     typography: {
-        'desktop': 'body-sm',
+        'desktop': 'body-md',
         'mobile': 'body'
     },
 
     spacing: {
-        'desktop': 'space-y-2',
+        'desktop': 'space-y-4',
         'mobile': 'space-y-3'
     }
 };

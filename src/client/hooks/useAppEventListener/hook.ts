@@ -9,7 +9,10 @@ import { eventBus, type Event } from '@/client/events';
  * @param event - The event to listen to.
  * @param callback - The callback to call when the event is emitted.
  */
-export const useAppEventListener = (event: Event, callback: () => void) => {
+export const useAppEventListener = (
+    event: Event,
+    callback: (payload?: any) => void
+) => {
     useEffect(() => {
         eventBus.on(event, callback);
 

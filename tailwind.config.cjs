@@ -6,6 +6,9 @@ module.exports = {
     darkMode: 'selector',
     theme: {
         extend: {
+            fontSize: {
+                'md': '0.9375rem'
+            },
             fontFamily: {
                 'open-sans': ['var(--font-open-sans)', 'sans-serif'],
                 'kalam': ['var(--font-kalam)']

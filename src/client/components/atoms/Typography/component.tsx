@@ -13,7 +13,9 @@ const classConfig = {
         'heading-sm': 'text-lg font-bold',
         'heading-xs': 'text-base font-bold',
         'body': 'text-base',
+        'body-md': 'text-md',
         'body-sm': 'text-sm',
+        'body-xs': 'text-xs',
         'label': 'text-sm font-semibold',
         'error': 'font-semibold text-red-700 dark:text-red-500'
     },
@@ -33,7 +35,9 @@ export type TypographyVariant =
     | 'heading-sm'
     | 'heading-xs'
     | 'body'
+    | 'body-md'
     | 'body-sm'
+    | 'body-xs'
     | 'label'
     | 'error';
 
@@ -67,7 +71,7 @@ export const Typography = <E extends React.ElementType = 'p'>({
         <Component
             {...props}
             className={classNames(
-                `font-open-sans ${classConfig.variant[variant]} ${disableLinkStyles ? 'no-underline typography-base' : ''}`,
+                `font-open-sans md:antialiased ${classConfig.variant[variant]} ${disableLinkStyles ? 'no-underline typography-base' : ''}`,
                 align && classConfig.align[align],
                 className
             )}

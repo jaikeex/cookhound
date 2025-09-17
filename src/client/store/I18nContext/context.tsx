@@ -10,8 +10,6 @@ import React, {
 } from 'react';
 import type { I18nMessage, Locale, Messages } from '@/client/locales';
 import { locales } from '@/client/locales';
-import { setLocaleCookie } from '@/app/actions';
-import { getCookieValue } from '@/client/utils';
 
 type LocaleContextType = {
     locale: Locale;
@@ -82,12 +80,6 @@ export const LocaleProvider: React.FC<LocaleProviderProps> = ({
     );
 
     useEffect(() => {
-        const localeCookie = getCookieValue('locale');
-
-        if (!localeCookie) {
-            setLocaleCookie(locale);
-        }
-
         setMessages(locales[locale]);
     }, [locale]);
 

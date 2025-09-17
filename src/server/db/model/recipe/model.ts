@@ -20,6 +20,7 @@ import {
     getUserRecipes,
     searchUserRecipes
 } from '@prisma/client/sql';
+import { DEFAULT_LOCALE } from '@/common/constants';
 
 //|=============================================================================================|//
 
@@ -377,7 +378,8 @@ class RecipeModel {
                     let ingredient = await tx.ingredient.findFirst({
                         where: {
                             name: ingredientData.name,
-                            language: (data.recipe as any).language || 'en'
+                            language:
+                                (data.recipe as any).language || DEFAULT_LOCALE
                         }
                     });
 
@@ -385,7 +387,9 @@ class RecipeModel {
                         ingredient = await tx.ingredient.create({
                             data: {
                                 name: ingredientData.name,
-                                language: (data.recipe as any).language || 'en'
+                                language:
+                                    (data.recipe as any).language ||
+                                    DEFAULT_LOCALE
                             }
                         });
                     }
@@ -496,7 +500,7 @@ class RecipeModel {
                 const language =
                     (recipeData as any).language ??
                     originalRecipe.language ??
-                    'en';
+                    DEFAULT_LOCALE;
 
                 for (let i = 0; i < ingredients.length; i++) {
                     const ingredientData = ingredients[i];

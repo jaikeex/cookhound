@@ -26,10 +26,9 @@ type TopNavigationProps = Readonly<NonNullable<unknown>>;
 export const TopNavigation: React.FC<TopNavigationProps> = () => {
     const { t } = useLocale();
     const { authResolved, user } = useAuth();
+    const pathname = usePathname();
 
     const [isNotfound, setIsNotfound] = useState<boolean>(false);
-
-    const pathname = usePathname();
 
     const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
 

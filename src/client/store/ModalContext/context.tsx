@@ -245,7 +245,7 @@ const ModalWrapper: React.FC<ModalWrapperProps> = ({
                 className={classNames(
                     'relative z-10 overflow-y-auto rounded-md py-8 px-2 md:px-6',
                     'max-h-[95dvh] max-w-[95dvw] md:max-h-[80dvh] md:max-w-[80dvw] ',
-                    'bg-teal-50 dark:bg-[#222233]'
+                    'bg-teal-50 dark:bg-slate-900'
                 )}
             >
                 {hideCloseButton ? null : (

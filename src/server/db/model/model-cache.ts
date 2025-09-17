@@ -1,5 +1,9 @@
 import { redisClient } from '@/server/integrations';
-import { ENV_CONFIG_PRIVATE } from '@/common/constants';
+import {
+    ENV_CONFIG_PRIVATE,
+    ONE_HOUR_IN_SECONDS,
+    ONE_MINUTE_IN_SECONDS
+} from '@/common/constants';
 import { Logger } from '@/server/logger';
 
 //|=============================================================================================|//
@@ -43,8 +47,8 @@ const log = Logger.getInstance('model-cache');
 //?—————————————————————————————————————————————————————————————————————————————————————————————?//
 
 export const CACHE_TTL = {
-    TTL_1: 60, // C1 - 1 minute
-    TTL_2: 60 * 60 * 6 // C2 - 6 hours
+    TTL_1: ONE_MINUTE_IN_SECONDS, // C1 - 1 minute
+    TTL_2: ONE_HOUR_IN_SECONDS * 6 // C2 - 6 hours
 } as const;
 
 /**
