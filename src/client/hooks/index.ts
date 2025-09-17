@@ -1,4 +1,5 @@
 export * from './routingListeners';
+export * from './settingsPersistence';
 export * from './useAppEventListener';
 export * from './useCheckScrollbarExistence';
 export * from './useCooldown';
@@ -11,7 +12,7 @@ export * from './useKeyboardOpen';
 export * from './useLocalStorage';
 export * from './useOutsideClick';
 export * from './useRecipeDiscovery';
-export * from './useRecipeFormController/hook';
+export * from './useRecipeFormController';
 export * from './useRunOnce';
 export * from './useScreenSize';
 export * from './useUnsavedChangesWarning';
