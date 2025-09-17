@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState, useMemo } from 'react';
 import {
     ButtonBase,
     DraggableList,
@@ -8,7 +8,6 @@ import {
 } from '@/client/components';
 import type { Ingredient } from '@/common/types';
 import { useLocale } from '@/client/store';
-import { useScreenSize } from '@/client/hooks';
 
 type IngredientsListCreateProps = Readonly<{
     defaultIngredients?: Ingredient[] | null;
@@ -20,7 +19,6 @@ export const IngredientsListCreate: React.FC<IngredientsListCreateProps> = ({
     onChange
 }) => {
     const { t } = useLocale();
-    const { isDesktop } = useScreenSize();
 
     // used only for the draggable list - should not be used to determine the order of ingredients
     const [ingredients, setIngredients] = useState<number[]>(() =>
@@ -52,17 +50,18 @@ export const IngredientsListCreate: React.FC<IngredientsListCreateProps> = ({
 
         /**
          * The autofocus on mobile is quite annoying, so it is disabled there for now.
+         * Use lazy evaluation of window size to prevent re-renders on resize.
          */
-        if (!isDesktop) return;
-
-        // Focus the new ingredient
-        setTimeout(() => {
-            const ingredient = document.getElementById(
-                'ingredient-name-' + ingredients.length
-            );
-            ingredient?.focus();
-        }, 0);
-    }, [ingredients.length, isDesktop]);
+        if (typeof window !== 'undefined' && window.innerWidth >= 1140) {
+            // Focus the new ingredient
+            setTimeout(() => {
+                const ingredient = document.getElementById(
+                    'ingredient-name-' + ingredients.length
+                );
+                ingredient?.focus();
+            }, 0);
+        }
+    }, [ingredients.length]);
 
     const handleRemoveIngredient = useCallback(
         (key: number) => (index: number) => {
@@ -110,8 +109,9 @@ export const IngredientsListCreate: React.FC<IngredientsListCreateProps> = ({
         [ingredients]
     );
 
-    return (
-        <React.Fragment>
+    // Memoize the DraggableList to prevent unnecessary re-renders during screen size changes
+    const draggableList = useMemo(
+        () => (
             <DraggableList onReorder={handleReorder} values={ingredients}>
                 {ingredients.map((key, index) => (
                     <IngredientRowCreate
@@ -125,6 +125,20 @@ export const IngredientsListCreate: React.FC<IngredientsListCreateProps> = ({
                     />
                 ))}
             </DraggableList>
+        ),
+        [
+            ingredients,
+            ingredientValues,
+            handleReorder,
+            handleAddIngredient,
+            handleRemoveIngredient,
+            handleRowChange
+        ]
+    );
+
+    return (
+        <React.Fragment>
+            {draggableList}
             <ButtonBase
                 className={'w-full'}
                 icon={'plus'}

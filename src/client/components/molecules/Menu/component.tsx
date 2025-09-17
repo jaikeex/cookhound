@@ -27,11 +27,21 @@ export const Menu: React.FC<MenuProps> = ({ items, className, ...props }) => {
         const hrefPathname = hrefUrl.pathname;
         const hrefSearchParams = hrefUrl.searchParams;
 
-        const currentUrl = `${pathname}${searchParams.toString() ? `?${searchParams.toString()}` : ''}`;
+        // There is 1456432 better ways to do this, but this is the simplest one.
+        const NON_NAVIGATIONAL_PARAMS = ['modal', 'sidebar-open'];
+        const filteredSearchParams = new URLSearchParams();
+
+        for (const [key, value] of searchParams.entries()) {
+            if (!NON_NAVIGATIONAL_PARAMS.includes(key)) {
+                filteredSearchParams.set(key, value);
+            }
+        }
+
+        const currentUrl = `${pathname}${filteredSearchParams.toString() ? `?${filteredSearchParams.toString()}` : ''}`;
 
         /**
          * Consider a path active if:
-         * 1. The full URL (pathname + query params) matches exactly, OR
+         * 1. The full URL (pathname + navigational query params) matches exactly, OR
          * 2. The pathname matches exactly and href has no query params, OR
          * 3. The current path is a child route of the href path (for nested routes) and href has no query params
          */

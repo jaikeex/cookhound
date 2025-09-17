@@ -65,7 +65,7 @@ const initializeStore = () =>
  */
 function getStore() {
     if (typeof window === 'undefined') {
-        // ❄️  Server – fresh store per render for safety.
+        // Server – fresh store per render for safety.
         return initializeStore();
     }
 
