@@ -9,3 +9,5 @@ export * from './Recipe';
 export * from './ShoppingList';
 export * from './Tag';
 export * from './Dropdown';
+export * from './ConsentBanner';
+export * from './ConsentSettingsModal';
