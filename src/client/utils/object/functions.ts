@@ -98,3 +98,183 @@ export function deepClone<T>(value: T): T {
 
     return cloneInternal(value);
 }
+
+export function deepEquals(a: AnyObject, b: AnyObject): boolean {
+    // Fast path for identical references and primitive equality (handles NaN correctly)
+    if (Object.is(a, b)) {
+        return true;
+    }
+
+    // Different types (including one being null) can never be equal at this point
+    if (typeof a !== typeof b || a === null || b === null) {
+        return false;
+    }
+
+    // Only objects, arrays or special built-ins reach this point
+
+    // WeakMap cache to track already compared pairs – prevents infinite recursion on
+    // circular structures and drastically reduces complexity for shared sub-graphs.
+    const cache = new WeakMap<object, WeakSet<object>>();
+
+    function equalsInternal(x: any, y: any): boolean {
+        // Primitive & function reference equality (includes Symbol, bigint, undefined, etc.)
+        if (Object.is(x, y)) {
+            return true;
+        }
+        if (
+            typeof x !== 'object' ||
+            x === null ||
+            typeof y !== 'object' ||
+            y === null
+        ) {
+            return false;
+        }
+
+        // Handle cyclic references
+        const cachedY = cache.get(x);
+        if (cachedY) {
+            if (cachedY.has(y)) {
+                return true; // We have already proven x and y are equal earlier in the recursion tree
+            }
+        } else {
+            cache.set(x, new WeakSet<object>());
+        }
+        cache.get(x)!.add(y);
+
+        // Classes must have identical prototypes to be considered equal.
+        if (Object.getPrototypeOf(x) !== Object.getPrototypeOf(y)) {
+            return false;
+        }
+
+        // ----- Specialised built-ins -----
+        // Date
+        if (x instanceof Date) {
+            return y instanceof Date && x.getTime() === y.getTime();
+        }
+
+        // RegExp
+        if (x instanceof RegExp) {
+            return (
+                y instanceof RegExp &&
+                x.source === y.source &&
+                x.flags === y.flags &&
+                x.lastIndex === y.lastIndex
+            );
+        }
+
+        // ArrayBuffer & TypedArray (incl. DataView)
+        if (ArrayBuffer.isView(x)) {
+            if (!ArrayBuffer.isView(y) || x.constructor !== y.constructor) {
+                return false;
+            }
+            const viewX = new Uint8Array(x.buffer, x.byteOffset, x.byteLength);
+            const viewY = new Uint8Array(y.buffer, y.byteOffset, y.byteLength);
+            if (viewX.length !== viewY.length) {
+                return false;
+            }
+            for (let i = 0; i < viewX.length; i++) {
+                if (viewX[i] !== viewY[i]) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        if (x instanceof ArrayBuffer) {
+            if (!(y instanceof ArrayBuffer) || x.byteLength !== y.byteLength) {
+                return false;
+            }
+            const viewX = new Uint8Array(x);
+            const viewY = new Uint8Array(y);
+            for (let i = 0; i < viewX.length; i++) {
+                if (viewX[i] !== viewY[i]) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        // Map – order independent deep comparison
+        if (x instanceof Map) {
+            if (!(y instanceof Map) || x.size !== y.size) {
+                return false;
+            }
+            for (const [k1, v1] of x) {
+                let found = false;
+                for (const [k2, v2] of y) {
+                    if (equalsInternal(k1, k2)) {
+                        if (!equalsInternal(v1, v2)) {
+                            return false;
+                        }
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        // Set – order independent deep comparison
+        if (x instanceof Set) {
+            if (!(y instanceof Set) || x.size !== y.size) {
+                return false;
+            }
+            const unmatched = new Set(y);
+            for (const v1 of x) {
+                let found = false;
+                for (const v2 of unmatched) {
+                    if (equalsInternal(v1, v2)) {
+                        unmatched.delete(v2);
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    return false;
+                }
+            }
+            return unmatched.size === 0;
+        }
+
+        // Array (maintain order)
+        if (Array.isArray(x)) {
+            if (!Array.isArray(y) || x.length !== y.length) {
+                return false;
+            }
+            for (let i = 0; i < x.length; i++) {
+                if (!equalsInternal(x[i], y[i])) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        // General object – compare own property keys (including symbols)
+        const keysX = Reflect.ownKeys(x);
+        const keysY = Reflect.ownKeys(y);
+        if (keysX.length !== keysY.length) {
+            return false;
+        }
+
+        // Property order is irrelevant – create a Set for quick existence check
+        const keySet = new Set(keysY);
+        for (const k of keysX) {
+            if (!keySet.has(k)) {
+                return false;
+            }
+        }
+
+        // Deep compare property values
+        for (const k of keysX) {
+            if (!equalsInternal((x as any)[k], (y as any)[k])) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    return equalsInternal(a, b);
+}
