@@ -63,6 +63,8 @@ export const ENV_CONFIG_PRIVATE = createConfig(
             process.env.GOOGLE_STORAGE_BUCKET_RECIPE_IMAGES,
         GOOGLE_STORAGE_BUCKET_AVATAR_IMAGES:
             process.env.GOOGLE_STORAGE_BUCKET_AVATAR_IMAGES,
+        COOKIE_CONSENT_HASH_V2025_09_15:
+            process.env.COOKIE_CONSENT_HASH_V2025_09_15,
         TYPESENSE_API_KEY: process.env.TYPESENSE_API_KEY,
         OPENAI_API_KEY: process.env.OPENAI_API_KEY
     },

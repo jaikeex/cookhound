@@ -4,10 +4,20 @@ import {
     generateCacheKey,
     invalidateModelCache
 } from '@/server/db/model/model-cache';
+import { ServerError } from '@/server/error';
+import { ApplicationErrorCode } from '@/server/error/codes';
 import { prisma } from '@/server/integrations';
 import { Logger } from '@/server/logger';
-import type { Prisma, User } from '@prisma/client';
-import { getUserLastViewedRecipes } from '@prisma/client/sql';
+import type {
+    CookieConsent,
+    Prisma,
+    User,
+    UserPreference
+} from '@prisma/client';
+import {
+    getUserLastViewedRecipes,
+    upsertUserPreference
+} from '@prisma/client/sql';
 
 //|=============================================================================================|//
 
@@ -22,7 +32,11 @@ class UserModel {
      * Cached user lookup by email
      * Query class -> C2
      */
-    async getOneByEmail(email: string, ttl?: number): Promise<User | null> {
+    async getOneByEmail(
+        email: string,
+        select: Prisma.UserSelect,
+        ttl?: number
+    ): Promise<User | null> {
         const cacheKey = generateCacheKey('user', 'findUnique', {
             where: { email }
         });
@@ -33,19 +47,23 @@ class UserModel {
             cacheKey,
             async () => {
                 log.trace('Fetching user from db by email', { email });
-                return prisma.user.findUnique({ where: { email } });
+                return prisma.user.findUnique({ where: { email }, select });
             },
             ttl ?? CACHE_TTL.TTL_2
         );
 
-        return this.reviveUserDates(user);
+        return this.reviveUserDates(user as User | null);
     }
 
     /**
      * Cached user lookup by ID
      * Query class -> C2
      */
-    async getOneById(id: number, ttl?: number): Promise<User | null> {
+    async getOneById(
+        id: number,
+        select: Prisma.UserSelect,
+        ttl?: number
+    ): Promise<User | null> {
         const cacheKey = generateCacheKey('user', 'findUnique', {
             where: { id }
         });
@@ -57,37 +75,6 @@ class UserModel {
             async () => {
                 log.trace('Fetching user from db by id', { id });
 
-                return prisma.user.findUnique({ where: { id } });
-            },
-            ttl ?? CACHE_TTL.TTL_2
-        );
-
-        return this.reviveUserDates(user);
-    }
-
-    /**
-     * Cached user lookup by ID with column projection
-     * Query class -> C2
-     */
-    async getOneByIdWithSelect(
-        id: number,
-        select: Prisma.UserSelect,
-        ttl?: number
-    ): Promise<User | null> {
-        const cacheKey = generateCacheKey('user', 'findUnique', {
-            where: { id },
-            select
-        });
-
-        log.trace('Getting user by id with select', { id, select });
-
-        const user = await cachePrismaQuery(
-            cacheKey,
-            async () => {
-                log.trace('Fetching user from db by id with select', {
-                    id,
-                    select
-                });
                 return prisma.user.findUnique({ where: { id }, select });
             },
             ttl ?? CACHE_TTL.TTL_2
@@ -231,6 +218,23 @@ class UserModel {
         return this.reviveUserDates(user);
     }
 
+    /**
+     * Get the latest user cookie consent
+     * Query class -> C3
+     */
+    async getLatestUserCookieConsent(
+        userId: number
+    ): Promise<CookieConsent | null> {
+        log.trace('Getting latest user cookie consent', { userId });
+
+        const consent = await prisma.cookieConsent.findFirst({
+            where: { userId },
+            orderBy: { createdAt: 'desc' }
+        });
+
+        return consent;
+    }
+
     //~=========================================================================================~//
     //$                                         MUTATIONS                                       $//
     //~=========================================================================================~//
@@ -246,7 +250,47 @@ class UserModel {
         });
 
         const user = await prisma.user.create({ data });
+
         return user;
+    }
+
+    /**
+     * Create a new user consent
+     * Write class -> W3
+     */
+    async createUserCookieConsent(
+        userId: number,
+        data: Omit<Prisma.CookieConsentCreateInput, 'user'>
+    ): Promise<CookieConsent> {
+        log.trace('Creating user consent', { data });
+
+        const consent = await prisma.cookieConsent.create({
+            data: { ...data, userId }
+        });
+
+        await this.invalidateUserCache({ id: userId });
+
+        return consent;
+    }
+
+    /**
+     * Revoke a user's cookie consent
+     * Write class -> W3
+     */
+    async revokeUserCookieConsent(
+        id: number,
+        userId: number
+    ): Promise<CookieConsent> {
+        log.trace('Updating user consent', { id, userId });
+
+        const consent = await prisma.cookieConsent.update({
+            where: { id, userId },
+            data: { revokedAt: new Date() }
+        });
+
+        await this.invalidateUserCache({ id: userId });
+
+        return consent;
     }
 
     /**
@@ -267,6 +311,19 @@ class UserModel {
         await this.invalidateUserCache(user);
 
         return this.reviveUserDates(user);
+    }
+
+    /**
+     * Register a user visit
+     * Write class -> W3
+     */
+    async registerUserVisit(userId: number): Promise<void> {
+        log.trace('Registering user visit', { userId });
+
+        await prisma.user.update({
+            where: { id: userId },
+            data: { lastVisitedAt: new Date() }
+        });
     }
 
     /**
@@ -327,6 +384,43 @@ class UserModel {
                 }
             }
         });
+    }
+
+    /**
+     * Merge user preferences
+     * Write class -> W3
+     */
+    async upsertUserPreference(
+        userId: number,
+        settings: Prisma.InputJsonValue
+    ): Promise<UserPreference> {
+        log.trace('Merging user preferences', { userId, settings });
+
+        const jsonSettings = (settings ?? {}) as Prisma.InputJsonObject;
+
+        //? Note: `prisma.$queryRawTyped` is used because the jsonb concat (||)
+        //? operator is not yet available in the prisma client api.
+        await prisma.$queryRawTyped(upsertUserPreference(userId, jsonSettings));
+
+        // Fetch the latest preference so callers receive the fully-merged value
+        const preference = await prisma.userPreference.findUnique({
+            where: { userId }
+        });
+
+        await this.invalidateUserCache({ id: userId });
+
+        if (!preference) {
+            log.warn('Failed to upsert user preference', { userId });
+
+            throw new ServerError(
+                'app.error.infrastructure',
+                500,
+                ApplicationErrorCode.DEFAULT,
+                { userId }
+            );
+        }
+
+        return preference;
     }
 
     //~=========================================================================================~//

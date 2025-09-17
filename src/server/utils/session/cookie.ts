@@ -1,5 +1,6 @@
 import { ENV_CONFIG_PUBLIC } from '@/common/constants/env';
 import { SESSION_COOKIE_NAME } from '@/common/constants/general';
+import { ONE_MONTH_IN_SECONDS } from '@/common/constants/time';
 import { cookies } from 'next/headers';
 import { serialize } from 'cookie';
 
@@ -19,7 +20,7 @@ export const createSessionCookie = (
     sessionId: string,
     keepLoggedIn: boolean
 ) => {
-    const maxAge = keepLoggedIn ? 60 * 60 * 24 * 30 : undefined;
+    const maxAge = keepLoggedIn ? ONE_MONTH_IN_SECONDS : undefined;
     const secure = ENV_CONFIG_PUBLIC.ENV !== 'development';
 
     return serialize(SESSION_COOKIE_NAME, sessionId, {

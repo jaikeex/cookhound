@@ -1,3 +1,5 @@
+import type { Locale } from '@/client/locales';
+
 export type UserForCreatePayload = {
     username: string;
     email: string;
@@ -22,6 +24,11 @@ export type UserForLogin = {
 };
 
 export type UserVisibilityGroup = 'public' | 'self' | 'admin';
+
+export type UserPreferences = {
+    theme?: 'light' | 'dark' | 'system';
+    locale?: Locale;
+};
 
 export enum UserRole {
     Guest = 'guest',

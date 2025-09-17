@@ -33,6 +33,8 @@ model User {
   ratings        Rating[]
   shoppingList   ShoppingListIngredient[]
   flags          RecipeFlag[]
+  preferences     UserPreference?
+  cookieConsent  CookieConsent[]
 
   // Indexes
   @@index([username])
@@ -40,6 +42,40 @@ model User {
   @@index([emailVerificationToken])
   @@index([passwordResetToken])
   @@map("users")
+}
+
+model CookieConsent {
+  id            Int       @id @default(autoincrement())
+  userId        Int       @map("user_id")
+  consent       Boolean   @default(false)
+  accepted      String[]  @map("accepted") @db.VarChar(255)
+  version       String    @default("2025-09-15") @map("version") @db.VarChar(255)
+  userIpAddress String?   @map("user_ip_address") @db.VarChar(255)
+  userAgent     String?   @map("user_agent") @db.VarChar(255)
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamp(3)
+  revokedAt     DateTime? @map("revoked_at") @db.Timestamp(3)
+  updatedAt     DateTime  @updatedAt @map("updated_at") @db.Timestamp(3)
+  proofHash     String    @map("proof_hash") @db.VarChar(255)
+
+  // Relations
+  user User @relation(fields: [userId], references: [id])
+
+  // Indexes
+  @@index([id, userId])
+  @@map("cookie_consents")
+}
+
+model UserPreference {
+  userId      Int      @id @map("user_id")
+  settings    Json     @default("{}")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  user User @relation(fields: [userId], references: [id])
+
+  // Indexes
+  @@index([userId])
+  @@map("user_preferences")
 }
 
 model Recipe {

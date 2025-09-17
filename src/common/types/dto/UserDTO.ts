@@ -1,5 +1,6 @@
 import { Expose } from 'class-transformer';
-import { Status, UserRole } from '@/common/types';
+import { Status, type UserPreferences, UserRole } from '@/common/types';
+import type { CookieConsentFromDb } from '@/common/types/cookie-consent';
 
 export class UserDTO {
     @Expose()
@@ -17,6 +18,12 @@ export class UserDTO {
 
     @Expose({ groups: ['self', 'admin'] })
     email: string | null = null;
+
+    @Expose({ groups: ['self', 'admin'] })
+    cookieConsent: CookieConsentFromDb[] | null = null;
+
+    @Expose({ groups: ['self', 'admin'] })
+    preferences: UserPreferences = {};
 
     //|-------------------------------------------------------------------------------------|//
     //?                                   ADMINISTRATIVE                                    ?//

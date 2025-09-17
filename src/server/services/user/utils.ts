@@ -24,8 +24,17 @@ export function getUserDataPermissionGroups(id: number): UserVisibilityGroup[] {
 export function createUserDTO(user: UserFromDB): UserDTO {
     const groups = getUserDataPermissionGroups(user.id);
 
+    const rawPreferences: unknown = (user as any).preferences;
+    const flattenedPreferences =
+        rawPreferences &&
+        typeof rawPreferences === 'object' &&
+        'settings' in rawPreferences
+            ? ((rawPreferences as { settings: unknown }).settings ?? {})
+            : (rawPreferences ?? {});
+
     const normalized = {
         ...user,
+        preferences: flattenedPreferences,
         role: user.role as UserRole,
         status: user.status as Status,
         createdAt: user.createdAt?.toISOString() ?? '',

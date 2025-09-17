@@ -5,7 +5,8 @@ import type {
     ShoppingListIngredientPayload,
     UserDTO,
     UserForCreatePayload,
-    UserForGoogleCreatePayload
+    UserForGoogleCreatePayload,
+    UserPreferences
 } from '@/common/types';
 import bcrypt from 'bcrypt';
 import { v4 as uuid } from 'uuid';
@@ -15,6 +16,7 @@ import {
     AuthErrorUnauthorized,
     ConflictError,
     NotFoundError,
+    ServerError,
     ValidationError
 } from '@/server/error';
 import { type UserForGoogleCreate, type UserForLocalCreate } from './types';
@@ -23,6 +25,13 @@ import db, { getUserSelect } from '@/server/db/model';
 import { Logger } from '@/server/logger';
 import { RequestContext } from '@/server/utils/reqwest/context';
 import { ApplicationErrorCode } from '@/server/error/codes';
+import type {
+    ConsentCategory,
+    CookieConsent,
+    CookieConsentForCreate
+} from '@/common/types/cookie-consent';
+import { ONE_DAY_IN_MILLISECONDS } from '@/common/constants';
+import { areConsentsEqual } from '@/common/utils';
 
 //|=============================================================================================|//
 
@@ -142,7 +151,9 @@ class UserService {
 
         log.trace('createUserFromGoogle - attempt', { email, username });
 
-        const existingUser = await db.user.getOneByEmail(email);
+        // This method only cares whether the email is already taken
+        const userSelect = getUserSelect(['public']);
+        const existingUser = await db.user.getOneByEmail(email, userSelect);
 
         if (existingUser) {
             log.info('createUserFromGoogle - user already exists', { email });
@@ -182,7 +193,7 @@ class UserService {
         const groups = getUserDataPermissionGroups(id);
         const select = getUserSelect(groups);
 
-        const user = await db.user.getOneByIdWithSelect(id, select);
+        const user = await db.user.getOneById(id, select);
 
         if (!user) {
             log.warn('getUserById - user not found', { id });
@@ -452,6 +463,167 @@ class UserService {
     }
 
     //~-----------------------------------------------------------------------------------------~//
+    //$                                   CREATE COOKIE CONSENT                                 $//
+    //~-----------------------------------------------------------------------------------------~//
+
+    async createUserCookieConsent(
+        userId: number,
+        payload: CookieConsentForCreate
+    ): Promise<CookieConsent> {
+        log.trace('createUserCookieConsent - attempt', { payload, userId });
+
+        if (!userId) {
+            log.warn('createUserCookieConsent - called anonymously');
+            throw new AuthErrorUnauthorized();
+        }
+
+        if (RequestContext.getUserId() !== userId) {
+            log.warn('createUserCookieConsent - called by the wrong user');
+            throw new AuthErrorUnauthorized();
+        }
+
+        const user = await this.getUserById(userId);
+
+        if (!user) {
+            log.warn('createUserCookieConsent - user not found', { userId });
+            throw new NotFoundError(
+                'app.error.not-found',
+                ApplicationErrorCode.USER_NOT_FOUND
+            );
+        }
+
+        // if the new payload matches the latest stored consent, skip the write.
+        const latestConsent =
+            user.cookieConsent &&
+            Array.isArray(user.cookieConsent) &&
+            user.cookieConsent.length > 0
+                ? user.cookieConsent[0]
+                : null;
+
+        if (
+            latestConsent !== null &&
+            areConsentsEqual(latestConsent, payload)
+        ) {
+            log.trace(
+                'createUserCookieConsent - duplicate consent, skipping DB write',
+                {
+                    userId
+                }
+            );
+
+            const consentDto: CookieConsent = {
+                id: latestConsent.id.toString(),
+                userId: latestConsent.userId.toString(),
+                consent: latestConsent.consent,
+                accepted: latestConsent.accepted as ConsentCategory[],
+                version: latestConsent.version,
+                userIpAddress: latestConsent.userIpAddress ?? '',
+                userAgent: latestConsent.userAgent ?? '',
+                createdAt: latestConsent.createdAt,
+                revokedAt: latestConsent.revokedAt ?? null,
+                updatedAt: latestConsent.updatedAt
+            };
+
+            return consentDto;
+        }
+
+        // From here on, the consent is fresh new, revoke the previous if any and save the new one.
+
+        try {
+            // db should always return only the latest cookie consent
+            if (latestConsent) {
+                await db.user.revokeUserCookieConsent(
+                    Number(latestConsent.id),
+                    userId
+                );
+            }
+        } catch (error) {
+            log.error(
+                'createUserCookieConsent - error revoking user cookie consent',
+                { userId, error }
+            );
+
+            /**
+             * Do NOT continue if the revocation fails.
+             * Allowing this to continue would result in a duplicate consent, which sounds really bad.
+             */
+            throw new ServerError(
+                'app.error.default',
+                500,
+                ApplicationErrorCode.DEFAULT
+            );
+        }
+
+        const consent = await db.user.createUserCookieConsent(userId, payload);
+
+        log.trace('createUserCookieConsent - success', { payload, userId });
+
+        const consentDto: CookieConsent = {
+            id: consent.id.toString(),
+            userId: consent.userId.toString(),
+            consent: consent.consent,
+            accepted: consent.accepted as ConsentCategory[],
+            version: consent.version,
+            userIpAddress: consent.userIpAddress ?? '',
+            userAgent: consent.userAgent ?? '',
+            createdAt: consent.createdAt,
+            revokedAt: consent.revokedAt ?? null,
+            updatedAt: consent.updatedAt
+        };
+
+        return consentDto;
+    }
+
+    //~-----------------------------------------------------------------------------------------~//
+    //$                                 UPDATE USER PREFERENCES                                 $//
+    //~-----------------------------------------------------------------------------------------~//
+
+    async updateUserPreferences(
+        userId: number,
+        preferences: UserPreferences
+    ): Promise<void> {
+        log.trace('updateUserPreferences - attempt', { userId, preferences });
+
+        if (!userId) {
+            log.warn('updateUserPreferences - called anonymously');
+            throw new AuthErrorUnauthorized();
+        }
+
+        if (RequestContext.getUserId() !== userId) {
+            log.warn('updateUserPreferences - called by the wrong user');
+            throw new AuthErrorUnauthorized();
+        }
+
+        const user = await this.getUserById(userId);
+
+        if (!user) {
+            log.warn('updateUserPreferences - user not found', { userId });
+            throw new NotFoundError(
+                'app.error.not-found',
+                ApplicationErrorCode.USER_NOT_FOUND
+            );
+        }
+
+        // The Prisma projection returns `preferences` as `{ settings: UserPreferences }`.
+        // Flatten it, so we only merge plain key-value pairs.
+        const currentSettings: UserPreferences =
+            user.preferences && 'settings' in (user.preferences as any)
+                ? ((user.preferences as any).settings as UserPreferences)
+                : (user.preferences as UserPreferences);
+
+        const preferencesForUpdate = {
+            ...currentSettings,
+            ...preferences
+        };
+
+        await db.user.upsertUserPreference(userId, preferencesForUpdate);
+
+        log.trace('updateUserPreferences - success', { userId, preferences });
+
+        return;
+    }
+
+    //~-----------------------------------------------------------------------------------------~//
     //$                                       VERIFY EMAIL                                      $//
     //~-----------------------------------------------------------------------------------------~//
 
@@ -526,7 +698,16 @@ class UserService {
             );
         }
 
-        const user = await db.user.getOneByEmail(email);
+        const userId = RequestContext.getUserId();
+
+        if (!userId) {
+            log.warn('resendVerificationEmail - called anonymously');
+            throw new AuthErrorUnauthorized();
+        }
+
+        const groups = getUserDataPermissionGroups(userId);
+        const userSelect = getUserSelect(groups);
+        const user = await db.user.getOneByEmail(email, userSelect);
 
         if (!user) {
             log.warn('resendVerificationEmail - user not found', { email });
@@ -537,7 +718,7 @@ class UserService {
             );
         }
 
-        if (user.emailVerified) {
+        if (user?.emailVerified) {
             log.info('resendVerificationEmail - email already verified', {
                 email
             });
@@ -587,7 +768,16 @@ class UserService {
             );
         }
 
-        const user = await db.user.getOneByEmail(email);
+        const userId = RequestContext.getUserId();
+
+        if (!userId) {
+            log.warn('resendVerificationEmail - called anonymously');
+            throw new AuthErrorUnauthorized();
+        }
+
+        const groups = getUserDataPermissionGroups(userId);
+        const userSelect = getUserSelect(groups);
+        const user = await db.user.getOneByEmail(email, userSelect);
 
         if (!user) {
             log.info('sendPasswordResetEmail - user not found', { email });
@@ -618,7 +808,7 @@ class UserService {
 
         const passwordResetToken = uuid();
         const passwordResetTokenExpires = new Date(
-            Date.now() + 1000 * 60 * 60 * 24 // 24 hours
+            Date.now() + ONE_DAY_IN_MILLISECONDS
         );
 
         await db.user.updateOneById(user.id, {
@@ -690,7 +880,8 @@ class UserService {
 
         if (
             user?.lastPasswordReset &&
-            user.lastPasswordReset > new Date(Date.now() - 1000 * 60 * 60 * 24)
+            user.lastPasswordReset >
+                new Date(Date.now() - ONE_DAY_IN_MILLISECONDS)
         ) {
             log.warn('resetPassword - password changed too recently');
             throw new ValidationError(

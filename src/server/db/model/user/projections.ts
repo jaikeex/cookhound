@@ -16,7 +16,19 @@ export const USER_SELECT: Record<UserVisibilityGroup, UserSelect> = {
         avatarUrl: true,
         createdAt: true,
         lastLogin: true,
-        lastVisitedAt: true
+        lastVisitedAt: true,
+        emailVerified: true,
+        passwordHash: true,
+        preferences: {
+            select: {
+                settings: true
+            }
+        },
+        cookieConsent: {
+            where: { revokedAt: null },
+            orderBy: { createdAt: 'desc' },
+            take: 1
+        }
     },
     admin: {
         id: true,
@@ -27,7 +39,18 @@ export const USER_SELECT: Record<UserVisibilityGroup, UserSelect> = {
         status: true,
         createdAt: true,
         lastLogin: true,
-        lastVisitedAt: true
+        lastVisitedAt: true,
+        passwordHash: true,
+        preferences: {
+            select: {
+                settings: true
+            }
+        },
+        cookieConsent: {
+            where: { revokedAt: null },
+            orderBy: { createdAt: 'desc' },
+            take: 1
+        }
     }
 };
 
