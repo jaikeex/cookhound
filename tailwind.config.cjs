@@ -1,5 +1,19 @@
 const colors = require('tailwindcss/colors');
 
+// Tailwind's default color palette includes colors that have been renamed, and if you spread over these, it will
+// trigger warnings. This code extracts the non-getter properties from the object, so that we don't trigger warnings.
+//? https://github.com/tailwindlabs/tailwindcss/discussions/11127#discussioncomment-10919929
+
+const entries = Object.entries(Object.getOwnPropertyDescriptors(colors)).filter(
+    ([key, descriptor]) => {
+        return typeof descriptor.get !== 'function'; // Exclude getters
+    }
+);
+
+const nonDeprecatedColors = Object.fromEntries(
+    entries.map(([key, descriptor]) => [key, descriptor.value])
+);
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
     content: ['./src/**/*.{js,ts,jsx,tsx,mdx}'],
@@ -94,15 +108,15 @@ module.exports = {
             '3xl': '2000px'
         },
         colors: {
-            ...colors,
+            ...nonDeprecatedColors,
 
-            primary: colors.blue,
-            secondary: colors.green,
-            success: colors.green,
-            danger: colors.red,
-            warning: colors.yellow,
-            info: colors.blue,
-            sheet: colors.gray
+            primary: nonDeprecatedColors.blue,
+            secondary: nonDeprecatedColors.green,
+            success: nonDeprecatedColors.green,
+            danger: nonDeprecatedColors.red,
+            warning: nonDeprecatedColors.yellow,
+            info: nonDeprecatedColors.blue,
+            sheet: nonDeprecatedColors.gray
         }
     },
     plugins: []
