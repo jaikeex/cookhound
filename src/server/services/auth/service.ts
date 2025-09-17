@@ -1,4 +1,4 @@
-import type { Status, UserDTO, UserRole } from '@/common/types';
+import type { UserDTO, UserRole, UserVisibilityGroup } from '@/common/types';
 import type {
     UserForLogin,
     AuthResponse,
@@ -12,7 +12,7 @@ import {
 } from '@/server/error';
 import { ENV_CONFIG_PRIVATE, ENV_CONFIG_PUBLIC } from '@/common/constants';
 import { userService } from '@/server/services/user/service';
-import db from '@/server/db/model';
+import db, { getUserSelect } from '@/server/db/model';
 import { Logger } from '@/server/logger';
 import { deleteSessionCookie, sessions } from '@/server/utils/session';
 import { RequestContext } from '@/server/utils/reqwest/context';
@@ -22,6 +22,10 @@ import { createUserDTO } from '@/server/services/user/utils';
 //|=============================================================================================|//
 
 const log = Logger.getInstance('auth-service');
+
+// This is true by definition for all methods in this service
+const AUTH_USER_GROUPS = ['self'] as UserVisibilityGroup[];
+const AUTH_USER_SELECT = getUserSelect(AUTH_USER_GROUPS);
 
 /**
  * Service class for handling authentication-related logic.
@@ -67,8 +71,7 @@ class AuthService {
                 ApplicationErrorCode.MISSING_FIELD
             );
         }
-
-        const user = await db.user.getOneByEmail(email);
+        const user = await db.user.getOneByEmail(email, AUTH_USER_SELECT);
 
         if (!user || !user.passwordHash) {
             log.info('login - user not found', { email });
@@ -110,17 +113,7 @@ class AuthService {
 
         log.trace('login - success', { email });
 
-        const userResponse: UserDTO = {
-            id: user.id,
-            email: user.email,
-            username: user.username,
-            avatarUrl: user.avatarUrl,
-            createdAt: user.createdAt.toISOString(),
-            role: user.role as UserRole,
-            status: user.status as Status,
-            lastLogin: user.lastLogin?.toISOString() || null,
-            lastVisitedAt: user.lastVisitedAt?.toISOString() || null
-        };
+        const userResponse: UserDTO = createUserDTO(user);
 
         return { token, user: userResponse };
     }
@@ -203,7 +196,10 @@ class AuthService {
         }
 
         const userInfoData: UserFromGoogle = await userInfoResponse.json();
-        const dbUser = await db.user.getOneByEmail(userInfoData.email);
+        const dbUser = await db.user.getOneByEmail(
+            userInfoData.email,
+            AUTH_USER_SELECT
+        );
 
         let user: UserDTO;
 
@@ -212,17 +208,7 @@ class AuthService {
                 email: userInfoData.email
             });
 
-            user = {
-                id: dbUser.id,
-                email: dbUser.email,
-                username: dbUser.username,
-                avatarUrl: dbUser.avatarUrl,
-                createdAt: dbUser.createdAt.toISOString(),
-                role: dbUser.role as UserRole,
-                status: dbUser.status as Status,
-                lastLogin: dbUser.lastLogin?.toISOString() ?? null,
-                lastVisitedAt: dbUser.lastVisitedAt?.toISOString() ?? null
-            };
+            user = createUserDTO(dbUser);
         } else {
             log.info('loginWithGoogle - creating new user', {
                 email: userInfoData.email
@@ -291,7 +277,11 @@ class AuthService {
             throw new AuthErrorUnauthorized();
         }
 
-        const user = await db.user.getOneById(Number(userId));
+        // This is true by definition
+        const groups = ['self'] as UserVisibilityGroup[];
+        const select = getUserSelect(groups);
+
+        const user = await db.user.getOneById(Number(userId), select);
 
         if (!user) {
             log.warn('getCurrentUser - user not found', {
@@ -321,7 +311,7 @@ class AuthService {
             );
         }
 
-        db.user.updateOneById(user.id, { lastVisitedAt: new Date() });
+        db.user.registerUserVisit(user.id);
 
         log.trace('getCurrentUser - success', {
             id: userId
