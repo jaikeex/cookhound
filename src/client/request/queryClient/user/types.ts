@@ -7,8 +7,13 @@ import type {
     RecipeForDisplayDTO,
     ResetPasswordEmailPayload,
     ResetPasswordPayload,
-    UserForUpdatePayload
+    UserForUpdatePayload,
+    UserPreferences
 } from '@/common/types';
+import type {
+    CookieConsent,
+    CookieConsentPayload
+} from '@/common/types/cookie-consent';
 import type {
     UseQueryOptions,
     UseMutationOptions
@@ -90,6 +95,24 @@ export type UpdateUserByIdOptions = Omit<
         UserDTO,
         RequestError,
         { userId: number; data: UserForUpdatePayload }
+    >,
+    'mutationFn'
+>;
+
+export type CreateUserCookieConsentOptions = Omit<
+    UseMutationOptions<
+        CookieConsent,
+        RequestError,
+        { userId: number; data: CookieConsentPayload }
+    >,
+    'mutationFn'
+>;
+
+export type UpdateUserPreferencesOptions = Omit<
+    UseMutationOptions<
+        void,
+        RequestError,
+        { userId: number; data: UserPreferences }
     >,
     'mutationFn'
 >;

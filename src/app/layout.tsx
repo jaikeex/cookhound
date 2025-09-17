@@ -17,6 +17,7 @@ import {
 } from '@/client/components';
 import { locales } from '@/client/locales';
 import { classNames } from '@/client/utils';
+import { pickMostRecentConsent } from '@/common/utils';
 import { cookies, headers } from 'next/headers';
 import type { UserDTO } from '@/common/types';
 import { apiClient } from '@/client/request';
@@ -25,6 +26,10 @@ import { CONTENT_WRAPPER_ID, MAIN_PAGE_ID } from '@/client/constants';
 import { QueryClient, dehydrate } from '@tanstack/react-query';
 import { QUERY_KEYS } from '@/client/request/queryClient';
 import { SESSION_COOKIE_NAME } from '@/common/constants/general';
+import { ConsentProvider } from '@/client/store';
+import { ConsentBanner } from '@/client/components';
+import { ClientShell } from './ClientShell';
+import type { CookieConsent } from '@/common/types/cookie-consent';
 
 const openSans = Open_Sans({
     subsets: ['latin'],
@@ -99,51 +104,97 @@ export default async function RootLayout({
     qc.setQueryData(QUERY_KEYS.auth.currentUser, user);
 
     //|-----------------------------------------------------------------------------------------|//
+    //?                                      COOKIE CONSENT                                     ?//
+    //|-----------------------------------------------------------------------------------------|//
+
+    let cookieConsent: CookieConsent | null = null;
+
+    const rawConsent = cookieStore.get('cookie_consent')?.value;
+
+    //The user consent should never be fetched from db if revoked, but just to make sure not to mess gdpr up...
+    const dbConsent = user?.cookieConsent?.[0]?.revokedAt
+        ? null
+        : (user?.cookieConsent?.[0] ?? null);
+
+    if (rawConsent) {
+        try {
+            cookieConsent = JSON.parse(decodeURIComponent(rawConsent));
+        } catch {
+            cookieConsent = null;
+        }
+    }
+
+    const initialConsent = cookieConsent
+        ? pickMostRecentConsent(cookieConsent, dbConsent)
+        : null;
+
+    //|-----------------------------------------------------------------------------------------|//
+    //?                                          THEME                                          ?//
+    //|-----------------------------------------------------------------------------------------|//
+
+    const themeFromCookie = initialConsent?.accepted?.includes('preferences')
+        ? (cookieStore.get('ui_theme')?.value ?? null)
+        : null;
+
+    const canUsePreferences =
+        initialConsent?.accepted?.includes('preferences') ?? false;
+
+    const themeFromPreferences = user?.preferences?.theme ?? null;
+
+    const initialTheme = canUsePreferences
+        ? (themeFromCookie ?? themeFromPreferences ?? 'dark')
+        : 'dark';
+
+    //|-----------------------------------------------------------------------------------------|//
     //?                                          RENDER                                         ?//
     //|-----------------------------------------------------------------------------------------|//
 
     const dehydratedState = dehydrate(qc);
 
     return (
-        <html lang="en" suppressHydrationWarning>
+        <html lang={locale} suppressHydrationWarning>
             <body className={`${kalam.variable} ${openSans.variable}`}>
                 <QueryProvider dehydratedState={dehydratedState}>
                     <ThemeProvider
                         attribute="class"
-                        defaultTheme="dark"
+                        defaultTheme={initialTheme}
                         enableSystem={false}
                         disableTransitionOnChange
                     >
-                        <LocaleProvider
-                            defaultMessages={messages}
-                            defaultLocale={locale}
-                        >
-                            <AuthProvider>
-                                <SnackbarProvider>
+                        <AuthProvider>
+                            <ConsentProvider initialConsent={initialConsent}>
+                                <LocaleProvider
+                                    defaultMessages={messages}
+                                    defaultLocale={locale}
+                                >
                                     <ModalProvider>
-                                        <ScrollToTop />
-                                        <div
-                                            id={MAIN_PAGE_ID}
-                                            className="flex flex-col typography-base"
-                                        >
-                                            <div className="fixed top-0 left-0 w-screen h-screen page-background z-[-10]" />
-                                            {/* DO NOT CHANGE THE ORDER OF THESE COMPONENTS */}
-                                            <TopNavigation />
-                                            <BottomNavigation />
+                                        <ClientShell />
+                                        <SnackbarProvider>
+                                            <ConsentBanner />
+                                            <ScrollToTop />
                                             <div
-                                                id={CONTENT_WRAPPER_ID}
-                                                className={classNames(
-                                                    'flex-1 px-2 pt-16 pb-16 md:px-4 md:pt-24',
-                                                    'relative'
-                                                )}
+                                                id={MAIN_PAGE_ID}
+                                                className="flex flex-col typography-base"
                                             >
-                                                {children}
+                                                <div className="fixed top-0 left-0 w-screen h-screen page-background z-[-10]" />
+                                                {/* DO NOT CHANGE THE ORDER OF THESE COMPONENTS */}
+                                                <TopNavigation />
+                                                <BottomNavigation />
+                                                <div
+                                                    id={CONTENT_WRAPPER_ID}
+                                                    className={classNames(
+                                                        'flex-1 px-2 pt-16 pb-16 md:px-4 md:pt-24',
+                                                        'relative'
+                                                    )}
+                                                >
+                                                    {children}
+                                                </div>
                                             </div>
-                                        </div>
+                                        </SnackbarProvider>
                                     </ModalProvider>
-                                </SnackbarProvider>
-                            </AuthProvider>
-                        </LocaleProvider>
+                                </LocaleProvider>
+                            </ConsentProvider>
+                        </AuthProvider>
                     </ThemeProvider>
                 </QueryProvider>
             </body>

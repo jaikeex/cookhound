@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth, useLocale, useSnackbar } from '@/client/store';
 import { chqc } from '@/client/request/queryClient';
 import { useQueryClient } from '@tanstack/react-query';
+import { Event, eventBus } from '@/client/events';
 
 type LogoutButtonProps = BaseButtonProps;
 
@@ -24,6 +25,7 @@ export const LogoutButton: React.FC<LogoutButtonProps> = ({ className }) => {
                 message: t('auth.success.logout'),
                 variant: 'success'
             });
+
             setUser(null);
             queryClient.clear();
             handleLogoutSuccess();
@@ -31,6 +33,8 @@ export const LogoutButton: React.FC<LogoutButtonProps> = ({ className }) => {
     });
 
     const handleLogoutSuccess = useCallback(() => {
+        eventBus.emit(Event.USER_LOGGED_OUT, undefined);
+
         router.push('/');
     }, [router]);
 

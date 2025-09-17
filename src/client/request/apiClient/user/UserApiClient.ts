@@ -9,8 +9,13 @@ import type {
     ShoppingListPayload,
     UserDTO,
     UserForCreatePayload,
-    UserForUpdatePayload
+    UserForUpdatePayload,
+    UserPreferences
 } from '@/common/types';
+import type {
+    CookieConsent,
+    CookieConsentPayload
+} from '@/common/types/cookie-consent';
 
 /**
  * Service for user-related operations.
@@ -159,6 +164,46 @@ class UserApiClient {
     ): Promise<UserDTO> {
         return await apiRequestWrapper.put({
             url: `/users/${id}`,
+            data,
+            ...config
+        });
+    }
+
+    /**
+     * Creates a new user cookie consent by calling `POST /api/users/{id}/cookie-consent`.
+     *
+     * @param id - The ID of the user.
+     * @param data - The user cookie consent data to create.
+     * @param config - Optional fetch request configuration.
+     * @returns A promise that resolves when the user cookie consent is created.
+     */
+    async createUserCookieConsent(
+        id: number,
+        data: CookieConsentPayload,
+        config?: RequestConfig
+    ): Promise<CookieConsent> {
+        return await apiRequestWrapper.post({
+            url: `/users/${id}/cookie-consent`,
+            data,
+            ...config
+        });
+    }
+
+    /**
+     * Updates a user's preferences by calling `PUT /api/users/{id}/preferences`.
+     *
+     * @param id - The ID of the user.
+     * @param data - The user preferences data to update.
+     * @param config - Optional fetch request configuration.
+     * @returns A promise that resolves when the user preferences are updated.
+     */
+    async updateUserPreferences(
+        id: number,
+        data: UserPreferences,
+        config?: RequestConfig
+    ): Promise<void> {
+        await apiRequestWrapper.put({
+            url: `/users/${id}/preferences`,
             data,
             ...config
         });

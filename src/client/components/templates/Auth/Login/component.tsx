@@ -19,6 +19,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { chqc, QUERY_KEYS } from '@/client/request/queryClient';
 import { useQueryClient } from '@tanstack/react-query';
+import { Event, eventBus } from '@/client/events';
 
 //~---------------------------------------------------------------------------------------------~//
 //$                                          VALIDATION                                         $//
@@ -78,6 +79,8 @@ export const LoginTemplate: React.FC<LoginTemplateProps> = ({
     const cleanUpAndRedirectAfterLogin = useCallback(
         (user: UserDTO) => {
             setUser(user);
+
+            eventBus.emit(Event.USER_LOGGED_IN, user);
 
             alert({ message: t('auth.success.login'), variant: 'success' });
             formRef.current?.reset();

@@ -15,7 +15,9 @@ import type {
     SendResetPasswordEmailOptions,
     ResetPasswordOptions,
     GetUserByIdOptions,
-    UpdateUserByIdOptions
+    UpdateUserByIdOptions,
+    CreateUserCookieConsentOptions,
+    UpdateUserPreferencesOptions
 } from './types';
 import { USER_QUERY_KEYS } from './types';
 
@@ -124,6 +126,30 @@ class UserQueryClient {
     useUpdateUserById = (options?: Partial<UpdateUserByIdOptions>) =>
         useAppMutation(
             ({ userId, data }) => apiClient.user.updateUserById(userId, data),
+            options
+        );
+
+    /**
+     * Creates a user cookie consent.
+     */
+    useCreateUserCookieConsent = (
+        options?: Partial<CreateUserCookieConsentOptions>
+    ) =>
+        useAppMutation(
+            ({ userId, data }) =>
+                apiClient.user.createUserCookieConsent(userId, data),
+            options
+        );
+
+    /**
+     * Updates a user's preferences.
+     */
+    useUpdateUserPreferences = (
+        options?: Partial<UpdateUserPreferencesOptions>
+    ) =>
+        useAppMutation(
+            ({ userId, data }) =>
+                apiClient.user.updateUserPreferences(userId, data),
             options
         );
 
