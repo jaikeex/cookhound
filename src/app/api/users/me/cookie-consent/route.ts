@@ -27,7 +27,7 @@ const UserCookieConsentForCreateSchema = z.strictObject({
 //|=============================================================================================|//
 
 /**
- * Handles POST requests to `/api/users/{id}/cookie-consent` to create a new user cookie consent.
+ * Handles POST requests to `/api/users/me/cookie-consent` to create a new user cookie consent.
  *
  * @param request - The incoming Next.js request object.
  * @returns A JSON response with the created user cookie consent.
@@ -37,12 +37,12 @@ export async function POST(request: NextRequest) {
         try {
             logRequest(request);
 
-            const userId = request.nextUrl.pathname.split('/').at(-2);
+            const userId = RequestContext.getUserId();
 
-            if (!userId || isNaN(Number(userId))) {
+            if (!userId) {
                 throw new ValidationError(
-                    'app.error.bad-request',
-                    ApplicationErrorCode.MISSING_FIELD
+                    'auth.error.unauthorized',
+                    ApplicationErrorCode.UNAUTHORIZED
                 );
             }
 
@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
             };
 
             const cookieConsent = await userService.createUserCookieConsent(
-                Number(userId),
+                userId,
                 payloadWithServerData
             );
 

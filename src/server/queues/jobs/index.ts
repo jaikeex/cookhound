@@ -32,6 +32,9 @@
 
 export * from './emails/SendVerificationEmailJob';
 export * from './emails/SendPasswordResetEmailJob';
+export * from './emails/SendEmailChangeConfirmationJob';
+export * from './emails/SendEmailChangeNoticeJob';
+export * from './emails/SendEmailChangedAuditJob';
 
 //|-----------------------------------------------------------------------------------------|//
 //?                                        SEARCH                                          ?//

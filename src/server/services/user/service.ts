@@ -904,6 +904,228 @@ class UserService {
 
         return;
     }
+
+    //~-----------------------------------------------------------------------------------------~//
+    //$                                  INITIATE EMAIL CHANGE                                  $//
+    //~-----------------------------------------------------------------------------------------~//
+
+    /**
+     * Initiates the email change flow for the authenticated user.
+     *
+     * @param userId - ID of the user requesting the change (must equal RequestContext.getUserId())
+     * @param newEmail - E-mail address that should replace the current one
+     * @param currentPassword - The user’s current password (required for local accounts)
+     *
+     * @throws ValidationError   If required fields are missing or the new email is identical to the existing one
+     * @throws ConflictError     If the new email is already taken by a different user
+     * @throws AuthErrorForbidden If the password is invalid or password authentication is not possible
+     */
+    async initiateEmailChange(
+        userId: number,
+        newEmail: string,
+        currentPassword: string
+    ): Promise<void> {
+        log.trace('initiateEmailChange - attempt', {
+            userId,
+            newEmail
+        });
+
+        //|-------------------------------------------------------------------------------------|//
+        //?                                       GUARDS                                        ?//
+        //|-------------------------------------------------------------------------------------|//
+
+        if (RequestContext.getUserId() !== userId) {
+            log.warn('initiateEmailChange - unauthorized');
+            throw new AuthErrorUnauthorized();
+        }
+
+        if (!newEmail) {
+            log.warn('initiateEmailChange - missing email');
+            throw new ValidationError(
+                'auth.error.email-required',
+                ApplicationErrorCode.MISSING_FIELD
+            );
+        }
+
+        if (!currentPassword) {
+            log.warn('initiateEmailChange - missing password');
+            throw new ValidationError(
+                'auth.error.password-required',
+                ApplicationErrorCode.MISSING_FIELD
+            );
+        }
+
+        const user = await db.user.getOneById(userId, {
+            id: true,
+            email: true,
+            username: true,
+            passwordHash: true,
+            authType: true,
+            emailVerified: true
+        });
+
+        if (!user) {
+            log.warn('initiateEmailChange - user not found', { userId });
+            throw new NotFoundError(
+                'app.error.not-found',
+                ApplicationErrorCode.USER_NOT_FOUND
+            );
+        }
+
+        if (newEmail === user.email) {
+            log.warn('initiateEmailChange - email unchanged');
+            throw new ValidationError(undefined, ApplicationErrorCode.CONFLICT);
+        }
+
+        const existing = await db.user.getOneByEmail(newEmail, { id: true });
+
+        if (existing) {
+            log.trace('initiateEmailChange - email already in use', {
+                newEmail
+            });
+
+            throw new ConflictError(
+                'auth.error.email-already-taken',
+                ApplicationErrorCode.EMAIL_ALREADY_IN_USE
+            );
+        }
+
+        if (user.authType === AuthType.Local) {
+            const matches = await bcrypt.compare(
+                currentPassword,
+                user.passwordHash ?? ''
+            );
+
+            if (!matches) {
+                log.warn('initiateEmailChange - invalid password');
+                throw new AuthErrorForbidden(
+                    undefined,
+                    ApplicationErrorCode.INVALID_PASSWORD
+                );
+            }
+        } else {
+            // Google-only accounts have no password to compare
+            log.warn('initiateEmailChange - password required for google auth');
+            throw new AuthErrorForbidden(
+                'auth.error.password-required',
+                ApplicationErrorCode.INVALID_PASSWORD
+            );
+        }
+
+        //|-------------------------------------------------------------------------------------|//
+        //?                                    TOKEN AND MAIL                                   ?//
+        //|-------------------------------------------------------------------------------------|//
+
+        const token = uuid();
+        const expiresAt = new Date(Date.now() + ONE_DAY_IN_MILLISECONDS);
+
+        await db.user.upsertEmailChangeRequest(
+            userId,
+            newEmail,
+            token,
+            expiresAt
+        );
+
+        await mailService.sendEmailChangeConfirmation(
+            newEmail,
+            token,
+            user.username
+        );
+        await mailService.sendEmailChangeNotice(user.email, user.username);
+
+        log.notice('initiateEmailChange - success', { userId, newEmail });
+    }
+
+    //~-----------------------------------------------------------------------------------------~//
+    //$                                  CONFIRM EMAIL CHANGE                                   $//
+    //~-----------------------------------------------------------------------------------------~//
+
+    /**
+     * Confirms email change request by token, swaps the e-mail in the DB and sends an audit mail.
+     *
+     * @param token - The confirmation token supplied in the confirmation link
+     * @returns The updated `UserDTO` object.
+     */
+    async confirmEmailChange(token: string): Promise<UserDTO> {
+        log.trace('confirmEmailChange - attempt', { token });
+
+        //|-------------------------------------------------------------------------------------|//
+        //?                                       GUARDS                                        ?//
+        //|-------------------------------------------------------------------------------------|//
+
+        if (!token) {
+            throw new ValidationError(
+                'auth.error.missing-token',
+                ApplicationErrorCode.MISSING_FIELD
+            );
+        }
+
+        const request = await db.user.getEmailChangeRequestByToken(token);
+
+        if (!request) {
+            log.warn('confirmEmailChange - request not found');
+            throw new ValidationError(
+                undefined,
+                ApplicationErrorCode.EMAIL_CHANGE_TOKEN_EXPIRED
+            );
+        }
+
+        if (request.expiresAt < new Date()) {
+            log.trace('confirmEmailChange - token expired');
+            throw new ValidationError(
+                undefined,
+                ApplicationErrorCode.EMAIL_CHANGE_TOKEN_EXPIRED
+            );
+        }
+
+        const user = await db.user.getOneById(request.userId, {
+            id: true,
+            email: true,
+            username: true
+        });
+
+        if (!user) {
+            log.error('confirmEmailChange - user not found', {
+                userId: request.userId
+            });
+
+            throw new NotFoundError(
+                'app.error.not-found',
+                ApplicationErrorCode.USER_NOT_FOUND
+            );
+        }
+
+        //|-------------------------------------------------------------------------------------|//
+        //?                                      CHANGE                                         ?//
+        //|-------------------------------------------------------------------------------------|//
+
+        const oldEmail = user.email;
+
+        await db.user.applyEmailChange(user.id, request.newEmail, token);
+
+        await mailService.sendEmailChangedAudit(
+            oldEmail,
+            request.newEmail,
+            user.username
+        );
+
+        const updated = await db.user.getOneById(
+            user.id,
+            getUserSelect(['public'])
+        );
+
+        if (!updated) {
+            throw new ServerError(
+                'app.error.default',
+                500,
+                ApplicationErrorCode.DEFAULT
+            );
+        }
+
+        log.notice('confirmEmailChange - success', { userId: updated.id });
+
+        return createUserDTO(updated);
+    }
 }
 
 export const userService = new UserService();

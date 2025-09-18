@@ -172,18 +172,16 @@ class UserApiClient {
     /**
      * Creates a new user cookie consent by calling `POST /api/users/{id}/cookie-consent`.
      *
-     * @param id - The ID of the user.
      * @param data - The user cookie consent data to create.
      * @param config - Optional fetch request configuration.
      * @returns A promise that resolves when the user cookie consent is created.
      */
     async createUserCookieConsent(
-        id: number,
         data: CookieConsentPayload,
         config?: RequestConfig
     ): Promise<CookieConsent> {
         return await apiRequestWrapper.post({
-            url: `/users/${id}/cookie-consent`,
+            url: '/users/me/cookie-consent',
             data,
             ...config
         });
@@ -287,6 +285,34 @@ class UserApiClient {
         await apiRequestWrapper.put({
             url: '/users/reset-password',
             data,
+            ...config
+        });
+    }
+
+    /**
+     * Initiates an e-mail change for the current user by calling `POST /api/users/me/email`.
+     */
+    async initiateEmailChange(
+        data: { newEmail: string; password: string },
+        config?: RequestConfig
+    ): Promise<void> {
+        await apiRequestWrapper.post({
+            url: '/users/me/email',
+            data,
+            ...config
+        });
+    }
+
+    /**
+     * Confirms an e-mail change using the provided token by calling `PUT /api/users/me/email`.
+     */
+    async confirmEmailChange(
+        token: string,
+        config?: RequestConfig
+    ): Promise<UserDTO> {
+        return await apiRequestWrapper.put({
+            url: '/users/me/email',
+            params: { token },
             ...config
         });
     }

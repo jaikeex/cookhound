@@ -100,11 +100,21 @@ export type UpdateUserByIdOptions = Omit<
 >;
 
 export type CreateUserCookieConsentOptions = Omit<
+    UseMutationOptions<CookieConsent, RequestError, CookieConsentPayload>,
+    'mutationFn'
+>;
+
+export type InitiateEmailChangeOptions = Omit<
     UseMutationOptions<
-        CookieConsent,
+        void,
         RequestError,
-        { userId: number; data: CookieConsentPayload }
+        { newEmail: string; password: string }
     >,
+    'mutationFn'
+>;
+
+export type ConfirmEmailChangeOptions = Omit<
+    UseMutationOptions<UserDTO, RequestError, string>,
     'mutationFn'
 >;
 

@@ -35,6 +35,7 @@ model User {
   flags          RecipeFlag[]
   preferences     UserPreference?
   cookieConsent  CookieConsent[]
+  emailChangeRequest EmailChangeRequest?
 
   // Indexes
   @@index([username])
@@ -76,6 +77,21 @@ model UserPreference {
   // Indexes
   @@index([userId])
   @@map("user_preferences")
+}
+
+model EmailChangeRequest {
+  id         Int      @id @default(autoincrement())
+  userId     Int      @unique        
+  newEmail   String   @unique        
+  token      String   @unique @db.VarChar(36)
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+
+  // Relations
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([token, expiresAt])
+  @@map("email_change_requests")
 }
 
 model Recipe {

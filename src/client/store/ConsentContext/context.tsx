@@ -172,10 +172,7 @@ export const ConsentProvider: React.FC<ConsentProviderProps> = ({
                         createdAt: now
                     };
 
-                    await createUserCookieConsent({
-                        userId: user.id,
-                        data: payloadForDb
-                    });
+                    await createUserCookieConsent(payloadForDb);
                 }
             } catch (error) {
                 alert({
@@ -274,7 +271,7 @@ export const ConsentProvider: React.FC<ConsentProviderProps> = ({
                 createdAt: consent.createdAt ?? new Date()
             };
 
-            createUserCookieConsent({ userId: user.id, data: payloadForDb });
+            createUserCookieConsent(payloadForDb);
         }
     });
 

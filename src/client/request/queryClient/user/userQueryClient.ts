@@ -17,7 +17,9 @@ import type {
     GetUserByIdOptions,
     UpdateUserByIdOptions,
     CreateUserCookieConsentOptions,
-    UpdateUserPreferencesOptions
+    UpdateUserPreferencesOptions,
+    InitiateEmailChangeOptions,
+    ConfirmEmailChangeOptions
 } from './types';
 import { USER_QUERY_KEYS } from './types';
 
@@ -134,12 +136,19 @@ class UserQueryClient {
      */
     useCreateUserCookieConsent = (
         options?: Partial<CreateUserCookieConsentOptions>
-    ) =>
-        useAppMutation(
-            ({ userId, data }) =>
-                apiClient.user.createUserCookieConsent(userId, data),
-            options
-        );
+    ) => useAppMutation(apiClient.user.createUserCookieConsent, options);
+
+    /**
+     * Initiates an e-mail change.
+     */
+    useInitiateEmailChange = (options?: Partial<InitiateEmailChangeOptions>) =>
+        useAppMutation(apiClient.user.initiateEmailChange, options);
+
+    /**
+     * Confirms an e-mail change.
+     */
+    useConfirmEmailChange = (options?: Partial<ConfirmEmailChangeOptions>) =>
+        useAppMutation(apiClient.user.confirmEmailChange, options);
 
     /**
      * Updates a user's preferences.

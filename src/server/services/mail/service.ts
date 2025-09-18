@@ -53,6 +53,44 @@ class MailService {
 
         return;
     }
+
+    async sendEmailChangeConfirmation(
+        email: string,
+        token: string,
+        username: string
+    ) {
+        log.trace('queueing email change confirmation', { email, username });
+
+        await queueManager.addJob(JOB_NAMES.SEND_EMAIL_CHANGE_CONFIRMATION, {
+            token,
+            to: { name: username, address: email }
+        });
+    }
+
+    async sendEmailChangeNotice(email: string, username: string) {
+        log.trace('queueing email change notice', { email, username });
+
+        await queueManager.addJob(JOB_NAMES.SEND_EMAIL_CHANGE_NOTICE, {
+            to: { name: username, address: email }
+        });
+    }
+
+    async sendEmailChangedAudit(
+        oldEmail: string,
+        newEmail: string,
+        username: string
+    ) {
+        log.trace('queueing email changed audit', {
+            oldEmail,
+            newEmail,
+            username
+        });
+
+        await queueManager.addJob(JOB_NAMES.SEND_EMAIL_CHANGED_AUDIT, {
+            toOld: { name: username, address: oldEmail },
+            toNew: { name: username, address: newEmail }
+        });
+    }
 }
 
 export const mailService = new MailService();

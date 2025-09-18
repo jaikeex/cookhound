@@ -12,7 +12,8 @@ import type {
     CookieConsent,
     Prisma,
     User,
-    UserPreference
+    UserPreference,
+    EmailChangeRequest
 } from '@prisma/client';
 import {
     getUserLastViewedRecipes,
@@ -38,7 +39,8 @@ class UserModel {
         ttl?: number
     ): Promise<User | null> {
         const cacheKey = generateCacheKey('user', 'findUnique', {
-            where: { email }
+            where: { email },
+            select
         });
 
         log.trace('Getting user by email', { email });
@@ -65,7 +67,8 @@ class UserModel {
         ttl?: number
     ): Promise<User | null> {
         const cacheKey = generateCacheKey('user', 'findUnique', {
-            where: { id }
+            where: { id },
+            select
         });
 
         log.trace('Getting user by id', { id });
@@ -233,6 +236,142 @@ class UserModel {
         });
 
         return consent;
+    }
+
+    //~=========================================================================================~//
+    //$                               EMAIL CHANGE REQUEST METHODS                              $//
+    //~=========================================================================================~//
+
+    /**
+     * Upsert (create or replace) an email change request for a user.
+     * Ensures there is at most one active request per user by using the unique
+     * constraint on `userId`. Any previous request for the same user will be
+     * overwritten.
+     * Write class -> W2
+     */
+    async upsertEmailChangeRequest(
+        userId: number,
+        newEmail: string,
+        token: string,
+        expiresAt: Date
+    ): Promise<EmailChangeRequest> {
+        log.trace('Upserting email change request', {
+            userId,
+            newEmail,
+            token,
+            expiresAt
+        });
+
+        const request = await prisma.emailChangeRequest.upsert({
+            where: { userId },
+            update: {
+                newEmail,
+                token,
+                expiresAt
+            },
+            create: {
+                userId,
+                newEmail,
+                token,
+                expiresAt
+            }
+        });
+
+        // No user fields change yet, but still invalidate cache in case callers
+        // read user relations that depend on email change requests.
+        await this.invalidateUserCache({ id: userId });
+
+        return request;
+    }
+
+    /**
+     * Fetch an email change request by its verification token.
+     * Query class -> C1
+     */
+    async getEmailChangeRequestByToken(
+        token: string,
+        ttl?: number
+    ): Promise<EmailChangeRequest | null> {
+        const cacheKey = generateCacheKey('emailChangeRequest', 'findUnique', {
+            where: { token }
+        });
+
+        log.trace('Getting email change request by token');
+
+        const request = await cachePrismaQuery(
+            cacheKey,
+            async () => {
+                log.trace('Fetching email change request from db by token');
+                return prisma.emailChangeRequest.findUnique({
+                    where: { token }
+                });
+            },
+            ttl ?? CACHE_TTL.TTL_1
+        );
+
+        if (!request) return null;
+
+        return {
+            ...request,
+            expiresAt: new Date(request.expiresAt),
+            createdAt: new Date(request.createdAt)
+        };
+    }
+
+    /**
+     * Delete (consume) an email change request by token once it is confirmed or expired.
+     * Write class -> W1
+     */
+    async deleteEmailChangeRequestByToken(
+        token: string
+    ): Promise<EmailChangeRequest | null> {
+        log.trace('Deleting email change request by token');
+
+        try {
+            const deleted = await prisma.emailChangeRequest.delete({
+                where: { token }
+            });
+
+            await this.invalidateUserCache({ id: deleted.userId });
+
+            return deleted;
+        } catch (error: unknown) {
+            // Swallow not-found errors to keep idempotency for callers.
+            if (
+                error instanceof ServerError &&
+                error.code === ApplicationErrorCode.DEFAULT
+            ) {
+                return null;
+            }
+            throw error;
+        }
+    }
+
+    /**
+     * Apply an email change for a user and consume the corresponding email change request token.
+     * Performs the operation atomically within a single transaction.
+     * Write class -> W2
+     */
+    async applyEmailChange(
+        userId: number,
+        newEmail: string,
+        token: string
+    ): Promise<void> {
+        log.trace('Applying email change', { userId, newEmail, token });
+
+        await prisma.$transaction(async (tx) => {
+            await tx.user.update({
+                where: { id: userId },
+                data: {
+                    email: newEmail,
+                    emailVerified: true
+                }
+            });
+            await tx.emailChangeRequest.delete({ where: { token } });
+        });
+
+        // Invalidate cache for the affected user so subsequent reads get fresh data
+        await this.invalidateUserCache({ id: userId });
     }
 
     //~=========================================================================================~//
