@@ -1,57 +1,41 @@
 import { ENV_CONFIG_PRIVATE } from '@/common/constants';
 import { googleApiClient } from '@/server/integrations/google';
 import type { LogEntry } from '@/server/integrations/google';
-import { Logger } from '@/server/logger';
+import { Logger, LogServiceMethod } from '@/server/logger';
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const log = Logger.getInstance('google-api-service');
 
 class GoogleApiService {
+    @LogServiceMethod({ names: ['fileName', 'data'] })
     async uploadRecipeImage(fileName: string, data: number[] | BodyInit) {
         const bucket = ENV_CONFIG_PRIVATE.GOOGLE_STORAGE_BUCKET_RECIPE_IMAGES;
 
         // Convert array of numbers to Uint8Array if needed
         const binaryData = Array.isArray(data) ? new Uint8Array(data) : data;
 
-        log.trace('uploadRecipeImage - uploading recipe image to bucket', {
-            fileName,
-            bucket
-        });
-
         const response = await googleApiClient
             .getStorageService()
             .upload(fileName, binaryData, bucket, 'image/webp');
 
-        log.trace('uploadRecipeImage - upload finished', {
-            fileName,
-            status: response.status
-        });
-
         return response;
     }
 
+    @LogServiceMethod({ names: ['fileName', 'data'] })
     async uploadAvatarImage(fileName: string, data: number[] | BodyInit) {
         const bucket = ENV_CONFIG_PRIVATE.GOOGLE_STORAGE_BUCKET_AVATAR_IMAGES;
 
         // Convert array of numbers to Uint8Array if needed
         const binaryData = Array.isArray(data) ? new Uint8Array(data) : data;
 
-        log.trace('uploadAvatarImage - uploading avatar image to bucket', {
-            fileName,
-            bucket
-        });
-
         const response = await googleApiClient
             .getStorageService()
             .upload(fileName, binaryData, bucket, 'image/webp');
 
-        log.trace('uploadAvatarImage - upload finished', {
-            fileName,
-            status: response.status
-        });
-
         return response;
     }
 
+    @LogServiceMethod({ names: ['logs'] })
     async writeLogsToGoogleCloud(logs: LogEntry[]) {
         //?—————————————————————————————————————————————————————————————————————————————————————?//
         //?                                      LOG NAME                                       ?//
@@ -78,10 +62,6 @@ class GoogleApiService {
             logName,
             resource
         }));
-
-        log.trace('writeLogsToGoogleCloud - writing logs', {
-            entriesCount: logs.length
-        });
 
         const response = await googleApiClient
             .getLoggingService()

@@ -1,4 +1,4 @@
-import { Logger } from '@/server/logger';
+import { Logger, LogServiceMethod } from '@/server/logger';
 import type { RecipeDTO } from '@/common/types';
 import { queueManager } from '@/server/queues/QueueManager';
 import { JOB_NAMES } from '@/server/queues/jobs/names';
@@ -15,12 +15,12 @@ import recipeTagModel from '@/server/db/model/recipe-tag/model';
 
 //|=============================================================================================|//
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const log = Logger.getInstance('openai-api-service');
 
 class OpenAIApiService {
+    @LogServiceMethod({ names: ['recipe'] })
     async evaluateRecipeContent(recipe: RecipeDTO) {
-        log.trace('evaluateRecipeContent - attempt', { id: recipe.id });
-
         const ingredientsForEvaluation = recipe.ingredients.map((i) => ({
             name: i.name,
             quantity: i.quantity
@@ -60,9 +60,8 @@ class OpenAIApiService {
      * The method then maps the returned slugs to database records and returns them
      * in the `RecipeTagDTO` format expected by the application.
      */
+    @LogServiceMethod({ names: ['recipe'] })
     async suggestRecipeTags(recipe: RecipeDTO): Promise<RecipeTagDTO[]> {
-        log.trace('suggestRecipeTags - attempt', { id: recipe.id });
-
         const prompt = this.buildTagSuggestionPrompt(recipe);
 
         const TagSuggestionResponse = z.object({
@@ -154,11 +153,6 @@ class OpenAIApiService {
                 categoryId: tag?.categoryId ?? 0
             })
         );
-
-        log.trace('suggestRecipeTags - success', {
-            id: recipe.id,
-            suggested: result.map((t) => t.id)
-        });
 
         return result;
     }

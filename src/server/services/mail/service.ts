@@ -1,9 +1,10 @@
-import { Logger } from '@/server/logger';
+import { Logger, LogServiceMethod } from '@/server/logger';
 import { queueManager } from '@/server/queues/QueueManager';
 import { JOB_NAMES } from '@/server/queues/jobs/names';
 
 //|=============================================================================================|//
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const log = Logger.getInstance('mail-service');
 
 /**
@@ -18,13 +19,12 @@ class MailService {
      * @param username - The recipient's username.
      * @param token - The verification token.
      */
+    @LogServiceMethod({ names: ['email', 'username', 'token'] })
     async sendEmailVerification(
         email: string,
         username: string,
         token: string
     ) {
-        log.trace('queueing verification email', { email, username });
-
         await queueManager.addJob(JOB_NAMES.SEND_VERIFICATION_EMAIL, {
             token,
             to: { name: username, address: email }
@@ -40,12 +40,8 @@ class MailService {
      * @param username - The recipient's username.
      * @param token - The verification token.
      */
+    @LogServiceMethod({ names: ['email', 'username', 'token'] })
     async sendPasswordReset(email: string, username: string, token: string) {
-        log.trace('queueing password reset email', {
-            email,
-            username
-        });
-
         await queueManager.addJob(JOB_NAMES.SEND_PASSWORD_RESET_EMAIL, {
             token,
             to: { name: username, address: email }
@@ -54,38 +50,31 @@ class MailService {
         return;
     }
 
+    @LogServiceMethod({ names: ['email', 'username', 'token'] })
     async sendEmailChangeConfirmation(
         email: string,
         token: string,
         username: string
     ) {
-        log.trace('queueing email change confirmation', { email, username });
-
         await queueManager.addJob(JOB_NAMES.SEND_EMAIL_CHANGE_CONFIRMATION, {
             token,
             to: { name: username, address: email }
         });
     }
 
+    @LogServiceMethod({ names: ['email', 'username'] })
     async sendEmailChangeNotice(email: string, username: string) {
-        log.trace('queueing email change notice', { email, username });
-
         await queueManager.addJob(JOB_NAMES.SEND_EMAIL_CHANGE_NOTICE, {
             to: { name: username, address: email }
         });
     }
 
+    @LogServiceMethod({ names: ['oldEmail', 'newEmail', 'username'] })
     async sendEmailChangedAudit(
         oldEmail: string,
         newEmail: string,
         username: string
     ) {
-        log.trace('queueing email changed audit', {
-            oldEmail,
-            newEmail,
-            username
-        });
-
         await queueManager.addJob(JOB_NAMES.SEND_EMAIL_CHANGED_AUDIT, {
             toOld: { name: username, address: oldEmail },
             toNew: { name: username, address: newEmail }

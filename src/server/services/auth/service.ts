@@ -13,7 +13,7 @@ import {
 import { ENV_CONFIG_PRIVATE, ENV_CONFIG_PUBLIC } from '@/common/constants';
 import { userService } from '@/server/services/user/service';
 import db, { getUserSelect } from '@/server/db/model';
-import { Logger } from '@/server/logger';
+import { Logger, LogServiceMethod } from '@/server/logger';
 import { deleteSessionCookie, sessions } from '@/server/utils/session';
 import { RequestContext } from '@/server/utils/reqwest/context';
 import { ApplicationErrorCode } from '@/server/error/codes';
@@ -51,10 +51,9 @@ class AuthService {
      * @throws {ServerError} Throws an error with status 401 for invalid credentials.
      * @throws {ServerError} Throws an error with status 403 if the user's email is not verified.
      */
+    @LogServiceMethod({ names: ['payload'] })
     async login(payload: UserForLogin): Promise<AuthResponse> {
         const { email, password } = payload;
-
-        log.trace('login attempt', { email });
 
         if (!email) {
             log.info('login - email required', { email });
@@ -111,8 +110,6 @@ class AuthService {
             loginMethod: 'manual'
         });
 
-        log.trace('login - success', { email });
-
         const userResponse: UserDTO = createUserDTO(user);
 
         return { token, user: userResponse };
@@ -133,10 +130,9 @@ class AuthService {
      * @throws {ServerError} Throws an error with status 401 if the access token is missing.
      * @throws {ServerError} Throws an error with status 401 if the user info is missing.
      */
+    @LogServiceMethod({ names: ['payload'] })
     async loginWithGoogle(payload: AuthCodePayload): Promise<AuthResponse> {
         const { code } = payload;
-
-        log.trace('loginWithGoogle attempt');
 
         if (!code) {
             log.warn('loginWithGoogle - code required');
@@ -228,10 +224,6 @@ class AuthService {
             loginMethod: 'manual'
         });
 
-        log.trace('loginWithGoogle - success', {
-            email: userInfoData.email
-        });
-
         return { token, user };
     }
 
@@ -245,13 +237,10 @@ class AuthService {
      * @returns void.
      * @throws {ServerError} Throws an error with status 500 if there is an error.
      */
+    @LogServiceMethod({ names: ['sessionId'] })
     async logout(sessionId: string): Promise<void> {
-        log.trace('logout attempt');
-
         await sessions.invalidateSession(sessionId);
         deleteSessionCookie();
-
-        log.trace('logout - success');
 
         return;
     }
@@ -267,6 +256,7 @@ class AuthService {
      * @returns void
      * @throws {AuthErrorUnauthorized} If no authenticated user is found in the request context.
      */
+    @LogServiceMethod({ names: ['userId'] })
     async logoutEverywhere(): Promise<void> {
         const userId = RequestContext.getUserId();
 
@@ -278,8 +268,6 @@ class AuthService {
         await sessions.invalidateAllUserSessions(userId);
 
         deleteSessionCookie();
-
-        log.info('logoutEverywhere - success', { userId });
     }
 
     //~-----------------------------------------------------------------------------------------~//
@@ -293,6 +281,7 @@ class AuthService {
      * @throws {ServerError} Throws an error with status 401 if the user is not authenticated.
      * @throws {ServerError} Throws an error with status 404 if the user is not found.
      */
+    @LogServiceMethod({ names: ['userId'] })
     async getCurrentUser(): Promise<UserDTO> {
         const userId = RequestContext.getUserId();
 
@@ -338,10 +327,6 @@ class AuthService {
         }
 
         db.user.registerUserVisit(user.id);
-
-        log.trace('getCurrentUser - success', {
-            id: userId
-        });
 
         const userResponse = createUserDTO(user);
 

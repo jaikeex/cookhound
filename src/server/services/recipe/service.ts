@@ -16,7 +16,7 @@ import {
     ValidationError
 } from '@/server/error';
 import type { Rating } from '@prisma/client';
-import { Logger } from '@/server/logger';
+import { Logger, LogServiceMethod } from '@/server/logger';
 import { RequestContext } from '@/server/utils/reqwest/context';
 import { randomUUID } from 'crypto';
 import { recipeSearchIndex } from '@/server/search-index';
@@ -37,9 +37,8 @@ class RecipeService {
     //$                                        GET BY ID                                        $//
     //~-----------------------------------------------------------------------------------------~//
 
+    @LogServiceMethod({ names: ['id'] })
     async getRecipeById(id: number): Promise<RecipeDTO> {
-        log.trace('getRecipeById - attempt', { id });
-
         const recipe = await db.recipe.getOneById(id);
 
         if (!recipe) {
@@ -96,8 +95,6 @@ class RecipeService {
             }
         }
 
-        log.trace('getRecipeById - success', { id });
-
         return recipeDTO;
     }
 
@@ -105,9 +102,8 @@ class RecipeService {
     //$                                    GET BY DISPLAY ID                                    $//
     //~-----------------------------------------------------------------------------------------~//
 
+    @LogServiceMethod({ names: ['displayId'] })
     async getRecipeByDisplayId(displayId: string): Promise<RecipeDTO> {
-        log.trace('getRecipeByDisplayId - attempt', { displayId });
-
         const recipe = await db.recipe.getOneByDisplayId(displayId);
 
         if (!recipe) {
@@ -169,8 +165,6 @@ class RecipeService {
             }
         }
 
-        log.trace('getRecipeByDisplayId - success', { displayId });
-
         return recipeDTO;
     }
 
@@ -178,9 +172,8 @@ class RecipeService {
     //$                                         CREATE                                          $//
     //~-----------------------------------------------------------------------------------------~//
 
+    @LogServiceMethod({ success: 'notice', names: ['payload'] })
     async createRecipe(payload: RecipeForCreatePayload): Promise<RecipeDTO> {
-        log.trace('createRecipe - attempt', { payload });
-
         const authorId = RequestContext.getUserId();
 
         if (!authorId) {
@@ -207,8 +200,6 @@ class RecipeService {
             ingredients: payload.ingredients,
             tags: payload.tags ?? []
         });
-
-        log.notice('createRecipe - success', { recipe });
 
         const recipeDTO = await this.getRecipeById(recipe.id);
 
@@ -241,12 +232,11 @@ class RecipeService {
     //$                                         UPDATE                                          $//
     //~-----------------------------------------------------------------------------------------~//
 
+    @LogServiceMethod({ names: ['recipeId', 'payload'] })
     async updateRecipe(
         recipeId: number,
         payload: Partial<RecipeForCreatePayload>
     ): Promise<RecipeDTO> {
-        log.trace('updateRecipe - attempt', { recipeId, payload });
-
         const currentUserId = RequestContext.getUserId();
 
         if (!currentUserId) {
@@ -291,8 +281,6 @@ class RecipeService {
         // The recipe was successfully updated, and needs to be evaluated again.
         openaiApiService.evaluateRecipeContent(recipeDTO);
 
-        log.trace('updateRecipe - success', { recipeId });
-
         return recipeDTO;
     }
 
@@ -300,9 +288,8 @@ class RecipeService {
     //$                                         DELETE                                          $//
     //~-----------------------------------------------------------------------------------------~//
 
+    @LogServiceMethod({ names: ['recipeId'] })
     async deleteRecipe(recipeId: number): Promise<void> {
-        log.trace('deleteRecipe - attempt', { recipeId });
-
         const currentUserId = RequestContext.getUserId();
 
         if (!currentUserId) {
@@ -341,21 +328,18 @@ class RecipeService {
                 recipeId
             });
         }
-
-        log.trace('deleteRecipe - success', { recipeId });
     }
 
     //~-----------------------------------------------------------------------------------------~//
     //$                                      REGISTER VISIT                                     $//
     //~-----------------------------------------------------------------------------------------~//
 
+    @LogServiceMethod({ names: ['recipeId', 'userId'] })
     async registerRecipeVisit(
         recipeId: number,
         userId: number | null
     ): Promise<void> {
         try {
-            log.trace('registerRecipeVisit - attempt', { recipeId, userId });
-
             if (!recipeId) {
                 log.warn('registerRecipeVisit - recipeId is required');
                 throw new ValidationError(
@@ -365,11 +349,6 @@ class RecipeService {
             }
 
             await queueManager.addJob(JOB_NAMES.REGISTER_RECIPE_VISIT, {
-                recipeId,
-                userId
-            });
-
-            log.trace('registerRecipeVisit - queued successfully', {
                 recipeId,
                 userId
             });
@@ -390,9 +369,8 @@ class RecipeService {
     //$                                         RATING                                          $//
     //~-----------------------------------------------------------------------------------------~//
 
+    @LogServiceMethod({ names: ['recipeId', 'rating'] })
     async rateRecipe(recipeId: number, rating: number): Promise<void> {
-        log.trace('rateRecipe - attempt', { recipeId, rating });
-
         if (rating < 0 || rating > 5) {
             throw new ValidationError(
                 undefined,
@@ -448,8 +426,6 @@ class RecipeService {
             timesRated: allRatings.length
         });
 
-        log.trace('rateRecipe - success', { recipeId, rating });
-
         // Update in search index, no need to await this.
         try {
             const updatedRecipe = await this.getRecipeById(recipeId);
@@ -485,13 +461,12 @@ class RecipeService {
      *              first batch is 1.
      * @param perPage Size of the batch. Defaults to 24.
      */
+    @LogServiceMethod({ names: ['language', 'batch', 'perPage'] })
     async getFrontPageRecipes(
         language: Locale,
         batch: number,
         perPage: number = 24
     ): Promise<RecipeForDisplayDTO[]> {
-        log.trace('getFrontPageRecipes - attempt', { batch, perPage });
-
         const MAX_BATCHES = 5;
 
         if (batch < 1 || batch > MAX_BATCHES) {
@@ -551,11 +526,6 @@ class RecipeService {
             portionSize: recipe.portionSize
         }));
 
-        log.trace('getFrontPageRecipes - success', {
-            batch,
-            count: recipes.length
-        });
-
         return recipes;
     }
 
@@ -568,19 +538,13 @@ class RecipeService {
      * Results are filtered by language and returned in paginated batches.
      * Supports multi-query search with "|" delimiter - returns recipes that match ALL queries.
      */
+    @LogServiceMethod({ names: ['query', 'language', 'batch', 'perPage'] })
     async searchRecipes(
         query: string,
         language: Locale,
         batch: number,
         perPage: number = 24
     ): Promise<RecipeForDisplayDTO[]> {
-        log.trace('searchRecipes - attempt', {
-            query,
-            language,
-            batch,
-            perPage
-        });
-
         const MAX_BATCHES = 20;
 
         const cleanQuery = query.trim();
@@ -749,12 +713,6 @@ class RecipeService {
         // Apply pagination to final results
         const paginatedResults = results.slice(offset, offset + perPage);
 
-        log.trace('searchRecipes - success', {
-            batch,
-            count: paginatedResults.length,
-            queryTerms: queryTerms.length > 1 ? queryTerms : undefined
-        });
-
         return paginatedResults;
     }
 
@@ -762,19 +720,13 @@ class RecipeService {
     //$                                 USER RECIPES FETCH                                      $//
     //~-----------------------------------------------------------------------------------------~//
 
+    @LogServiceMethod({ names: ['userId', 'language', 'batch', 'perPage'] })
     async getUserRecipes(
         userId: number,
         language: Locale,
         batch: number,
         perPage: number = 24
     ): Promise<RecipeForDisplayDTO[]> {
-        log.trace('getUserRecipes - attempt', {
-            userId,
-            language,
-            batch,
-            perPage
-        });
-
         if (perPage <= 0 || perPage > 100) {
             log.warn('getFrontPageRecipes - invalid perPage requested', {
                 perPage
@@ -818,6 +770,9 @@ class RecipeService {
     //$                                   USER RECIPES SEARCH                                   $//
     //~-----------------------------------------------------------------------------------------~//
 
+    @LogServiceMethod({
+        names: ['userId', 'query', 'language', 'batch', 'perPage']
+    })
     async searchUserRecipes(
         userId: number,
         query: string,
@@ -825,14 +780,6 @@ class RecipeService {
         batch: number,
         perPage: number = 24
     ): Promise<RecipeForDisplayDTO[]> {
-        log.trace('searchUserRecipes - attempt', {
-            userId,
-            query,
-            language,
-            batch,
-            perPage
-        });
-
         if (perPage <= 0 || perPage > 100) {
             log.warn('searchUserRecipes - invalid perPage requested', {
                 perPage

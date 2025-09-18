@@ -1,14 +1,14 @@
 import db from '@/server/db/model';
-import { Logger } from '@/server/logger';
+import { Logger, LogServiceMethod } from '@/server/logger';
 
 //|=============================================================================================|//
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const log = Logger.getInstance('recipe-tag-service');
 
 class RecipeTagService {
+    @LogServiceMethod({ names: ['language'] })
     async getAll(language: string) {
-        log.trace('Getting all tags with categories');
-
         const tags = await db.recipeTag.getAll(language);
 
         return tags;

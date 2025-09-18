@@ -13,17 +13,22 @@ import { v4 as uuid } from 'uuid';
 import { mailService } from '@/server/services';
 import {
     AuthErrorForbidden,
-    AuthErrorUnauthorized,
     ConflictError,
     NotFoundError,
     ServerError,
     ValidationError
 } from '@/server/error';
 import { type UserForGoogleCreate, type UserForLocalCreate } from './types';
-import { createUserDTO, getUserDataPermissionGroups } from './utils';
+import {
+    createUserDTO,
+    getUserDataPermissionGroups,
+    assertAuthenticated,
+    assertSelf,
+    assertSelfOrAdmin
+} from './utils';
 import db, { getUserSelect } from '@/server/db/model';
 import { Logger } from '@/server/logger';
-import { RequestContext } from '@/server/utils/reqwest/context';
+import { LogServiceMethod } from '@/server/logger';
 import { ApplicationErrorCode } from '@/server/error/codes';
 import type {
     ConsentCategory,
@@ -59,10 +64,9 @@ class UserService {
      * @throws {ServerError} Throws an error with status 400 if required fields are missing.
      * @throws {ServerError} Throws an error with status 409 if email or username is already taken.
      */
+    @LogServiceMethod({ success: 'notice', names: ['payload'] })
     async createUser(payload: UserForCreatePayload): Promise<UserDTO> {
         const { email, password, username } = payload;
-
-        log.trace('createUser - attempt', { email, password, username });
 
         if (!email || !password || !username) {
             log.warn('createUser - missing required fields', {
@@ -120,8 +124,6 @@ class UserService {
 
         const user = await db.user.createOne(userForCreate);
 
-        log.notice('createUser - success', { email, username });
-
         await mailService.sendEmailVerification(
             user.email,
             user.username,
@@ -144,12 +146,11 @@ class UserService {
      * @returns A promise that resolves to the newly created user object.
      * @throws {ServerError} Throws an error if a user with the same email already exists.
      */
+    @LogServiceMethod({ success: 'notice', names: ['payload'] })
     async createUserFromGoogle(
         payload: UserForGoogleCreatePayload
     ): Promise<UserDTO> {
         const { email, username, avatarUrl } = payload;
-
-        log.trace('createUserFromGoogle - attempt', { email, username });
 
         // This method only cares whether the email is already taken
         const userSelect = getUserSelect(['public']);
@@ -176,8 +177,6 @@ class UserService {
 
         const user = await db.user.createOne(userForCreate);
 
-        log.notice('createUserFromGoogle - success', { email, username });
-
         const userResponse: UserDTO = createUserDTO(user);
 
         return userResponse;
@@ -187,9 +186,8 @@ class UserService {
     //$                                           GET BY ID                                     $//
     //~-----------------------------------------------------------------------------------------~//
 
+    @LogServiceMethod({ names: ['id'] })
     async getUserById(id: number): Promise<UserDTO> {
-        log.trace('getUserById - attempt', { id });
-
         const groups = getUserDataPermissionGroups(id);
         const select = getUserSelect(groups);
 
@@ -205,8 +203,6 @@ class UserService {
 
         const userResponse = createUserDTO(user);
 
-        log.trace('getUserById - success', { id });
-
         return userResponse;
     }
 
@@ -214,13 +210,9 @@ class UserService {
     //$                                       GET SHOPPING LIST                                 $//
     //~-----------------------------------------------------------------------------------------~//
 
+    @LogServiceMethod({ names: ['userId'] })
     async getShoppingList(userId: number): Promise<ShoppingListDTO[]> {
-        log.trace('getShoppingList - attempt', { userId });
-
-        if (RequestContext.getUserId() !== userId) {
-            log.warn('getShoppingList - user not found');
-            throw new AuthErrorUnauthorized();
-        }
+        assertSelf(userId);
 
         const shoppingList = await db.shoppingList.getShoppingList(userId);
 
@@ -257,8 +249,6 @@ class UserService {
             });
         }
 
-        log.trace('getShoppingList - success');
-
         return shoppingListByRecipeId;
     }
 
@@ -266,13 +256,12 @@ class UserService {
     //$                                     CREATE SHOPPING LIST                                $//
     //~-----------------------------------------------------------------------------------------~//
 
+    @LogServiceMethod({ names: ['userId', 'recipeId', 'ingredients'] })
     async createShoppingList(
         userId: number,
         recipeId: number,
         ingredients: ShoppingListIngredientPayload[]
     ): Promise<ShoppingListDTO[]> {
-        log.trace('createShoppingList - attempt', { recipeId, ingredients });
-
         if (
             !recipeId ||
             !Array.isArray(ingredients) ||
@@ -289,10 +278,7 @@ class UserService {
             );
         }
 
-        if (RequestContext.getUserId() !== userId) {
-            log.warn('createShoppingList - user not found');
-            throw new AuthErrorUnauthorized();
-        }
+        assertSelf(userId);
 
         for (const i of ingredients) {
             const ingredient = await db.ingredient.getOneById(i.id);
@@ -311,11 +297,6 @@ class UserService {
 
         await db.shoppingList.upsertShoppingList(userId, recipeId, ingredients);
 
-        log.trace('createShoppingList - success', {
-            recipeId,
-            ingredients
-        });
-
         const result = this.getShoppingList(userId);
 
         return result;
@@ -325,13 +306,12 @@ class UserService {
     //$                                    UPDATE SHOPPING LIST                                 $//
     //~-----------------------------------------------------------------------------------------~//
 
+    @LogServiceMethod({ names: ['userId', 'recipeId', 'updates'] })
     async updateShoppingList(
         userId: number,
         recipeId: number,
         updates: ShoppingListIngredientPayload[]
     ): Promise<ShoppingListDTO[]> {
-        log.trace('updateShoppingListOrder - attempt', { updates });
-
         if (!Array.isArray(updates)) {
             log.warn('updateShoppingListOrder - missing required fields', {
                 updates
@@ -354,10 +334,7 @@ class UserService {
             );
         }
 
-        if (RequestContext.getUserId() !== userId) {
-            log.warn('updateShoppingListOrder - user not found');
-            throw new AuthErrorUnauthorized();
-        }
+        assertSelf(userId);
 
         await db.shoppingList.deleteShoppingList(userId, recipeId);
 
@@ -368,8 +345,6 @@ class UserService {
 
         await db.shoppingList.upsertShoppingList(userId, recipeId, updates);
 
-        log.trace('updateShoppingListOrder - success', { updates });
-
         const result = this.getShoppingList(userId);
 
         return result;
@@ -379,17 +354,11 @@ class UserService {
     //$                                     DELETE SHOPPING LIST                                $//
     //~-----------------------------------------------------------------------------------------~//
 
+    @LogServiceMethod({ names: ['userId', 'recipeId'] })
     async deleteShoppingList(userId: number, recipeId?: number): Promise<void> {
-        log.trace('deleteShoppingList - attempt', { recipeId });
-
-        if (RequestContext.getUserId() !== userId) {
-            log.warn('deleteShoppingList - user not found');
-            throw new AuthErrorUnauthorized();
-        }
+        assertSelf(userId);
 
         await db.shoppingList.deleteShoppingList(userId, recipeId);
-
-        log.trace('deleteShoppingList - success');
 
         return;
     }
@@ -398,13 +367,9 @@ class UserService {
     //$                                    GET LAST VIEWED RECIPES                              $//
     //~-----------------------------------------------------------------------------------------~//
 
+    @LogServiceMethod({ names: ['userId'] })
     async getLastViewedRecipes(userId: number): Promise<RecipeForDisplayDTO[]> {
-        log.trace('getLastViewedRecipes - attempt', { userId });
-
-        if (userId !== RequestContext.getUserId()) {
-            log.warn('getLastViewedRecipes - user not found');
-            throw new AuthErrorUnauthorized();
-        }
+        assertSelf(userId);
 
         const recipes = await db.user.getLastViewedRecipes(userId);
 
@@ -431,19 +396,12 @@ class UserService {
     //$                                     UPDATE ONE BY ID                                    $//
     //~-----------------------------------------------------------------------------------------~//
 
+    @LogServiceMethod({ names: ['userId', 'payload'] })
     async updateOneById(
         userId: number,
         payload: Partial<UserForCreatePayload>
     ): Promise<UserDTO> {
-        log.trace('updateOneById - attempt', { userId, payload });
-
-        if (
-            RequestContext.getUserId() !== userId &&
-            RequestContext.getUserRole() !== UserRole.Admin
-        ) {
-            log.warn('updateOneById - user not found');
-            throw new AuthErrorUnauthorized();
-        }
+        assertSelfOrAdmin(userId);
 
         const user = await db.user.updateOneById(userId, payload);
 
@@ -455,8 +413,6 @@ class UserService {
             );
         }
 
-        log.trace('updateOneById - success', { userId, payload });
-
         const userResponse = createUserDTO(user);
 
         return userResponse;
@@ -466,21 +422,13 @@ class UserService {
     //$                                   CREATE COOKIE CONSENT                                 $//
     //~-----------------------------------------------------------------------------------------~//
 
+    @LogServiceMethod({ names: ['userId', 'payload'] })
     async createUserCookieConsent(
         userId: number,
         payload: CookieConsentForCreate
     ): Promise<CookieConsent> {
-        log.trace('createUserCookieConsent - attempt', { payload, userId });
-
-        if (!userId) {
-            log.warn('createUserCookieConsent - called anonymously');
-            throw new AuthErrorUnauthorized();
-        }
-
-        if (RequestContext.getUserId() !== userId) {
-            log.warn('createUserCookieConsent - called by the wrong user');
-            throw new AuthErrorUnauthorized();
-        }
+        assertAuthenticated();
+        assertSelf(userId);
 
         const user = await this.getUserById(userId);
 
@@ -556,8 +504,6 @@ class UserService {
 
         const consent = await db.user.createUserCookieConsent(userId, payload);
 
-        log.trace('createUserCookieConsent - success', { payload, userId });
-
         const consentDto: CookieConsent = {
             id: consent.id.toString(),
             userId: consent.userId.toString(),
@@ -578,21 +524,13 @@ class UserService {
     //$                                 UPDATE USER PREFERENCES                                 $//
     //~-----------------------------------------------------------------------------------------~//
 
+    @LogServiceMethod({ names: ['userId', 'preferences'] })
     async updateUserPreferences(
         userId: number,
         preferences: UserPreferences
     ): Promise<void> {
-        log.trace('updateUserPreferences - attempt', { userId, preferences });
-
-        if (!userId) {
-            log.warn('updateUserPreferences - called anonymously');
-            throw new AuthErrorUnauthorized();
-        }
-
-        if (RequestContext.getUserId() !== userId) {
-            log.warn('updateUserPreferences - called by the wrong user');
-            throw new AuthErrorUnauthorized();
-        }
+        assertAuthenticated();
+        assertSelf(userId);
 
         const user = await this.getUserById(userId);
 
@@ -618,8 +556,6 @@ class UserService {
 
         await db.user.upsertUserPreference(userId, preferencesForUpdate);
 
-        log.trace('updateUserPreferences - success', { userId, preferences });
-
         return;
     }
 
@@ -635,9 +571,8 @@ class UserService {
      * @throws {ServerError} Throws an error with status 404 if the user is not found.
      * @throws {ServerError} Throws an error with status 403 if the email is already verified.
      */
+    @LogServiceMethod({ success: 'notice', names: ['token'] })
     async verifyEmail(token: string): Promise<void> {
-        log.trace('verifyEmail - attempt', { token });
-
         if (!token) {
             log.warn('verifyEmail - missing token', { token });
 
@@ -672,8 +607,6 @@ class UserService {
             emailVerificationToken: null
         });
 
-        log.notice('verifyEmail - success', { token });
-
         return;
     }
 
@@ -688,9 +621,8 @@ class UserService {
      * @param email - The email address of the user.
      * @throws {ServerError} Throws an error if the email is missing, user not found, or email is already verified.
      */
+    @LogServiceMethod({ names: ['email'] })
     async resendVerificationEmail(email: string): Promise<void> {
-        log.trace('resendVerificationEmail - attempt', { email });
-
         if (!email) {
             throw new ValidationError(
                 'auth.error.email-required',
@@ -698,12 +630,7 @@ class UserService {
             );
         }
 
-        const userId = RequestContext.getUserId();
-
-        if (!userId) {
-            log.warn('resendVerificationEmail - called anonymously');
-            throw new AuthErrorUnauthorized();
-        }
+        const userId = assertAuthenticated();
 
         const groups = getUserDataPermissionGroups(userId);
         const userSelect = getUserSelect(groups);
@@ -741,8 +668,6 @@ class UserService {
             verificationToken
         );
 
-        log.trace('resendVerificationEmail - success', { email });
-
         return;
     }
 
@@ -757,9 +682,8 @@ class UserService {
      * @param email - The email address of the user.
      * @throws {ServerError} Throws an error if the email is missing, not verified or the user is not found.
      */
+    @LogServiceMethod({ names: ['email'] })
     async sendPasswordResetEmail(email: string): Promise<void> {
-        log.trace('sendPasswordResetEmail - attempt', { email });
-
         if (!email) {
             log.warn('sendPasswordResetEmail - missing email', { email });
             throw new ValidationError(
@@ -768,12 +692,7 @@ class UserService {
             );
         }
 
-        const userId = RequestContext.getUserId();
-
-        if (!userId) {
-            log.warn('resendVerificationEmail - called anonymously');
-            throw new AuthErrorUnauthorized();
-        }
+        const userId = assertAuthenticated();
 
         const groups = getUserDataPermissionGroups(userId);
         const userSelect = getUserSelect(groups);
@@ -822,8 +741,6 @@ class UserService {
             passwordResetToken
         );
 
-        log.trace('sendPasswordResetEmail - success', { email });
-
         return;
     }
 
@@ -838,9 +755,8 @@ class UserService {
      * @param password - The new password.
      */
 
+    @LogServiceMethod({ success: 'notice', names: ['token', 'password'] })
     async resetPassword(token: string, password: string): Promise<void> {
-        log.trace('resetPassword - attempt');
-
         if (!token || !password) {
             log.warn('resetPassword - missing token or password');
             throw new ValidationError(
@@ -900,8 +816,6 @@ class UserService {
             lastPasswordReset: new Date()
         });
 
-        log.notice('resetPassword - success');
-
         return;
     }
 
@@ -920,24 +834,17 @@ class UserService {
      * @throws ConflictError     If the new email is already taken by a different user
      * @throws AuthErrorForbidden If the password is invalid or password authentication is not possible
      */
+    @LogServiceMethod({ success: 'notice', names: ['userId', 'newEmail'] })
     async initiateEmailChange(
         userId: number,
         newEmail: string,
         currentPassword: string
     ): Promise<void> {
-        log.trace('initiateEmailChange - attempt', {
-            userId,
-            newEmail
-        });
-
         //|-------------------------------------------------------------------------------------|//
         //?                                       GUARDS                                        ?//
         //|-------------------------------------------------------------------------------------|//
 
-        if (RequestContext.getUserId() !== userId) {
-            log.warn('initiateEmailChange - unauthorized');
-            throw new AuthErrorUnauthorized();
-        }
+        assertSelf(userId);
 
         if (!newEmail) {
             log.warn('initiateEmailChange - missing email');
@@ -1032,8 +939,6 @@ class UserService {
             user.username
         );
         await mailService.sendEmailChangeNotice(user.email, user.username);
-
-        log.notice('initiateEmailChange - success', { userId, newEmail });
     }
 
     //~-----------------------------------------------------------------------------------------~//
@@ -1046,9 +951,8 @@ class UserService {
      * @param token - The confirmation token supplied in the confirmation link
      * @returns The updated `UserDTO` object.
      */
+    @LogServiceMethod({ success: 'notice', names: ['token'] })
     async confirmEmailChange(token: string): Promise<UserDTO> {
-        log.trace('confirmEmailChange - attempt', { token });
-
         //|-------------------------------------------------------------------------------------|//
         //?                                       GUARDS                                        ?//
         //|-------------------------------------------------------------------------------------|//
@@ -1121,8 +1025,6 @@ class UserService {
                 ApplicationErrorCode.DEFAULT
             );
         }
-
-        log.notice('confirmEmailChange - success', { userId: updated.id });
 
         return createUserDTO(updated);
     }

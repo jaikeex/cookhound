@@ -3,6 +3,7 @@ import { UserDTO, UserRole } from '@/common/types';
 import type { User as UserFromDB } from '@prisma/client';
 import { serializeToPlain } from '@/server/utils/serialization';
 import { RequestContext } from '@/server/utils/reqwest/context';
+import { AuthErrorUnauthorized } from '@/server/error';
 
 /**
  * Determines the permission groups for the caller to access the user data.
@@ -43,4 +44,47 @@ export function createUserDTO(user: UserFromDB): UserDTO {
     };
 
     return serializeToPlain(UserDTO, normalized, groups) as UserDTO;
+}
+
+/**
+ * Asserts that the caller is authenticated (there is a userId present in the RequestContext).
+ * Returns the authenticated user id for convenience.
+ *
+ * @throws {AuthErrorUnauthorized} If the caller is anonymous.
+ */
+export function assertAuthenticated(): number {
+    const userId = RequestContext.getUserId();
+
+    if (!userId) {
+        throw new AuthErrorUnauthorized();
+    }
+
+    return userId;
+}
+
+/**
+ * Asserts that the caller is operating on their own user resource.
+ *
+ * @param userId - The user id that is being accessed/modified.
+ * @throws {AuthErrorUnauthorized} If the caller is not the same user.
+ */
+export function assertSelf(userId: number): void {
+    if (RequestContext.getUserId() !== userId) {
+        throw new AuthErrorUnauthorized();
+    }
+}
+
+/**
+ * Asserts that the caller is either the user themselves or has the Admin role.
+ *
+ * @param userId - The user id that is being accessed/modified.
+ * @throws {AuthErrorUnauthorized} If the caller is neither the same user nor an admin.
+ */
+export function assertSelfOrAdmin(userId: number): void {
+    const currentUserId = RequestContext.getUserId();
+    const role = RequestContext.getUserRole();
+
+    if (currentUserId !== userId && role !== UserRole.Admin) {
+        throw new AuthErrorUnauthorized();
+    }
 }
