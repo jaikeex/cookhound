@@ -3,6 +3,8 @@
 import React, { useEffect } from 'react';
 import { ENV_CONFIG_PUBLIC } from '@/common/constants';
 
+export const dynamic = 'force-dynamic';
+
 export default function GoogleCallback() {
     useEffect(() => {
         const data = {

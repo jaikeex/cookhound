@@ -152,7 +152,6 @@ export const RegisterTemplate: React.FC<RegisterTemplateProps> = () => {
                     return;
                 }
             } catch (error: unknown) {
-                console.error(error);
                 setFormErrors({ server: 'auth.error.default' });
                 return;
             }

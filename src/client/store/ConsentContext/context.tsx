@@ -129,7 +129,8 @@ export const ConsentProvider: React.FC<ConsentProviderProps> = ({
             onSuccess: () => {
                 queryClient.invalidateQueries({
                     predicate: (query) =>
-                        query.queryKey[0] === QUERY_KEYS.user.namespace
+                        query.queryKey[0] === QUERY_KEYS.user.namespace ||
+                        query.queryKey[0] === QUERY_KEYS.auth.namespace
                 });
             }
         });

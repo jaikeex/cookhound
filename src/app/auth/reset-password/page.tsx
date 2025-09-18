@@ -1,6 +1,8 @@
 import React from 'react';
 import { SendResetPasswordEmailTemplate } from '@/client/components';
 
+export const dynamic = 'force-dynamic';
+
 type ResetPasswordPageParams = {
     readonly searchParams: Promise<{ email: string }>;
 };

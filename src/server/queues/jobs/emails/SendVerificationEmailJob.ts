@@ -25,7 +25,7 @@ class SendVerificationEmailJob extends BaseJob<VerificationEmailJobData> {
 
         log.trace('handle - attempting to send verification email', to);
 
-        const verificationLink = `${ENV_CONFIG_PUBLIC.ORIGIN}/auth/callback/verify-email?token=${token}`;
+        const verificationLink = `${ENV_CONFIG_PUBLIC.ORIGIN}/auth/callback/verify-email?token=${token}&email=${to.address}`;
         const html = emailVerificationTemplate(to.name, verificationLink);
 
         await mailClient.send({
