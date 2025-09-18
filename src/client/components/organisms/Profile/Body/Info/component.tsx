@@ -1,8 +1,19 @@
-import React from 'react';
+'use client';
+
+import React, { useCallback } from 'react';
 import type { UserDTO } from '@/common/types';
-import { Typography } from '@/client/components';
-import Link from 'next/link';
-import { useLocale } from '@/client/store';
+import {
+    ButtonBase,
+    Divider,
+    LinkRow,
+    TextInputRow,
+    Typography
+} from '@/client/components';
+import { useLocale, useSnackbar } from '@/client/store';
+import { useModal } from '@/client/store';
+import { ConsentSettingsModal } from '@/client/components';
+import { chqc, QUERY_KEYS } from '@/client/request/queryClient';
+import { useQueryClient } from '@tanstack/react-query';
 
 export type ProfileBodyInfoProps = Readonly<{
     user: UserDTO;
@@ -10,16 +21,85 @@ export type ProfileBodyInfoProps = Readonly<{
 
 export const ProfileBodyInfo: React.FC<ProfileBodyInfoProps> = ({ user }) => {
     const { t } = useLocale();
+    const { alert } = useSnackbar();
+    const queryClient = useQueryClient();
+    const { openModal } = useModal();
+
+    const { mutateAsync: updateUserById, isPending } =
+        chqc.user.useUpdateUserById({
+            onSuccess: () => {
+                queryClient.invalidateQueries({
+                    predicate: (query) =>
+                        query.queryKey[0] === QUERY_KEYS.auth.namespace ||
+                        query.queryKey[0] === QUERY_KEYS.user.namespace
+                });
+            }
+        });
+
+    const handleUsernameChange = useCallback(
+        async (value: string) => {
+            await updateUserById(
+                { userId: user.id, data: { username: value } },
+                {
+                    onSuccess: () => {
+                        alert({
+                            variant: 'success',
+                            message: t('auth.form.username-changed')
+                        });
+                    }
+                }
+            );
+        },
+        [updateUserById, user.id, alert, t]
+    );
+
+    const handleCookieSettings = useCallback(
+        () =>
+            openModal((close) => <ConsentSettingsModal onClose={close} />, {
+                hideCloseButton: true
+            }),
+        [openModal]
+    );
 
     return (
         <div className="space-y-4">
-            <Typography variant="heading-md">{user.username}</Typography>
+            <section>
+                <Typography variant="heading-sm">
+                    {t('app.profile.settings.section-credentials')}
+                </Typography>
 
-            <Typography variant="body-sm" className="self-start">
-                <Link href={'/auth/reset-password?email=' + user.email}>
-                    {t('auth.form.reset-password')}
-                </Link>
-            </Typography>
+                <Divider className="mt-1" />
+
+                <TextInputRow
+                    className="mt-3"
+                    heading={t('app.profile.settings.username')}
+                    defaultValue={user.username}
+                    isPending={isPending}
+                    onSave={handleUsernameChange}
+                    name="username"
+                    inputId="username"
+                />
+
+                <Divider subtle className="mt-3" />
+
+                <LinkRow
+                    className="mt-3"
+                    heading={t('app.profile.settings.password')}
+                    href={'/auth/reset-password?email=' + user.email}
+                    linkText={t('app.profile.settings.password-link')}
+                />
+
+                <Divider subtle className="mt-3" />
+            </section>
+
+            <ButtonBase
+                size="sm"
+                color="subtle"
+                onClick={handleCookieSettings}
+                className="mt-2"
+            >
+                {t('app.cookies.modal.title')}
+            </ButtonBase>
         </div>
     );
 };
