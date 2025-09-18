@@ -12,6 +12,7 @@ export const USER_SELECT: Record<UserVisibilityGroup, UserSelect> = {
     self: {
         id: true,
         username: true,
+        authType: true,
         email: true,
         avatarUrl: true,
         createdAt: true,
@@ -33,6 +34,7 @@ export const USER_SELECT: Record<UserVisibilityGroup, UserSelect> = {
     admin: {
         id: true,
         username: true,
+        authType: true,
         email: true,
         avatarUrl: true,
         role: true,

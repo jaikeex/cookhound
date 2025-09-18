@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useCallback } from 'react';
-import type { UserDTO } from '@/common/types';
+import { AuthType, type UserDTO } from '@/common/types';
 import {
     ButtonBase,
     Divider,
@@ -82,12 +82,23 @@ export const ProfileBodyInfo: React.FC<ProfileBodyInfoProps> = ({ user }) => {
 
                 <Divider subtle className="mt-3" />
 
-                <LinkRow
-                    className="mt-3"
-                    heading={t('app.profile.settings.password')}
-                    href={'/auth/reset-password?email=' + user.email}
-                    linkText={t('app.profile.settings.password-link')}
-                />
+                {user.authType === AuthType.Local ? (
+                    <React.Fragment>
+                        <LinkRow
+                            className="mt-3"
+                            heading={t('app.profile.settings.password')}
+                            href={'/auth/reset-password?email=' + user.email}
+                            linkText={t('app.profile.settings.password-link')}
+                        />
+
+                        <LinkRow
+                            className="mt-3"
+                            heading={t('app.profile.settings.email')}
+                            href={'/user/change-email'}
+                            linkText={t('auth.form.change-email')}
+                        />
+                    </React.Fragment>
+                ) : null}
 
                 <Divider subtle className="mt-3" />
             </section>

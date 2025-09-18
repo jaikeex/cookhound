@@ -1,5 +1,10 @@
 import { Expose } from 'class-transformer';
-import { Status, type UserPreferences, UserRole } from '@/common/types';
+import {
+    AuthType,
+    Status,
+    type UserPreferences,
+    UserRole
+} from '@/common/types';
 import type { CookieConsentFromDb } from '@/common/types/cookie-consent';
 
 export class UserDTO {
@@ -38,6 +43,9 @@ export class UserDTO {
     //|-------------------------------------------------------------------------------------|//
     //?                                    SEMI-PRIVATE                                     ?//
     //|-------------------------------------------------------------------------------------|//
+
+    @Expose({ groups: ['self', 'admin'] })
+    authType: AuthType = AuthType.Local;
 
     // Semi-private profile fields
     @Expose({ groups: ['self', 'admin'] })
