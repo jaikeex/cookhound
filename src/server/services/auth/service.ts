@@ -257,6 +257,32 @@ class AuthService {
     }
 
     //~-----------------------------------------------------------------------------------------~//
+    //$                                    LOGOUT EVERYWHERE                                    $//
+    //~-----------------------------------------------------------------------------------------~//
+
+    /**
+     * Logs out the currently authenticated user on all devices by invalidating every
+     * server-side session associated with their account and deleting the current session cookie.
+     *
+     * @returns void
+     * @throws {AuthErrorUnauthorized} If no authenticated user is found in the request context.
+     */
+    async logoutEverywhere(): Promise<void> {
+        const userId = RequestContext.getUserId();
+
+        if (!userId) {
+            log.trace('logoutEverywhere - no userId in context');
+            throw new AuthErrorUnauthorized();
+        }
+
+        await sessions.invalidateAllUserSessions(userId);
+
+        deleteSessionCookie();
+
+        log.info('logoutEverywhere - success', { userId });
+    }
+
+    //~-----------------------------------------------------------------------------------------~//
     //$                                       GET CURRENT                                       $//
     //~-----------------------------------------------------------------------------------------~//
 
