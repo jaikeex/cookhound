@@ -5,8 +5,9 @@ import { classNames } from '@/client/utils';
 
 export type TextInputProps = Readonly<{
     placeholder?: string;
+    label?: string;
 }> &
-    Omit<FormInputProps, 'type'>;
+    Omit<FormInputProps, 'type' | 'label'>;
 
 export const TextInput: React.FC<TextInputProps> = ({
     className,
@@ -22,7 +23,9 @@ export const TextInput: React.FC<TextInputProps> = ({
 }) => {
     return (
         <div className={classNames('relative w-full', className)}>
-            <InputLabel htmlFor={id} text={label} disabled={disabled} />
+            {label ? (
+                <InputLabel htmlFor={id} text={label} disabled={disabled} />
+            ) : null}
             <BaseInput
                 type={'text'}
                 defaultValue={defaultValue}
