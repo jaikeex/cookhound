@@ -83,7 +83,7 @@ export function getAgeString(createdAt: string, locale: Locale): string {
 
     const langPack = languagePacks[locale];
     if (!langPack) {
-        throw new Error(`Unsupported locale: ${locale}`);
+        return '';
     }
 
     const difference = Date.now() - timestamp;

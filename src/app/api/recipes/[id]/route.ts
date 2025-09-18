@@ -1,16 +1,12 @@
 import { recipeService } from '@/server/services/recipe/service';
 import type { NextRequest } from 'next/server';
-import {
-    AuthErrorUnauthorized,
-    NotFoundError,
-    ValidationError
-} from '@/server/error';
+import { NotFoundError, ValidationError } from '@/server/error';
+import { withAuth } from '@/server/utils/session/with-auth';
 import { RequestContext } from '@/server/utils/reqwest/context';
 import { logRequest, logResponse } from '@/server/logger';
 import { handleServerError, validatePayload } from '@/server/utils/reqwest';
 import { ApplicationErrorCode } from '@/server/error/codes';
 import z from 'zod';
-import { UserRole } from '@/common/types/user';
 
 //|=============================================================================================|//
 //?                                     VALIDATION SCHEMAS                                      ?//
@@ -103,14 +99,10 @@ export async function GET(request: NextRequest) {
  * - 500: Internal Server Error, if there is another error during the updating process.
  */
 
-export async function PUT(request: NextRequest) {
+async function putHandler(request: NextRequest) {
     return RequestContext.run(request, async () => {
         try {
             logRequest(request);
-
-            if (RequestContext.getUserRole() === UserRole.Guest) {
-                throw new AuthErrorUnauthorized();
-            }
 
             const id = request.nextUrl.pathname.split('/').pop();
 
@@ -152,14 +144,10 @@ export async function PUT(request: NextRequest) {
  * - 400: Bad Request, if the recipe ID is not a number.
  * - 500: Internal Server Error, if there is another error during the deletion process.
  */
-export async function DELETE(request: NextRequest) {
+async function deleteHandler(request: NextRequest) {
     return RequestContext.run(request, async () => {
         try {
             logRequest(request);
-
-            if (RequestContext.getUserRole() === UserRole.Guest) {
-                throw new AuthErrorUnauthorized();
-            }
 
             const id = request.nextUrl.pathname.split('/').pop();
 
@@ -183,3 +171,6 @@ export async function DELETE(request: NextRequest) {
         }
     });
 }
+
+export const PUT = withAuth(putHandler);
+export const DELETE = withAuth(deleteHandler);

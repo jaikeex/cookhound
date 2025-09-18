@@ -4,9 +4,8 @@ import { RequestContext } from '@/server/utils/reqwest/context';
 import { handleServerError, validatePayload } from '@/server/utils/reqwest';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
-import { UserRole } from '@/common/types';
-import { AuthErrorUnauthorized } from '@/server/error';
 import { withRateLimit } from '@/server/utils/rate-limit';
+import { withAuth } from '@/server/utils/session/with-auth';
 import type { Locale } from '@/client/locales';
 import { z } from 'zod';
 import { validateQuery } from '@/server/utils/reqwest/validators';
@@ -100,10 +99,6 @@ async function createRecipeHandler(request: NextRequest) {
         try {
             logRequest(request);
 
-            if (RequestContext.getUserRole() === UserRole.Guest) {
-                throw new AuthErrorUnauthorized();
-            }
-
             const rawPayload = await request.json();
 
             const payload = validatePayload(
@@ -124,7 +119,7 @@ async function createRecipeHandler(request: NextRequest) {
     });
 }
 
-export const POST = withRateLimit(createRecipeHandler, {
+export const POST = withRateLimit(withAuth(createRecipeHandler), {
     maxRequests: 20,
     windowSizeInSeconds: 600
 });

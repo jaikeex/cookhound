@@ -7,7 +7,7 @@ import { handleServerError, validatePayload } from '@/server/utils/reqwest';
 import type { NextRequest } from 'next/server';
 import { z } from 'zod';
 import { ApplicationErrorCode } from '@/server/error/codes';
-import { UserRole } from '@/common/types';
+import { withAuth } from '@/server/utils/session/with-auth';
 
 //|=============================================================================================|//
 //?                                     VALIDATION SCHEMAS                                      ?//
@@ -34,10 +34,6 @@ async function initiateEmailChangeHandler(request: NextRequest) {
     return RequestContext.run(request, async () => {
         try {
             logRequest(request);
-
-            if (RequestContext.getUserRole() === UserRole.Guest) {
-                throw new AuthErrorUnauthorized();
-            }
 
             const userId = RequestContext.getUserId();
 
@@ -66,7 +62,7 @@ async function initiateEmailChangeHandler(request: NextRequest) {
     });
 }
 
-export const POST = withRateLimit(initiateEmailChangeHandler, {
+export const POST = withRateLimit(withAuth(initiateEmailChangeHandler), {
     maxRequests: 5,
     windowSizeInSeconds: 60 * 60 // 1 hour
 });

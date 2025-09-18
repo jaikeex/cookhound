@@ -6,10 +6,9 @@ import {
     validateParams
 } from '@/server/utils/reqwest';
 import { withRateLimit } from '@/server/utils/rate-limit/wrapper';
-import { AuthErrorUnauthorized } from '@/server/error';
 import { logRequest, logResponse } from '@/server/logger';
 import { RequestContext } from '@/server/utils/reqwest/context';
-import { UserRole } from '@/common/types';
+import { withAuth } from '@/server/utils/session/with-auth';
 import { z } from 'zod';
 
 //|=============================================================================================|//
@@ -46,10 +45,6 @@ async function rateRecipeHandler(request: NextRequest) {
         try {
             logRequest(request);
 
-            if (RequestContext.getUserRole() === UserRole.Guest) {
-                throw new AuthErrorUnauthorized();
-            }
-
             const { recipeId } = validateParams(RatingParamsSchema, {
                 recipeId: request.nextUrl.pathname.split('/').at(-2)
             });
@@ -72,7 +67,7 @@ async function rateRecipeHandler(request: NextRequest) {
     });
 }
 
-export const POST = withRateLimit(rateRecipeHandler, {
+export const POST = withRateLimit(withAuth(rateRecipeHandler), {
     maxRequests: 10,
     windowSizeInSeconds: 60
 });

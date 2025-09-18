@@ -1,14 +1,10 @@
-import { UserRole } from '@/common/types';
-import {
-    AuthErrorUnauthorized,
-    NotFoundError,
-    ValidationError
-} from '@/server/error';
+import { NotFoundError, ValidationError } from '@/server/error';
 import { ApplicationErrorCode } from '@/server/error/codes';
 import { logRequest, logResponse } from '@/server/logger';
 import { userService } from '@/server/services';
 import { handleServerError, validatePayload } from '@/server/utils/reqwest';
 import { RequestContext } from '@/server/utils/reqwest/context';
+import { withAuth } from '@/server/utils/session/with-auth';
 import type { NextRequest } from 'next/server';
 import { z } from 'zod';
 
@@ -18,7 +14,7 @@ import { z } from 'zod';
 
 const UserForUpdateSchema = z.strictObject({
     username: z.string().trim().min(3).max(40).optional(),
-    avatarUrl: z.string().trim().url().optional()
+    avatarUrl: z.url().optional()
 });
 
 //|=============================================================================================|//
@@ -88,14 +84,10 @@ export async function GET(request: NextRequest) {
  * - 404: Not Found, if the user is not found.
  * - 500: Internal Server Error, if there is another error during the updating process.
  */
-export async function PUT(request: NextRequest) {
+async function putHandler(request: NextRequest) {
     return RequestContext.run(request, async () => {
         try {
             logRequest(request);
-
-            if (RequestContext.getUserRole() === UserRole.Guest) {
-                throw new AuthErrorUnauthorized();
-            }
 
             const userId = request.nextUrl.pathname.split('/').pop();
 
@@ -134,3 +126,5 @@ export async function PUT(request: NextRequest) {
         }
     });
 }
+
+export const PUT = withAuth(putHandler);

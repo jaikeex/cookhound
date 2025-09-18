@@ -3,10 +3,9 @@ import { googleApiService } from '@/server/services';
 import type { NextRequest } from 'next/server';
 import { ENV_CONFIG_PRIVATE } from '@/common/constants';
 import { withRateLimit } from '@/server/utils/rate-limit';
-import { AuthErrorUnauthorized } from '@/server/error';
 import { logRequest, logResponse } from '@/server/logger';
 import { RequestContext } from '@/server/utils/reqwest/context';
-import { UserRole } from '@/common/types';
+import { withAuth } from '@/server/utils/session/with-auth';
 import { z } from 'zod';
 
 //|=============================================================================================|//
@@ -38,10 +37,6 @@ async function postHandler(request: NextRequest) {
 
             const payload = validatePayload(AvatarImageSchema, rawPayload);
 
-            if (RequestContext.getUserRole() === UserRole.Guest) {
-                throw new AuthErrorUnauthorized();
-            }
-
             await googleApiService.uploadAvatarImage(
                 payload.fileName,
                 payload.bytes
@@ -63,7 +58,7 @@ async function postHandler(request: NextRequest) {
     });
 }
 
-export const POST = withRateLimit(postHandler, {
+export const POST = withRateLimit(withAuth(postHandler), {
     maxRequests: 10,
     windowSizeInSeconds: 600
 });

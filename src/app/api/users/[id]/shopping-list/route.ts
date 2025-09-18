@@ -7,8 +7,7 @@ import {
 } from '@/server/utils/reqwest';
 import { logRequest, logResponse } from '@/server/logger';
 import { userService } from '@/server/services/user/service';
-import { UserRole } from '@/common/types';
-import { AuthErrorUnauthorized } from '@/server/error';
+import { withAuth } from '@/server/utils/session/with-auth';
 import { z } from 'zod';
 
 //|=============================================================================================|//
@@ -45,14 +44,10 @@ const ShoppingListParamsSchema = z.strictObject({
  * @returns A JSON response with the user's shopping list.
  * @throws {Error} Throws an error if the request fails.
  */
-export async function GET(request: NextRequest) {
+async function getHandler(request: NextRequest) {
     return RequestContext.run(request, async () => {
         try {
             logRequest(request);
-
-            if (RequestContext.getUserRole() === UserRole.Guest) {
-                throw new AuthErrorUnauthorized();
-            }
 
             const { userId } = validateParams(ShoppingListParamsSchema, {
                 userId: request.nextUrl.pathname.split('/').at(-2)
@@ -79,14 +74,10 @@ export async function GET(request: NextRequest) {
  * @returns A JSON response with the created shopping list item.
  * @throws {Error} Throws an error if the request fails.
  */
-export async function POST(request: NextRequest) {
+async function postHandler(request: NextRequest) {
     return RequestContext.run(request, async () => {
         try {
             logRequest(request);
-
-            if (RequestContext.getUserRole() === UserRole.Guest) {
-                throw new AuthErrorUnauthorized();
-            }
 
             const { userId } = validateParams(ShoppingListParamsSchema, {
                 userId: request.nextUrl.pathname.split('/').at(-2)
@@ -122,14 +113,10 @@ export async function POST(request: NextRequest) {
  * @returns A JSON response with the updated shopping list item.
  * @throws {Error} Throws an error if the request fails.
  */
-export async function PUT(request: NextRequest) {
+async function putHandler(request: NextRequest) {
     return RequestContext.run(request, async () => {
         try {
             logRequest(request);
-
-            if (RequestContext.getUserRole() === UserRole.Guest) {
-                throw new AuthErrorUnauthorized();
-            }
 
             const { userId } = validateParams(ShoppingListParamsSchema, {
                 userId: request.nextUrl.pathname.split('/').at(-2)
@@ -165,14 +152,10 @@ export async function PUT(request: NextRequest) {
  * @returns A JSON response with a message indicating that the shopping list has been deleted.
  * @throws {Error} Throws an error if the request fails.
  */
-export async function DELETE(request: NextRequest) {
+async function deleteHandler(request: NextRequest) {
     return RequestContext.run(request, async () => {
         try {
             logRequest(request);
-
-            if (RequestContext.getUserRole() === UserRole.Guest) {
-                throw new AuthErrorUnauthorized();
-            }
 
             const { userId } = validateParams(ShoppingListParamsSchema, {
                 userId: request.nextUrl.pathname.split('/').at(-2)
@@ -201,3 +184,8 @@ export async function DELETE(request: NextRequest) {
         }
     });
 }
+
+export const GET = withAuth(getHandler);
+export const POST = withAuth(postHandler);
+export const PUT = withAuth(putHandler);
+export const DELETE = withAuth(deleteHandler);
