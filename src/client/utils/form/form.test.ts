@@ -32,9 +32,8 @@ describe('validateFormData', () => {
     it('should handle custom error messages', async () => {
         const schema = z.object({
             email: z
-                .string()
-                .trim()
                 .email('Invalid email format')
+                .trim()
                 .min(1, 'Email is required')
         });
 

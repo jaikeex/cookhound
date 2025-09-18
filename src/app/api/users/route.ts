@@ -13,7 +13,7 @@ import { ApplicationErrorCode } from '@/server/error/codes';
 //|=============================================================================================|//
 
 const UserForCreateSchema = z.strictObject({
-    email: z.string().trim().email(),
+    email: z.email().trim(),
     password: z.string().trim().min(6).max(40),
     username: z.string().trim().min(3).max(40)
 });

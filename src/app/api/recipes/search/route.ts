@@ -14,7 +14,7 @@ import { validateQuery } from '@/server/utils/reqwest/validators';
 const SearchRecipesSchema = z.strictObject({
     query: z.string().trim().min(1).max(100),
     language: z.enum(['en', 'cs'], {
-        errorMap: () => ({ message: 'Language must be supported' })
+        error: () => 'Language must be supported'
     }),
     perPage: z.coerce.number().int().positive(),
     batch: z.coerce.number().int().positive()

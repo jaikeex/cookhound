@@ -16,7 +16,7 @@ import { ValidationError } from '@/server/error/server';
 const SearchRecipesByUserSchema = z.strictObject({
     query: z.string().trim().min(1).max(100),
     language: z.enum(['en', 'cs'], {
-        errorMap: () => ({ message: 'Language must be supported' })
+        error: () => 'Language must be supported'
     }),
     perPage: z.coerce.number().int().positive(),
     batch: z.coerce.number().int().positive()

@@ -14,7 +14,7 @@ import { z } from 'zod';
 
 const RecipesByUserSchema = z.strictObject({
     language: z.enum(['en', 'cs'], {
-        errorMap: () => ({ message: 'Language must be supported' })
+        error: () => 'Language must be supported'
     }),
     batch: z.coerce.number().int().positive(),
     perPage: z.coerce.number().int().positive()

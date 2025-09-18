@@ -32,7 +32,6 @@ export const registerSchema = z
             .min(1, 'auth.error.username-required')
             .max(40, 'auth.error.username-max-length'),
         email: z
-            .string()
             .email('auth.error.email-invalid')
             .min(1, 'auth.error.email-required'),
         password: z
@@ -153,6 +152,7 @@ export const RegisterTemplate: React.FC<RegisterTemplateProps> = () => {
                     return;
                 }
             } catch (error: unknown) {
+                console.error(error);
                 setFormErrors({ server: 'auth.error.default' });
                 return;
             }

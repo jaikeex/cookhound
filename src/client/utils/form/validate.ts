@@ -11,7 +11,7 @@ export const validateFormData = async <T>(
         const validationErrors: Record<string, string> = {};
 
         if (error instanceof z.ZodError) {
-            error.errors.forEach((err) => {
+            error.issues.forEach((err) => {
                 const path = err.path.join('.');
                 if (path && path in formData) {
                     validationErrors[path] = err.message;

@@ -17,7 +17,7 @@ import { validateQuery } from '@/server/utils/reqwest/validators';
 
 const FrontPageRecipesSchema = z.strictObject({
     language: z.enum(['en', 'cs'], {
-        errorMap: () => ({ message: 'Language must be supported' })
+        error: () => 'Language must be supported'
     }),
     batch: z.coerce.number().int().positive(),
     perPage: z.coerce.number().int().positive()
@@ -30,7 +30,7 @@ const IngredientForCreateSchema = z.strictObject({
 
 const RecipeForCreatePayloadSchema = z.strictObject({
     language: z.enum(['en', 'cs'], {
-        errorMap: () => ({ message: 'Language must be supported' })
+        error: () => 'Language must be supported'
     }),
     title: z.string().trim().min(1).max(200),
     instructions: z.array(z.string().trim().min(1)).min(1),

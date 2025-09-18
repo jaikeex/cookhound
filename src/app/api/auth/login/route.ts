@@ -14,7 +14,7 @@ import { createSessionCookie } from '@/server/utils/session/cookie';
 //|=============================================================================================|//
 
 const LoginSchema = z.object({
-    email: z.string().email(),
+    email: z.email(),
     password: z.string().trim().min(1).max(40), // Don't validate password strength on login
     keepLoggedIn: z.boolean().optional()
 });

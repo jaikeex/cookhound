@@ -23,7 +23,7 @@ const IngredientForCreateSchema = z.strictObject({
 
 const RecipeForUpdateSchema = z.strictObject({
     language: z.enum(['en', 'cs'], {
-        errorMap: () => ({ message: 'Language must be supported' })
+        error: () => 'Language must be supported'
     }),
     title: z.string().trim().min(1).max(200),
     instructions: z.array(z.string().trim().min(1)).min(1),

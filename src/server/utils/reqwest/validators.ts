@@ -39,7 +39,7 @@ export function validateQuery<T>(schema: z.ZodType<T>, url: URL): T {
     const result = schema.safeParse(queryObject);
 
     if (!result.success) {
-        const errorDetails = result.error.errors
+        const errorDetails = result.error.issues
             .map((err) => `${err.path.join('.')}: ${err.message}`)
             .join(', ');
 
@@ -81,7 +81,7 @@ export function validateHeaders<T>(schema: z.ZodType<T>, headers: Headers): T {
     const result = schema.safeParse(headersObject);
 
     if (!result.success) {
-        const errorDetails = result.error.errors
+        const errorDetails = result.error.issues
             .map((err) => `${err.path.join('.')}: ${err.message}`)
             .join(', ');
 
@@ -114,7 +114,7 @@ export function validateParams<T>(
     const result = schema.safeParse(params);
 
     if (!result.success) {
-        const errorDetails = result.error.errors
+        const errorDetails = result.error.issues
             .map((err) => `${err.path.join('.')}: ${err.message}`)
             .join(', ');
 
@@ -144,7 +144,7 @@ export function validatePayload<T>(schema: z.ZodType<T>, payload: any): T {
     const validationResult = schema.safeParse(payload);
 
     if (!validationResult.success) {
-        const errorDetails = validationResult.error.errors
+        const errorDetails = validationResult.error.issues
             .map((err) => `${err.path.join('.')}: ${err.message}`)
             .join(', ');
 

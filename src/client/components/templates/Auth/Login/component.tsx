@@ -27,12 +27,11 @@ import { Event, eventBus } from '@/client/events';
 
 export const loginSchema = z.object({
     email: z
-        .string()
         .email('auth.error.email-invalid')
         .min(1, 'auth.error.email-required'),
     password: z.string().trim().min(1, 'auth.error.password-required'),
     keepLoggedIn: z.boolean({
-        required_error: 'auth.error.keep-logged-in-required'
+        error: 'auth.error.keep-logged-in-required'
     })
 });
 

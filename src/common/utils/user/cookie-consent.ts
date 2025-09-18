@@ -1,19 +1,17 @@
 import { z } from 'zod';
 import type { CookieConsent } from '@/common/types/cookie-consent';
 
-const ConsentSchema = z
-    .object({
-        createdAt: z.preprocess(
-            (v) => new Date(v as string | number | Date),
-            z.date()
-        ),
-        consent: z.boolean(),
-        version: z.string(),
-        accepted: z.array(
-            z.enum(['essential', 'preferences', 'analytics', 'marketing'])
-        )
-    })
-    .passthrough();
+const ConsentSchema = z.looseObject({
+    createdAt: z.preprocess(
+        (v) => new Date(v as string | number | Date),
+        z.date()
+    ),
+    consent: z.boolean(),
+    version: z.string(),
+    accepted: z.array(
+        z.enum(['essential', 'preferences', 'analytics', 'marketing'])
+    )
+});
 
 export function pickMostRecentConsent(
     fromCookie: CookieConsent | null,

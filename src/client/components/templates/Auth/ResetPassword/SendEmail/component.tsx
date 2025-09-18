@@ -24,7 +24,6 @@ export type SendResetPasswordEmailTemplateProps = Readonly<{
 
 const sendResetPasswordEmailSchema = z.object({
     email: z
-        .string()
         .email('auth.error.email-invalid')
         .min(1, 'auth.error.email-required')
 });

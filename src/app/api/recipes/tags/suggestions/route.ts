@@ -11,27 +11,23 @@ import type { RecipeDTO } from '@/common/types';
 //?                                     VALIDATION SCHEMAS                                      ?//
 //|=============================================================================================|//
 
-const IngredientForTagSuggestionSchema = z
-    .strictObject({
-        name: z.string().trim().min(1).max(100),
-        quantity: z.string().trim().max(50).nullable()
-    })
-    .passthrough();
+const IngredientForTagSuggestionSchema = z.looseObject({
+    name: z.string().trim().min(1).max(100),
+    quantity: z.string().trim().max(50).nullable()
+});
 
-const RecipeForTagSuggestionPayloadSchema = z
-    .object({
-        language: z.enum(['en', 'cs'], {
-            errorMap: () => ({ message: 'Language must be supported' })
-        }),
-        title: z.string().trim().min(1).max(200),
-        instructions: z.array(z.string().trim().min(1)).min(1),
-        notes: z.string().trim().max(1400).nullable(),
-        time: z.coerce.number().int().positive().nullable(),
-        portionSize: z.coerce.number().int().positive().nullable(),
-        imageUrl: z.string().trim().nullable(),
-        ingredients: z.array(IngredientForTagSuggestionSchema).min(1)
-    })
-    .passthrough();
+const RecipeForTagSuggestionPayloadSchema = z.looseObject({
+    language: z.enum(['en', 'cs'], {
+        error: () => 'Language must be supported'
+    }),
+    title: z.string().trim().min(1).max(200),
+    instructions: z.array(z.string().trim().min(1)).min(1),
+    notes: z.string().trim().max(1400).nullable(),
+    time: z.coerce.number().int().positive().nullable(),
+    portionSize: z.coerce.number().int().positive().nullable(),
+    imageUrl: z.string().trim().nullable(),
+    ingredients: z.array(IngredientForTagSuggestionSchema).min(1)
+});
 
 async function suggestionsHandler(request: NextRequest) {
     return RequestContext.run(request, async () => {

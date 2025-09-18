@@ -12,7 +12,7 @@ import { ApplicationErrorCode } from '@/server/error/codes';
 //|=============================================================================================|//
 
 const SendVerificationEmailSchema = z.strictObject({
-    email: z.string().trim().email()
+    email: z.email().trim()
 });
 
 //|=============================================================================================|//

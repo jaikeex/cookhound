@@ -10,7 +10,7 @@ import { z } from 'zod';
 //|=============================================================================================|//
 
 const SendResetPasswordEmailSchema = z.strictObject({
-    email: z.string().trim().email()
+    email: z.email().trim()
 });
 
 const ResetPasswordSchema = z.strictObject({
