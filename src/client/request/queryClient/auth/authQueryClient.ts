@@ -41,6 +41,10 @@ class AuthQueryClient {
     /** Logs the current user out. */
     useLogout = (options?: Partial<LogoutOptions>) =>
         useAppMutation(apiClient.auth.logout, options);
+
+    /** Logs the current user out on all devices. */
+    useLogoutAll = (options?: Partial<LogoutOptions>) =>
+        useAppMutation(apiClient.auth.logoutAll, options);
 }
 
 export const authQueryClient = new AuthQueryClient();

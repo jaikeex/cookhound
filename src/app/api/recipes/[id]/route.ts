@@ -98,7 +98,6 @@ export async function GET(request: NextRequest) {
  * - 400: Bad Request, if the recipe ID is not a number.
  * - 500: Internal Server Error, if there is another error during the updating process.
  */
-
 async function putHandler(request: NextRequest) {
     return RequestContext.run(request, async () => {
         try {

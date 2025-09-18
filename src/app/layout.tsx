@@ -183,7 +183,7 @@ export default async function RootLayout({
                                                 <div
                                                     id={CONTENT_WRAPPER_ID}
                                                     className={classNames(
-                                                        'flex-1 px-2 pt-16 pb-16 md:px-4 md:pt-24',
+                                                        'flex-1 px-2 pt-16 pb-16 md:px-4 md:pt-24 min-h-screen',
                                                         'relative'
                                                     )}
                                                 >

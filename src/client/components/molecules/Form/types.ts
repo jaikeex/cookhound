@@ -3,6 +3,7 @@ import type React from 'react';
 export type FormInputProps = Readonly<{
     className?: string;
     defaultValue?: string;
+    autoComplete?: string;
     disabled?: boolean;
     error?: string;
     id: string;

@@ -215,5 +215,11 @@
     "app.profile.settings.cookies-button": "Manage your cookie preferences",
     "app.profile.settings.account-deactivation": "Account Deactivation",
     "app.profile.settings.account-deactivation-button": "Deactivate Account",
-    "recipe.error.not-found": "Recipe not found"
+    "recipe.error.not-found": "Recipe not found",
+    "app.profile.settings.logout-all": "Logout everywhere",
+    "auth.logout-all.title": "Logout from everywhere?",
+    "auth.logout-all.body": "This will immediately sign you out on every device. Continue?",
+    "auth.logout-all.password": "Confirm your password",
+    "auth.logout-all.confirm": "Continue",
+    "auth.logout-all.success": "You have been logged out on all devices."
 }

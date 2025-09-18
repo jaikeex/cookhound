@@ -94,6 +94,24 @@ class AuthApiClient {
             ...config
         });
     }
+
+    /**
+     * Logs out the currently logged-in user on ALL devices by calling `POST /auth/logout-all`.
+     *
+     * @param config - Optional fetch request configuration.
+     *
+     * @returns {Promise<void>} A promise that resolves when all sessions are invalidated.
+     * - 200: Success, with a success message.
+     *
+     * @throws {Error} Throws an error if the request fails.
+     * - 500: Internal Server Error, if there is another error during logout.
+     */
+    async logoutAll(config?: RequestConfig): Promise<void> {
+        await apiRequestWrapper.post({
+            url: '/auth/logout-all',
+            ...config
+        });
+    }
 }
 
 export const authApiClient = new AuthApiClient();

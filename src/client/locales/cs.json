@@ -215,5 +215,11 @@
     "auth.change-email.success": "Odeslali jsme potvrzovací odkaz na vaši novou adresu.",
     "auth.change-email.error": "Nepodařilo se změnit e-mail. Zkuste to prosím znovu.",
     "auth.verify-email-change.success": "Váš e-mail byl úspěšně změněn.",
-    "auth.verify-email-change.error": "Potvrzovací odkaz je neplatný nebo jeho platnost vypršela."
+    "auth.verify-email-change.error": "Potvrzovací odkaz je neplatný nebo jeho platnost vypršela.",
+    "app.profile.settings.logout-all": "Odhlásit ze všech zařízení",
+    "auth.logout-all.title": "Odhlásit ze všech zařízení?",
+    "auth.logout-all.body": "Budete okamžitě odhlášeni ze všech vašich zařízení kde jste přihlášeni. Opravdu chcete pokračovat?",
+    "auth.logout-all.password": "Tuto akci je nutné potvrdit heslem",
+    "auth.logout-all.confirm": "Pokračovat",
+    "auth.logout-all.success": "Byl jste úspěšně odhlášen ze všech zařízení."
 }

@@ -12,6 +12,7 @@ import {
 import { useLocale, useSnackbar } from '@/client/store';
 import { useModal } from '@/client/store';
 import { ConsentSettingsModal } from '@/client/components';
+import { LogoutAllConfirmModal } from '@/client/components';
 import { chqc, QUERY_KEYS } from '@/client/request/queryClient';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -61,6 +62,11 @@ export const ProfileBodyInfo: React.FC<ProfileBodyInfoProps> = ({ user }) => {
         [openModal]
     );
 
+    const handleLogoutAll = useCallback(
+        () => openModal((close) => <LogoutAllConfirmModal close={close} />),
+        [openModal]
+    );
+
     return (
         <div className="space-y-4">
             <section>
@@ -99,6 +105,17 @@ export const ProfileBodyInfo: React.FC<ProfileBodyInfoProps> = ({ user }) => {
                         />
                     </React.Fragment>
                 ) : null}
+
+                <Divider subtle className="mt-3" />
+
+                <ButtonBase
+                    size="sm"
+                    color="danger"
+                    onClick={handleLogoutAll}
+                    className="mt-3"
+                >
+                    {t('app.profile.settings.logout-all')}
+                </ButtonBase>
 
                 <Divider subtle className="mt-3" />
             </section>
