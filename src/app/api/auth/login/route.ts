@@ -41,7 +41,7 @@ const LoginSchema = z.object({
  * - 403: Forbidden, if the user's email is not verified.
  * - 500: Internal Server Error, if there is another error during authentication.
  */
-export async function postHandler(request: NextRequest) {
+async function postHandler(request: NextRequest) {
     assertAnonymous(
         new AuthErrorForbidden(
             'auth.error.user-already-logged-in',

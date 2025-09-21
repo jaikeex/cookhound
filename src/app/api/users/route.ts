@@ -38,7 +38,7 @@ const UserForCreateSchema = z.strictObject({
  * - 409: Conflict, if the email or username is already taken.
  * - 500: Internal Server Error, if there is another error during user creation.
  */
-export async function postHandler(request: NextRequest) {
+async function postHandler(request: NextRequest) {
     assertAnonymous(
         new AuthErrorForbidden(
             'auth.error.user-already-logged-in',

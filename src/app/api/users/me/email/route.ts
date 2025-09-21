@@ -57,7 +57,7 @@ async function postHandler(request: NextRequest) {
  * @param request - The incoming Next.js request object.
  * @returns 200 OK with updated `UserDTO` on success.
  */
-export async function putHandler(request: NextRequest) {
+async function putHandler(request: NextRequest) {
     const token = request.nextUrl.searchParams.get('token');
 
     if (!token) {

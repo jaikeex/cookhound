@@ -38,7 +38,7 @@ const UserCookieConsentForCreateSchema = z.strictObject({
  * @param request - The incoming Next.js request object.
  * @returns A JSON response with the created user cookie consent.
  */
-export async function postHandler(request: NextRequest) {
+async function postHandler(request: NextRequest) {
     const userId = assertAuthenticated();
 
     const rawPayload = await readJson(request);

@@ -37,7 +37,7 @@ const UserForUpdateSchema = z.strictObject({
  * - 404: Not Found, if the user is not found.
  * - 500: Internal Server Error, if there is another error during the fetching process.
  */
-export async function getHandler(request: NextRequest) {
+async function getHandler(request: NextRequest) {
     const userId = request.nextUrl.pathname.split('/').pop();
 
     /**

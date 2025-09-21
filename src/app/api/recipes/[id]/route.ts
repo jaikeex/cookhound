@@ -53,7 +53,7 @@ const RecipeForUpdateSchema = z.strictObject({
  * - 404: Not Found, if the recipe is not found.
  * - 500: Internal Server Error, if there is another error during the fetching process.
  */
-export async function getHandler(request: NextRequest) {
+async function getHandler(request: NextRequest) {
     /**
      * Do NOT validate the params by schema here, requesting a recipe that does
      * not exist should return a 404 error and be handled by the service, not a 400.

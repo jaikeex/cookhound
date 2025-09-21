@@ -35,7 +35,7 @@ const RecipeVisitParamsSchema = z.strictObject({
  * - 404: Not Found, if the recipe is not found.
  * - 500: Internal Server Error, if there is another error during the fetching process.
  */
-export async function postHandler(request: NextRequest) {
+async function postHandler(request: NextRequest) {
     const { recipeId } = validateParams(RecipeVisitParamsSchema, {
         recipeId: request.nextUrl.pathname.split('/').at(-2)
     });

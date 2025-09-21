@@ -33,7 +33,7 @@ const RecipesByUserSchema = z.strictObject({
  * - 400: Bad Request, if the user ID is not a number.
  * - 500: Internal Server Error, if there is another error during the fetching process.
  */
-export async function getHandler(request: NextRequest) {
+async function getHandler(request: NextRequest) {
     const userId = request.nextUrl.pathname.split('/').pop();
 
     if (!userId || isNaN(Number(userId))) {

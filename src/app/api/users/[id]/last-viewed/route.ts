@@ -23,7 +23,7 @@ const LastViewedParamsSchema = z.strictObject({
  * @returns A JSON response with the user's last viewed recipes.
  * @throws {Error} Throws an error if the request fails.
  */
-export async function getHandler(request: NextRequest) {
+async function getHandler(request: NextRequest) {
     const { userId } = validateParams(LastViewedParamsSchema, {
         userId: request.nextUrl.pathname.split('/').at(-2)
     });

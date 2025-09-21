@@ -31,7 +31,7 @@ const UserPreferencesForUpdateSchema = z.strictObject({
  * @param request - The incoming Next.js request object.
  * @returns A JSON response with the updated user preferences.
  */
-export async function putHandler(request: NextRequest) {
+async function putHandler(request: NextRequest) {
     const userId = request.nextUrl.pathname.split('/').at(-2);
 
     if (!userId || isNaN(Number(userId))) {

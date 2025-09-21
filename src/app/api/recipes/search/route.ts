@@ -27,7 +27,7 @@ const SearchRecipesSchema = z.strictObject({
  *
  * @returns A JSON response containing the search results.
  */
-export async function getHandler(request: NextRequest) {
+async function getHandler(request: NextRequest) {
     const payload = validateQuery(SearchRecipesSchema, request.nextUrl);
 
     const { query, language, perPage, batch } = payload;

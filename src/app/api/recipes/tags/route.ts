@@ -5,7 +5,7 @@ import { makeHandler, ok } from '@/server/utils/reqwest';
 
 //|=============================================================================================|//
 
-export async function getHandler(request: NextRequest) {
+async function getHandler(request: NextRequest) {
     const language = request.nextUrl.searchParams.get('lang') || DEFAULT_LOCALE;
     const tags = await recipeTagService.getAll(language);
 

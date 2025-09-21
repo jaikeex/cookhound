@@ -31,7 +31,7 @@ const SendVerificationEmailSchema = z.strictObject({
  * @returns A JSON response indicating the result of the operation.
  * @todo Implement the logic to resend a verification email.
  */
-export async function postHandler(request: NextRequest) {
+async function postHandler(request: NextRequest) {
     assertAnonymous(
         new AuthErrorForbidden(
             'auth.error.user-already-logged-in',
@@ -65,7 +65,7 @@ export async function postHandler(request: NextRequest) {
  * - 404: Not Found, if the user is not found.
  * - 500: Internal Server Error, if there is another error during email verification.
  */
-export async function putHandler(request: NextRequest) {
+async function putHandler(request: NextRequest) {
     assertAnonymous(
         new AuthErrorForbidden(
             'auth.error.user-already-logged-in',

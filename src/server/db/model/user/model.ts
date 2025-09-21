@@ -359,7 +359,7 @@ class UserModel {
     ): Promise<void> {
         log.trace('Applying email change', { userId, newEmail, token });
 
-        await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+        await prisma.$transaction(async (tx) => {
             await tx.user.update({
                 where: { id: userId },
                 data: {
@@ -480,7 +480,7 @@ class UserModel {
 
         const MAX_VIEWED_RECIPES = 10;
 
-        await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+        await prisma.$transaction(async (tx) => {
             // First, upsert the current recipe visit
             await tx.userVisitedRecipe.upsert({
                 where: {

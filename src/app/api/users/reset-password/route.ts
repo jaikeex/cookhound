@@ -32,7 +32,7 @@ const ResetPasswordSchema = z.strictObject({
  * @returns A JSON response with a message indicating that the password reset email has been sent.
  * @throws {Error} Throws an error if the request fails.
  */
-export async function postHandler(request: NextRequest) {
+async function postHandler(request: NextRequest) {
     const rawPayload = await readJson(request);
 
     const payload = validatePayload(SendResetPasswordEmailSchema, rawPayload);
@@ -51,7 +51,7 @@ export async function postHandler(request: NextRequest) {
  * @returns A JSON response with a message indicating that the password reset was successful.
  * @throws {Error} Throws an error if the request fails.
  */
-export async function putHandler(request: NextRequest) {
+async function putHandler(request: NextRequest) {
     const rawPayload = await readJson(request);
 
     const payload = validatePayload(ResetPasswordSchema, rawPayload);

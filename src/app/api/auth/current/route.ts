@@ -13,7 +13,7 @@ import { makeHandler, ok } from '@/server/utils/reqwest';
  * - 401: Unauthorized, if session is missing or invalid.
  * - 404: Not Found, if user from session does not exist.
  */
-export async function getHandler() {
+async function getHandler() {
     const user = await authService.getCurrentUser();
 
     return ok(user);

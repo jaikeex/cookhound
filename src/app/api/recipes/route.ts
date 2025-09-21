@@ -57,7 +57,7 @@ const RecipeForCreatePayloadSchema = z.strictObject({
  * @param request The incoming HTTP request.
  * @returns A JSON response containing the paginated list of recipes.
  */
-export async function getHandler(request: NextRequest) {
+async function getHandler(request: NextRequest) {
     const payload = validateQuery(FrontPageRecipesSchema, request.nextUrl);
 
     const { language, batch, perPage } = payload;

@@ -34,7 +34,7 @@ const GoogleAuthSchema = z.strictObject({
  *        token is missing or the user info is missing.
  * - 500: Internal Server Error, if there is an error during authentication.
  */
-export async function postHandler(request: NextRequest) {
+async function postHandler(request: NextRequest) {
     assertAnonymous(
         new AuthErrorForbidden(
             'auth.error.user-already-logged-in',

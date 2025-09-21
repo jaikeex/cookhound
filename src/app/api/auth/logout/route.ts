@@ -14,7 +14,7 @@ import { withAuth } from '@/server/utils/reqwest';
  * - 200: Success, with a success message.
  * - 500: Internal Server Error, if there is another error during logout.
  */
-export async function postHandler() {
+async function postHandler() {
     const sessionId = RequestContext.getSessionId();
 
     if (!sessionId) {

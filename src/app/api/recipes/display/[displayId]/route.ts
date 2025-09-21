@@ -16,7 +16,7 @@ import { ApplicationErrorCode } from '@/server/error/codes';
  * - 404: Not Found, if the recipe is not found.
  * - 500: Internal Server Error, if there is another error during the fetching process.
  */
-export async function getHandler(request: NextRequest) {
+async function getHandler(request: NextRequest) {
     const displayId = request.nextUrl.pathname.split('/').pop();
 
     /**
