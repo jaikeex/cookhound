@@ -1,11 +1,14 @@
 import type { NextRequest } from 'next/server';
 import { authService } from '@/server/services/auth/service';
 import { AuthErrorForbidden } from '@/server/error';
-import { logRequest, logResponse } from '@/server/logger';
-import { RequestContext } from '@/server/utils/reqwest/context';
-import { handleServerError, validatePayload } from '@/server/utils/reqwest';
-import { UserRole } from '@/common/types';
-import z from 'zod';
+import {
+    assertAnonymous,
+    makeHandler,
+    ok,
+    readJson,
+    validatePayload
+} from '@/server/utils/reqwest';
+import { z } from 'zod';
 import { ApplicationErrorCode } from '@/server/error/codes';
 import { createSessionCookie } from '@/server/utils/session/cookie';
 
@@ -38,47 +41,37 @@ const LoginSchema = z.object({
  * - 403: Forbidden, if the user's email is not verified.
  * - 500: Internal Server Error, if there is another error during authentication.
  */
-export async function POST(request: NextRequest) {
-    return RequestContext.run(request, async () => {
-        try {
-            logRequest(request);
+export async function postHandler(request: NextRequest) {
+    assertAnonymous(
+        new AuthErrorForbidden(
+            'auth.error.user-already-logged-in',
+            ApplicationErrorCode.ALREADY_LOGGED_IN
+        )
+    );
 
-            // Check if the user is already logged in.
-            if (RequestContext.getUserRole() !== UserRole.Guest) {
-                throw new AuthErrorForbidden(
-                    'auth.error.user-already-logged-in',
-                    ApplicationErrorCode.ALREADY_LOGGED_IN
-                );
-            }
+    const rawPayload = await readJson(request);
 
-            const rawPayload = await request.json();
+    const payload = validatePayload(LoginSchema, rawPayload);
 
-            const payload = validatePayload(LoginSchema, rawPayload);
-
-            const user = await authService.login({
-                email: payload.email,
-                password: payload.password,
-                keepLoggedIn: payload.keepLoggedIn ?? false
-            });
-
-            const cookie = createSessionCookie(
-                user.token,
-                payload.keepLoggedIn ?? false
-            );
-
-            const response = Response.json(
-                { ...user.user },
-                {
-                    headers: {
-                        'Set-Cookie': cookie
-                    }
-                }
-            );
-
-            logResponse(response);
-            return response;
-        } catch (error: unknown) {
-            return handleServerError(error);
-        }
+    const user = await authService.login({
+        email: payload.email,
+        password: payload.password,
+        keepLoggedIn: payload.keepLoggedIn ?? false
     });
+
+    const cookie = createSessionCookie(
+        user.token,
+        payload.keepLoggedIn ?? false
+    );
+
+    return ok(
+        { ...user.user },
+        {
+            headers: {
+                'Set-Cookie': cookie
+            }
+        }
+    );
 }
+
+export const POST = makeHandler(postHandler);

@@ -1,14 +1,14 @@
 import type { NextRequest } from 'next/server';
 import { recipeService } from '@/server/services/recipe/service';
 import {
-    handleServerError,
     validatePayload,
-    validateParams
+    validateParams,
+    makeHandler,
+    ok,
+    readJson
 } from '@/server/utils/reqwest';
 import { withRateLimit } from '@/server/utils/rate-limit/wrapper';
-import { logRequest, logResponse } from '@/server/logger';
-import { RequestContext } from '@/server/utils/reqwest/context';
-import { withAuth } from '@/server/utils/session/with-auth';
+import { withAuth } from '@/server/utils/reqwest';
 import { z } from 'zod';
 
 //|=============================================================================================|//
@@ -40,34 +40,27 @@ const RatingParamsSchema = z.strictObject({
  * - 429: Too Many Requests, if the user has exceeded the rate limit.
  * - 500: Internal Server Error, if there is another error during the rating process.
  */
-async function rateRecipeHandler(request: NextRequest) {
-    return RequestContext.run(request, async () => {
-        try {
-            logRequest(request);
+async function postHandler(request: NextRequest) {
+    const { recipeId } = validateParams(RatingParamsSchema, {
+        recipeId: request.nextUrl.pathname.split('/').at(-2)
+    });
 
-            const { recipeId } = validateParams(RatingParamsSchema, {
-                recipeId: request.nextUrl.pathname.split('/').at(-2)
-            });
+    const rawPayload = await readJson(request);
 
-            const rawPayload = await request.json();
+    const payload = validatePayload(RatingForCreateSchema, rawPayload);
 
-            const payload = validatePayload(RatingForCreateSchema, rawPayload);
+    await recipeService.rateRecipe(Number(recipeId), payload.rating);
 
-            await recipeService.rateRecipe(Number(recipeId), payload.rating);
-
-            const response = Response.json({
-                message: 'Recipe rated successfully'
-            });
-
-            logResponse(response);
-            return response;
-        } catch (error: unknown) {
-            return handleServerError(error);
-        }
+    return ok({
+        message: 'Recipe rated successfully'
     });
 }
 
-export const POST = withRateLimit(withAuth(rateRecipeHandler), {
-    maxRequests: 10,
-    windowSizeInSeconds: 60
-});
+export const POST = makeHandler(
+    postHandler,
+    withAuth,
+    withRateLimit({
+        maxRequests: 10,
+        windowSizeInSeconds: 60
+    })
+);

@@ -66,7 +66,8 @@ export const ENV_CONFIG_PRIVATE = createConfig(
         COOKIE_CONSENT_HASH_V2025_09_15:
             process.env.COOKIE_CONSENT_HASH_V2025_09_15,
         TYPESENSE_API_KEY: process.env.TYPESENSE_API_KEY,
-        OPENAI_API_KEY: process.env.OPENAI_API_KEY
+        OPENAI_API_KEY: process.env.OPENAI_API_KEY,
+        ALLOWED_ORIGINS: process.env.ALLOWED_ORIGINS
     },
     'ENV_CONFIG_PRIVATE',
     process.env.NEXT_PUBLIC_ENV !== 'test' && typeof window === 'undefined'

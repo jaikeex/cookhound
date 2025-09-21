@@ -1,30 +1,15 @@
 import { withRateLimit } from '@/server/utils/rate-limit/wrapper';
-import { withAuth } from '@/server/utils/session/with-auth';
+import { makeHandler, noContent, withAuth } from '@/server/utils/reqwest';
 import { authService } from '@/server/services/auth/service';
-import { logRequest, logResponse } from '@/server/logger';
-import { RequestContext } from '@/server/utils/reqwest/context';
-import { handleServerError } from '@/server/utils/reqwest/handleApiError';
-import type { NextRequest } from 'next/server';
 
-async function logoutAllHandler(request: NextRequest) {
-    return RequestContext.run(request, async () => {
-        try {
-            logRequest(request);
+async function postHandler() {
+    await authService.logoutEverywhere();
 
-            await authService.logoutEverywhere();
-
-            const response = Response.json({ ok: true });
-
-            logResponse(response);
-
-            return response;
-        } catch (error: unknown) {
-            return handleServerError(error);
-        }
-    });
+    return noContent();
 }
 
-export const POST = withRateLimit(withAuth(logoutAllHandler), {
-    maxRequests: 5,
-    windowSizeInSeconds: 60
-});
+export const POST = makeHandler(
+    postHandler,
+    withAuth,
+    withRateLimit({ maxRequests: 5, windowSizeInSeconds: 60 })
+);

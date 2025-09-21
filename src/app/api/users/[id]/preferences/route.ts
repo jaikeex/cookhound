@@ -1,10 +1,15 @@
 import { ApplicationErrorCode } from '@/server/error/codes';
 import { ValidationError } from '@/server/error/server';
-import { logRequest, logResponse } from '@/server/logger';
 import { userService } from '@/server/services/user/service';
-import { handleServerError, validatePayload } from '@/server/utils/reqwest';
-import { RequestContext } from '@/server/utils/reqwest/context';
+import {
+    assertSelf,
+    makeHandler,
+    noContent,
+    readJson,
+    validatePayload
+} from '@/server/utils/reqwest';
 import type { NextRequest } from 'next/server';
+import { withAuth } from '@/server/utils/reqwest';
 import { z } from 'zod';
 
 //|=============================================================================================|//
@@ -26,38 +31,25 @@ const UserPreferencesForUpdateSchema = z.strictObject({
  * @param request - The incoming Next.js request object.
  * @returns A JSON response with the updated user preferences.
  */
-export async function PUT(request: NextRequest) {
-    return RequestContext.run(request, async () => {
-        try {
-            logRequest(request);
+export async function putHandler(request: NextRequest) {
+    const userId = request.nextUrl.pathname.split('/').at(-2);
 
-            const userId = request.nextUrl.pathname.split('/').at(-2);
+    if (!userId || isNaN(Number(userId))) {
+        throw new ValidationError(
+            'app.error.bad-request',
+            ApplicationErrorCode.MISSING_FIELD
+        );
+    }
 
-            if (!userId || isNaN(Number(userId))) {
-                throw new ValidationError(
-                    'app.error.bad-request',
-                    ApplicationErrorCode.MISSING_FIELD
-                );
-            }
+    assertSelf(Number(userId));
 
-            const rawPayload = await request.json();
+    const rawPayload = await readJson(request);
 
-            const payload = validatePayload(
-                UserPreferencesForUpdateSchema,
-                rawPayload
-            );
+    const payload = validatePayload(UserPreferencesForUpdateSchema, rawPayload);
 
-            await userService.updateUserPreferences(Number(userId), payload);
+    await userService.updateUserPreferences(Number(userId), payload);
 
-            const response = Response.json({
-                message: 'user preferences updated'
-            });
-
-            logResponse(response);
-
-            return response;
-        } catch (error: unknown) {
-            return handleServerError(error);
-        }
-    });
+    return noContent();
 }
+
+export const PUT = makeHandler(putHandler, withAuth);

@@ -19,56 +19,47 @@ export interface RateLimitOptions extends RateLimitConfig {
     algorithm?: RateLimitAlgorithm;
 }
 
-/**
- * Higher-order function to wrap App Router handlers with rate limiting
- *
- * @param handler - The handler function to wrap
- * @param options - The options for the rate limiter
- * @returns A new handler function with rate limiting - **THIS IS THE FUNCTION THAT SHOULD BE RETURNED
- *                                                      FROM THE HANDLER FILE.**
- *
- * @example
- * ```ts
- * export const GET = withRateLimit(async (req, context) => {
- *     return new Response('Hello, world!');
- * }, { maxRequests: 10, windowSizeInSeconds: 60 });
- * ```
- */
+// Middleware-friendly curried signature: withRateLimit(options)(handler)
 export function withRateLimit(
-    handler: (req: NextRequest, context?: any) => Promise<Response>,
     options: RateLimitOptions
-): (req: NextRequest, context?: any) => Promise<Response> {
-    return async (req: NextRequest, context?: any): Promise<Response> => {
-        logger.info('withRateLimit - guarded reqeust received', {
-            path: req.nextUrl.pathname,
-            method: req.method
-        });
+): <T extends (req: NextRequest, context?: any) => Promise<Response>>(
+    handler: T
+) => T {
+    return <T extends (req: NextRequest, context?: any) => Promise<Response>>(
+        handler: T
+    ): T => {
+        return (async (req: NextRequest, context?: any): Promise<Response> => {
+            logger.info('withRateLimit - guarded request received', {
+                path: req.nextUrl.pathname,
+                method: req.method
+            });
 
-        const rateLimiter = createRateLimiter(options);
-        let result: RateLimitResult;
+            const rateLimiter = createRateLimiter(options);
+            let result: RateLimitResult;
 
-        try {
-            const identifier = getAppRouterClientIdentifier(req);
-            result = await rateLimiter.checkLimit(identifier);
-        } catch (error: unknown) {
-            return NextResponse.json(
-                { error: 'app.error.default' },
-                { status: 500 }
-            );
-        }
+            try {
+                const identifier = getAppRouterClientIdentifier(req);
+                result = await rateLimiter.checkLimit(identifier);
+            } catch (error: unknown) {
+                return NextResponse.json(
+                    { error: 'app.error.default' },
+                    { status: 500 }
+                );
+            }
 
-        if (!result.allowed) {
-            const response = options.onRateLimitExceeded
-                ? options.onRateLimitExceeded(req)
-                : NextResponse.json(
-                      { error: 'app.error.too-many-requests' },
-                      { status: 429 }
-                  );
+            if (!result.allowed) {
+                const response = options.onRateLimitExceeded
+                    ? options.onRateLimitExceeded(req)
+                    : NextResponse.json(
+                          { error: 'app.error.too-many-requests' },
+                          { status: 429 }
+                      );
 
-            return response;
-        } else {
-            return await handler(req, context);
-        }
+                return response;
+            }
+
+            return handler(req, context);
+        }) as T;
     };
 }
 

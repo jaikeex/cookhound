@@ -1,9 +1,7 @@
 import { recipeService } from '@/server/services/recipe/service';
 import type { NextRequest } from 'next/server';
 import { NotFoundError, ValidationError } from '@/server/error';
-import { RequestContext } from '@/server/utils/reqwest/context';
-import { logRequest, logResponse } from '@/server/logger';
-import { handleServerError } from '@/server/utils/reqwest';
+import { makeHandler, ok } from '@/server/utils/reqwest';
 import { ApplicationErrorCode } from '@/server/error/codes';
 
 //|=============================================================================================|//
@@ -18,40 +16,31 @@ import { ApplicationErrorCode } from '@/server/error/codes';
  * - 404: Not Found, if the recipe is not found.
  * - 500: Internal Server Error, if there is another error during the fetching process.
  */
-export async function GET(request: NextRequest) {
-    return RequestContext.run(request, async () => {
-        try {
-            logRequest(request);
+export async function getHandler(request: NextRequest) {
+    const displayId = request.nextUrl.pathname.split('/').pop();
 
-            const displayId = request.nextUrl.pathname.split('/').pop();
+    /**
+     * Do NOT validate the params by schema here, requesting a recipe that does
+     * not exist should return a 404 error and be handled by the service, not a 400.
+     */
 
-            /**
-             * Do NOT validate the params by schema here, requesting a recipe that does
-             * not exist should return a 404 error and be handled by the service, not a 400.
-             */
+    if (!displayId) {
+        throw new ValidationError(
+            'app.error.bad-request',
+            ApplicationErrorCode.MISSING_FIELD
+        );
+    }
 
-            if (!displayId) {
-                throw new ValidationError(
-                    'app.error.bad-request',
-                    ApplicationErrorCode.MISSING_FIELD
-                );
-            }
+    const recipe = await recipeService.getRecipeByDisplayId(displayId);
 
-            const recipe = await recipeService.getRecipeByDisplayId(displayId);
+    if (!recipe) {
+        throw new NotFoundError(
+            'app.error.not-found',
+            ApplicationErrorCode.RECIPE_NOT_FOUND
+        );
+    }
 
-            if (!recipe) {
-                throw new NotFoundError(
-                    'app.error.not-found',
-                    ApplicationErrorCode.RECIPE_NOT_FOUND
-                );
-            }
-
-            const response = Response.json(recipe);
-
-            logResponse(response);
-            return response;
-        } catch (error: unknown) {
-            return handleServerError(error);
-        }
-    });
+    return ok(recipe);
 }
+
+export const GET = makeHandler(getHandler);

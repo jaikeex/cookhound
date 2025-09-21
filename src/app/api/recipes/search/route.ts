@@ -1,11 +1,9 @@
-import { RequestContext } from '@/server/utils/reqwest/context';
-import { logRequest, logResponse } from '@/server/logger';
-import { handleServerError } from '@/server/utils/reqwest';
 import type { NextRequest } from 'next/server';
 import { recipeService } from '@/server/services/recipe/service';
 import type { Locale } from '@/client/locales';
 import { z } from 'zod';
-import { validateQuery } from '@/server/utils/reqwest/validators';
+import { validateQuery } from '@/server/utils/reqwest';
+import { makeHandler, ok } from '@/server/utils/reqwest';
 
 //|=============================================================================================|//
 //?                                     VALIDATION SCHEMAS                                      ?//
@@ -29,28 +27,18 @@ const SearchRecipesSchema = z.strictObject({
  *
  * @returns A JSON response containing the search results.
  */
-export async function GET(request: NextRequest) {
-    return RequestContext.run(request, async () => {
-        try {
-            logRequest(request);
+export async function getHandler(request: NextRequest) {
+    const payload = validateQuery(SearchRecipesSchema, request.nextUrl);
 
-            const payload = validateQuery(SearchRecipesSchema, request.nextUrl);
+    const { query, language, perPage, batch } = payload;
 
-            const { query, language, perPage, batch } = payload;
+    const recipes = await recipeService.searchRecipes(
+        query,
+        language as Locale,
+        batch,
+        perPage
+    );
 
-            const recipes = await recipeService.searchRecipes(
-                query,
-                language as Locale,
-                batch,
-                perPage
-            );
-
-            const response = Response.json(recipes);
-
-            logResponse(response);
-            return response;
-        } catch (error: unknown) {
-            return handleServerError(error);
-        }
-    });
+    return ok(recipes);
 }
+export const GET = makeHandler(getHandler);

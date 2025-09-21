@@ -1,7 +1,7 @@
-import { logRequest, logResponse } from '@/server/logger';
 import { authService } from '@/server/services/auth/service';
 import { RequestContext } from '@/server/utils/reqwest/context';
-import { handleServerError } from '@/server/utils/reqwest';
+import { makeHandler, noContent } from '@/server/utils/reqwest';
+import { withAuth } from '@/server/utils/reqwest';
 
 //|=============================================================================================|//
 
@@ -14,29 +14,16 @@ import { handleServerError } from '@/server/utils/reqwest';
  * - 200: Success, with a success message.
  * - 500: Internal Server Error, if there is another error during logout.
  */
-export async function POST(request: Request) {
-    return RequestContext.run(request, async () => {
-        try {
-            logRequest(request);
+export async function postHandler() {
+    const sessionId = RequestContext.getSessionId();
 
-            const sessionId = RequestContext.getSessionId();
+    if (!sessionId) {
+        return noContent();
+    }
 
-            if (!sessionId) {
-                return Response.json({
-                    message: 'No session found'
-                });
-            }
+    await authService.logout(sessionId);
 
-            await authService.logout(sessionId);
-
-            const response = Response.json({
-                message: 'Logged out successfully'
-            });
-
-            logResponse(response);
-            return response;
-        } catch (error: unknown) {
-            return handleServerError(error);
-        }
-    });
+    return noContent();
 }
+
+export const POST = makeHandler(postHandler, withAuth);

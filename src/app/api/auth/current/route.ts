@@ -1,7 +1,5 @@
-import { logRequest, logResponse } from '@/server/logger';
 import { authService } from '@/server/services/auth/service';
-import { RequestContext } from '@/server/utils/reqwest/context';
-import { handleServerError } from '@/server/utils/reqwest';
+import { makeHandler, ok } from '@/server/utils/reqwest';
 
 //|=============================================================================================|//
 
@@ -15,18 +13,11 @@ import { handleServerError } from '@/server/utils/reqwest';
  * - 401: Unauthorized, if session is missing or invalid.
  * - 404: Not Found, if user from session does not exist.
  */
-export async function GET(request: Request) {
-    return RequestContext.run(request, async () => {
-        try {
-            logRequest(request);
+export async function getHandler() {
+    const user = await authService.getCurrentUser();
 
-            const user = await authService.getCurrentUser();
-            const response = Response.json(user);
-
-            logResponse(response);
-            return response;
-        } catch (error: unknown) {
-            return handleServerError(error);
-        }
-    });
+    return ok(user);
 }
+
+// Not using withAuth here on purpose. @see AuthService.getCurrentUser
+export const GET = makeHandler(getHandler);

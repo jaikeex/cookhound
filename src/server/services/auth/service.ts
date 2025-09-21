@@ -18,6 +18,7 @@ import { deleteSessionCookie, sessions } from '@/server/utils/session';
 import { RequestContext } from '@/server/utils/reqwest/context';
 import { ApplicationErrorCode } from '@/server/error/codes';
 import { createUserDTO } from '@/server/services/user/utils';
+import { assertAuthenticated } from '@/server/utils/reqwest';
 
 //|=============================================================================================|//
 
@@ -283,14 +284,7 @@ class AuthService {
      */
     @LogServiceMethod({ names: ['userId'] })
     async getCurrentUser(): Promise<UserDTO> {
-        const userId = RequestContext.getUserId();
-
-        if (!userId) {
-            log.trace('getCurrentUser - no token found');
-
-            deleteSessionCookie();
-            throw new AuthErrorUnauthorized();
-        }
+        const userId = assertAuthenticated();
 
         // This is true by definition
         const groups = ['self'] as UserVisibilityGroup[];

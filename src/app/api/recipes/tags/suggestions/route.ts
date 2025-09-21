@@ -1,11 +1,15 @@
-import { RequestContext } from '@/server/utils/reqwest/context';
-import { logRequest, logResponse } from '@/server/logger';
-import { handleServerError, validatePayload } from '@/server/utils/reqwest';
+import {
+    makeHandler,
+    ok,
+    readJson,
+    validatePayload
+} from '@/server/utils/reqwest';
 import { openaiApiService } from '@/server/services/openai-api/service';
 import type { NextRequest } from 'next/server';
 import { withRateLimit } from '@/server/utils/rate-limit';
 import { z } from 'zod';
 import type { RecipeDTO } from '@/common/types';
+import { withAuth } from '@/server/utils/reqwest';
 
 //|=============================================================================================|//
 //?                                     VALIDATION SCHEMAS                                      ?//
@@ -29,33 +33,24 @@ const RecipeForTagSuggestionPayloadSchema = z.looseObject({
     ingredients: z.array(IngredientForTagSuggestionSchema).min(1)
 });
 
-async function suggestionsHandler(request: NextRequest) {
-    return RequestContext.run(request, async () => {
-        try {
-            logRequest(request);
+async function postHandler(request: NextRequest) {
+    const rawPayload = await readJson(request);
 
-            const rawPayload = await request.json();
+    const payload = validatePayload(
+        RecipeForTagSuggestionPayloadSchema,
+        rawPayload
+    );
 
-            const payload = validatePayload(
-                RecipeForTagSuggestionPayloadSchema,
-                rawPayload
-            );
+    const tags = await openaiApiService.suggestRecipeTags(payload as RecipeDTO);
 
-            const tags = await openaiApiService.suggestRecipeTags(
-                payload as RecipeDTO
-            );
-
-            const response = Response.json(tags);
-
-            logResponse(response);
-            return response;
-        } catch (error: unknown) {
-            return handleServerError(error);
-        }
-    });
+    return ok(tags);
 }
 
-export const POST = withRateLimit(suggestionsHandler, {
-    maxRequests: 20,
-    windowSizeInSeconds: 600
-});
+export const POST = makeHandler(
+    postHandler,
+    withAuth,
+    withRateLimit({
+        maxRequests: 20,
+        windowSizeInSeconds: 600
+    })
+);

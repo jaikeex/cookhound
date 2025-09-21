@@ -13,7 +13,8 @@ export enum ServerErrorName {
     AuthErrorUnauthorized = 'AuthErrorUnauthorized',
     AuthErrorForbidden = 'AuthErrorForbidden',
     NotFoundError = 'NotFoundError',
-    ConflictError = 'ConflictError'
+    ConflictError = 'ConflictError',
+    PayloadTooLargeError = 'PayloadTooLargeError'
 }
 
 const serverErrorNames = Object.values(ServerErrorName);
@@ -136,6 +137,18 @@ export class ConflictError extends ClientError {
     ) {
         super(message, 409, code, cause);
         this.name = 'ConflictError';
+    }
+}
+
+/** 413 – Payload Too Large */
+export class PayloadTooLargeError extends ClientError {
+    constructor(
+        message: I18nMessage = 'app.error.payload-too-large',
+        code: ApplicationErrorCode = ApplicationErrorCode.PAYLOAD_TOO_LARGE,
+        cause?: unknown
+    ) {
+        super(message, 413, code, cause);
+        this.name = 'PayloadTooLargeError';
     }
 }
 

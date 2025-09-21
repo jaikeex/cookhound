@@ -1,10 +1,13 @@
 import { userService } from '@/server/services';
 import type { NextRequest } from 'next/server';
-import { handleServerError, validatePayload } from '@/server/utils/reqwest';
+import {
+    assertAnonymous,
+    created,
+    makeHandler,
+    readJson,
+    validatePayload
+} from '@/server/utils/reqwest';
 import { AuthErrorForbidden } from '@/server/error';
-import { logRequest, logResponse } from '@/server/logger';
-import { RequestContext } from '@/server/utils/reqwest/context';
-import { UserRole } from '@/common/types';
 import { z } from 'zod';
 import { ApplicationErrorCode } from '@/server/error/codes';
 
@@ -23,16 +26,6 @@ const UserForCreateSchema = z.strictObject({
 //|=============================================================================================|//
 
 /**
- * Handles GET requests to `/api/user` to fetch users.
- *
- * @returns A JSON response with a list of users.
- * @todo Implement the logic to fetch users.
- */
-export async function GET() {
-    return Response.json({ message: 'Hello, world!' });
-}
-
-/**
  * Handles POST requests to `/api/user` to create a new user.
  *
  * ! This endpoint is restricted and only accessible to guests.
@@ -45,41 +38,21 @@ export async function GET() {
  * - 409: Conflict, if the email or username is already taken.
  * - 500: Internal Server Error, if there is another error during user creation.
  */
-export async function POST(request: NextRequest) {
-    return RequestContext.run(request, async () => {
-        try {
-            logRequest(request);
+export async function postHandler(request: NextRequest) {
+    assertAnonymous(
+        new AuthErrorForbidden(
+            'auth.error.user-already-logged-in',
+            ApplicationErrorCode.ALREADY_LOGGED_IN
+        )
+    );
 
-            // Check if the user is already logged in.
-            if (RequestContext.getUserRole() !== UserRole.Guest) {
-                throw new AuthErrorForbidden(
-                    'auth.error.user-already-logged-in',
-                    ApplicationErrorCode.ALREADY_LOGGED_IN
-                );
-            }
+    const rawPayload = await readJson(request);
 
-            const rawPayload = await request.json();
+    const payload = validatePayload(UserForCreateSchema, rawPayload);
 
-            const payload = validatePayload(UserForCreateSchema, rawPayload);
+    const user = await userService.createUser(payload);
 
-            const user = await userService.createUser(payload);
-
-            const response = Response.json({ user }, { status: 201 });
-
-            logResponse(response);
-            return response;
-        } catch (error: unknown) {
-            return handleServerError(error);
-        }
-    });
+    return created(user);
 }
 
-/**
- * Handles PUT requests to `/api/user` to update a user.
- *
- * @returns A JSON response indicating the result of the update operation.
- * @todo Implement the logic to update a user.
- */
-export async function PUT() {
-    return Response.json({ message: 'Hello, world!' });
-}
+export const POST = makeHandler(postHandler);

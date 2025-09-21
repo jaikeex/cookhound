@@ -182,6 +182,7 @@
     "app.error.image-upload-failed": "Failed to upload image",
     "app.error.bad-request": "This action cannot be performed",
     "app.error.conflict": "Conflict – this action could not be completed",
+    "app.error.payload-too-large": "The data is too large",
     "app.error.infrastructure": "Service temporarily unavailable, please try again later",
     "app.cookies.modal.title": "Cookie settings",
     "app.cookies.modal.description": "Manage your cookie preferences below. Essential cookies are always enabled as they are necessary for the website to function properly.",

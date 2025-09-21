@@ -13,22 +13,22 @@ export function withAuth<
     const authGuard = async (
         ...args: Parameters<T>
     ): Promise<Awaited<ReturnType<T>>> => {
-        const [req] = args as Parameters<T>;
+        const userId = RequestContext.getUserId();
+        const userRole = RequestContext.getUserRole();
 
-        return RequestContext.run(req, async () => {
-            if (RequestContext.getUserRole() === UserRole.Guest) {
-                return handleServerError(new AuthErrorUnauthorized());
-            }
+        if (!userId || userRole === UserRole.Guest) {
+            return handleServerError(new AuthErrorUnauthorized()) as Awaited<
+                ReturnType<T>
+            >;
+        }
 
-            // Forward the original arguments to the wrapped handler
-            return (
-                handler as unknown as (
-                    ...a: Parameters<T>
-                ) => Awaited<ReturnType<T>>
-            )(...args);
-        }) as Awaited<ReturnType<T>>;
+        // Forward the original arguments to the wrapped handler
+        return (
+            handler as unknown as (
+                ...a: Parameters<T>
+            ) => Awaited<ReturnType<T>>
+        )(...args);
     };
 
-    // Cast is safe because `authGuard` preserves the handler's signature
     return authGuard as unknown as T;
 }

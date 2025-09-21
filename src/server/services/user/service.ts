@@ -19,13 +19,7 @@ import {
     ValidationError
 } from '@/server/error';
 import { type UserForGoogleCreate, type UserForLocalCreate } from './types';
-import {
-    createUserDTO,
-    getUserDataPermissionGroups,
-    assertAuthenticated,
-    assertSelf,
-    assertSelfOrAdmin
-} from './utils';
+import { createUserDTO, getUserDataPermissionGroups } from './utils';
 import db, { getUserSelect } from '@/server/db/model';
 import { Logger } from '@/server/logger';
 import { LogServiceMethod } from '@/server/logger';
@@ -67,19 +61,6 @@ class UserService {
     @LogServiceMethod({ success: 'notice', names: ['payload'] })
     async createUser(payload: UserForCreatePayload): Promise<UserDTO> {
         const { email, password, username } = payload;
-
-        if (!email || !password || !username) {
-            log.warn('createUser - missing required fields', {
-                email,
-                password,
-                username
-            });
-
-            throw new ValidationError(
-                'auth.error.email-password-username-required',
-                ApplicationErrorCode.MISSING_FIELD
-            );
-        }
 
         const existingUser = await db.user.getOneByEmailOrUsername(
             email,
@@ -212,8 +193,6 @@ class UserService {
 
     @LogServiceMethod({ names: ['userId'] })
     async getShoppingList(userId: number): Promise<ShoppingListDTO[]> {
-        assertSelf(userId);
-
         const shoppingList = await db.shoppingList.getShoppingList(userId);
 
         const recipeIdList = shoppingList.map((item) => item.recipeId);
@@ -278,8 +257,6 @@ class UserService {
             );
         }
 
-        assertSelf(userId);
-
         for (const i of ingredients) {
             const ingredient = await db.ingredient.getOneById(i.id);
 
@@ -334,8 +311,6 @@ class UserService {
             );
         }
 
-        assertSelf(userId);
-
         await db.shoppingList.deleteShoppingList(userId, recipeId);
 
         if (updates.length === 0) {
@@ -356,8 +331,6 @@ class UserService {
 
     @LogServiceMethod({ names: ['userId', 'recipeId'] })
     async deleteShoppingList(userId: number, recipeId?: number): Promise<void> {
-        assertSelf(userId);
-
         await db.shoppingList.deleteShoppingList(userId, recipeId);
 
         return;
@@ -369,8 +342,6 @@ class UserService {
 
     @LogServiceMethod({ names: ['userId'] })
     async getLastViewedRecipes(userId: number): Promise<RecipeForDisplayDTO[]> {
-        assertSelf(userId);
-
         const recipes = await db.user.getLastViewedRecipes(userId);
 
         if (!recipes || recipes.length === 0) {
@@ -401,8 +372,6 @@ class UserService {
         userId: number,
         payload: Partial<UserForCreatePayload>
     ): Promise<UserDTO> {
-        assertSelfOrAdmin(userId);
-
         const user = await db.user.updateOneById(userId, payload);
 
         if (!user) {
@@ -427,9 +396,6 @@ class UserService {
         userId: number,
         payload: CookieConsentForCreate
     ): Promise<CookieConsent> {
-        assertAuthenticated();
-        assertSelf(userId);
-
         const user = await this.getUserById(userId);
 
         if (!user) {
@@ -529,9 +495,6 @@ class UserService {
         userId: number,
         preferences: UserPreferences
     ): Promise<void> {
-        assertAuthenticated();
-        assertSelf(userId);
-
         const user = await this.getUserById(userId);
 
         if (!user) {
@@ -630,11 +593,12 @@ class UserService {
             );
         }
 
-        const userId = assertAuthenticated();
-
-        const groups = getUserDataPermissionGroups(userId);
-        const userSelect = getUserSelect(groups);
-        const user = await db.user.getOneByEmail(email, userSelect);
+        const user = await db.user.getOneByEmail(email, {
+            id: true,
+            email: true,
+            username: true,
+            emailVerified: true
+        });
 
         if (!user) {
             log.warn('resendVerificationEmail - user not found', { email });
@@ -692,11 +656,10 @@ class UserService {
             );
         }
 
-        const userId = assertAuthenticated();
-
-        const groups = getUserDataPermissionGroups(userId);
-        const userSelect = getUserSelect(groups);
-        const user = await db.user.getOneByEmail(email, userSelect);
+        const user = await db.user.getOneByEmail(
+            email,
+            getUserSelect(['self'])
+        );
 
         if (!user) {
             log.info('sendPasswordResetEmail - user not found', { email });
@@ -844,16 +807,6 @@ class UserService {
         //?                                       GUARDS                                        ?//
         //|-------------------------------------------------------------------------------------|//
 
-        assertSelf(userId);
-
-        if (!newEmail) {
-            log.warn('initiateEmailChange - missing email');
-            throw new ValidationError(
-                'auth.error.email-required',
-                ApplicationErrorCode.MISSING_FIELD
-            );
-        }
-
         if (!currentPassword) {
             log.warn('initiateEmailChange - missing password');
             throw new ValidationError(
@@ -957,13 +910,6 @@ class UserService {
         //?                                       GUARDS                                        ?//
         //|-------------------------------------------------------------------------------------|//
 
-        if (!token) {
-            throw new ValidationError(
-                'auth.error.missing-token',
-                ApplicationErrorCode.MISSING_FIELD
-            );
-        }
-
         const request = await db.user.getEmailChangeRequestByToken(token);
 
         if (!request) {
@@ -1007,11 +953,28 @@ class UserService {
 
         await db.user.applyEmailChange(user.id, request.newEmail, token);
 
-        await mailService.sendEmailChangedAudit(
-            oldEmail,
-            request.newEmail,
-            user.username
-        );
+        //|-------------------------------------------------------------------------------------|//
+        //?                                 AUDIT NOTIFICATION                                  ?//
+        ///
+        //# Send audit email outside the DB transaction. If the job enqueue fails we
+        //# do not want to roll back the already committed email change, that would
+        //# leave the system in an inconsistent state from the user’s perspective.
+        ///
+        //|-------------------------------------------------------------------------------------|//
+
+        try {
+            await mailService.sendEmailChangedAudit(
+                oldEmail,
+                request.newEmail,
+                user.username
+            );
+        } catch (mailError: unknown) {
+            log.error('confirmEmailChange - failed to enqueue audit email', {
+                mailError,
+                userId: user.id,
+                token
+            });
+        }
 
         const updated = await db.user.getOneById(
             user.id,

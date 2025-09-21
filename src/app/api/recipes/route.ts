@@ -1,14 +1,17 @@
-import { logRequest, logResponse } from '@/server/logger';
 import { recipeService } from '@/server/services/recipe/service';
-import { RequestContext } from '@/server/utils/reqwest/context';
-import { handleServerError, validatePayload } from '@/server/utils/reqwest';
+import {
+    created,
+    makeHandler,
+    ok,
+    readJson,
+    validatePayload
+} from '@/server/utils/reqwest';
 import type { NextRequest } from 'next/server';
-import { NextResponse } from 'next/server';
 import { withRateLimit } from '@/server/utils/rate-limit';
-import { withAuth } from '@/server/utils/session/with-auth';
+import { withAuth } from '@/server/utils/reqwest';
 import type { Locale } from '@/client/locales';
 import { z } from 'zod';
-import { validateQuery } from '@/server/utils/reqwest/validators';
+import { validateQuery } from '@/server/utils/reqwest';
 
 //|=============================================================================================|//
 //?                                     VALIDATION SCHEMAS                                      ?//
@@ -54,32 +57,18 @@ const RecipeForCreatePayloadSchema = z.strictObject({
  * @param request The incoming HTTP request.
  * @returns A JSON response containing the paginated list of recipes.
  */
-export async function GET(request: NextRequest) {
-    return RequestContext.run(request, async () => {
-        try {
-            logRequest(request);
+export async function getHandler(request: NextRequest) {
+    const payload = validateQuery(FrontPageRecipesSchema, request.nextUrl);
 
-            const payload = validateQuery(
-                FrontPageRecipesSchema,
-                request.nextUrl
-            );
+    const { language, batch, perPage } = payload;
 
-            const { language, batch, perPage } = payload;
+    const recipes = await recipeService.getFrontPageRecipes(
+        language as Locale,
+        batch,
+        perPage
+    );
 
-            const recipes = await recipeService.getFrontPageRecipes(
-                language as Locale,
-                batch,
-                perPage
-            );
-
-            const response = NextResponse.json(recipes);
-
-            logResponse(response);
-            return response;
-        } catch (error: unknown) {
-            return handleServerError(error);
-        }
-    });
+    return ok(recipes);
 }
 
 /**
@@ -94,32 +83,23 @@ export async function GET(request: NextRequest) {
  * - 400: Bad Request, if the payload validation fails.
  * - 500: Internal Server Error, if there is another error during the creation process.
  */
-async function createRecipeHandler(request: NextRequest) {
-    return RequestContext.run(request, async () => {
-        try {
-            logRequest(request);
+async function postHandler(request: NextRequest) {
+    const rawPayload = await readJson(request);
 
-            const rawPayload = await request.json();
+    const payload = validatePayload(RecipeForCreatePayloadSchema, rawPayload);
 
-            const payload = validatePayload(
-                RecipeForCreatePayloadSchema,
-                rawPayload
-            );
+    const recipe = await recipeService.createRecipe(payload);
 
-            const recipe = await recipeService.createRecipe(payload);
-
-            const response = Response.json(recipe, { status: 201 });
-
-            logResponse(response);
-
-            return response;
-        } catch (error: unknown) {
-            return handleServerError(error);
-        }
-    });
+    return created(recipe, { status: 201 });
 }
 
-export const POST = withRateLimit(withAuth(createRecipeHandler), {
-    maxRequests: 20,
-    windowSizeInSeconds: 600
-});
+export const GET = makeHandler(getHandler);
+
+export const POST = makeHandler(
+    postHandler,
+    withAuth,
+    withRateLimit({
+        maxRequests: 20,
+        windowSizeInSeconds: 600
+    })
+);

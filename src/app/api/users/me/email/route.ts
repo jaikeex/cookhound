@@ -1,20 +1,25 @@
-import { AuthErrorUnauthorized, ValidationError } from '@/server/error/server';
-import { logRequest, logResponse } from '@/server/logger';
+import { ValidationError } from '@/server/error/server';
 import { userService } from '@/server/services';
 import { withRateLimit } from '@/server/utils/rate-limit';
-import { RequestContext } from '@/server/utils/reqwest/context';
-import { handleServerError, validatePayload } from '@/server/utils/reqwest';
+import {
+    assertAuthenticated,
+    makeHandler,
+    noContent,
+    ok,
+    readJson,
+    validatePayload
+} from '@/server/utils/reqwest';
 import type { NextRequest } from 'next/server';
 import { z } from 'zod';
 import { ApplicationErrorCode } from '@/server/error/codes';
-import { withAuth } from '@/server/utils/session/with-auth';
+import { withAuth } from '@/server/utils/reqwest';
 
 //|=============================================================================================|//
 //?                                     VALIDATION SCHEMAS                                      ?//
 //|=============================================================================================|//
 
 const ChangeEmailSchema = z.strictObject({
-    newEmail: z.string().email().trim(),
+    newEmail: z.email().trim(),
     password: z.string().min(1).max(100).trim()
 });
 
@@ -30,42 +35,21 @@ const ChangeEmailSchema = z.strictObject({
  * @param request - The incoming Next.js request object.
  * @returns 204 No Content on success.
  */
-async function initiateEmailChangeHandler(request: NextRequest) {
-    return RequestContext.run(request, async () => {
-        try {
-            logRequest(request);
+async function postHandler(request: NextRequest) {
+    const userId = assertAuthenticated();
 
-            const userId = RequestContext.getUserId();
+    const rawPayload = await readJson(request);
 
-            if (!userId) {
-                throw new AuthErrorUnauthorized();
-            }
+    const payload = validatePayload(ChangeEmailSchema, rawPayload);
 
-            const rawPayload = await request.json();
+    await userService.initiateEmailChange(
+        userId,
+        payload.newEmail,
+        payload.password
+    );
 
-            const payload = validatePayload(ChangeEmailSchema, rawPayload);
-
-            await userService.initiateEmailChange(
-                userId,
-                payload.newEmail,
-                payload.password
-            );
-
-            const response = new Response(null, { status: 204 });
-
-            logResponse(response);
-
-            return response;
-        } catch (error: unknown) {
-            return handleServerError(error);
-        }
-    });
+    return noContent();
 }
-
-export const POST = withRateLimit(withAuth(initiateEmailChangeHandler), {
-    maxRequests: 5,
-    windowSizeInSeconds: 60 * 60 // 1 hour
-});
 
 /**
  * Handles PUT requests to `/api/users/me/email` to confirm an e-mail change via token.
@@ -73,29 +57,34 @@ export const POST = withRateLimit(withAuth(initiateEmailChangeHandler), {
  * @param request - The incoming Next.js request object.
  * @returns 200 OK with updated `UserDTO` on success.
  */
-export async function PUT(request: NextRequest) {
-    return RequestContext.run(request, async () => {
-        try {
-            logRequest(request);
+export async function putHandler(request: NextRequest) {
+    const token = request.nextUrl.searchParams.get('token');
 
-            const token = request.nextUrl.searchParams.get('token');
+    if (!token) {
+        throw new ValidationError(
+            undefined,
+            ApplicationErrorCode.MISSING_FIELD
+        );
+    }
 
-            if (!token) {
-                throw new ValidationError(
-                    undefined,
-                    ApplicationErrorCode.MISSING_FIELD
-                );
-            }
+    const updatedUser = await userService.confirmEmailChange(token);
 
-            const updatedUser = await userService.confirmEmailChange(token);
-
-            const response = Response.json(updatedUser);
-
-            logResponse(response);
-
-            return response;
-        } catch (error: unknown) {
-            return handleServerError(error);
-        }
-    });
+    return ok(updatedUser);
 }
+
+export const POST = makeHandler(
+    postHandler,
+    withAuth,
+    withRateLimit({
+        maxRequests: 5,
+        windowSizeInSeconds: 60 * 60 // 1 hour
+    })
+);
+
+export const PUT = makeHandler(
+    putHandler,
+    withRateLimit({
+        maxRequests: 20,
+        windowSizeInSeconds: 60 // 1 minute
+    })
+);

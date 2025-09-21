@@ -66,7 +66,7 @@ export const setCookie = (
     document.cookie = cookie.serialize(name, encodeURIComponent(value), {
         ...other,
         sameSite:
-            (sameSite?.toLowerCase() as 'lax' | 'strict' | 'none') ?? undefined,
+            (sameSite?.toLowerCase() as 'lax' | 'strict' | 'none') ?? 'lax',
         maxAge,
         expires:
             typeof maxAge === 'number'

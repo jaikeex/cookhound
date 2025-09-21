@@ -1,7 +1,10 @@
 import type { NextRequest } from 'next/server';
-import { RequestContext } from '@/server/utils/reqwest/context';
-import { handleServerError, validatePayload } from '@/server/utils/reqwest';
-import { logRequest, logResponse } from '@/server/logger';
+import {
+    makeHandler,
+    noContent,
+    readJson,
+    validatePayload
+} from '@/server/utils/reqwest';
 import { userService } from '@/server/services/user/service';
 import { z } from 'zod';
 
@@ -29,32 +32,16 @@ const ResetPasswordSchema = z.strictObject({
  * @returns A JSON response with a message indicating that the password reset email has been sent.
  * @throws {Error} Throws an error if the request fails.
  */
-export async function POST(request: NextRequest) {
-    return RequestContext.run(request, async () => {
-        try {
-            logRequest(request);
+export async function postHandler(request: NextRequest) {
+    const rawPayload = await readJson(request);
 
-            const rawPayload = await request.json();
+    const payload = validatePayload(SendResetPasswordEmailSchema, rawPayload);
 
-            const payload = validatePayload(
-                SendResetPasswordEmailSchema,
-                rawPayload
-            );
+    const { email } = payload;
 
-            const { email } = payload;
+    await userService.sendPasswordResetEmail(email);
 
-            await userService.sendPasswordResetEmail(email);
-
-            const response = Response.json({
-                message: 'Password reset email sent'
-            });
-
-            logResponse(response);
-            return response;
-        } catch (error: unknown) {
-            return handleServerError(error);
-        }
-    });
+    return noContent();
 }
 
 /**
@@ -64,27 +51,17 @@ export async function POST(request: NextRequest) {
  * @returns A JSON response with a message indicating that the password reset was successful.
  * @throws {Error} Throws an error if the request fails.
  */
-export async function PUT(request: NextRequest) {
-    return RequestContext.run(request, async () => {
-        try {
-            logRequest(request);
+export async function putHandler(request: NextRequest) {
+    const rawPayload = await readJson(request);
 
-            const rawPayload = await request.json();
+    const payload = validatePayload(ResetPasswordSchema, rawPayload);
 
-            const payload = validatePayload(ResetPasswordSchema, rawPayload);
+    const { token, password } = payload;
 
-            const { token, password } = payload;
+    await userService.resetPassword(token, password);
 
-            await userService.resetPassword(token, password);
-
-            const response = Response.json({
-                message: 'Password reset successful'
-            });
-
-            logResponse(response);
-            return response;
-        } catch (error: unknown) {
-            return handleServerError(error);
-        }
-    });
+    return noContent();
 }
+
+export const POST = makeHandler(postHandler);
+export const PUT = makeHandler(putHandler);

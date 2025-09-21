@@ -174,6 +174,7 @@
     "app.error.image-upload-failed": "Nahrání obrázku selhalo",
     "app.error.bad-request": "Tuto akci nelze provést",
     "app.error.conflict": "Konflikt – akci nelze dokončit",
+    "app.error.payload-too-large": "Data jsou příliš velká",
     "app.error.infrastructure": "Služba není momentálně dostupná, zkuste to prosím později",
     "app.cookies.modal.title": "Nastavení cookies",
     "app.cookies.modal.description": "Spravujte svá nastavení cookies níže. Některé soubory cookie jsou vždy povoleny, protože jsou nezbytné pro správné fungování tohoto webu.",

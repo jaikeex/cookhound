@@ -2,6 +2,7 @@ import { isServerError } from '@/server/error';
 import { logErrorResponse, Logger } from '@/server/logger';
 import { RequestContext } from './context';
 import { ApplicationErrorCode } from '@/server/error/codes';
+import { NextResponse } from 'next/server';
 
 const log = Logger.getInstance('api');
 
@@ -14,7 +15,7 @@ const log = Logger.getInstance('api');
  * @param error the error object to be handled
  * @returns 'sanitized' response object with message, status and other metadata.
  */
-export function handleServerError(error: unknown) {
+export function handleServerError(error: unknown): NextResponse<ErrorResponse> {
     const requestId = RequestContext.getRequestId() ?? 'unknown';
 
     /**
@@ -45,5 +46,5 @@ export function handleServerError(error: unknown) {
 
     logErrorResponse(response);
 
-    return Response.json(response, { status: response.status });
+    return NextResponse.json(response, { status: response.status });
 }

@@ -1,13 +1,15 @@
 import type { NextRequest } from 'next/server';
-import { RequestContext } from '@/server/utils/reqwest/context';
 import {
-    handleServerError,
+    assertSelf,
+    makeHandler,
+    noContent,
+    ok,
+    readJson,
     validateParams,
     validatePayload
 } from '@/server/utils/reqwest';
-import { logRequest, logResponse } from '@/server/logger';
 import { userService } from '@/server/services/user/service';
-import { withAuth } from '@/server/utils/session/with-auth';
+import { withAuth } from '@/server/utils/reqwest';
 import { z } from 'zod';
 
 //|=============================================================================================|//
@@ -45,26 +47,15 @@ const ShoppingListParamsSchema = z.strictObject({
  * @throws {Error} Throws an error if the request fails.
  */
 async function getHandler(request: NextRequest) {
-    return RequestContext.run(request, async () => {
-        try {
-            logRequest(request);
-
-            const { userId } = validateParams(ShoppingListParamsSchema, {
-                userId: request.nextUrl.pathname.split('/').at(-2)
-            });
-
-            const shoppingList = await userService.getShoppingList(
-                Number(userId)
-            );
-
-            const response = Response.json(shoppingList);
-
-            logResponse(response);
-            return response;
-        } catch (error: unknown) {
-            return handleServerError(error);
-        }
+    const { userId } = validateParams(ShoppingListParamsSchema, {
+        userId: request.nextUrl.pathname.split('/').at(-2)
     });
+
+    assertSelf(Number(userId));
+
+    const shoppingList = await userService.getShoppingList(Number(userId));
+
+    return ok(shoppingList);
 }
 
 /**
@@ -75,35 +66,23 @@ async function getHandler(request: NextRequest) {
  * @throws {Error} Throws an error if the request fails.
  */
 async function postHandler(request: NextRequest) {
-    return RequestContext.run(request, async () => {
-        try {
-            logRequest(request);
-
-            const { userId } = validateParams(ShoppingListParamsSchema, {
-                userId: request.nextUrl.pathname.split('/').at(-2)
-            });
-
-            const rawPayload = await request.json();
-
-            const payload = validatePayload(
-                ShoppingListPayloadSchema,
-                rawPayload
-            );
-
-            const shoppingList = await userService.createShoppingList(
-                Number(userId),
-                payload.recipeId,
-                payload.ingredients
-            );
-
-            const response = Response.json(shoppingList);
-
-            logResponse(response);
-            return response;
-        } catch (error: unknown) {
-            return handleServerError(error);
-        }
+    const { userId } = validateParams(ShoppingListParamsSchema, {
+        userId: request.nextUrl.pathname.split('/').at(-2)
     });
+
+    assertSelf(Number(userId));
+
+    const rawPayload = await readJson(request);
+
+    const payload = validatePayload(ShoppingListPayloadSchema, rawPayload);
+
+    const shoppingList = await userService.createShoppingList(
+        Number(userId),
+        payload.recipeId,
+        payload.ingredients
+    );
+
+    return ok(shoppingList);
 }
 
 /**
@@ -114,35 +93,23 @@ async function postHandler(request: NextRequest) {
  * @throws {Error} Throws an error if the request fails.
  */
 async function putHandler(request: NextRequest) {
-    return RequestContext.run(request, async () => {
-        try {
-            logRequest(request);
-
-            const { userId } = validateParams(ShoppingListParamsSchema, {
-                userId: request.nextUrl.pathname.split('/').at(-2)
-            });
-
-            const rawPayload = await request.json();
-
-            const payload = validatePayload(
-                ShoppingListPayloadSchema,
-                rawPayload
-            );
-
-            const shoppingList = await userService.updateShoppingList(
-                Number(userId),
-                payload.recipeId,
-                payload.ingredients
-            );
-
-            const response = Response.json(shoppingList);
-
-            logResponse(response);
-            return response;
-        } catch (error: unknown) {
-            return handleServerError(error);
-        }
+    const { userId } = validateParams(ShoppingListParamsSchema, {
+        userId: request.nextUrl.pathname.split('/').at(-2)
     });
+
+    const rawPayload = await readJson(request);
+
+    assertSelf(Number(userId));
+
+    const payload = validatePayload(ShoppingListPayloadSchema, rawPayload);
+
+    const shoppingList = await userService.updateShoppingList(
+        Number(userId),
+        payload.recipeId,
+        payload.ingredients
+    );
+
+    return ok(shoppingList);
 }
 
 /**
@@ -153,39 +120,28 @@ async function putHandler(request: NextRequest) {
  * @throws {Error} Throws an error if the request fails.
  */
 async function deleteHandler(request: NextRequest) {
-    return RequestContext.run(request, async () => {
-        try {
-            logRequest(request);
-
-            const { userId } = validateParams(ShoppingListParamsSchema, {
-                userId: request.nextUrl.pathname.split('/').at(-2)
-            });
-
-            const rawPayload = await request.json();
-
-            const payload = validatePayload(
-                DeleteShoppingListPayloadSchema,
-                rawPayload
-            );
-
-            await userService.deleteShoppingList(
-                Number(userId),
-                payload.recipeId ?? undefined
-            );
-
-            const response = Response.json({
-                message: 'Shopping list deleted'
-            });
-
-            logResponse(response);
-            return response;
-        } catch (error: unknown) {
-            return handleServerError(error);
-        }
+    const { userId } = validateParams(ShoppingListParamsSchema, {
+        userId: request.nextUrl.pathname.split('/').at(-2)
     });
+
+    assertSelf(Number(userId));
+
+    const rawPayload = await readJson(request);
+
+    const payload = validatePayload(
+        DeleteShoppingListPayloadSchema,
+        rawPayload
+    );
+
+    await userService.deleteShoppingList(
+        Number(userId),
+        payload.recipeId ?? undefined
+    );
+
+    return noContent();
 }
 
-export const GET = withAuth(getHandler);
-export const POST = withAuth(postHandler);
-export const PUT = withAuth(putHandler);
-export const DELETE = withAuth(deleteHandler);
+export const GET = makeHandler(getHandler, withAuth);
+export const POST = makeHandler(postHandler, withAuth);
+export const PUT = makeHandler(putHandler, withAuth);
+export const DELETE = makeHandler(deleteHandler, withAuth);

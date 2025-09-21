@@ -1,12 +1,16 @@
 import { recipeService } from '@/server/services/recipe/service';
 import type { NextRequest } from 'next/server';
 import { NotFoundError, ValidationError } from '@/server/error';
-import { withAuth } from '@/server/utils/session/with-auth';
-import { RequestContext } from '@/server/utils/reqwest/context';
-import { logRequest, logResponse } from '@/server/logger';
-import { handleServerError, validatePayload } from '@/server/utils/reqwest';
+import {
+    makeHandler,
+    noContent,
+    ok,
+    readJson,
+    withAuth
+} from '@/server/utils/reqwest';
+import { validatePayload } from '@/server/utils/reqwest';
 import { ApplicationErrorCode } from '@/server/error/codes';
-import z from 'zod';
+import { z } from 'zod';
 
 //|=============================================================================================|//
 //?                                     VALIDATION SCHEMAS                                      ?//
@@ -49,42 +53,31 @@ const RecipeForUpdateSchema = z.strictObject({
  * - 404: Not Found, if the recipe is not found.
  * - 500: Internal Server Error, if there is another error during the fetching process.
  */
-export async function GET(request: NextRequest) {
-    return RequestContext.run(request, async () => {
-        try {
-            logRequest(request);
+export async function getHandler(request: NextRequest) {
+    /**
+     * Do NOT validate the params by schema here, requesting a recipe that does
+     * not exist should return a 404 error and be handled by the service, not a 400.
+     */
 
-            /**
-             * Do NOT validate the params by schema here, requesting a recipe that does
-             * not exist should return a 404 error and be handled by the service, not a 400.
-             */
+    const id = request.nextUrl.pathname.split('/').pop();
 
-            const id = request.nextUrl.pathname.split('/').pop();
+    if (!id || isNaN(Number(id))) {
+        throw new ValidationError(
+            'app.error.bad-request',
+            ApplicationErrorCode.MISSING_FIELD
+        );
+    }
 
-            if (!id || isNaN(Number(id))) {
-                throw new ValidationError(
-                    'app.error.bad-request',
-                    ApplicationErrorCode.MISSING_FIELD
-                );
-            }
+    const recipe = await recipeService.getRecipeById(Number(id));
 
-            const recipe = await recipeService.getRecipeById(Number(id));
+    if (!recipe) {
+        throw new NotFoundError(
+            'app.error.not-found',
+            ApplicationErrorCode.RECIPE_NOT_FOUND
+        );
+    }
 
-            if (!recipe) {
-                throw new NotFoundError(
-                    'app.error.not-found',
-                    ApplicationErrorCode.RECIPE_NOT_FOUND
-                );
-            }
-
-            const response = Response.json(recipe);
-
-            logResponse(response);
-            return response;
-        } catch (error: unknown) {
-            return handleServerError(error);
-        }
-    });
+    return ok(recipe);
 }
 
 /**
@@ -99,37 +92,22 @@ export async function GET(request: NextRequest) {
  * - 500: Internal Server Error, if there is another error during the updating process.
  */
 async function putHandler(request: NextRequest) {
-    return RequestContext.run(request, async () => {
-        try {
-            logRequest(request);
+    const id = request.nextUrl.pathname.split('/').pop();
 
-            const id = request.nextUrl.pathname.split('/').pop();
+    if (!id || isNaN(Number(id))) {
+        throw new ValidationError(
+            'app.error.bad-request',
+            ApplicationErrorCode.MISSING_FIELD
+        );
+    }
 
-            if (!id || isNaN(Number(id))) {
-                throw new ValidationError(
-                    'app.error.bad-request',
-                    ApplicationErrorCode.MISSING_FIELD
-                );
-            }
+    const rawPayload = await readJson(request);
 
-            const rawPayload = await request.json();
+    const payload = validatePayload(RecipeForUpdateSchema, rawPayload);
 
-            const payload = validatePayload(RecipeForUpdateSchema, rawPayload);
+    const recipe = await recipeService.updateRecipe(Number(id), payload);
 
-            const recipe = await recipeService.updateRecipe(
-                Number(id),
-                payload
-            );
-
-            const response = Response.json(recipe);
-
-            logResponse(response);
-
-            return response;
-        } catch (error: unknown) {
-            return handleServerError(error);
-        }
-    });
+    return ok(recipe);
 }
 
 /**
@@ -144,32 +122,20 @@ async function putHandler(request: NextRequest) {
  * - 500: Internal Server Error, if there is another error during the deletion process.
  */
 async function deleteHandler(request: NextRequest) {
-    return RequestContext.run(request, async () => {
-        try {
-            logRequest(request);
+    const id = request.nextUrl.pathname.split('/').pop();
 
-            const id = request.nextUrl.pathname.split('/').pop();
+    if (!id || isNaN(Number(id))) {
+        throw new ValidationError(
+            'app.error.bad-request',
+            ApplicationErrorCode.MISSING_FIELD
+        );
+    }
 
-            if (!id || isNaN(Number(id))) {
-                throw new ValidationError(
-                    'app.error.bad-request',
-                    ApplicationErrorCode.MISSING_FIELD
-                );
-            }
+    await recipeService.deleteRecipe(Number(id));
 
-            await recipeService.deleteRecipe(Number(id));
-
-            const response = Response.json({
-                message: 'Recipe deleted successfully'
-            });
-
-            logResponse(response);
-            return response;
-        } catch (error: unknown) {
-            return handleServerError(error);
-        }
-    });
+    return noContent();
 }
 
-export const PUT = withAuth(putHandler);
-export const DELETE = withAuth(deleteHandler);
+export const GET = makeHandler(getHandler);
+export const PUT = makeHandler(putHandler, withAuth);
+export const DELETE = makeHandler(deleteHandler, withAuth);

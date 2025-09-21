@@ -1,13 +1,11 @@
-import { RequestContext } from '@/server/utils/reqwest/context';
-import { logRequest, logResponse } from '@/server/logger';
-import { handleServerError } from '@/server/utils/reqwest';
 import type { NextRequest } from 'next/server';
 import { recipeService } from '@/server/services/recipe/service';
 import type { Locale } from '@/client/locales';
 import { z } from 'zod';
-import { validateQuery } from '@/server/utils/reqwest/validators';
+import { validateQuery } from '@/server/utils/reqwest';
 import { ApplicationErrorCode } from '@/server/error/codes';
 import { ValidationError } from '@/server/error/server';
+import { makeHandler, ok } from '@/server/utils/reqwest';
 
 //|=============================================================================================|//
 //?                                     VALIDATION SCHEMAS                                      ?//
@@ -35,41 +33,29 @@ const SearchRecipesByUserSchema = z.strictObject({
  * - 400: Bad Request, if the user ID is not a number.
  * - 500: Internal Server Error, if there is another error during the fetching process.
  */
-export async function GET(request: NextRequest) {
-    return RequestContext.run(request, async () => {
-        try {
-            logRequest(request);
+export async function getHandler(request: NextRequest) {
+    const userId = request.nextUrl.pathname.split('/').at(-2);
 
-            const userId = request.nextUrl.pathname.split('/').at(-2);
+    if (!userId || isNaN(Number(userId))) {
+        throw new ValidationError(
+            'app.error.bad-request',
+            ApplicationErrorCode.MISSING_FIELD
+        );
+    }
 
-            if (!userId || isNaN(Number(userId))) {
-                throw new ValidationError(
-                    'app.error.bad-request',
-                    ApplicationErrorCode.MISSING_FIELD
-                );
-            }
+    const payload = validateQuery(SearchRecipesByUserSchema, request.nextUrl);
 
-            const payload = validateQuery(
-                SearchRecipesByUserSchema,
-                request.nextUrl
-            );
+    const { query, language, perPage, batch } = payload;
 
-            const { query, language, perPage, batch } = payload;
+    const recipes = await recipeService.searchUserRecipes(
+        Number(userId),
+        query,
+        language as Locale,
+        batch,
+        perPage
+    );
 
-            const recipes = await recipeService.searchUserRecipes(
-                Number(userId),
-                query,
-                language as Locale,
-                batch,
-                perPage
-            );
-
-            const response = Response.json(recipes);
-
-            logResponse(response);
-            return response;
-        } catch (error: unknown) {
-            return handleServerError(error);
-        }
-    });
+    return ok(recipes);
 }
+
+export const GET = makeHandler(getHandler);
