@@ -25,7 +25,7 @@
         "ecmaVersion": "latest",
         "sourceType": "module"
     },
-    "plugins": ["react", "@typescript-eslint"],
+    "plugins": ["react", "@typescript-eslint", "cookhound"],
     "ignorePatterns": [
         "tailwind.config.js",
         "postcss.config.js",
@@ -83,6 +83,9 @@
             }
         ],
         "react/jsx-closing-bracket-location": [2, "tag-aligned"],
+        //~ Custom Cookhound rules
+        "cookhound/require-make-handler": "error",
+        "cookhound/no-raw-request-json": "error",
         //~ General rules
         "prefer-const": "error",
         "react/prop-types": "off",

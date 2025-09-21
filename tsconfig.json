@@ -32,7 +32,9 @@
         "**/*.tsx",
         ".next/types/**/*.ts",
         "next.config.mjs",
-        "src/server/queues/worker.ts"
+        "src/server/queues/worker.ts",
+        "libs/**/*.ts",
+        "libs/**/*.js"
     ],
     "exclude": ["node_modules", "./src/stories/**", "./scripts", "./docs"]
 }
