@@ -1,7 +1,6 @@
 export * from './Button';
 export * from './Card';
 export * from './ConsentRow';
-export * from './Footer';
 export * from './Form';
 export * from './IngredientRow';
 export * from './InstructionRow';

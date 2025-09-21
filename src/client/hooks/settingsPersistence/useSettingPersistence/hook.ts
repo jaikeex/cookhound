@@ -122,10 +122,7 @@ export const useSettingPersistence = <T>(
         }
 
         setCookie(storageKey, serialized, {
-            maxAge: cookieMaxAge,
-            secure:
-                typeof window !== 'undefined' &&
-                window.location.protocol === 'https:'
+            maxAge: cookieMaxAge
         });
 
         if (typeof window !== 'undefined') {

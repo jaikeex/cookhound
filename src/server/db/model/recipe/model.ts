@@ -339,103 +339,108 @@ class RecipeModel {
             language: data.recipe.language
         });
 
-        return await prisma.$transaction(async (tx) => {
-            log.trace('Creating recipe object', {
-                title: data.recipe.title,
-                authorId: data.authorId
-            });
+        return await prisma.$transaction(
+            async (tx: Prisma.TransactionClient) => {
+                log.trace('Creating recipe object', {
+                    title: data.recipe.title,
+                    authorId: data.authorId
+                });
 
-            const recipe = await tx.recipe.create({
-                data: {
-                    ...data.recipe,
-                    author: {
-                        connect: {
-                            id: data.authorId
+                const recipe = await tx.recipe.create({
+                    data: {
+                        ...data.recipe,
+                        author: {
+                            connect: {
+                                id: data.authorId
+                            }
                         }
                     }
-                }
-            });
-
-            log.trace('Creating instructions', { recipeId: recipe.id });
-
-            if (data.instructions.length > 0) {
-                await tx.instruction.createMany({
-                    data: data.instructions.map((text, index) => ({
-                        recipeId: recipe.id,
-                        step: index + 1,
-                        text
-                    }))
                 });
-            }
 
-            log.trace('Creating ingredients', { recipeId: recipe.id });
+                log.trace('Creating instructions', { recipeId: recipe.id });
 
-            if (data.ingredients.length > 0) {
-                for (let i = 0; i < data.ingredients.length; i++) {
-                    const ingredientData = data.ingredients[i];
-
-                    // Only create ingredient if it doesn't already exist
-                    let ingredient = await tx.ingredient.findFirst({
-                        where: {
-                            name: ingredientData.name,
-                            language:
-                                (data.recipe as any).language || DEFAULT_LOCALE
-                        }
+                if (data.instructions.length > 0) {
+                    await tx.instruction.createMany({
+                        data: data.instructions.map((text, index) => ({
+                            recipeId: recipe.id,
+                            step: index + 1,
+                            text
+                        }))
                     });
+                }
 
-                    if (!ingredient) {
-                        ingredient = await tx.ingredient.create({
-                            data: {
+                log.trace('Creating ingredients', { recipeId: recipe.id });
+
+                if (data.ingredients.length > 0) {
+                    for (let i = 0; i < data.ingredients.length; i++) {
+                        const ingredientData = data.ingredients[i];
+
+                        // Only create ingredient if it doesn't already exist
+                        let ingredient = await tx.ingredient.findFirst({
+                            where: {
                                 name: ingredientData.name,
                                 language:
                                     (data.recipe as any).language ||
                                     DEFAULT_LOCALE
                             }
                         });
-                    }
 
-                    // Create recipe-ingredient relation
-                    await tx.recipeIngredient.create({
-                        data: {
-                            recipeId: recipe.id,
-                            ingredientId: ingredient.id,
-                            quantity: ingredientData.quantity,
-                            ingredientOrder: i + 1
+                        if (!ingredient) {
+                            ingredient = await tx.ingredient.create({
+                                data: {
+                                    name: ingredientData.name,
+                                    language:
+                                        (data.recipe as any).language ||
+                                        DEFAULT_LOCALE
+                                }
+                            });
                         }
+
+                        // Create recipe-ingredient relation
+                        await tx.recipeIngredient.create({
+                            data: {
+                                recipeId: recipe.id,
+                                ingredientId: ingredient.id,
+                                quantity: ingredientData.quantity,
+                                ingredientOrder: i + 1
+                            }
+                        });
+                    }
+                }
+
+                log.trace('Creating tags', { recipeId: recipe.id });
+
+                if (data.tags.length > 0) {
+                    await tx.recipeTag.createMany({
+                        data: data.tags.map((tag) => ({
+                            recipeId: recipe.id,
+                            tagId: tag.id
+                        }))
                     });
                 }
-            }
 
-            log.trace('Creating tags', { recipeId: recipe.id });
-
-            if (data.tags.length > 0) {
-                await tx.recipeTag.createMany({
-                    data: data.tags.map((tag) => ({
-                        recipeId: recipe.id,
-                        tagId: tag.id
-                    }))
+                log.trace('Recipe successfully created', {
+                    recipeId: recipe.id
                 });
-            }
 
-            log.trace('Recipe successfully created', { recipeId: recipe.id });
+                await this.invalidateUserRecipeCache(data.authorId);
 
-            await this.invalidateUserRecipeCache(data.authorId);
-
-            return (await tx.recipe.findUnique({
-                where: { id: recipe.id },
-                include: {
-                    ingredients: {
-                        include: {
-                            ingredient: true
+                return (await tx.recipe.findUnique({
+                    where: { id: recipe.id },
+                    include: {
+                        ingredients: {
+                            include: {
+                                ingredient: true
+                            },
+                            orderBy: {
+                                ingredientOrder: 'asc'
+                            }
                         },
-                        orderBy: {
-                            ingredientOrder: 'asc'
-                        }
-                    },
-                    instructions: true
-                }
-            })) as Recipe;
-        });
+                        instructions: true
+                    }
+                })) as Recipe;
+            }
+        );
     }
 
     /**
@@ -473,89 +478,95 @@ class RecipeModel {
             );
         }
 
-        const updatedRecipe = await prisma.$transaction(async (tx) => {
-            if (Object.keys(recipeData).length > 0) {
-                await tx.recipe.update({ where: { id }, data: recipeData });
-            }
-
-            if (instructions !== undefined) {
-                await tx.instruction.deleteMany({ where: { recipeId: id } });
-
-                if (instructions.length > 0) {
-                    await tx.instruction.createMany({
-                        data: instructions.map((text, index) => ({
-                            recipeId: id,
-                            step: index + 1,
-                            text
-                        }))
-                    });
+        const updatedRecipe = await prisma.$transaction(
+            async (tx: Prisma.TransactionClient) => {
+                if (Object.keys(recipeData).length > 0) {
+                    await tx.recipe.update({ where: { id }, data: recipeData });
                 }
-            }
 
-            if (ingredients !== undefined) {
-                await tx.recipeIngredient.deleteMany({
-                    where: { recipeId: id }
-                });
-
-                const language =
-                    (recipeData as any).language ??
-                    originalRecipe.language ??
-                    DEFAULT_LOCALE;
-
-                for (let i = 0; i < ingredients.length; i++) {
-                    const ingredientData = ingredients[i];
-
-                    let ingredient = await tx.ingredient.findFirst({
-                        where: {
-                            name: ingredientData.name,
-                            language
-                        }
+                if (instructions !== undefined) {
+                    await tx.instruction.deleteMany({
+                        where: { recipeId: id }
                     });
 
-                    if (!ingredient) {
-                        ingredient = await tx.ingredient.create({
-                            data: {
+                    if (instructions.length > 0) {
+                        await tx.instruction.createMany({
+                            data: instructions.map(
+                                (text: string, index: number) => ({
+                                    recipeId: id,
+                                    step: index + 1,
+                                    text
+                                })
+                            )
+                        });
+                    }
+                }
+
+                if (ingredients !== undefined) {
+                    await tx.recipeIngredient.deleteMany({
+                        where: { recipeId: id }
+                    });
+
+                    const language =
+                        (recipeData as any).language ??
+                        originalRecipe.language ??
+                        DEFAULT_LOCALE;
+
+                    for (let i = 0; i < ingredients.length; i++) {
+                        const ingredientData = ingredients[i];
+
+                        let ingredient = await tx.ingredient.findFirst({
+                            where: {
                                 name: ingredientData.name,
                                 language
                             }
                         });
-                    }
 
-                    await tx.recipeIngredient.create({
-                        data: {
-                            recipeId: id,
-                            ingredientId: ingredient.id,
-                            quantity: ingredientData.quantity,
-                            ingredientOrder: i + 1
+                        if (!ingredient) {
+                            ingredient = await tx.ingredient.create({
+                                data: {
+                                    name: ingredientData.name,
+                                    language
+                                }
+                            });
                         }
-                    });
+
+                        await tx.recipeIngredient.create({
+                            data: {
+                                recipeId: id,
+                                ingredientId: ingredient.id,
+                                quantity: ingredientData.quantity,
+                                ingredientOrder: i + 1
+                            }
+                        });
+                    }
                 }
+
+                if (tags !== undefined) {
+                    await tx.recipeTag.deleteMany({ where: { recipeId: id } });
+
+                    if (tags.length > 0) {
+                        await tx.recipeTag.createMany({
+                            data: tags.map((tag) => ({
+                                recipeId: id,
+                                tagId: tag.id
+                            }))
+                        });
+                    }
+                }
+
+                return (await tx.recipe.findUnique({
+                    where: { id },
+                    include: {
+                        ingredients: {
+                            include: { ingredient: true },
+                            orderBy: { ingredientOrder: 'asc' }
+                        },
+                        instructions: true
+                    }
+                })) as Recipe;
             }
-
-            if (tags !== undefined) {
-                await tx.recipeTag.deleteMany({ where: { recipeId: id } });
-
-                if (tags.length > 0) {
-                    await tx.recipeTag.createMany({
-                        data: tags.map((tag) => ({
-                            recipeId: id,
-                            tagId: tag.id
-                        }))
-                    });
-                }
-            }
-
-            return (await tx.recipe.findUnique({
-                where: { id },
-                include: {
-                    ingredients: {
-                        include: { ingredient: true },
-                        orderBy: { ingredientOrder: 'asc' }
-                    },
-                    instructions: true
-                }
-            })) as Recipe;
-        });
+        );
 
         await this.invalidateUserRecipeCache(originalRecipe.authorId);
 
@@ -619,7 +630,7 @@ class RecipeModel {
 
         // Use a transaction to ensure that all dependent records are removed
         // before the actual recipe is deleted, foreign key constraints will fail otherwise.
-        await prisma.$transaction(async (tx) => {
+        await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
             await Promise.all([
                 tx.instruction.deleteMany({ where: { recipeId: id } }),
                 tx.recipeIngredient.deleteMany({ where: { recipeId: id } }),
