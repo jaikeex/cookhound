@@ -14,9 +14,9 @@ export type RequestConfig = {
     /** The URL of the API endpoint. */
     url?: UrlString;
     /** The data to be sent in the request body. */
-    data?: any;
+    data?: AnyObject;
     /** The URL parameters to be appended to the URL. */
-    params?: any;
+    params?: Record<string, string | number | boolean | undefined>;
     /** Optional custom headers for the request. */
     headers?: HeadersInit;
     /** Optional revalidation time for the request. */
@@ -207,9 +207,11 @@ class ApiRequestWrapper {
 
         const url = new URL(this.API_URL + config.url);
         if (config.params) {
-            Object.keys(config.params).forEach((key) =>
-                url.searchParams.append(key, config.params[key])
-            );
+            Object.entries(config.params).forEach(([key, value]) => {
+                if (value !== undefined) {
+                    url.searchParams.append(key, String(value ?? ''));
+                }
+            });
         }
 
         //?—————————————————————————————————————————————————————————————————————————————————————?//

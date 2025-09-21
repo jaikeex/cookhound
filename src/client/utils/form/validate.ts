@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const validateFormData = async <T>(
-    formData: any,
+    formData: AnyObject,
     schema: z.ZodType<T>
 ): Promise<Record<string, string>> => {
     try {

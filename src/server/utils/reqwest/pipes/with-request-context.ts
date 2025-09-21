@@ -13,9 +13,10 @@ import { handleServerError } from '@/server/utils/reqwest/handleApiError';
  * any thrown error into a app standardized format.
  */
 export function withRequestContext<
+    S extends unknown[],
     T extends (
         req: NextRequest,
-        ...rest: any[]
+        ...rest: S
     ) => Promise<NextResponse> | NextResponse
 >(handler: T): T {
     const wrapped = async (

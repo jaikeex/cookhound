@@ -12,7 +12,8 @@ import {
     fileToByteArray,
     lowerCaseFirstLetter,
     validateFormData,
-    generateUuid
+    generateUuid,
+    type ExtractedRecipeFormData
 } from '@/client/utils';
 import type {
     Ingredient,
@@ -151,7 +152,7 @@ export const useRecipeFormController = ({
             const formElement = event.currentTarget;
             const data = new FormData(formElement);
 
-            let formData: any;
+            let formData: ExtractedRecipeFormData;
 
             try {
                 formData = await extractFormData(data);

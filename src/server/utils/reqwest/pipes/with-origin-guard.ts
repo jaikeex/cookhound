@@ -18,9 +18,10 @@ const ALLOWED_ORIGINS: ReadonlyArray<string> =
  *? protected. State changing request MUST be one of POST, PUT, PATCH, DELETE.
  */
 export function withOriginGuard<
+    S extends unknown[],
     T extends (
         req: NextRequest,
-        ...rest: any[]
+        ...rest: S
     ) => Promise<NextResponse> | NextResponse
 >(handler: T): T {
     const guard = async (

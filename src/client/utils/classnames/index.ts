@@ -8,7 +8,7 @@ type ClassValue =
     | null
     | undefined;
 interface ClassDictionary {
-    [id: string]: any;
+    [id: string]: unknown;
 }
 interface ClassArray extends Array<ClassValue> {}
 

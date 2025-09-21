@@ -8,7 +8,8 @@ import { handleServerError } from '@/server/utils/reqwest/handleApiError';
  * hoc to guard route handlers and allow access only to authenticated users.
  */
 export function withAuth<
-    T extends (req: NextRequest, context?: any) => Promise<Response>
+    S extends unknown[],
+    T extends (req: NextRequest, ...rest: S) => Promise<Response>
 >(handler: T): T {
     const authGuard = async (
         ...args: Parameters<T>

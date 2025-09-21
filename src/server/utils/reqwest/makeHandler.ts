@@ -12,9 +12,10 @@ import type { Middleware } from './pipes/handler-pipe';
  * Additional middlewares can be supplied and will be applied after the request context is set up.
  */
 export function makeHandler<
+    S extends unknown[],
     T extends (
         req: NextRequest,
-        ...rest: any[]
+        ...rest: S
     ) => Promise<NextResponse> | NextResponse
 >(handler: T, ...middlewares: Middleware[]): T {
     //?—————————————————————————————————————————————————————————————————————————————————————————?//
@@ -31,5 +32,5 @@ export function makeHandler<
         withRequestContext,
         withOriginGuard,
         ...middlewares
-    )(handler) as T;
+    )(handler) as unknown as T;
 }
