@@ -4292,7 +4292,7 @@ __metadata:
     eslint: "npm:^8"
     eslint-config-next: "npm:14.2.13"
     eslint-config-prettier: "npm:^9.1.0"
-    eslint-plugin-cookhound: "file:libs/eslint-plugin-cookhound"
+    eslint-plugin-cookhound: "workspace:^"
     eslint-plugin-react: "npm:^7.36.1"
     eslint-plugin-storybook: "npm:^0.8.0"
     framer-motion: "npm:^12.23.14"
@@ -5361,14 +5361,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-cookhound@file:libs/eslint-plugin-cookhound::locator=cookhound%40workspace%3A.":
-  version: 0.1.0
-  resolution: "eslint-plugin-cookhound@file:libs/eslint-plugin-cookhound#libs/eslint-plugin-cookhound::hash=ec6c5e&locator=cookhound%40workspace%3A."
-  checksum: 10c0/6ffa5448df5a15cd935db83d910c91616fe104dce00c929e4a2fec4bec3ecef50bb0b2e57457bbe03c0c6dfdddc7fcd0ffa729b534521f43865e9af0e55335ed
-  languageName: node
-  linkType: hard
-
-"eslint-plugin-cookhound@workspace:libs/eslint-plugin-cookhound":
+"eslint-plugin-cookhound@workspace:^, eslint-plugin-cookhound@workspace:libs/eslint-plugin-cookhound":
   version: 0.0.0-use.local
   resolution: "eslint-plugin-cookhound@workspace:libs/eslint-plugin-cookhound"
   languageName: unknown

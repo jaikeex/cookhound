@@ -74,7 +74,7 @@ if (ENV_CONFIG_PUBLIC.ENV === 'production') {
 //~=============================================================================================~//
 
 // In development, also output to console so debugging does not take years.
-if (ENV_CONFIG_PUBLIC.ENV !== 'production') {
+if (ENV_CONFIG_PUBLIC.ENV === 'production') {
     baseLogger.add(
         new transports.Console({
             format: format.combine(

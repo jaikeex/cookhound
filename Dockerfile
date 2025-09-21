@@ -1,60 +1,95 @@
-FROM node:20-alpine AS base
+# -------------------------------------------------------------------
+# Cookhound – production image (Next.js web + worker)
+# -------------------------------------------------------------------
+# syntax=docker/dockerfile:1.5
 
-# Install dependencies only when needed
+# -------- Base image with Node.js ------------------------------------------------
+FROM node:20-bullseye AS base
+WORKDIR /app
+ENV NODE_ENV=production
+
+ARG NEXT_PUBLIC_ENV
+ARG NEXT_SHARP_PATH
+ARG NEXT_PUBLIC_API_URL
+ARG NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID
+ARG NEXT_PUBLIC_ORIGIN
+ARG NEXT_PUBLIC_COOKIE_DOMAIN
+ARG ALLOWED_ORIGINS
+ARG GOOGLE_OAUTH_CLIENT_SECRET
+ARG GOOGLE_OAUTH_REDIRECT_URI
+ARG GOOGLE_SMTP_USERNAME
+ARG GOOGLE_SMTP_PASSWORD
+ARG LOG_DIR
+ARG GOOGLE_API_PROJECT_ID
+ARG GOOGLE_LOGGING_WRITE_CREDENTIALS
+ARG GOOGLE_LOGGING_CLIENT_ID
+ARG GOOGLE_STORAGE_CREDENTIALS
+ARG GOOGLE_STORAGE_CLIENT_ID
+ARG GOOGLE_STORAGE_BUCKET_RECIPE_IMAGES
+ARG GOOGLE_STORAGE_BUCKET_AVATAR_IMAGES
+ARG COOKIE_CONSENT_HASH_V2025_09_15
+ARG DB_NAME
+ARG DB_USERNAME
+ARG DB_PASSWORD
+ARG DB_PORT
+ARG DATABASE_URL
+ARG DB_CONNECTIONS
+ARG DB_IDLE_TIMEOUT
+ARG DB_ACQUIRE_TIMEOUT
+ARG DB_MAX_ATTEMPTS
+ARG REDIS_TTL
+ARG REDIS_PASSWORD
+ARG REDIS_HOST
+ARG REDIS_PORT
+ARG TYPESENSE_API_KEY
+ARG NEXT_PUBLIC_TYPESENSE_SEARCH_ONLY_KEY
+ARG NEXT_PUBLIC_TYPESENSE_HOST
+ARG NEXT_PUBLIC_TYPESENSE_PORT
+ARG NEXT_PUBLIC_TYPESENSE_PROTOCOL
+ARG OPENAI_API_KEY
+
+
+RUN corepack enable
+
+# -------- Dependencies layer -----------------------------------------------------
 FROM base AS deps
-# Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
-RUN apk add --no-cache libc6-compat
-WORKDIR /app
+COPY package.json yarn.lock ./
+COPY libs ./libs
+# Install dependencies (prod+dev, we keep dev so that tsx is available for the worker)
+RUN yarn install --immutable --inline-builds
 
-# Install dependencies based on the preferred package manager
-COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* ./
-RUN \
-  if [ -f yarn.lock ]; then yarn; \
-  else echo "Lockfile not found." && exit 1; \
-  fi
-
-
-# Rebuild the source code only when needed
-FROM base AS builder
-WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
+# -------- Build layer ------------------------------------------------------------
+FROM deps AS builder
 COPY . .
+# 1) Apply migrations to ensure the database schema exists
+# 2) Generate Prisma client (incl. TypedSQL) against the migrated database
+# 3) Build standalone Next.js output
+# 4) Copy static assets into standalone folder
+RUN yarn prisma migrate deploy \
+    && yarn prisma generate --sql \
+    && yarn next build \
+    && node scripts/copy-standalone.js
 
-ENV NEXT_TELEMETRY_DISABLED 1
-
-RUN \
-  if [ -f yarn.lock ]; then yarn run build; \
-  else echo "Lockfile not found." && exit 1; \
-  fi
-
-# Production image, copy all the files and run next
+# -------- Runtime image ----------------------------------------------------------
 FROM base AS runner
-WORKDIR /app
-
-ENV NODE_ENV production
-ENV NEXT_TELEMETRY_DISABLED 1
-ENV NEXT_SHARP_PATH=/app/node_modules/sharp
-
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
-
+# Copy all node_modules (incl. dev deps so that tsx is available)
+COPY --from=builder /app/node_modules ./node_modules
+ENV PATH="/app/node_modules/.bin:${PATH}"
+# Copy application build artifacts
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./public/_next/static
 COPY --from=builder /app/public ./public
-
-# Set the correct permission for prerender cache
-RUN mkdir .next
-RUN chown nextjs:nodejs .next
-
-# Automatically leverage output traces to reduce image size
-# https://nextjs.org/docs/advanced-features/output-file-tracing
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-
-USER nextjs
+# Copy application source needed for worker & migrations
+COPY --from=builder /app/src ./src
+# Ensure tsconfig.json is present for tsx path alias resolution at runtime
+COPY --from=builder /app/tsconfig.json ./tsconfig.json
+COPY --from=builder /app/prisma ./prisma
+# Entrypoint wraps Prisma migrate and then execs CMD/args
+COPY docker/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
 EXPOSE 3000
-
-ENV PORT 3000
-
-# server.js is created by next build from the standalone output
-# https://nextjs.org/docs/pages/api-reference/next-config-js/output
-CMD HOSTNAME="0.0.0.0" node server.js
+ENV PORT=3000
+ENTRYPOINT ["/entrypoint.sh"]
+# Default command runs the Next.js server; worker container overrides this
+CMD ["node","server.js"]

@@ -1,0 +1,107 @@
+name: Deploy to DigitalOcean Droplet
+
+on:
+    push:
+        branches: ['master']
+
+permissions:
+    contents: read
+    packages: write
+
+jobs:
+    deploy:
+        runs-on: ubuntu-latest
+
+        env:
+            REGISTRY: ghcr.io
+            IMAGE_NAME: ${{ github.repository }}
+
+        steps:
+            - name: Checkout source
+              uses: actions/checkout@v4
+
+            - name: Set up Node
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 20
+                  cache: 'yarn'
+
+            - name: Install dependencies
+              run: yarn install --immutable --inline-builds
+
+            - name: Log in to registry
+              uses: docker/login-action@v3
+              with:
+                  registry: ghcr.io
+                  username: ${{ github.actor }}
+                  password: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Build & push image
+              uses: docker/build-push-action@v5
+              with:
+                  context: .
+                  push: true
+                  tags: |
+                      ghcr.io/${{ github.repository }}:${{ github.sha }}
+                      ghcr.io/${{ github.repository }}:latest
+                  build-args: |
+                      NEXT_PUBLIC_ENV=${{ secrets.NEXT_PUBLIC_ENV }}
+                      NEXT_SHARP_PATH=${{ secrets.NEXT_SHARP_PATH }}
+                      NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}
+                      NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID=${{ secrets.NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID }}
+                      NEXT_PUBLIC_ORIGIN=${{ secrets.NEXT_PUBLIC_ORIGIN }}
+                      NEXT_PUBLIC_COOKIE_DOMAIN=${{ secrets.NEXT_PUBLIC_COOKIE_DOMAIN }}
+                      ALLOWED_ORIGINS=${{ secrets.ALLOWED_ORIGINS }}
+                      GOOGLE_OAUTH_CLIENT_SECRET=${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+                      GOOGLE_OAUTH_REDIRECT_URI=${{ secrets.GOOGLE_OAUTH_REDIRECT_URI }}
+                      GOOGLE_SMTP_USERNAME=${{ secrets.GOOGLE_SMTP_USERNAME }}
+                      GOOGLE_SMTP_PASSWORD=${{ secrets.GOOGLE_SMTP_PASSWORD }}
+                      LOG_DIR=${{ secrets.LOG_DIR }}
+                      GOOGLE_API_PROJECT_ID=${{ secrets.GOOGLE_API_PROJECT_ID }}
+                      GOOGLE_LOGGING_WRITE_CREDENTIALS=${{ secrets.GOOGLE_LOGGING_WRITE_CREDENTIALS }}
+                      GOOGLE_LOGGING_CLIENT_ID=${{ secrets.GOOGLE_LOGGING_CLIENT_ID }}
+                      GOOGLE_STORAGE_CREDENTIALS=${{ secrets.GOOGLE_STORAGE_CREDENTIALS }}
+                      GOOGLE_STORAGE_CLIENT_ID=${{ secrets.GOOGLE_STORAGE_CLIENT_ID }}
+                      GOOGLE_STORAGE_BUCKET_RECIPE_IMAGES=${{ secrets.GOOGLE_STORAGE_BUCKET_RECIPE_IMAGES }}
+                      GOOGLE_STORAGE_BUCKET_AVATAR_IMAGES=${{ secrets.GOOGLE_STORAGE_BUCKET_AVATAR_IMAGES }}
+                      COOKIE_CONSENT_HASH_V2025_09_15=${{ secrets.COOKIE_CONSENT_HASH_V2025_09_15 }}
+                      DB_NAME=${{ secrets.DB_NAME }}
+                      DB_USERNAME=${{ secrets.DB_USERNAME }}
+                      DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+                      DB_PORT=${{ secrets.DB_PORT }}
+                      DATABASE_URL=${{ secrets.DATABASE_URL }}
+                      DB_CONNECTIONS=${{ secrets.DB_CONNECTIONS }}
+                      DB_IDLE_TIMEOUT=${{ secrets.DB_IDLE_TIMEOUT }}
+                      DB_ACQUIRE_TIMEOUT=${{ secrets.DB_ACQUIRE_TIMEOUT }}
+                      DB_MAX_ATTEMPTS=${{ secrets.DB_MAX_ATTEMPTS }}
+                      REDIS_TTL=${{ secrets.REDIS_TTL }}
+                      REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}
+                      REDIS_HOST=${{ secrets.REDIS_HOST }}
+                      REDIS_PORT=${{ secrets.REDIS_PORT }}
+                      TYPESENSE_API_KEY=${{ secrets.TYPESENSE_API_KEY }}
+                      NEXT_PUBLIC_TYPESENSE_SEARCH_ONLY_KEY=${{ secrets.NEXT_PUBLIC_TYPESENSE_SEARCH_ONLY_KEY }}
+                      NEXT_PUBLIC_TYPESENSE_HOST=${{ secrets.NEXT_PUBLIC_TYPESENSE_HOST }}
+                      NEXT_PUBLIC_TYPESENSE_PORT=${{ secrets.NEXT_PUBLIC_TYPESENSE_PORT }}
+                      NEXT_PUBLIC_TYPESENSE_PROTOCOL=${{ secrets.NEXT_PUBLIC_TYPESENSE_PROTOCOL }}
+                      OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
+
+            - name: Deploy on droplet
+              uses: appleboy/ssh-action@v1
+              with:
+                  host: ${{ secrets.DO_SSH_HOST }}
+                  username: ${{ secrets.DO_SSH_USER }}
+                  key: ${{ secrets.DO_SSH_KEY }}
+                  port: 22
+                  script: |
+                      set -e
+                      if [ ! -d /cookhound/.git ]; then
+                        git clone --depth=1 git@github.com:jaikeex/cookhound.git /cookhound
+                      else
+                        cd /cookhound && git fetch --depth=1 origin master && git reset --hard origin/master
+                      fi
+
+                      echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u jaikeex --password-stdin
+
+                      cd /cookhound
+                      docker compose pull
+                      docker compose up -d --remove-orphans
