@@ -4,6 +4,7 @@ import { RecipeInfo } from '@/client/components/molecules/RecipeInfo';
 import { Rating } from '@/client/components/molecules';
 import Link from 'next/link';
 import type { RecipeCardProps } from '@/client/components/molecules/Card/types';
+import { classNames } from '@/client/utils';
 
 export const RecipeCard: React.FC<RecipeCardProps> = ({
     displayId,
@@ -15,16 +16,21 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({
 }) => {
     return (
         <div
-            className="flex flex-col h-full overflow-hidden border border-gray-300 rounded-lg shadow-sm bg-slate-200 dark:bg-slate-800 dark:border-gray-700 animate-fade-in-up"
+            className={classNames(
+                'group focus-within:outline-none focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 focus-within:ring-offset-slate-200 dark:focus-within:ring-offset-slate-800',
+                'flex flex-col h-full overflow-hidden border border-gray-300 rounded-lg shadow-sm',
+                'bg-slate-200 dark:bg-slate-800 dark:border-gray-700 animate-fade-in-up'
+            )}
             style={{ animationDelay: `${index * 1}ms` }}
         >
             <Link
                 href={`/recipe/${displayId}`}
                 className="flex flex-col h-full text-inherit"
+                aria-label={title}
             >
                 <RecipeImage
                     src={imageUrl}
-                    alt={title}
+                    alt={`${title} image`}
                     width={280}
                     height={160}
                     className="flex-shrink-0 object-cover w-full aspect-video"

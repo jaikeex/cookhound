@@ -12,6 +12,7 @@ export type IconButtonProps = Readonly<{
     onClick?: () => void;
     size?: number;
     tabIndex?: number;
+    ariaLabel?: string;
 }>;
 
 export const IconButton: React.FC<IconButtonProps> = ({
@@ -22,7 +23,8 @@ export const IconButton: React.FC<IconButtonProps> = ({
     loading,
     onClick = () => {},
     size,
-    tabIndex
+    tabIndex,
+    ariaLabel
 }) => {
     return (
         <button
@@ -35,6 +37,7 @@ export const IconButton: React.FC<IconButtonProps> = ({
             type={'button'}
             onClick={onClick}
             disabled={disabled || loading}
+            aria-label={ariaLabel}
         >
             {loading ? (
                 <Loader size="sm" className={iconClassName} />

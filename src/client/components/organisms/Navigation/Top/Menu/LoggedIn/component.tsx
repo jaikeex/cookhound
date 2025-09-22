@@ -39,8 +39,12 @@ export const LoggedInMenuContent: React.FC<LoggedInMenuContentProps> = ({
                 <Link
                     href={`/user/${user.id}`}
                     className="flex flex-col items-center gap-4"
+                    tabIndex={-1}
                 >
-                    <ButtonBase className="mx-auto w-52">
+                    <ButtonBase
+                        className="mx-auto w-52"
+                        aria-label={t('app.general.my-account')}
+                    >
                         {t('app.general.my-account')}
                     </ButtonBase>
                 </Link>

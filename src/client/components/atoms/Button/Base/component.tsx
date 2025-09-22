@@ -113,6 +113,7 @@ export const ButtonBase: React.FC<BaseButtonProps> = ({
                 classConfig.colors[color].color,
                 outlined && classConfig.colors[color].outline,
                 classConfig.sizes[size].dimensions,
+                'focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:outline-none',
                 uppercase && 'uppercase',
                 className
             )}

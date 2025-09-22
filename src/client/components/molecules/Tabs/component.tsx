@@ -137,6 +137,7 @@ export const Tabs: React.FC<TabsProps> = ({
                         key={index}
                         active={currentTab === index}
                         tabWidth={tabWidth}
+                        ariaLabel={tab.title}
                     >
                         {tab.title}
                     </TabButton>

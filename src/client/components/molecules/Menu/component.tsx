@@ -59,6 +59,7 @@ export const Menu: React.FC<MenuProps> = ({ items, className, ...props }) => {
             <li key={href} className="my-0.5">
                 <Link
                     href={href}
+                    aria-label={label}
                     aria-current={isActive ? 'page' : undefined}
                     prefetch={false}
                     className={classNames(

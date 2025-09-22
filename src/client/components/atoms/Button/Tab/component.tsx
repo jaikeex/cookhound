@@ -7,6 +7,7 @@ type TabButtonProps = Readonly<{
     className?: string;
     onClick: () => void;
     tabWidth: number;
+    ariaLabel: string;
 }> &
     React.PropsWithChildren<NonNullable<unknown>>;
 
@@ -15,7 +16,8 @@ export const TabButton: React.FC<TabButtonProps> = ({
     children,
     className,
     onClick,
-    tabWidth
+    tabWidth,
+    ariaLabel
 }) => {
     return (
         <button
@@ -27,6 +29,7 @@ export const TabButton: React.FC<TabButtonProps> = ({
             style={{
                 width: `${tabWidth}%`
             }}
+            aria-label={ariaLabel}
         >
             <Typography
                 variant={'label'}

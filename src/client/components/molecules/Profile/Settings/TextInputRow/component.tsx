@@ -68,6 +68,7 @@ export const TextInputRow: React.FC<TextInputRowProps> = ({
                         id={inputId}
                         name={name}
                         className="max-w-96 h-8"
+                        aria-label={heading}
                     />
                 ) : (
                     <Typography variant="body-sm">{defaultValue}</Typography>
@@ -82,6 +83,7 @@ export const TextInputRow: React.FC<TextInputRowProps> = ({
                             icon={'cancel'}
                             outlined
                             onClick={stopEditing}
+                            aria-label={t('app.general.cancel')}
                         >
                             {t('app.general.cancel')}
                         </ButtonBase>
@@ -93,6 +95,11 @@ export const TextInputRow: React.FC<TextInputRowProps> = ({
                         color={isEditing ? 'secondary' : 'subtle'}
                         outlined
                         onClick={isEditing ? handleSave : startEditing}
+                        aria-label={
+                            isEditing
+                                ? t('app.general.save')
+                                : t('app.general.change')
+                        }
                     >
                         {isPending ? (
                             <Loader size="sm" className="w-4 h-4" />

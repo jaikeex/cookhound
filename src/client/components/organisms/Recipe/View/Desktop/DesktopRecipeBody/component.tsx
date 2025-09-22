@@ -53,6 +53,7 @@ export const DesktopRecipeBody: React.FC<DesktopRecipeBodyProps> = ({
                             color="secondary"
                             className={'w-full mt-2'}
                             onClick={onShoppingListCreate}
+                            aria-label={t('app.recipe.create-shopping-list')}
                         >
                             {t('app.recipe.create-shopping-list')}
                         </ButtonBase>

@@ -105,13 +105,13 @@ export const Dropdown: React.FC<DropdownProps> = ({
                     <Link
                         href={href}
                         {...commonProps}
+                        aria-label={label?.toString()}
                         key={
                             typeof label === 'string'
                                 ? label
                                 : (href ?? Math.random())
                         }
                         role="menuitem"
-                        tabIndex={-1}
                         prefetch={false}
                     >
                         {icon ? (

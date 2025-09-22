@@ -20,6 +20,7 @@ export const GoogleSigninButton: React.FC<GoogleSigninProps> = ({
             textClassName="mr-2"
             textVariant="label"
             disabled={pending}
+            aria-label={label ?? 'Sign in with Google'}
         >
             {label ?? 'Sign in with Google'}
         </ButtonBase>

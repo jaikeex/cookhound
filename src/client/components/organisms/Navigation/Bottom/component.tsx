@@ -57,11 +57,12 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = () => {
                 isNotfound ? 'hidden' : ''
             )}
         >
-            <Link href={'/'}>
+            <Link href={'/'} aria-label={t('app.general.home')}>
                 <Icon name="home" label={t('app.general.home')} />
             </Link>
             <Link
                 href={'/'}
+                aria-label={t('app.general.cookbooks')}
                 tabIndex={isLoggedin ? 0 : -1}
                 className={classNames(!isLoggedin && 'link-disabled')}
             >
@@ -79,6 +80,7 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = () => {
             >
                 <Link
                     href={'/recipe/create'}
+                    aria-label={t('app.recipe.create')}
                     prefetch={isLoggedin}
                     tabIndex={isLoggedin ? 0 : -1}
                     className={classNames(!isLoggedin && 'link-disabled')}
@@ -98,6 +100,7 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = () => {
             >
                 <Link
                     href={'/shopping-list'}
+                    aria-label={t('app.general.shopping-list')}
                     prefetch={isLoggedin}
                     tabIndex={isLoggedin ? 0 : -1}
                     className={classNames(!isLoggedin && 'link-disabled')}

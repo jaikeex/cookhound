@@ -9,6 +9,7 @@ import { useLocale } from '@/client/store';
 type ThemeSwitcherIconProps = Omit<IconButtonProps, 'icon' | 'onClick'>;
 
 export const ThemeSwitcherIcon: React.FC<ThemeSwitcherIconProps> = (props) => {
+    const { t } = useLocale();
     const { theme, setTheme, resolvedTheme } = useTheme();
     const [mounted, setMounted] = useState(false);
 
@@ -50,13 +51,31 @@ export const ThemeSwitcherIcon: React.FC<ThemeSwitcherIconProps> = (props) => {
     const icon = useMemo(() => {
         switch (currentTheme) {
             case 'light':
-                return <IconButton icon="moon" {...iconProps} />;
+                return (
+                    <IconButton
+                        icon="moon"
+                        {...iconProps}
+                        ariaLabel={t('app.general.dark-mode')}
+                    />
+                );
             case 'dark':
-                return <IconButton icon="sun" {...iconProps} />;
+                return (
+                    <IconButton
+                        icon="sun"
+                        {...iconProps}
+                        ariaLabel={t('app.general.light-mode')}
+                    />
+                );
             default:
-                return <IconButton icon="sun" {...iconProps} />;
+                return (
+                    <IconButton
+                        icon="sun"
+                        {...iconProps}
+                        ariaLabel={t('app.general.light-mode')}
+                    />
+                );
         }
-    }, [currentTheme, iconProps]);
+    }, [currentTheme, iconProps, t]);
 
     return icon;
 };

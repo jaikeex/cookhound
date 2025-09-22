@@ -37,7 +37,6 @@ export const TopNavigation: React.FC<TopNavigationProps> = () => {
 
     const handleOpenSidebar = useCallback(() => setIsSidebarOpen(true), []);
     const handleCloseSidebar = useCallback(() => setIsSidebarOpen(false), []);
-    const handleSearchClick = useCallback(() => {}, []);
 
     useAppEventListener(Event.NOT_FOUND_OPENED, () => setIsNotfound(true));
     useAppEventListener(Event.NOT_FOUND_CLOSED, () => setIsNotfound(false));
@@ -65,21 +64,28 @@ export const TopNavigation: React.FC<TopNavigationProps> = () => {
             {/* --------------------------------------- */}
             {/* ---------- MOBILE RIGHT SIDE ---------- */}
             {/* --------------------------------------- */}
-            <div className="flex items-center md:hidden">
+            <Link
+                href={'/search'}
+                className="flex items-center md:hidden"
+                tabIndex={-1}
+            >
                 <IconButton
                     icon="search"
+                    aria-label={t('app.general.search')}
                     size={28}
-                    onClick={handleSearchClick}
                     className="flex items-center justify-center w-10 h-12"
                 />
 
                 <button
                     onClick={handleOpenSidebar}
-                    className="flex items-center justify-center w-10 h-12"
+                    className={classNames(
+                        'flex items-center justify-center w-10 h-12',
+                        'block md:hidden'
+                    )}
                 >
                     <Avatar src={avatarSrc || 'anonymous'} size="md" />
                 </button>
-            </div>
+            </Link>
 
             {/* --------------------------------------- */}
             {/* ---------- DESKTOP RIGHT SIDE --------- */}
@@ -90,7 +96,11 @@ export const TopNavigation: React.FC<TopNavigationProps> = () => {
                         text={t('app.general.register-to-create-recipe')}
                         disabled={isLoggedin}
                     >
-                        <Link href={'/recipe/create'} prefetch={isLoggedin}>
+                        <Link
+                            href={'/recipe/create'}
+                            prefetch={isLoggedin}
+                            tabIndex={-1}
+                        >
                             <ButtonBase
                                 color="subtle"
                                 icon="plus"
@@ -113,6 +123,7 @@ export const TopNavigation: React.FC<TopNavigationProps> = () => {
                     >
                         <IconLink
                             href={'/shopping-list'}
+                            aria-label={t('app.general.shopping-list')}
                             icon="shoppingList"
                             disabled={!isLoggedin || !authResolved}
                             prefetch={isLoggedin}
@@ -126,7 +137,15 @@ export const TopNavigation: React.FC<TopNavigationProps> = () => {
                     {/* --------------------------------------- */}
 
                     <Popup content={<NavMenu user={user} className="w-56" />}>
-                        <button>
+                        <button
+                            className={
+                                isLoggedin
+                                    ? 'block'
+                                    : authResolved
+                                      ? 'hidden'
+                                      : 'opacity-50 animate-pulse'
+                            }
+                        >
                             <Avatar
                                 alt={'Click to open user menu'}
                                 src={avatarSrc || 'anonymous'}
@@ -139,8 +158,13 @@ export const TopNavigation: React.FC<TopNavigationProps> = () => {
                     <Link
                         href={'/auth/login'}
                         className={`${isLoggedin || !authResolved ? 'hidden' : 'block'}`}
+                        tabIndex={-1}
                     >
-                        <ButtonBase color="primary" size="sm">
+                        <ButtonBase
+                            color="primary"
+                            size="sm"
+                            aria-label={t('auth.form.login')}
+                        >
                             {t('auth.form.login')}
                         </ButtonBase>
                     </Link>
@@ -148,8 +172,13 @@ export const TopNavigation: React.FC<TopNavigationProps> = () => {
                     <Link
                         href={'/auth/register'}
                         className={`${isLoggedin || !authResolved ? 'hidden' : 'block'}`}
+                        tabIndex={-1}
                     >
-                        <ButtonBase color="primary" size="sm">
+                        <ButtonBase
+                            color="primary"
+                            size="sm"
+                            aria-label={t('auth.form.register')}
+                        >
                             {t('auth.form.register')}
                         </ButtonBase>
                     </Link>
@@ -166,7 +195,10 @@ export const TopNavigation: React.FC<TopNavigationProps> = () => {
                     onClose={handleCloseSidebar}
                     paramKey="menu"
                     position="right"
-                    className="w-9/12 min-w-72"
+                    className={classNames(
+                        'w-9/12 min-w-72',
+                        isSidebarOpen ? 'block' : 'hidden'
+                    )}
                 >
                     <NavMenu user={user} />
                 </Sidebar>

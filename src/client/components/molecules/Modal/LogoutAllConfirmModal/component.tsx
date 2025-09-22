@@ -64,7 +64,7 @@ export const LogoutAllConfirmModal: React.FC<LogoutAllConfirmModalProps> = ({
     const needsPassword = user?.authType === AuthType.Local;
 
     return (
-        <div className="flex flex-col w-full h-full max-h-[85dvh] md:max-h-[70dvh] max-w-[80dvh] md:max-w-[30dvh] xl:max-w-[30dvh] px-4">
+        <div className="flex flex-col w-full h-full max-h-[85dvh] md:max-h-[70dvh] max-w-[80dvh] md:max-w-[50dvh] xl:max-w-[40dvh] px-4">
             <Typography variant="heading-sm">
                 {t('auth.logout-all.title')}
             </Typography>

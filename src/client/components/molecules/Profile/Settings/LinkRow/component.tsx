@@ -22,7 +22,9 @@ export const LinkRow: React.FC<LinkRowProps> = ({
             </Typography>
 
             <Typography variant="body-sm" className="self-start mt-2">
-                <Link href={href}>{linkText}</Link>
+                <Link href={href} aria-label={linkText}>
+                    {linkText}
+                </Link>
             </Typography>
         </div>
     );
