@@ -93,10 +93,12 @@ export const SnackbarProvider: React.FC<SnackbarProviderProps> = ({
                         <div
                             key={alertObj.id}
                             style={{
+                                width: '50%',
+                                margin: '0 auto',
                                 position: 'fixed',
                                 top: `${16 + index * 70}px`, // 16px initial offset + 70px per snackbar
-                                left: 0,
-                                right: 0,
+                                left: '50%',
+                                transform: 'translateX(-50%)',
                                 zIndex: 2000 - index
                             }}
                         >

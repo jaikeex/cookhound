@@ -167,9 +167,9 @@ export default async function RootLayout({
                                     defaultMessages={messages}
                                     defaultLocale={locale}
                                 >
-                                    <ModalProvider>
-                                        <ClientShell />
-                                        <SnackbarProvider>
+                                    <SnackbarProvider>
+                                        <ModalProvider>
+                                            <ClientShell />
                                             <ConsentBanner />
                                             <ScrollToTop />
                                             <div
@@ -190,8 +190,8 @@ export default async function RootLayout({
                                                     {children}
                                                 </div>
                                             </div>
-                                        </SnackbarProvider>
-                                    </ModalProvider>
+                                        </ModalProvider>
+                                    </SnackbarProvider>
                                 </LocaleProvider>
                             </ConsentProvider>
                         </AuthProvider>

@@ -132,6 +132,14 @@ export class Logger {
 
             // Throwing here makes no sense, but logging is essential
             process.on('uncaughtException', (err) => {
+                if (
+                    err instanceof Error &&
+                    (err.message === 'ECONNRESET' || err.message === 'aborted')
+                ) {
+                    // this is the (only) exception to the rule...
+                    return;
+                }
+
                 log.errorWithStack('uncaughtException', err);
             });
 
