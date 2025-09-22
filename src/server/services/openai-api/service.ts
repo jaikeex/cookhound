@@ -5,7 +5,7 @@ import { JOB_NAMES } from '@/server/queues/jobs/names';
 import type { RecipeForEvaluation } from './types';
 import { openaiClient } from '@/server/integrations';
 import { z } from 'zod';
-import { zodTextFormat } from 'openai/helpers/zod';
+import { zodTextFormat } from '@/server/utils/openai';
 import {
     RECIPE_CATEGORY_TAGS,
     RECIPE_TAG_CATEGORY_LIMITS_BY_NAME

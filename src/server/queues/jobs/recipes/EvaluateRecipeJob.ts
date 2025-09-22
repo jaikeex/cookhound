@@ -10,7 +10,7 @@ import recipeModel from '@/server/db/model/recipe/model';
 import { InfrastructureError } from '@/server/error/server';
 import { InfrastructureErrorCode } from '@/server/error/codes';
 import { ENV_CONFIG_PUBLIC, RecipeFlagReason } from '@/common/constants';
-import { zodTextFormat } from 'openai/helpers/zod';
+import { zodTextFormat } from '@/server/utils/openai';
 import { z } from 'zod';
 import { recipeSearchIndex } from '@/server/search-index/recipeIndex';
 
