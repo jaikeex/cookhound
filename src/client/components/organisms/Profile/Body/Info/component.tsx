@@ -3,7 +3,7 @@
 import React, { useCallback } from 'react';
 import { AuthType, type UserDTO } from '@/common/types';
 import {
-    ButtonBase,
+    ButtonRow,
     Divider,
     LinkRow,
     TextInputRow,
@@ -86,16 +86,18 @@ export const ProfileBodyInfo: React.FC<ProfileBodyInfoProps> = ({ user }) => {
                     inputId="username"
                 />
 
-                <Divider subtle className="mt-3" />
-
                 {user.authType === AuthType.Local ? (
                     <React.Fragment>
+                        <Divider subtle className="mt-3" />
+
                         <LinkRow
                             className="mt-3"
                             heading={t('app.profile.settings.password')}
                             href={'/auth/reset-password?email=' + user.email}
                             linkText={t('app.profile.settings.password-link')}
                         />
+
+                        <Divider subtle className="mt-3" />
 
                         <LinkRow
                             className="mt-3"
@@ -108,26 +110,38 @@ export const ProfileBodyInfo: React.FC<ProfileBodyInfoProps> = ({ user }) => {
 
                 <Divider subtle className="mt-3" />
 
-                <ButtonBase
-                    size="sm"
-                    color="danger"
-                    onClick={handleLogoutAll}
+                <Typography variant="heading-sm" className="mt-6">
+                    {t('app.profile.settings.section-privacy')}
+                </Typography>
+
+                <Divider className="mt-1" />
+
+                <ButtonRow
                     className="mt-3"
-                >
-                    {t('app.profile.settings.logout-all')}
-                </ButtonBase>
+                    label={t('app.profile.settings.cookies-description')}
+                    buttonText={t('app.cookies.modal.title')}
+                    outlined
+                    onClick={handleCookieSettings}
+                />
 
                 <Divider subtle className="mt-3" />
-            </section>
 
-            <ButtonBase
-                size="sm"
-                color="subtle"
-                onClick={handleCookieSettings}
-                className="mt-2"
-            >
-                {t('app.cookies.modal.title')}
-            </ButtonBase>
+                <ButtonRow
+                    className="mt-3"
+                    label={t('app.profile.settings.logout-all')}
+                    buttonText={t('app.profile.settings.logout-all')}
+                    onClick={handleLogoutAll}
+                    buttonColor="danger"
+                />
+
+                <Divider subtle className="mt-3" />
+
+                <Typography variant="heading-sm" className="mt-6">
+                    {t('app.profile.settings.section-danger-zone')}
+                </Typography>
+
+                <Divider className="mt-1" />
+            </section>
         </div>
     );
 };
