@@ -40,6 +40,29 @@ export function handleServerError(error: unknown): NextResponse<ErrorResponse> {
             break;
         }
 
+        //?—————————————————————————————————————————————————————————————————————————————————————?//
+        //?                                   Error: aborted                                    ?//
+        ///
+        //# Node occasionally throws an uncatchable "Error: aborted" when the client disconnects
+        //# before the request has finished being parsed. This has no real consequence and
+        //# the request causing this is 99% either DO healthchecks or something similar.
+        //# (https://github.com/nodejs/node/blob/v20.x/lib/internal/http_server.js)
+        ///
+        //?—————————————————————————————————————————————————————————————————————————————————————?//
+
+        case error instanceof Error && error.message === 'aborted': {
+            response.message = 'app.error.client-aborted';
+            // 499 is non-standard but widely used to signal that the client
+            // dropped the connection. Next.js will happily accept it.
+            response.status = 499;
+            response.code = ApplicationErrorCode.DEFAULT;
+
+            log.trace;
+
+            // No need to log this anywhere.
+            return NextResponse.json(response, { status: response.status });
+        }
+
         default:
             log.errorWithStack('unchecked server error', error);
     }

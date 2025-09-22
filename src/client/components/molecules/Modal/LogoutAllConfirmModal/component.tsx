@@ -33,7 +33,6 @@ export const LogoutAllConfirmModal: React.FC<LogoutAllConfirmModalProps> = ({
             onSuccess: () => {
                 queryClient.clear();
                 setUser(null);
-                router.push('/');
 
                 alert({
                     variant: 'success',
@@ -42,6 +41,10 @@ export const LogoutAllConfirmModal: React.FC<LogoutAllConfirmModalProps> = ({
 
                 eventBus.emit(Event.USER_LOGGED_OUT, undefined);
                 close?.();
+
+                setTimeout(() => {
+                    router.push('/');
+                }, 200);
             }
         }
     );
