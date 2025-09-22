@@ -84,6 +84,8 @@ jobs:
                       NEXT_PUBLIC_TYPESENSE_PORT=${{ secrets.NEXT_PUBLIC_TYPESENSE_PORT }}
                       NEXT_PUBLIC_TYPESENSE_PROTOCOL=${{ secrets.NEXT_PUBLIC_TYPESENSE_PROTOCOL }}
                       OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
+                      MAIL_DRIVER=${{ secrets.MAIL_DRIVER }}
+                      MAIL_GMAIL_FROM=${{ secrets.MAIL_GMAIL_FROM }}
 
             - name: Deploy on droplet
               uses: appleboy/ssh-action@v1
@@ -94,13 +96,12 @@ jobs:
                   port: 22
                   script: |
                       set -e
+
                       if [ ! -d /cookhound/.git ]; then
                         git clone --depth=1 git@github.com:jaikeex/cookhound.git /cookhound
                       else
                         cd /cookhound && git fetch --depth=1 origin master && git reset --hard origin/master
                       fi
-
-                      echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u jaikeex --password-stdin
 
                       cd /cookhound
                       docker compose pull

@@ -21,6 +21,7 @@ interface TokenManagerOptions {
 export class TokenManager {
     private accessToken: string | null = null;
     private tokenExpiry: Date | null = null;
+    private currentSubject?: string;
 
     /**
      * @param serviceAccount - The service account credentials.
@@ -38,16 +39,17 @@ export class TokenManager {
      *
      * @returns A promise that resolves to the access token.
      */
-    public async getAccessToken(): Promise<string> {
+    public async getAccessToken(subject?: string): Promise<string> {
         if (
             this.accessToken &&
             this.tokenExpiry &&
-            this.tokenExpiry > new Date()
+            this.tokenExpiry > new Date() &&
+            subject === this.currentSubject
         ) {
             return this.accessToken;
         }
 
-        const newAccessToken = await this.fetchNewAccessToken();
+        const newAccessToken = await this.fetchNewAccessToken(subject);
         this.accessToken = newAccessToken.access_token;
         //-300 seconds to account for clock drift and latency
         this.tokenExpiry = new Date(
@@ -62,7 +64,7 @@ export class TokenManager {
      * @returns The created JWT.
      * @internal
      */
-    private createJwt(): string {
+    private createJwt(subject?: string): string {
         const header = {
             alg: 'RS256',
             typ: 'JWT'
@@ -71,13 +73,17 @@ export class TokenManager {
         const now = Math.floor(Date.now() / 1000);
         const thirtyMinutes = 60 * 30;
 
-        const claims = {
+        const claims: Record<string, unknown> = {
             iss: this.serviceAccount.client_email,
             scope: this.scopes.join(' '),
             aud: GOOGLE_TOKEN_URI,
             exp: now + thirtyMinutes,
             iat: now
         };
+
+        if (subject) {
+            claims.sub = subject;
+        }
 
         const base64Header = Buffer.from(JSON.stringify(header)).toString(
             'base64url'
@@ -103,13 +109,13 @@ export class TokenManager {
      * @returns A promise that resolves to the new access token.
      * @internal
      */
-    private async fetchNewAccessToken(): Promise<AccessToken> {
+    private async fetchNewAccessToken(subject?: string): Promise<AccessToken> {
         const maxRetries = this.options.maxRetries || 3;
         const backoffMs = 1000;
 
         for (let attempt = 1; attempt <= maxRetries; attempt++) {
             try {
-                const jwt = this.createJwt();
+                const jwt = this.createJwt(subject);
                 const response = await this.makeTokenRequest(jwt);
                 return (await response.json()) as AccessToken;
             } catch (error: unknown) {

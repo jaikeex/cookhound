@@ -13,6 +13,9 @@ const SERVICE_ACCOUNT_SCOPES: Record<ServiceAccountIdentifier, string[]> = {
     ],
     GOOGLE_LOGGING_WRITE_CREDENTIALS: [
         'https://www.googleapis.com/auth/logging.write'
+    ],
+    GOOGLE_GMAIL_SEND_CREDENTIALS: [
+        'https://www.googleapis.com/auth/gmail.send'
     ]
 };
 
@@ -86,7 +89,8 @@ class GoogleApiClient {
     }
 
     private async getAccessToken(
-        service: ServiceAccountIdentifier
+        service: ServiceAccountIdentifier,
+        subject?: string
     ): Promise<string> {
         await this.ensureInitialized();
         const manager = this.tokenManagers[service];
@@ -100,15 +104,16 @@ class GoogleApiClient {
                 InfrastructureErrorCode.GOOGLE_API_REQUEST_FAILED
             );
         }
-        return manager.getAccessToken();
+        return manager.getAccessToken(subject);
     }
 
     private async authenticatedRequest(
         service: ServiceAccountIdentifier,
         url: string,
-        init?: RequestInit
+        init?: RequestInit,
+        subject?: string
     ): Promise<Response> {
-        const token = await this.getAccessToken(service);
+        const token = await this.getAccessToken(service, subject);
         const headers = new Headers(init?.headers);
         headers.set('Authorization', `Bearer ${token}`);
 
@@ -172,6 +177,56 @@ class GoogleApiClient {
                     'GOOGLE_LOGGING_WRITE_CREDENTIALS',
                     url,
                     { method: 'POST', body: JSON.stringify(body) }
+                );
+            }
+        };
+    }
+
+    // Gmail service
+    public getGmailService() {
+        return {
+            sendMail: async (params: {
+                from: string;
+                to: string | string[];
+                subject: string;
+                html: string;
+                text?: string;
+            }) => {
+                const { from, to, subject, html, text } = params;
+                const toHeader = Array.isArray(to) ? to.join(', ') : to;
+
+                const messageLines = [
+                    `From: ${from}`,
+                    `To: ${toHeader}`,
+                    `Subject: ${subject}`,
+                    'MIME-Version: 1.0',
+                    'Content-Type: text/html; charset="UTF-8"',
+                    '',
+                    html,
+                    text ?? ''
+                ];
+
+                const rawMessage = Buffer.from(
+                    messageLines.join('\r\n')
+                ).toString('base64url');
+
+                // Gmail userId should be the raw email or "me"; extract email if display name provided
+                const emailMatch = /<(.+?)>/.exec(from);
+                const userId = emailMatch ? emailMatch[1] : from;
+
+                const url = `https://gmail.googleapis.com/gmail/v1/users/${encodeURIComponent(
+                    userId
+                )}/messages/send`;
+
+                return await this.authenticatedRequest(
+                    'GOOGLE_GMAIL_SEND_CREDENTIALS',
+                    url,
+                    {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ raw: rawMessage })
+                    },
+                    emailMatch ? emailMatch[1] : undefined
                 );
             }
         };

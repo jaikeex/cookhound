@@ -18,7 +18,8 @@ export type ServiceAccount = {
 
 const gsaMap = Object.freeze({
     GOOGLE_LOGGING_WRITE_CREDENTIALS: accounts.logging,
-    GOOGLE_STORAGE_CREDENTIALS: accounts.storage
+    GOOGLE_STORAGE_CREDENTIALS: accounts.storage,
+    GOOGLE_GMAIL_SEND_CREDENTIALS: accounts.mail
 });
 
 export const loadServiceAccount = async (

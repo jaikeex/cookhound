@@ -10,7 +10,8 @@ export type AccessToken = {
 
 export type ServiceAccountIdentifier =
     | 'GOOGLE_LOGGING_WRITE_CREDENTIALS'
-    | 'GOOGLE_STORAGE_CREDENTIALS';
+    | 'GOOGLE_STORAGE_CREDENTIALS'
+    | 'GOOGLE_GMAIL_SEND_CREDENTIALS';
 
 export enum LogName {
     ERROR = '/logs/errors',
