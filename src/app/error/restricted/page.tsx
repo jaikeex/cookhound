@@ -1,6 +1,8 @@
 import React from 'react';
 import { RestrictedTemplate } from '@/client/components';
 
+export const dynamic = 'force-dynamic';
+
 type RestrictedPageProps = Readonly<{
     searchParams: Promise<Readonly<{ anonymous?: boolean; target?: string }>>;
 }>;

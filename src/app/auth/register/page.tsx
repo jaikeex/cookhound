@@ -1,8 +1,13 @@
+'use client';
+
 import React from 'react';
 import { RegisterTemplate } from '@/client/components';
+import dynamic from 'next/dynamic';
 
-export const dynamic = 'force-dynamic';
-
-export default async function RegisterPage() {
+function RegisterPage() {
     return <RegisterTemplate />;
 }
+
+export default dynamic(() => Promise.resolve(RegisterPage), {
+    ssr: false
+});

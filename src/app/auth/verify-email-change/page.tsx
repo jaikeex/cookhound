@@ -2,9 +2,12 @@
 
 import React from 'react';
 import { VerifyEmailChangeTemplate } from '@/client/components';
+import dynamic from 'next/dynamic';
 
-export const dynamic = 'force-dynamic';
-
-export default function VerifyEmailChangePage() {
+function VerifyEmailChangePage() {
     return <VerifyEmailChangeTemplate />;
 }
+
+export default dynamic(() => Promise.resolve(VerifyEmailChangePage), {
+    ssr: false
+});

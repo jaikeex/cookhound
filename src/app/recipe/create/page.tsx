@@ -1,6 +1,6 @@
 import React from 'react';
-import { RecipeCreate } from '@/client/components';
+import { RecipeCreateTemplate } from '@/client/components';
 
-export default async function Page() {
-    return <RecipeCreate />;
+export default async function RecipeCreatePage() {
+    return <RecipeCreateTemplate />;
 }

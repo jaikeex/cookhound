@@ -1,8 +1,13 @@
+'use client';
+
 import React from 'react';
 import { LoginTemplate } from '@/client/components';
+import dynamic from 'next/dynamic';
 
-export const dynamic = 'force-dynamic';
-
-export default async function LoginPage() {
+function LoginPage() {
     return <LoginTemplate />;
 }
+
+export default dynamic(() => Promise.resolve(LoginPage), {
+    ssr: false
+});

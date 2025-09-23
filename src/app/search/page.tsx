@@ -6,6 +6,8 @@ import { cookies, headers } from 'next/headers';
 import React, { Suspense } from 'react';
 import { SESSION_COOKIE_NAME } from '@/common/constants/general';
 
+export const dynamic = 'force-dynamic';
+
 export default async function SearchPage({
     searchParams
 }: Readonly<{

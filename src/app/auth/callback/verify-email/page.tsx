@@ -2,10 +2,9 @@
 
 import React, { Suspense } from 'react';
 import { VerifyEmailCallbackTemplate, Loader } from '@/client/components';
+import dynamic from 'next/dynamic';
 
-export const dynamic = 'force-dynamic';
-
-export default function VerifyEmailCallbackPage() {
+function VerifyEmailCallbackPage() {
     return (
         <Suspense
             fallback={
@@ -20,3 +19,7 @@ export default function VerifyEmailCallbackPage() {
         </Suspense>
     );
 }
+
+export default dynamic(() => Promise.resolve(VerifyEmailCallbackPage), {
+    ssr: false
+});

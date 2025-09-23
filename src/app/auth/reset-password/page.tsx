@@ -7,7 +7,9 @@ type ResetPasswordPageParams = {
     readonly searchParams: Promise<{ email: string }>;
 };
 
-export default async function Page({ searchParams }: ResetPasswordPageParams) {
+export default async function ResetPasswordPage({
+    searchParams
+}: ResetPasswordPageParams) {
     const searchParamsResolved = await searchParams;
 
     return (
