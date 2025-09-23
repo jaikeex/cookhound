@@ -18,7 +18,7 @@ import type {
 } from '@/common/types/cookie-consent';
 import { getCookie } from '@/client/utils';
 import { eventBus } from '@/client/events';
-import { Event } from '@/client/events';
+import { AppEvent } from '@/client/events';
 import { chqc, QUERY_KEYS } from '@/client/request/queryClient';
 import { CONSENT_VERSION, COOKIE_NAME } from '@/common/constants';
 import { setConsentCookie } from '@/app/actions';
@@ -143,7 +143,7 @@ export const ConsentProvider: React.FC<ConsentProviderProps> = ({
         setConsent(consent);
 
         //! NEVER REMOVE THIS
-        eventBus.emit(Event.CONSENT_CHANGED, consent);
+        eventBus.emit(AppEvent.CONSENT_CHANGED, consent);
     }, []);
 
     const updateConsent = useCallback(
@@ -263,7 +263,7 @@ export const ConsentProvider: React.FC<ConsentProviderProps> = ({
     //?                                         EFFECTS                                         ?//
     //|-----------------------------------------------------------------------------------------|//
 
-    useAppEventListener(Event.USER_LOGGED_IN, (user) => {
+    useAppEventListener(AppEvent.USER_LOGGED_IN, (user) => {
         if (user.id && consent) {
             const payloadForDb: CookieConsentPayload = {
                 consent: true,
@@ -282,7 +282,7 @@ export const ConsentProvider: React.FC<ConsentProviderProps> = ({
 
     // Emit initial consent on mount for subscribers
     useEffect(() => {
-        eventBus.emit(Event.CONSENT_CHANGED, consent);
+        eventBus.emit(AppEvent.CONSENT_CHANGED, consent);
     }, [consent]);
 
     useEffect(() => {

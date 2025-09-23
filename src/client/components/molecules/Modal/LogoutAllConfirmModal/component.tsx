@@ -9,7 +9,7 @@ import { PasswordInput } from '@/client/components/molecules/Form/PasswordInput/
 import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { chqc } from '@/client/request/queryClient';
-import { eventBus, Event } from '@/client/events';
+import { eventBus, AppEvent } from '@/client/events';
 
 export type LogoutAllConfirmModalProps = Readonly<{
     onClose?: () => void;
@@ -39,7 +39,7 @@ export const LogoutAllConfirmModal: React.FC<LogoutAllConfirmModalProps> = ({
                     message: t('auth.logout-all.success')
                 });
 
-                eventBus.emit(Event.USER_LOGGED_OUT, undefined);
+                eventBus.emit(AppEvent.USER_LOGGED_OUT, undefined);
                 router.push('/');
             }
         }

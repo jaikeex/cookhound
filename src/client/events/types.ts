@@ -1,7 +1,7 @@
 import type { UserDTO } from '@/common/types';
 import type { CookieConsent } from '@/common/types/cookie-consent';
 
-export enum Event {
+export enum AppEvent {
     NOT_FOUND_OPENED = 'not-found-opened',
     NOT_FOUND_CLOSED = 'not-found-closed',
     CONSENT_CHANGED = 'consent-changed',
@@ -10,11 +10,11 @@ export enum Event {
 }
 
 export interface AppEventMap {
-    [Event.NOT_FOUND_OPENED]: void;
-    [Event.NOT_FOUND_CLOSED]: void;
-    [Event.CONSENT_CHANGED]: CookieConsent | null;
-    [Event.USER_LOGGED_IN]: UserDTO;
-    [Event.USER_LOGGED_OUT]: void;
+    [AppEvent.NOT_FOUND_OPENED]: void;
+    [AppEvent.NOT_FOUND_CLOSED]: void;
+    [AppEvent.CONSENT_CHANGED]: CookieConsent | null;
+    [AppEvent.USER_LOGGED_IN]: UserDTO;
+    [AppEvent.USER_LOGGED_OUT]: void;
 }
 
 export type EventKey = keyof AppEventMap;

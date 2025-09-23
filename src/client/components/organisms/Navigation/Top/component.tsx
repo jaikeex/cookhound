@@ -18,7 +18,7 @@ import { NavMenu } from './Menu';
 import { TOP_NAVBAR_ID } from '@/client/constants';
 import { classNames } from '@/client/utils';
 import { usePathname } from 'next/navigation';
-import { Event } from '@/client/events';
+import { AppEvent } from '@/client/events';
 import { useAppEventListener } from '@/client/hooks';
 
 type TopNavigationProps = Readonly<NonNullable<unknown>>;
@@ -38,8 +38,8 @@ export const TopNavigation: React.FC<TopNavigationProps> = () => {
     const handleOpenSidebar = useCallback(() => setIsSidebarOpen(true), []);
     const handleCloseSidebar = useCallback(() => setIsSidebarOpen(false), []);
 
-    useAppEventListener(Event.NOT_FOUND_OPENED, () => setIsNotfound(true));
-    useAppEventListener(Event.NOT_FOUND_CLOSED, () => setIsNotfound(false));
+    useAppEventListener(AppEvent.NOT_FOUND_OPENED, () => setIsNotfound(true));
+    useAppEventListener(AppEvent.NOT_FOUND_CLOSED, () => setIsNotfound(false));
 
     if (isNotfound) return null;
 
@@ -61,9 +61,9 @@ export const TopNavigation: React.FC<TopNavigationProps> = () => {
                 <Logo className="logo-xs md:logo-sm" />
             </Link>
 
-            {/* --------------------------------------- */}
-            {/* ---------- MOBILE RIGHT SIDE ---------- */}
-            {/* --------------------------------------- */}
+            {/*|---------------------------------------------------------------------------------|*/}
+            {/*?                                MOBILE RIGHT SIDE                                ?*/}
+            {/*|---------------------------------------------------------------------------------|*/}
             <Link
                 href={'/search'}
                 className="flex items-center md:hidden"
@@ -87,9 +87,10 @@ export const TopNavigation: React.FC<TopNavigationProps> = () => {
                 </button>
             </Link>
 
-            {/* --------------------------------------- */}
-            {/* ---------- DESKTOP RIGHT SIDE --------- */}
-            {/* --------------------------------------- */}
+            {/*|---------------------------------------------------------------------------------|*/}
+            {/*?                                DESKTOP RIGHT SIDE                               ?*/}
+            {/*|---------------------------------------------------------------------------------|*/}
+
             <div className="items-center hidden gap-3 md:flex">
                 <React.Fragment>
                     <Tooltip
@@ -132,9 +133,9 @@ export const TopNavigation: React.FC<TopNavigationProps> = () => {
 
                     <ThemeSwitcherIcon />
 
-                    {/* --------------------------------------- */}
-                    {/* ---------- DESKTOP USER MENU ---------- */}
-                    {/* --------------------------------------- */}
+                    {/*|-------------------------------------------------------------------------|*/}
+                    {/*?                             DESKTOP USER MENU                           ?*/}
+                    {/*|-------------------------------------------------------------------------|*/}
 
                     <Popup content={<NavMenu user={user} className="w-56" />}>
                         <button
@@ -185,9 +186,9 @@ export const TopNavigation: React.FC<TopNavigationProps> = () => {
                 </React.Fragment>
             </div>
 
-            {/* --------------------------------------- */}
-            {/* ----------- MOBILE USER MENU ---------- */}
-            {/* --------------------------------------- */}
+            {/*|---------------------------------------------------------------------------------|*/}
+            {/*?                                 MOBILE USER MENU                                ?*/}
+            {/*|---------------------------------------------------------------------------------|*/}
 
             <Suspense fallback={null}>
                 <Sidebar

@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { useAuth, useLocale } from '@/client/store';
 import { BOTTOM_NAVBAR_ID } from '@/client/constants';
 import { usePathname } from 'next/navigation';
-import { Event } from '@/client/events';
+import { AppEvent } from '@/client/events';
 import { useAppEventListener } from '@/client/hooks';
 
 const DISABLED_FOR_ROUTES = ['/recipe/create'];
@@ -43,8 +43,8 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = () => {
 
     const isDisabled = isNavigationDisabled(pathname);
 
-    useAppEventListener(Event.NOT_FOUND_OPENED, () => setIsNotfound(true));
-    useAppEventListener(Event.NOT_FOUND_CLOSED, () => setIsNotfound(false));
+    useAppEventListener(AppEvent.NOT_FOUND_OPENED, () => setIsNotfound(true));
+    useAppEventListener(AppEvent.NOT_FOUND_CLOSED, () => setIsNotfound(false));
 
     if (!authResolved || isDisabled || isNotfound) return null;
 

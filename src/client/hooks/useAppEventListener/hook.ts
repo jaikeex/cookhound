@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { eventBus, type Event } from '@/client/events';
+import { eventBus, type AppEvent } from '@/client/events';
 
 /**
  * Simple hook to listen to app events. If any advanced needs come up, use the EventBus directly.
@@ -10,7 +10,7 @@ import { eventBus, type Event } from '@/client/events';
  * @param callback - The callback to call when the event is emitted.
  */
 export const useAppEventListener = (
-    event: Event,
+    event: AppEvent,
     callback: (payload?: any) => void
 ) => {
     useEffect(() => {

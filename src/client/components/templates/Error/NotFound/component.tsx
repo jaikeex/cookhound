@@ -1,7 +1,7 @@
 'use client';
 
 import { ButtonBase, Logo, Typography } from '@/client/components';
-import { eventBus, Event } from '@/client/events';
+import { eventBus, AppEvent } from '@/client/events';
 import { useLocale } from '@/client/store';
 import * as React from 'react';
 import { useCallback, useEffect } from 'react';
@@ -16,10 +16,10 @@ export const NotFoundTemplate: React.FC<NotFoundTemplateProps> = () => {
     }, []);
 
     useEffect(() => {
-        eventBus.emit(Event.NOT_FOUND_OPENED, undefined);
+        eventBus.emit(AppEvent.NOT_FOUND_OPENED, undefined);
 
         return () => {
-            eventBus.emit(Event.NOT_FOUND_CLOSED, undefined);
+            eventBus.emit(AppEvent.NOT_FOUND_CLOSED, undefined);
         };
     }, []);
 
