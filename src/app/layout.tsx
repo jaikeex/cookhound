@@ -21,7 +21,7 @@ import { pickMostRecentConsent } from '@/common/utils';
 import { cookies, headers } from 'next/headers';
 import type { UserDTO } from '@/common/types';
 import { apiClient } from '@/client/request';
-import { getUserLocale } from '@/client/utils';
+import { getUserLocale } from '@/common/utils';
 import { CONTENT_WRAPPER_ID, MAIN_PAGE_ID } from '@/client/constants';
 import { QueryClient, dehydrate } from '@tanstack/react-query';
 import { QUERY_KEYS } from '@/client/request/queryClient';

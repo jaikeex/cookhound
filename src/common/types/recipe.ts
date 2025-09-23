@@ -1,4 +1,4 @@
-import type { Locale } from '@/client/locales';
+import type { Locale } from '@/common/types';
 import type { RecipeFlagDTO } from './flags/recipe-flag';
 import type { RecipeTagDTO } from './tags';
 

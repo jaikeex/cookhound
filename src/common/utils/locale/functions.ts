@@ -1,5 +1,5 @@
 import { DEFAULT_LOCALE, SUPPORTED_LOCALES } from '@/common/constants';
-import type { Locale } from '@/client/locales';
+import type { Locale } from '@/common/types';
 import type { ReadonlyRequestCookies } from 'next/dist/server/web/spec-extension/adapters/request-cookies';
 
 /**
@@ -58,20 +58,25 @@ export function isSupportedLocale(locale: string): locale is Locale {
  */
 export async function getUserLocale(
     cookies: ReadonlyRequestCookies,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     headers: Headers
 ): Promise<Locale> {
     let localeString;
 
     // Check if the user has a locale cookie
-    const localeFromCookie = await cookies.get('locale');
+    const localeFromCookie = cookies.get('locale');
 
     if (localeFromCookie) {
         // If the user has a locale cookie, use that
         localeString = localeFromCookie.value;
     } else {
         // If the user doesn't have a locale cookie, use the Accept-Language header
-        const acceptLanguageHeaderContent = headers.get('accept-language');
-        localeString = extractPreferredLanguage(acceptLanguageHeaderContent);
+
+        // const acceptLanguageHeaderContent = headers.get('accept-language');
+        // localeString = extractPreferredLanguage(acceptLanguageHeaderContent);
+
+        //? Default to czech for now, after i get a new job this can be changed
+        localeString = DEFAULT_LOCALE;
     }
 
     return isSupportedLocale(localeString) ? localeString : DEFAULT_LOCALE;

@@ -1,4 +1,4 @@
-import type { Locale } from '@/client/locales';
+import type { Locale } from '@/common/types';
 import { ApplicationErrorCode } from '@/server/error/codes';
 import { ValidationError } from '@/server/error/server';
 import { recipeService } from '@/server/services';

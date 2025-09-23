@@ -1,4 +1,4 @@
-import type { Locale } from '@/client/locales';
+import type { Locale } from '@/common/types';
 import { apiRequestWrapper } from '@/client/request/apiClient/ApiRequestWrapper';
 import type { RequestConfig } from '@/client/request/apiClient/ApiRequestWrapper';
 import type { RecipeDTO, TagListDTO, RecipeTagDTO } from '@/common/types';

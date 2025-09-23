@@ -1,4 +1,4 @@
-import type { Locale } from '@/client/locales';
+import type { Locale } from '@/common/types';
 
 export type RecipeForCreate = {
     displayId: string;

@@ -1,4 +1,4 @@
-import type { Locale } from '@/client/locales';
+import type { Locale } from '@/common/types';
 
 type TimeUnits = 'year' | 'month' | 'day' | 'hour' | 'minute' | 'second';
 type PluralCategory = 'one' | 'few' | 'many' | 'other';

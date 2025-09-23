@@ -1,7 +1,7 @@
 import { FrontPageTemplate } from '@/client/components/templates/Dashboard/FrontPage';
 import { FrontPageSkeleton } from '@/client/components/templates/Dashboard/FrontPage/skeleton';
 import { apiClient } from '@/client/request';
-import { getUserLocale } from '@/client/utils';
+import { getUserLocale } from '@/common/utils';
 import { cookies, headers } from 'next/headers';
 import React, { Suspense } from 'react';
 import { SESSION_COOKIE_NAME } from '@/common/constants/general';

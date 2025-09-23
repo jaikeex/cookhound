@@ -1,5 +1,7 @@
 import { Logger, LogServiceMethod } from '@/server/logger';
 import { queueManager } from '@/server/queues/QueueManager';
+import { RequestContext } from '@/server/utils/reqwest/context/requestContext';
+import { DEFAULT_LOCALE } from '@/common/constants/general';
 import { JOB_NAMES } from '@/server/queues/jobs/names';
 
 //|=============================================================================================|//
@@ -27,7 +29,8 @@ class MailService {
     ) {
         await queueManager.addJob(JOB_NAMES.SEND_VERIFICATION_EMAIL, {
             token,
-            to: { name: username, address: email }
+            to: { name: username, address: email },
+            locale: RequestContext.getUserLocale() ?? DEFAULT_LOCALE
         });
 
         return;
@@ -44,7 +47,8 @@ class MailService {
     async sendPasswordReset(email: string, username: string, token: string) {
         await queueManager.addJob(JOB_NAMES.SEND_PASSWORD_RESET_EMAIL, {
             token,
-            to: { name: username, address: email }
+            to: { name: username, address: email },
+            locale: RequestContext.getUserLocale() ?? DEFAULT_LOCALE
         });
 
         return;
@@ -58,14 +62,16 @@ class MailService {
     ) {
         await queueManager.addJob(JOB_NAMES.SEND_EMAIL_CHANGE_CONFIRMATION, {
             token,
-            to: { name: username, address: email }
+            to: { name: username, address: email },
+            locale: RequestContext.getUserLocale() ?? DEFAULT_LOCALE
         });
     }
 
     @LogServiceMethod({ names: ['email', 'username'] })
     async sendEmailChangeNotice(email: string, username: string) {
         await queueManager.addJob(JOB_NAMES.SEND_EMAIL_CHANGE_NOTICE, {
-            to: { name: username, address: email }
+            to: { name: username, address: email },
+            locale: RequestContext.getUserLocale() ?? DEFAULT_LOCALE
         });
     }
 
@@ -77,7 +83,8 @@ class MailService {
     ) {
         await queueManager.addJob(JOB_NAMES.SEND_EMAIL_CHANGED_AUDIT, {
             toOld: { name: username, address: oldEmail },
-            toNew: { name: username, address: newEmail }
+            toNew: { name: username, address: newEmail },
+            locale: RequestContext.getUserLocale() ?? DEFAULT_LOCALE
         });
     }
 }

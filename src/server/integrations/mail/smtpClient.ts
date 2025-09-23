@@ -1,4 +1,5 @@
 import { ENV_CONFIG_PRIVATE } from '@/common/constants/env';
+import { encodeHeaderUtf8 } from '@/server/queues/jobs/emails/utils/encoding';
 import { InfrastructureError } from '@/server/error';
 import { InfrastructureErrorCode } from '@/server/error/codes';
 import { Logger } from '@/server/logger';
@@ -192,8 +193,15 @@ export class MailClient {
 
         let email = `From: ${from}\r\n`;
         email += `To: ${to}\r\n`;
-        email += `Subject: ${options.subject}\r\n`;
-        email += 'Content-Type: text/html; charset=utf-8\r\n\r\n';
+
+        // Detect non-ASCII characters using Unicode property escapes to avoid control-char regex lint error
+        const needsEncoding = /[^\p{ASCII}]/u.test(options.subject);
+        const subjectHeader = needsEncoding
+            ? encodeHeaderUtf8(options.subject)
+            : options.subject;
+
+        email += `Subject: ${subjectHeader}\r\n`;
+        email += 'Content-Type: text/html; charset=UTF-8\r\n\r\n';
         email += options.html;
 
         return email;

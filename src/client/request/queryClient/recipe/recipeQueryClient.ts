@@ -1,4 +1,4 @@
-import type { Locale } from '@/client/locales';
+import type { Locale } from '@/common/types';
 import { useInfiniteQuery, keepPreviousData } from '@tanstack/react-query';
 import {
     useAppQuery,

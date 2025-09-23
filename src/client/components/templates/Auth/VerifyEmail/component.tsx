@@ -27,14 +27,6 @@ export const VerifyEmailTemplate: React.FC<VerifyEmailTemplateProps> = ({
 
     //TODO: Display a success message after the email is sent.
 
-    console.log('newParam', newParam);
-    console.log(
-        't',
-        newParam
-            ? t('auth.register.success.title')
-            : t('auth.verify-email.retry-title')
-    );
-
     return (
         <div className="w-full max-w-md mx-auto text-center space-y-8 flex items-center flex-col">
             <Typography>

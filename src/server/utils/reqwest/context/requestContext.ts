@@ -3,7 +3,12 @@ import { AsyncLocalStorage } from 'async_hooks';
 import { randomUUID } from 'crypto';
 import { cookies } from 'next/headers';
 import { sessions } from '@/server/utils/session/manager';
-import { SESSION_COOKIE_NAME } from '@/common/constants/general';
+import {
+    DEFAULT_LOCALE,
+    SESSION_COOKIE_NAME
+} from '@/common/constants/general';
+import type { Locale } from '@/common/types';
+import { getUserLocale } from '@/common/utils';
 
 export const REQUEST_ID_FIELD_NAME = 'requestId';
 export const REQUEST_PATH_FIELD_NAME = 'path';
@@ -18,6 +23,7 @@ export interface RequestContextShape {
     requestMethod?: string;
     sessionId?: string | null;
     userRole?: UserRole | null;
+    userLocale?: Locale | null;
     userId?: number | null;
     userAgent?: string | null;
     ip?: string | null;
@@ -68,6 +74,19 @@ export const RequestContext = {
                 // If the URL parsing fails, provide a placeholder, do nothing more.
                 ctx.requestPath = 'PATH UNKNOWN';
             }
+            ///---------------------------------------------------------------------------------///
+            ///                                     LOCALE                                      ///
+            ///---------------------------------------------------------------------------------///
+
+            try {
+                const cookieStore = await cookies();
+
+                const locale = await getUserLocale(cookieStore, req.headers);
+                ctx.userLocale = locale;
+            } catch {
+                // If the locale fetching fails, provide a placeholder, do nothing more.
+                ctx.userLocale = DEFAULT_LOCALE;
+            }
 
             ///---------------------------------------------------------------------------------///
             ///                                     SESSION                                     ///
@@ -90,7 +109,7 @@ export const RequestContext = {
             }
         } catch {
             /**
-             * DO NOTHING HERE
+             *!DO NOTHING HERE
              * Under no circumstances can an error here fail the entire request. It should simply continue
              * with the values that did not fail, or empty if none of them were set. That is not
              * a big isssue, services should still do all the needed checks themselves where appropriate.
@@ -98,7 +117,7 @@ export const RequestContext = {
         }
 
         // The AsyncLocalStorage instance takes care of propagating the store
-        // across every async boundary that happens while `fn` is running.
+        // across every async boundary that happens while 'fn' is running.
         return asyncLocalStorage.run(ctx, fn);
     },
 
@@ -138,6 +157,10 @@ export const RequestContext = {
 
     getUserId(): number | null {
         return this.get('userId') ?? null;
+    },
+
+    getUserLocale(): Locale | null {
+        return (this.get('userLocale') as Locale | null) ?? null;
     },
 
     getIp(): string | null {

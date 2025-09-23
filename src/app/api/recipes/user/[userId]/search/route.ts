@@ -1,6 +1,6 @@
 import type { NextRequest } from 'next/server';
 import { recipeService } from '@/server/services/recipe/service';
-import type { Locale } from '@/client/locales';
+import type { Locale } from '@/common/types';
 import { z } from 'zod';
 import { validateQuery } from '@/server/utils/reqwest';
 import { ApplicationErrorCode } from '@/server/error/codes';

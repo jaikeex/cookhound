@@ -8,7 +8,7 @@ import {
 } from '@/common/types';
 import type { RecipeForCreate } from './types';
 import db from '@/server/db/model';
-import type { Locale } from '@/client/locales';
+import type { Locale } from '@/common/types';
 import {
     AuthErrorForbidden,
     AuthErrorUnauthorized,
@@ -530,7 +530,7 @@ class RecipeService {
     }
 
     //~-----------------------------------------------------------------------------------------~//
-    //$                                 TEXT SEARCH FETCH                                     $//
+    //$                                   TEXT SEARCH FETCH                                     $//
     //~-----------------------------------------------------------------------------------------~//
 
     /**

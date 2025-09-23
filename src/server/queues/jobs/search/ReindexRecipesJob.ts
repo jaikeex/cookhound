@@ -5,7 +5,7 @@ import { Logger } from '@/server/logger';
 import type { Job } from 'bullmq';
 import { recipeSearchIndex } from '@/server/search-index';
 import type { Ingredient, RecipeDTO, RecipeTagDTO } from '@/common/types';
-import type { Locale } from '@/client/locales';
+import type { Locale } from '@/common/types';
 import type { RecipeFlagDTO } from '@/common/types/flags/recipe-flag';
 import recipeModel from '@/server/db/model/recipe/model';
 

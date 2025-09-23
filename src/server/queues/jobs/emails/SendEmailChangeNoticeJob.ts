@@ -5,12 +5,15 @@ import { queueManager } from '@/server/queues/QueueManager';
 import { JOB_NAMES, QUEUE_NAMES } from '@/server/queues/jobs/names';
 import { FROM_ADDRESS, FROM_NAME, QUEUE_OPTIONS } from './constants';
 import { Logger } from '@/server/logger';
-import { emailChangeNoticeTemplate } from './templates/email-change-notice';
+import { emailChangeNoticeTpl } from './templates/email-change-notice';
+import type { Locale } from '@/common/types';
+import { createTemplate } from './utils';
 
 const log = Logger.getInstance('email-change-notice-worker');
 
 type EmailChangeNoticeData = {
     to: { address: string; name: string };
+    locale: Locale;
 };
 
 class SendEmailChangeNoticeJob extends BaseJob<EmailChangeNoticeData> {
@@ -19,16 +22,20 @@ class SendEmailChangeNoticeJob extends BaseJob<EmailChangeNoticeData> {
     static queueOptions = QUEUE_OPTIONS;
 
     async handle(job: Job<EmailChangeNoticeData>) {
-        const { to } = job.data;
+        const { to, locale } = job.data;
 
         log.trace('handle - sending email change notice', to);
 
-        const html = emailChangeNoticeTemplate(to.name);
+        const { subject, html } = createTemplate(
+            emailChangeNoticeTpl,
+            locale,
+            to.name
+        );
 
         await mailClient.send({
             from: { name: FROM_NAME, address: FROM_ADDRESS },
             to,
-            subject: 'Email change requested',
+            subject,
             html
         });
 

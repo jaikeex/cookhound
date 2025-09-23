@@ -84,7 +84,7 @@ export const POST = makeHandler(
 export const PUT = makeHandler(
     putHandler,
     withRateLimit({
-        maxRequests: 20,
-        windowSizeInSeconds: 60 // 1 minute
+        maxRequests: 5,
+        windowSizeInSeconds: 60 * 60 // 1 hour
     })
 );

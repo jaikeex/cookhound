@@ -1,7 +1,7 @@
 import { typesenseClient } from '@/server/integrations';
 import { Logger } from '@/server/logger';
 import type { RecipeDTO, RecipeForDisplayDTO } from '@/common/types';
-import type { Locale } from '@/client/locales';
+import type { Locale } from '@/common/types';
 import { redisClient } from '@/server/integrations';
 import { InfrastructureError } from '@/server/error';
 import { InfrastructureErrorCode } from '@/server/error/codes';

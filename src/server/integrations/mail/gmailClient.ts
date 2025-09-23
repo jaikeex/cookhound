@@ -2,6 +2,7 @@ import { gmailService } from '@/server/integrations';
 import { Logger } from '@/server/logger';
 import { InfrastructureError } from '@/server/error';
 import { InfrastructureErrorCode } from '@/server/error/codes';
+import { encodeHeaderUtf8 } from '@/server/queues/jobs/emails/utils/encoding';
 
 export interface MailAddress {
     name: string;
@@ -21,19 +22,27 @@ const log = Logger.getInstance('gmail-mail-client');
 class GmailMailClient {
     async send(options: MailOptions): Promise<void> {
         try {
+            const from = `"${options.from.name}" <${options.from.address}>`;
             const to = Array.isArray(options.to)
                 ? options.to.map((t) => `${t.name} <${t.address}>`).join(', ')
                 : `${options.to.name} <${options.to.address}>`;
 
+            // Detect non-ASCII characters using Unicode property escapes to avoid control-char regex lint error
+            const needsEncoding = /[^\p{ASCII}]/u.test(options.subject);
+            const subjectHeader = needsEncoding
+                ? encodeHeaderUtf8(options.subject)
+                : options.subject;
+
             await gmailService.sendMail({
-                from: `${options.from.name} <${options.from.address}>`,
+                from,
                 to,
-                subject: options.subject,
+                subject: subjectHeader,
                 html: options.html,
                 text: options.text ?? ''
             });
         } catch (error: unknown) {
             log.errorWithStack('send - failed to send via Gmail API', error);
+
             throw new InfrastructureError(
                 InfrastructureErrorCode.SMTP_SEND_FAILED // reuse code
             );

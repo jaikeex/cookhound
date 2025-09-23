@@ -9,7 +9,7 @@ import {
 import type { NextRequest } from 'next/server';
 import { withRateLimit } from '@/server/utils/rate-limit';
 import { withAuth } from '@/server/utils/reqwest';
-import type { Locale } from '@/client/locales';
+import type { Locale } from '@/common/types';
 import { z } from 'zod';
 import { validateQuery } from '@/server/utils/reqwest';
 

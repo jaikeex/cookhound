@@ -9,7 +9,7 @@ import {
     type TagSuggestionsOptions
 } from './types';
 import type { RecipeDTO } from '@/common/types';
-import type { Locale } from '@/client/locales';
+import type { Locale } from '@/common/types';
 
 class TagQueryClient {
     useTags = (language: Locale, options?: Partial<TagListOptions>) =>
