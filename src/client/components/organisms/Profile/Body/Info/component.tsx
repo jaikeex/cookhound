@@ -3,6 +3,7 @@
 import React, { useCallback } from 'react';
 import { AuthType, type UserDTO } from '@/common/types';
 import {
+    ButtonBase,
     ButtonRow,
     Divider,
     LinkRow,
@@ -15,6 +16,7 @@ import { ConsentSettingsModal } from '@/client/components';
 import { LogoutAllConfirmModal } from '@/client/components';
 import { chqc, QUERY_KEYS } from '@/client/request/queryClient';
 import { useQueryClient } from '@tanstack/react-query';
+import { useLogout } from '@/client/hooks';
 
 export type ProfileBodyInfoProps = Readonly<{
     user: UserDTO;
@@ -23,8 +25,10 @@ export type ProfileBodyInfoProps = Readonly<{
 export const ProfileBodyInfo: React.FC<ProfileBodyInfoProps> = ({ user }) => {
     const { t } = useLocale();
     const { alert } = useSnackbar();
-    const queryClient = useQueryClient();
     const { openModal } = useModal();
+
+    const { logout: handleLogout } = useLogout();
+    const queryClient = useQueryClient();
 
     const { mutateAsync: updateUserById, isPending } =
         chqc.user.useUpdateUserById({
@@ -108,39 +112,55 @@ export const ProfileBodyInfo: React.FC<ProfileBodyInfoProps> = ({ user }) => {
                     </React.Fragment>
                 ) : null}
 
-                <Divider subtle className="mt-3" />
+                {/* <Divider subtle className="mt-3" /> */}
 
-                <Typography variant="heading-sm" className="mt-6">
+                <Typography variant="heading-sm" className="mt-8">
                     {t('app.profile.settings.section-privacy')}
                 </Typography>
 
                 <Divider className="mt-1" />
 
+                <Typography variant="heading-xs" className="font-semibold mt-3">
+                    {t('app.profile.settings.logout')}
+                </Typography>
+
+                <div className="flex items-stretch justify-between gap-4 mt-3">
+                    <ButtonBase
+                        className="w-full"
+                        size="md"
+                        onClick={handleLogout}
+                        color="primary"
+                    >
+                        {t('auth.form.logout')}
+                    </ButtonBase>
+
+                    <ButtonBase
+                        className="w-full"
+                        size="md"
+                        onClick={handleLogoutAll}
+                        color="danger"
+                    >
+                        {t('app.profile.settings.logout-all')}
+                    </ButtonBase>
+                </div>
+
+                <Divider subtle className="mt-3" />
+
                 <ButtonRow
                     className="mt-3"
-                    label={t('app.profile.settings.cookies-description')}
+                    buttonSize="md"
                     buttonText={t('app.cookies.modal.title')}
                     outlined
                     onClick={handleCookieSettings}
                 />
 
-                <Divider subtle className="mt-3" />
-
-                <ButtonRow
-                    className="mt-3"
-                    label={t('app.profile.settings.logout-all')}
-                    buttonText={t('app.profile.settings.logout-all')}
-                    onClick={handleLogoutAll}
-                    buttonColor="danger"
-                />
-
-                <Divider subtle className="mt-3" />
+                {/* <Divider subtle className="mt-3" />
 
                 <Typography variant="heading-sm" className="mt-6">
                     {t('app.profile.settings.section-danger-zone')}
                 </Typography>
 
-                <Divider className="mt-1" />
+                <Divider className="mt-1" /> */}
             </section>
         </div>
     );
