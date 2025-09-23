@@ -90,13 +90,13 @@ export const InstructionsListCreate: React.FC<InstructionsListCreateProps> = ({
             <DraggableList onReorder={setInstructions} values={instructions}>
                 {instructions.map((key, index) => (
                     <InstructionRowCreate
-                        dragIndex={key}
-                        key={key}
-                        index={index}
                         defaultInstruction={defaultInstructions?.[index]}
+                        dragIndex={key}
+                        index={index}
+                        key={key}
                         onAddInstruction={handleAddInstruction}
-                        onRemove={handleRemoveInstruction(key)}
                         onChange={handleRowChange(index)}
+                        onRemove={handleRemoveInstruction(key)}
                     />
                 ))}
             </DraggableList>
@@ -115,10 +115,10 @@ export const InstructionsListCreate: React.FC<InstructionsListCreateProps> = ({
             {draggableInstructionsList}
             <ButtonBase
                 className={'w-full'}
-                icon={'plus'}
                 color={'subtle'}
-                size={'sm'}
+                icon={'plus'}
                 onClick={handleAddInstruction}
+                size={'sm'}
             >
                 {t('app.recipe.add-instruction')}
             </ButtonBase>

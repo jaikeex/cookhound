@@ -22,27 +22,27 @@ import type { RecipeFormMode } from '@/client/types/core';
 
 type RecipeFormProps = Readonly<{
     className?: string;
+    defaultValues?: RecipeDTO | null;
     errors?: RecipeFormErrors;
     mode: RecipeFormMode;
     onChange?: (name: string, value: any) => void;
     pending?: boolean;
-    defaultValues?: RecipeDTO | null;
 }>;
 
 export type RecipeFormErrors = {
-    title?: I18nMessage;
     ingredients?: I18nMessage;
     instructions?: I18nMessage;
     server?: I18nMessage;
+    title?: I18nMessage;
 };
 
 export const RecipeForm: React.FC<RecipeFormProps> = ({
     className,
-    errors,
-    onChange,
-    pending,
     defaultValues,
-    mode
+    errors,
+    mode,
+    onChange,
+    pending
 }) => {
     // This hook call does nothing at the moment as it only works with react server actions.
     // It is left here for reference and to possibly inspire another solution in the future :D
@@ -109,10 +109,10 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({
     return (
         <div className={`space-y-4 md:px-8 overflow-x-hidden ${className}`}>
             <ImageInput
-                onUpload={handleImageChange}
-                name={'recipe-image'}
-                showPreview
                 defaultImageUrl={defaultValues?.imageUrl}
+                name={'recipe-image'}
+                onUpload={handleImageChange}
+                showPreview
             />
 
             {/* Hidden field to preserve the default imageUrl when no new image is uploaded */}
@@ -126,35 +126,35 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({
 
             <TextInput
                 defaultValue={defaultValues?.title}
+                error={t(errors?.title)}
                 id={'recipe-title'}
                 label={t('app.recipe.title')}
                 name={'title'}
                 onChange={handleInputChange('title')}
                 onKeyDown={handleInputKeyPress('recipe-portionSize')}
-                error={t(errors?.title)}
             />
 
             <Divider className="md:hidden" />
 
             <div className={'flex flex-col gap-4 md:grid md:grid-cols-2'}>
                 <NumberInput
+                    allowDecimals={false}
                     className={'mt-auto'}
                     defaultValue={defaultValues?.portionSize}
                     id={'recipe-portionSize'}
                     label={t('app.recipe.servings')}
-                    name={'portionSize'}
                     max={100}
-                    allowDecimals={false}
+                    name={'portionSize'}
                     onChange={handleInputChange('portionSize')}
                     onKeyDown={handleInputKeyPress('recipe-time')}
                 />
                 <NumberInput
+                    allowDecimals={false}
                     defaultValue={defaultValues?.time}
                     id={'recipe-time'}
                     label={t('app.recipe.preparation-time')}
-                    name={'time'}
                     max={9999}
-                    allowDecimals={false}
+                    name={'time'}
                     onChange={handleInputChange('time')}
                     onKeyDown={handleInputKeyPress('ingredient-quantity-0')}
                 />
@@ -173,8 +173,8 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({
             </div>
 
             <IngredientsListCreate
-                onChange={handleIngredientsChange}
                 defaultIngredients={defaultValues?.ingredients}
+                onChange={handleIngredientsChange}
             />
 
             <Divider />
@@ -221,7 +221,7 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({
             />
 
             {errors?.server ? (
-                <Typography variant={'error'} align={'center'}>
+                <Typography align={'center'} variant={'error'}>
                     {t(errors.server)}
                 </Typography>
             ) : null}

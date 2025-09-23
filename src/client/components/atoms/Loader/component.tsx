@@ -6,7 +6,7 @@ export type LoaderProps = Readonly<{
     size?: 'xs' | 'sm' | 'md' | 'lg';
 }>;
 
-export const Loader: React.FC<LoaderProps> = ({ size = 'md', className }) => {
+export const Loader: React.FC<LoaderProps> = ({ className, size = 'md' }) => {
     const sizes = {
         xs: 'w-3 h-3',
         sm: 'w-5 h-5',

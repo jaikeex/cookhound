@@ -13,8 +13,8 @@ type ShoppingListHeadProps = Readonly<{
 }>;
 
 export const ShoppingListHead: React.FC<ShoppingListHeadProps> = ({
-    error,
     editing,
+    error,
     loading,
     onEdit
 }) => {
@@ -27,21 +27,21 @@ export const ShoppingListHead: React.FC<ShoppingListHeadProps> = ({
 
                 {editing ? (
                     <ButtonBase
+                        className={classNames('min-w-24')}
                         color="secondary"
+                        onClick={onEdit}
                         outlined
                         size="sm"
-                        className={classNames('min-w-24')}
-                        onClick={onEdit}
                     >
                         {loading ? <Loader /> : t('app.general.confirm')}
                     </ButtonBase>
                 ) : (
                     <ButtonBase
+                        className={classNames('min-w-24')}
                         color="subtle"
+                        onClick={onEdit}
                         outlined
                         size="sm"
-                        className={classNames('min-w-24')}
-                        onClick={onEdit}
                     >
                         {loading ? <Loader size="xs" /> : t('app.general.edit')}
                     </ButtonBase>

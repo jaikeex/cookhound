@@ -10,8 +10,8 @@ type ButtonWithCooldownProps = Readonly<{
     BaseButtonProps;
 
 export const ButtonWithCooldown: React.FC<ButtonWithCooldownProps> = ({
-    cooldown,
     children,
+    cooldown,
     onClick,
     ...props
 }) => {

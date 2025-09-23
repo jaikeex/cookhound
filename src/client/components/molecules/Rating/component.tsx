@@ -18,10 +18,10 @@ const classConfig = {
 export type RatingProps = Readonly<{
     className?: string;
     cooldown?: number;
+    cooldownKey?: string;
     disabled?: boolean;
     fill?: 'gold' | 'silver' | 'bronze';
     iconSize?: number;
-    cooldownKey?: string;
     onClick?: (rating: number) => void;
     rating: number | null;
     size?: RatingSize;
@@ -32,10 +32,10 @@ export const MAX_RATING = 5;
 export const Rating: React.FC<RatingProps> = ({
     className,
     cooldown,
+    cooldownKey,
     disabled,
     fill = 'gold',
     iconSize = 24,
-    cooldownKey,
     onClick,
     rating,
     size = 'md'

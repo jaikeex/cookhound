@@ -7,16 +7,16 @@ import Link, { type LinkProps } from 'next/link';
 type IconLinkProps = Readonly<{
     className?: string;
     disabled?: boolean;
-    icon: IconName;
     href: string;
+    icon: IconName;
 }> &
     LinkProps;
 
 export const IconLink: React.FC<IconLinkProps> = ({
     className,
     disabled,
-    icon,
     href,
+    icon,
     ...props
 }) => {
     return (

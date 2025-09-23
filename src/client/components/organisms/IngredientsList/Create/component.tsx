@@ -115,13 +115,13 @@ export const IngredientsListCreate: React.FC<IngredientsListCreateProps> = ({
             <DraggableList onReorder={handleReorder} values={ingredients}>
                 {ingredients.map((key, index) => (
                     <IngredientRowCreate
-                        dragIndex={key}
-                        key={key}
-                        index={index}
                         defaultIngredient={ingredientValues[index]}
+                        dragIndex={key}
+                        index={index}
+                        key={key}
                         onAddIngredient={handleAddIngredient}
-                        onRemove={handleRemoveIngredient(key)}
                         onChange={handleRowChange(index)}
+                        onRemove={handleRemoveIngredient(key)}
                     />
                 ))}
             </DraggableList>
@@ -141,10 +141,10 @@ export const IngredientsListCreate: React.FC<IngredientsListCreateProps> = ({
             {draggableList}
             <ButtonBase
                 className={'w-full'}
-                icon={'plus'}
                 color={'subtle'}
-                size={'sm'}
+                icon={'plus'}
                 onClick={handleAddIngredient}
+                size={'sm'}
             >
                 {t('app.recipe.add-ingredient')}
             </ButtonBase>

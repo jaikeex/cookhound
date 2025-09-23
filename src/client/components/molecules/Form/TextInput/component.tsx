@@ -4,8 +4,8 @@ import type { FormInputProps } from '@/client/components/molecules/Form/types';
 import { classNames } from '@/client/utils';
 
 export type TextInputProps = Readonly<{
-    placeholder?: string;
     label?: string;
+    placeholder?: string;
 }> &
     Omit<FormInputProps, 'type' | 'label'>;
 

@@ -7,8 +7,8 @@ import { useKeyPress } from '@/client/hooks';
 
 export type SwitchProps = Readonly<{
     className?: string;
-    labelRight?: string;
     labelLeft?: string;
+    labelRight?: string;
     onChange?: React.ChangeEventHandler<HTMLInputElement>;
     stretch?: boolean;
 }> &
@@ -16,8 +16,8 @@ export type SwitchProps = Readonly<{
 
 export const Switch: React.FC<SwitchProps> = ({
     className,
-    labelRight,
     labelLeft,
+    labelRight,
     onChange,
     stretch = false,
     ...props

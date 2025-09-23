@@ -8,11 +8,11 @@ import { classNames } from '@/client/utils';
 
 export const RecipeCard: React.FC<RecipeCardProps> = ({
     displayId,
-    title,
     imageUrl,
+    index = 0,
     rating,
     time,
-    index = 0
+    title
 }) => {
     return (
         <div

@@ -26,19 +26,19 @@ const classConfig = {
 type RecipeInfoProps = Readonly<{
     className?: string;
     portionSize?: number | null;
+    size?: RecipeInfoSize;
     time?: number | null;
     typographyVariant?: TypographyVariant;
     verbose?: boolean;
-    size?: RecipeInfoSize;
 }>;
 
 export const RecipeInfo: React.FC<RecipeInfoProps> = ({
     className,
     portionSize,
+    size = 'md',
     time,
     typographyVariant = 'body-sm',
-    verbose,
-    size = 'md'
+    verbose
 }) => {
     const { t } = useLocale();
 

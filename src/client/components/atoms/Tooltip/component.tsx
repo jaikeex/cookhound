@@ -21,9 +21,9 @@ type TooltipProps = Readonly<{
         | 'left-end'
         | 'right-start'
         | 'right-end';
+    targetRef?: React.RefObject<HTMLElement | null>;
     text: string;
     visible?: boolean;
-    targetRef?: React.RefObject<HTMLElement | null>;
 }> &
     React.PropsWithChildren<NonNullable<unknown>>;
 
@@ -46,12 +46,12 @@ const classConfig = {
 
 export const Tooltip: React.FC<TooltipProps> = ({
     children,
-    disabled,
     className,
+    disabled,
     position,
+    targetRef,
     text,
-    visible,
-    targetRef
+    visible
 }) => {
     const [isVisible, setIsVisible] = useState(false);
     const [targetRect, setTargetRect] = useState<DOMRect | null>(null);

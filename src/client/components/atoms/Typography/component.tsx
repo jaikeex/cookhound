@@ -58,11 +58,11 @@ export type TypographyProps<E extends React.ElementType> =
 
 export const Typography = <E extends React.ElementType = 'p'>({
     align,
-    className = '',
-    variant = 'body',
-    children,
     as,
+    children,
+    className = '',
     disableLinkStyles = false,
+    variant = 'body',
     ...props
 }: TypographyProps<E>) => {
     const Component = as || 'p';

@@ -121,54 +121,54 @@ export const ConsentSettingsModal: React.FC<ConsentSettingsModalProps> = ({
                 <ConsentRow
                     allwaysOn={true}
                     description={t('app.cookies.modal.essential-description')}
-                    title={t('app.cookies.modal.essential')}
                     status={getCategoryStatusString('essential')}
+                    title={t('app.cookies.modal.essential')}
                 />
 
                 <ConsentRow
                     allwaysOn={false}
                     checked={preferences}
                     description={t('app.cookies.modal.preferences-description')}
-                    title={t('app.cookies.modal.preferences')}
-                    status={getCategoryStatusString('preferences')}
                     onChange={handlePreferences}
+                    status={getCategoryStatusString('preferences')}
+                    title={t('app.cookies.modal.preferences')}
                 />
 
                 <ConsentRow
                     allwaysOn={false}
                     checked={analytics}
                     description={t('app.cookies.modal.analytics-description')}
-                    title={t('app.cookies.modal.analytics')}
-                    status={getCategoryStatusString('analytics')}
                     onChange={handleAnalytics}
+                    status={getCategoryStatusString('analytics')}
+                    title={t('app.cookies.modal.analytics')}
                 />
 
                 <ConsentRow
                     allwaysOn={false}
                     checked={marketing}
                     description={t('app.cookies.modal.marketing-description')}
-                    title={t('app.cookies.modal.marketing')}
-                    status={getCategoryStatusString('marketing')}
                     onChange={handleMarketing}
+                    status={getCategoryStatusString('marketing')}
+                    title={t('app.cookies.modal.marketing')}
                 />
             </div>
 
             <div className="flex gap-2">
                 <ButtonBase
-                    color="subtle"
-                    outlined
-                    onClick={onClose}
-                    size="md"
                     className="w-full"
+                    color="subtle"
+                    onClick={onClose}
+                    outlined
+                    size="md"
                 >
                     {t('app.general.cancel')}
                 </ButtonBase>
 
                 <ButtonBase
+                    className="w-full"
                     color="primary"
                     onClick={handleSave}
                     size="md"
-                    className="w-full"
                 >
                     {t('app.general.save')}
                 </ButtonBase>

@@ -6,14 +6,14 @@ import { classNames } from '@/client/utils';
 export type PasswordInputProps = FormInputProps;
 
 export const PasswordInput: React.FC<PasswordInputProps> = ({
+    autoComplete,
     className,
     disabled,
     error,
     id,
     label,
     name,
-    onChange,
-    autoComplete
+    onChange
 }) => {
     return (
         <div className={classNames('w-full relative', className)}>

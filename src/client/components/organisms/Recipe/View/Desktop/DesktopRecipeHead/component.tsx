@@ -39,26 +39,26 @@ export const DesktopRecipeHead: React.FC<DesktopRecipeHeadProps> = ({
                     </Typography>
 
                     <Tooltip
+                        className={'w-fit'}
+                        disabled={isPreview || !!user}
                         position={'bottom'}
                         text={t('app.general.anonymous')}
-                        disabled={isPreview || !!user}
-                        className={'w-fit'}
                     >
                         <Rating
-                            onClick={onRateRecipe}
-                            disabled={isPreview || !user}
-                            rating={recipe.rating}
-                            fill={'gold'}
-                            iconSize={22}
                             cooldown={60000}
                             cooldownKey={recipe.displayId}
+                            disabled={isPreview || !user}
+                            fill={'gold'}
+                            iconSize={22}
+                            onClick={onRateRecipe}
+                            rating={recipe.rating}
                         />
                     </Tooltip>
 
                     <TagList
-                        tags={recipe.tags ?? []}
-                        size="sm"
                         className="mt-2"
+                        size="sm"
+                        tags={recipe.tags ?? []}
                     />
                 </div>
 
@@ -66,15 +66,15 @@ export const DesktopRecipeHead: React.FC<DesktopRecipeHeadProps> = ({
                     className="mt-4"
                     portionSize={recipe.portionSize}
                     time={recipe.time}
-                    verbose={true}
                     typographyVariant={'body-sm'}
+                    verbose={true}
                 />
             </div>
 
             <RecipeImage
-                src={recipe.imageUrl}
                 alt={recipe.title}
                 className="max-h-[180px] max-w-80"
+                src={recipe.imageUrl}
             />
         </div>
     );

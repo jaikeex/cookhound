@@ -82,8 +82,8 @@ export type ChipProps = Readonly<{
 export const Chip: React.FC<ChipProps> = ({
     children,
     className,
-    icon,
     color = 'primary',
+    icon,
     outlined = false,
     size = 'md',
     textClassName,

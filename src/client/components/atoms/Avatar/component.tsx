@@ -30,15 +30,15 @@ const urls = {
 type AvatarProps = Readonly<{
     alt?: string;
     className?: string;
-    src: string | 'default' | 'anonymous';
     size?: keyof typeof config.wrapperSize;
+    src: string | 'default' | 'anonymous';
 }>;
 
 export const Avatar: React.FC<AvatarProps> = ({
     alt,
     className,
-    src,
-    size = 'md'
+    size = 'md',
+    src
 }) => {
     const url = src === 'default' || src === 'anonymous' ? urls[src] : src;
     const imgClassName = ['default', 'anonymous'].includes(src)

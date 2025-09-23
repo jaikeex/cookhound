@@ -5,14 +5,14 @@ import { Icon } from '@/client/components';
 import { classNames } from '@/client/utils';
 
 export type StarProps = Readonly<{
+    className?: string;
     disabled?: boolean;
     fill?: 'gold' | 'silver' | 'bronze';
-    iconSize?: number;
     highlight?: boolean;
+    iconSize?: number;
     onMouseMove?: (isInLeftHalf: boolean) => void;
     pulse?: boolean;
     state: 'full' | 'half' | 'empty';
-    className?: string;
 }>;
 
 export enum StarState {
@@ -35,14 +35,14 @@ const config = {
 };
 
 export const Star: React.FC<StarProps> = ({
+    className,
     disabled = false,
     fill = 'gold',
     highlight = false,
     iconSize = 32,
     onMouseMove,
     pulse,
-    state,
-    className
+    state
 }) => {
     const ref = useRef<HTMLDivElement>(null);
 

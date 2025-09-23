@@ -20,12 +20,12 @@ export type RecipeSearchInputProps = Readonly<{
     SearchInputProps;
 
 export const RecipeSearchInput: React.FC<RecipeSearchInputProps> = ({
-    enableSuggestions = true,
-    onChange,
-    value,
     defaultValue,
+    enableSuggestions = true,
     initialQueries,
+    onChange,
     onSearch,
+    value,
     ...rest
 }) => {
     //~-----------------------------------------------------------------------------------------~//
@@ -223,25 +223,25 @@ export const RecipeSearchInput: React.FC<RecipeSearchInputProps> = ({
     return (
         <SearchInput
             {...rest}
+            defaultValue={defaultValue}
+            isLoading={isLoading}
+            onBlur={handleInputBlur}
+            onChange={handleInputChange}
+            onFocus={handleInputFocus}
+            onSearch={handleSearch}
             placeholder={t('app.recipe.search.placeholder')}
             ref={containerRef}
             value={value}
-            defaultValue={defaultValue}
-            onChange={handleInputChange}
-            onFocus={handleInputFocus}
-            onBlur={handleInputBlur}
-            isLoading={isLoading}
-            onSearch={handleSearch}
         >
             {shouldShowSuggestions && (
                 <SearchSuggestionBox
-                    suggestions={suggestions}
+                    emptyMessage={emptyMessage}
+                    error={error}
                     isEmpty={isEmpty}
                     isLoading={isLoading}
-                    error={error}
                     onSuggestionClick={handleSuggestionClick}
+                    suggestions={suggestions}
                     title={titleElement}
-                    emptyMessage={emptyMessage}
                 />
             )}
         </SearchInput>

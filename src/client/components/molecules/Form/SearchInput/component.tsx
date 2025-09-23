@@ -8,34 +8,34 @@ import { classNames } from '@/client/utils';
 import { useLocale } from '@/client/store';
 
 export type SearchInputProps = Readonly<{
-    placeholder?: string;
-    isLoading?: boolean;
-    onSearch?: () => void;
-    ref?: React.RefObject<HTMLDivElement | null>;
-    label?: string;
-    value?: string;
     children?: ReactNode;
-    onFocus?: () => void;
+    isLoading?: boolean;
+    label?: string;
     onBlur?: () => void;
+    onFocus?: () => void;
+    onSearch?: () => void;
+    placeholder?: string;
+    ref?: React.RefObject<HTMLDivElement | null>;
+    value?: string;
 }> &
     Omit<FormInputProps, 'type' | 'label' | 'children'>;
 
 export const SearchInput: React.FC<SearchInputProps> = ({
+    children,
     className,
     defaultValue,
     disabled,
     id,
+    isLoading,
     label,
     name,
+    onBlur,
     onChange,
+    onFocus,
     onSearch,
     placeholder,
-    isLoading,
-    value,
-    children,
-    onFocus,
-    onBlur,
-    ref
+    ref,
+    value
 }) => {
     const { t } = useLocale();
 

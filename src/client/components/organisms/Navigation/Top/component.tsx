@@ -70,10 +70,10 @@ export const TopNavigation: React.FC<TopNavigationProps> = () => {
                 tabIndex={-1}
             >
                 <IconButton
-                    icon="search"
                     aria-label={t('app.general.search')}
-                    size={28}
                     className="flex items-center justify-center w-10 h-12"
+                    icon="search"
+                    size={28}
                 />
 
                 <button
@@ -83,7 +83,7 @@ export const TopNavigation: React.FC<TopNavigationProps> = () => {
                         'block md:hidden'
                     )}
                 >
-                    <Avatar src={avatarSrc || 'anonymous'} size="md" />
+                    <Avatar size="md" src={avatarSrc || 'anonymous'} />
                 </button>
             </Link>
 
@@ -104,9 +104,9 @@ export const TopNavigation: React.FC<TopNavigationProps> = () => {
                         >
                             <ButtonBase
                                 color="subtle"
+                                disabled={!isLoggedin || !authResolved}
                                 icon="plus"
                                 size="sm"
-                                disabled={!isLoggedin || !authResolved}
                             >
                                 {t('app.recipe.create')}
                             </ButtonBase>
@@ -123,10 +123,10 @@ export const TopNavigation: React.FC<TopNavigationProps> = () => {
                         }
                     >
                         <IconLink
-                            href={'/shopping-list'}
                             aria-label={t('app.general.shopping-list')}
-                            icon="shoppingList"
                             disabled={!isLoggedin || !authResolved}
+                            href={'/shopping-list'}
+                            icon="shoppingList"
                             prefetch={isLoggedin}
                         />
                     </Tooltip>
@@ -137,7 +137,7 @@ export const TopNavigation: React.FC<TopNavigationProps> = () => {
                     {/*?                             DESKTOP USER MENU                           ?*/}
                     {/*|-------------------------------------------------------------------------|*/}
 
-                    <Popup content={<NavMenu user={user} className="w-56" />}>
+                    <Popup content={<NavMenu className="w-56" user={user} />}>
                         <button
                             className={
                                 isLoggedin
@@ -149,9 +149,9 @@ export const TopNavigation: React.FC<TopNavigationProps> = () => {
                         >
                             <Avatar
                                 alt={'Click to open user menu'}
-                                src={avatarSrc || 'anonymous'}
-                                size="md"
                                 className={`${isLoggedin ? 'block' : authResolved ? 'hidden' : 'opacity-50 animate-pulse'}`}
+                                size="md"
+                                src={avatarSrc || 'anonymous'}
                             />
                         </button>
                     </Popup>
@@ -162,9 +162,9 @@ export const TopNavigation: React.FC<TopNavigationProps> = () => {
                         tabIndex={-1}
                     >
                         <ButtonBase
+                            aria-label={t('auth.form.login')}
                             color="primary"
                             size="sm"
-                            aria-label={t('auth.form.login')}
                         >
                             {t('auth.form.login')}
                         </ButtonBase>
@@ -176,9 +176,9 @@ export const TopNavigation: React.FC<TopNavigationProps> = () => {
                         tabIndex={-1}
                     >
                         <ButtonBase
+                            aria-label={t('auth.form.register')}
                             color="primary"
                             size="sm"
-                            aria-label={t('auth.form.register')}
                         >
                             {t('auth.form.register')}
                         </ButtonBase>
@@ -192,14 +192,14 @@ export const TopNavigation: React.FC<TopNavigationProps> = () => {
 
             <Suspense fallback={null}>
                 <Sidebar
-                    isOpen={isSidebarOpen}
-                    onClose={handleCloseSidebar}
-                    paramKey="menu"
-                    position="right"
                     className={classNames(
                         'w-9/12 min-w-72',
                         isSidebarOpen ? 'block' : 'hidden'
                     )}
+                    isOpen={isSidebarOpen}
+                    onClose={handleCloseSidebar}
+                    paramKey="menu"
+                    position="right"
                 >
                     <NavMenu user={user} />
                 </Sidebar>

@@ -7,13 +7,13 @@ import { useLocale } from '@/client/store';
 import { getAgeString } from '@/client/utils';
 
 export type ProfileHeadPropsDesktop = Readonly<{
-    user: UserDTO;
     isCurrentUser: boolean;
+    user: UserDTO;
 }>;
 
 export const ProfileHeadDesktop: React.FC<ProfileHeadPropsDesktop> = ({
-    user,
-    isCurrentUser
+    isCurrentUser,
+    user
 }) => {
     const { t, locale } = useLocale();
 
@@ -27,7 +27,7 @@ export const ProfileHeadDesktop: React.FC<ProfileHeadPropsDesktop> = ({
             {isCurrentUser ? (
                 <AvatarInput className="h-36 w-36 max-w-36 max-h-36" />
             ) : (
-                <Avatar src={user.avatarUrl ?? 'default'} size="xxxl" />
+                <Avatar size="xxxl" src={user.avatarUrl ?? 'default'} />
             )}
 
             <div className="flex flex-col gap-2 h-32 text-right">

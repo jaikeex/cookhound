@@ -40,44 +40,44 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
     return (
         <div className="base-form">
             <TextInput
-                label={t('auth.form.username')}
-                id="username"
-                name="username"
                 disabled={pending}
+                id="username"
+                label={t('auth.form.username')}
+                name="username"
             />
 
             <TextInput
-                label={t('auth.form.email')}
+                disabled={pending}
                 id="email"
+                label={t('auth.form.email')}
                 name="email"
-                disabled={pending}
             />
 
             <PasswordInput
-                label={t('auth.form.password')}
+                disabled={pending}
                 id="password"
+                label={t('auth.form.password')}
                 name="password"
-                disabled={pending}
             />
 
             <PasswordInput
-                label={t('auth.form.repeat-password')}
-                id="repeat-password"
-                name="repeat-password"
                 disabled={pending}
+                id="repeat-password"
+                label={t('auth.form.repeat-password')}
+                name="repeat-password"
             />
 
-            <ErrorList errors={errorsToDisplay} className="self-start" />
+            <ErrorList className="self-start" errors={errorsToDisplay} />
 
             <Submit
                 className="min-w-40 !mt-6 mx-auto"
                 disabled={pending}
-                pending={pending}
                 label={t('auth.form.register')}
+                pending={pending}
             />
 
             {errors?.server ? (
-                <Typography variant={'error'} align={'center'}>
+                <Typography align={'center'} variant={'error'}>
                     {t(errors.server)}
                 </Typography>
             ) : null}

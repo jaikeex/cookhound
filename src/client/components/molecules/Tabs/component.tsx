@@ -16,21 +16,21 @@ export type TabsProps = Readonly<{
     activeTab?: number;
     buttonRowClassName?: string;
     className?: string;
-    onTabChange?: (tabIndex: number) => void;
-    tabs: TabContent[];
     enableNavigation?: boolean;
+    onTabChange?: (tabIndex: number) => void;
     paramKey?: string;
+    tabs: TabContent[];
 }> &
     React.PropsWithChildren;
 
 export const Tabs: React.FC<TabsProps> = ({
     activeTab = 0,
-    onTabChange,
-    tabs,
     buttonRowClassName,
     className,
     enableNavigation = false,
-    paramKey = 'tab'
+    onTabChange,
+    paramKey = 'tab',
+    tabs
 }) => {
     const router = useRouter();
     const searchParams = useSearchParams();

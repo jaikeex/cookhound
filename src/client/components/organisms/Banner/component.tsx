@@ -7,20 +7,20 @@ import { Typography } from '@/client/components';
 
 type BannerProps = Readonly<{
     defaultSearchValue?: string;
-    searchValue?: string;
-    onChange: (event: ChangeEvent<HTMLInputElement>) => void;
-    onSearch: () => void;
     initialQueries?: string[];
     isLoading: boolean;
+    onChange: (event: ChangeEvent<HTMLInputElement>) => void;
+    onSearch: () => void;
+    searchValue?: string;
 }>;
 
 export const Banner: React.FC<BannerProps> = ({
     defaultSearchValue,
-    searchValue,
+    initialQueries,
+    isLoading,
     onChange,
     onSearch,
-    isLoading,
-    initialQueries
+    searchValue
 }) => {
     return (
         <React.Fragment>
@@ -48,15 +48,15 @@ export const Banner: React.FC<BannerProps> = ({
 
                     <div className="w-full max-w-md">
                         <RecipeSearchInput
-                            placeholder="Search for a recipe"
-                            id="search"
-                            name="search"
-                            value={searchValue}
                             defaultValue={defaultSearchValue}
+                            id="search"
+                            initialQueries={initialQueries}
+                            isLoading={isLoading}
+                            name="search"
                             onChange={onChange}
                             onSearch={onSearch}
-                            isLoading={isLoading}
-                            initialQueries={initialQueries}
+                            placeholder="Search for a recipe"
+                            value={searchValue}
                         />
                     </div>
                 </div>

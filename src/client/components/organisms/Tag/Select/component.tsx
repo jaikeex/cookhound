@@ -41,13 +41,13 @@ export const TagSelection: React.FC<TagSelectionProps> = ({
         () => (close: () => void) => {
             return (
                 <TagSelectionModal
-                    initialTags={selectedTags}
                     close={close}
-                    onCancel={close}
-                    onApply={handleConfirm}
-                    tagLists={tagLists}
-                    isLoading={isLoading}
                     error={error}
+                    initialTags={selectedTags}
+                    isLoading={isLoading}
+                    onApply={handleConfirm}
+                    onCancel={close}
+                    tagLists={tagLists}
                 />
             );
         },
@@ -77,13 +77,13 @@ export const TagSelection: React.FC<TagSelectionProps> = ({
                 readOnly
             />
 
-            <TagList tags={selectedTags} size="sm" className="justify-center" />
+            <TagList className="justify-center" size="sm" tags={selectedTags} />
 
             <ButtonBase
-                onClick={openTagSelectionModal}
-                color="subtle"
-                outlined
                 className="w-full"
+                color="subtle"
+                onClick={openTagSelectionModal}
+                outlined
             >
                 {t('app.recipe.select-tags')}
             </ButtonBase>

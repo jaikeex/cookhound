@@ -42,10 +42,10 @@ export const ChipButton: React.FC<ChipButtonProps> = ({
     children,
     className,
     color = 'primary',
+    id,
+    onClick,
     outlined = false,
     size = 'md',
-    onClick,
-    id,
     ...props
 }) => {
     return (

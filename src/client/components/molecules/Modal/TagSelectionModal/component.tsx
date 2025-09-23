@@ -11,23 +11,23 @@ import { MAX_TAGS, RECIPE_TAG_CATEGORY_LIMITS_BY_ID } from '@/common/constants';
 import { chqc } from '@/client/request/queryClient';
 
 type TagSelectionModalProps = Readonly<{
-    initialTags?: RecipeTagDTO[];
-    onCancel?: () => void;
-    onApply?: (tags: RecipeTagDTO[]) => void;
-    tagLists?: TagListDTO[];
-    isLoading?: boolean;
     error?: RequestError | null;
+    initialTags?: RecipeTagDTO[];
+    isLoading?: boolean;
+    onApply?: (tags: RecipeTagDTO[]) => void;
+    onCancel?: () => void;
+    tagLists?: TagListDTO[];
 }> &
     ModalProps;
 
 export const TagSelectionModal: React.FC<TagSelectionModalProps> = ({
-    initialTags = [],
-    onCancel,
     close,
-    onApply,
-    tagLists,
+    error,
+    initialTags = [],
     isLoading,
-    error
+    onApply,
+    onCancel,
+    tagLists
 }) => {
     const { t } = useLocale();
     const { alert } = useSnackbar();

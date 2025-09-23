@@ -37,8 +37,8 @@ export type PopupProps = Readonly<{
     contentClassName?: string;
     disabled?: boolean;
     offset?: number;
-    onOpen?: () => void;
     onClose?: () => void;
+    onOpen?: () => void;
     placement?: PopupPlacement;
 }> &
     React.PropsWithChildren;
@@ -57,8 +57,8 @@ export const Popup: React.FC<PopupProps> = ({
     contentClassName,
     disabled = false,
     offset = 8,
-    onOpen,
     onClose,
+    onOpen,
     placement = 'bottom'
 }) => {
     const [isOpen, setIsOpen] = useState(false);

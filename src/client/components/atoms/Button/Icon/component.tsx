@@ -4,6 +4,7 @@ import type { IconName } from '@/client/types';
 import { classNames } from '@/client/utils';
 
 export type IconButtonProps = Readonly<{
+    ariaLabel?: string;
     className?: string;
     disabled?: boolean;
     icon: IconName;
@@ -12,10 +13,10 @@ export type IconButtonProps = Readonly<{
     onClick?: () => void;
     size?: number;
     tabIndex?: number;
-    ariaLabel?: string;
 }>;
 
 export const IconButton: React.FC<IconButtonProps> = ({
+    ariaLabel,
     className,
     disabled,
     icon,
@@ -23,8 +24,7 @@ export const IconButton: React.FC<IconButtonProps> = ({
     loading,
     onClick = () => {},
     size,
-    tabIndex,
-    ariaLabel
+    tabIndex
 }) => {
     return (
         <button

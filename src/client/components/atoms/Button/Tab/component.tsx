@@ -4,20 +4,20 @@ import { Typography } from '@/client/components';
 
 type TabButtonProps = Readonly<{
     active?: boolean;
+    ariaLabel: string;
     className?: string;
     onClick: () => void;
     tabWidth: number;
-    ariaLabel: string;
 }> &
     React.PropsWithChildren<NonNullable<unknown>>;
 
 export const TabButton: React.FC<TabButtonProps> = ({
     active,
+    ariaLabel,
     children,
     className,
     onClick,
-    tabWidth,
-    ariaLabel
+    tabWidth
 }) => {
     return (
         <button

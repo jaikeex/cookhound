@@ -17,9 +17,9 @@ export type RecipeCardListGridColumns = {
 type RecipeCardListProps = Readonly<{
     className?: string;
     cols?: RecipeCardListGridColumns;
-    loadMore: () => void;
     hasMore: boolean;
     isLoading?: boolean;
+    loadMore: () => void;
     recipes: RecipeForDisplayDTO[];
     withHandling?: boolean;
 }>;
@@ -32,9 +32,9 @@ export const RecipeCardList: React.FC<RecipeCardListProps> = ({
         lg: GRID_COLS[4],
         xl: GRID_COLS[4]
     },
-    loadMore,
     hasMore,
     isLoading,
+    loadMore,
     recipes,
     withHandling = false
 }) => {

@@ -13,12 +13,12 @@ export type MenuItem = Readonly<{
 }>;
 
 export type MenuProps = Readonly<{
-    items: readonly MenuItem[];
     className?: string;
+    items: readonly MenuItem[];
 }> &
     React.ComponentProps<'nav'>;
 
-export const Menu: React.FC<MenuProps> = ({ items, className, ...props }) => {
+export const Menu: React.FC<MenuProps> = ({ className, items, ...props }) => {
     const pathname = usePathname();
     const searchParams = useSearchParams();
 

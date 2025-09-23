@@ -16,27 +16,27 @@ const classConfig = {
 };
 
 export type DropdownItem = Readonly<{
+    color?: 'primary' | 'danger';
+    disabled?: boolean;
+    href?: string;
+    icon?: IconName;
     label: React.ReactNode;
     onClick?: () => void;
-    href?: string;
-    disabled?: boolean;
-    icon?: IconName;
-    color?: 'primary' | 'danger';
 }>;
 
 export type DropdownProps = Readonly<{
-    items: readonly DropdownItem[];
     children: React.ReactNode;
     className?: string;
+    items: readonly DropdownItem[];
     menuClassName?: string;
     position?: 'left' | 'center' | 'right';
 }> &
     React.ComponentProps<'div'>;
 
 export const Dropdown: React.FC<DropdownProps> = ({
-    items,
     children,
     className,
+    items,
     menuClassName,
     position = 'right',
     ...rest
@@ -71,12 +71,12 @@ export const Dropdown: React.FC<DropdownProps> = ({
 
     const renderedItems = items.map((item) => {
         const {
-            label,
-            onClick,
-            href,
+            color = 'primary',
             disabled,
+            href,
             icon,
-            color = 'primary'
+            label,
+            onClick
         } = item;
 
         const commonProps = {
@@ -103,23 +103,23 @@ export const Dropdown: React.FC<DropdownProps> = ({
             return (
                 <li role="none" key={href}>
                     <Link
-                        href={href}
                         {...commonProps}
                         aria-label={label?.toString()}
+                        href={href}
                         key={
                             typeof label === 'string'
                                 ? label
                                 : (href ?? Math.random())
                         }
-                        role="menuitem"
                         prefetch={false}
+                        role="menuitem"
                     >
                         {icon ? (
                             <Icon
-                                key={`${icon}-${label}`}
-                                size={20}
-                                name={icon}
                                 className={classConfig.colors[color]}
+                                key={`${icon}-${label}`}
+                                name={icon}
+                                size={20}
                             />
                         ) : null}
                         {label}
@@ -136,7 +136,6 @@ export const Dropdown: React.FC<DropdownProps> = ({
                 }
             >
                 <button
-                    type="button"
                     {...commonProps}
                     key={
                         typeof label === 'string'
@@ -145,13 +144,14 @@ export const Dropdown: React.FC<DropdownProps> = ({
                     }
                     role="menuitem"
                     tabIndex={-1}
+                    type="button"
                 >
                     {icon ? (
                         <Icon
-                            key={`${icon}-${label}`}
-                            size={20}
-                            name={icon}
                             className={classConfig.colors[color]}
+                            key={`${icon}-${label}`}
+                            name={icon}
+                            size={20}
                         />
                     ) : null}
                     {label}

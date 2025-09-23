@@ -11,17 +11,17 @@ export type NumberInputProps = Readonly<{
     Omit<FormInputProps, 'type' | 'defaultValue'>;
 
 export const NumberInput: React.FC<NumberInputProps> = ({
+    allowDecimals = false,
     className,
     defaultValue,
     disabled,
     error,
     id,
     label,
+    max,
     name,
     onChange,
-    onKeyDown,
-    allowDecimals = false,
-    max
+    onKeyDown
 }) => {
     const handleChange = useCallback(
         (e: React.ChangeEvent<HTMLInputElement>) => {

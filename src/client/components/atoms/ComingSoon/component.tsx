@@ -8,8 +8,8 @@ type ComingSoonProps = Readonly<{
 }>;
 
 export const ComingSoon: React.FC<ComingSoonProps> = ({
-    className,
-    alt = 'Coming Soon'
+    alt = 'Coming Soon',
+    className
 }) => {
     return (
         <Image

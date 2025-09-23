@@ -5,17 +5,17 @@ import { classNames, generateImgPlaceholder } from '@/client/utils';
 type RecipeImageProps = Readonly<{
     alt: string | null;
     className?: string;
+    height?: number;
     src: string | null;
     width?: number;
-    height?: number;
 }>;
 
 export const RecipeImage: React.FC<RecipeImageProps> = ({
     alt,
     className,
+    height = 192,
     src,
-    width = 320,
-    height = 192
+    width = 320
 }) => {
     return (
         <Image
