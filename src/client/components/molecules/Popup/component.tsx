@@ -8,7 +8,12 @@ import React, {
     useLayoutEffect
 } from 'react';
 import { classNames } from '@/client/utils';
-import { useEventListener, usePathnameChangeListener } from '@/client/hooks';
+import {
+    useAppEventListener,
+    useEventListener,
+    usePathnameChangeListener
+} from '@/client/hooks';
+import { AppEvent } from '@/client/events';
 
 export type PopupPlacement =
     | 'top'
@@ -139,6 +144,16 @@ export const Popup: React.FC<PopupProps> = ({
         onChange: handlePathnameChange
     });
 
+    /**
+     * Not the best way to go about this, but a major use of this component is the nav user menu,
+     * and not closing it on logout was weird af.
+     * If this behaviour becomes problematic (for some other popup) then another fix (but more work)
+     * is to turn this into a controlled component. Might do it later anyway...
+     */
+    useAppEventListener(AppEvent.USER_LOGGED_OUT, () => {
+        handleClose();
+    });
+
     useEventListener('keydown', handleEscape);
     useEventListener('resize', () => {
         if (isOpen) {
@@ -154,9 +169,6 @@ export const Popup: React.FC<PopupProps> = ({
 
     return (
         <>
-            {/* --------------------------------------- */}
-            {/* ----------- TRIGGER ELEMENT ----------- */}
-            {/* --------------------------------------- */}
             <div
                 ref={triggerRef}
                 onClick={handleToggle}
@@ -165,9 +177,6 @@ export const Popup: React.FC<PopupProps> = ({
                 {children}
             </div>
 
-            {/* --------------------------------------- */}
-            {/* ------------ POPUP CONTENT ------------ */}
-            {/* --------------------------------------- */}
             {isOpen ? (
                 <div
                     ref={popupRef}

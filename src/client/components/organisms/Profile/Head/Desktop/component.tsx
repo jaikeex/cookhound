@@ -23,32 +23,26 @@ export const ProfileHeadDesktop: React.FC<ProfileHeadPropsDesktop> = ({
     );
 
     return (
-        <div>
-            <div className="flex items-center gap-10 h-36 w-full">
+        <div className="flex items-center gap-10 h-36 w-full">
+            {isCurrentUser ? (
+                <AvatarInput className="h-36 w-36 max-w-36 max-h-36" />
+            ) : (
+                <Avatar src={user.avatarUrl ?? 'default'} size="xxxl" />
+            )}
+
+            <div className="flex flex-col gap-2 h-32 text-right">
+                <Typography variant="heading-md">{user.username}</Typography>
+
                 {isCurrentUser ? (
-                    <AvatarInput className="h-36 w-36 max-w-36 max-h-36" />
-                ) : (
-                    <Avatar src={user.avatarUrl ?? 'default'} size="xxxl" />
-                )}
+                    <React.Fragment>
+                        <Typography variant="body-sm">{user.email}</Typography>
 
-                <div className="flex flex-col gap-2 h-32 text-right">
-                    <Typography variant="heading-md">
-                        {user.username}
-                    </Typography>
-
-                    {isCurrentUser ? (
-                        <React.Fragment>
-                            <Typography variant="body-sm">
-                                {user.email}
-                            </Typography>
-
-                            <Typography variant="body-sm" className="mt-auto">
-                                {t('app.profile.account-age')}:&nbsp;
-                                {accountAge}
-                            </Typography>
-                        </React.Fragment>
-                    ) : null}
-                </div>
+                        <Typography variant="body-sm" className="mt-auto">
+                            {t('app.profile.account-age')}:&nbsp;
+                            {accountAge}
+                        </Typography>
+                    </React.Fragment>
+                ) : null}
             </div>
         </div>
     );

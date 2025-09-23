@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { classNames } from '@/client/utils';
 import { convertImgToWebP, verifyImgSize } from '@/client/utils';
 import { Icon, ImageCropperModal, Loader } from '@/client/components';
@@ -58,6 +58,10 @@ export const ImageInput: React.FC<ImageInputProps> = ({
     const handleDragLeave = useCallback(() => {
         setIsDragging(false);
     }, []);
+
+    useEffect(() => {
+        setPreviewUrl(defaultImageUrl ?? null);
+    }, [defaultImageUrl]);
 
     /**
      * Set the input URL with the file

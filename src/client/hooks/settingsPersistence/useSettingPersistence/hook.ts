@@ -3,7 +3,7 @@
 import { useEffect, useMemo } from 'react';
 import { getCookie, setCookie, deleteCookie } from '@/client/utils/cookies';
 import { ONE_YEAR_IN_SECONDS } from '@/common/constants';
-import { Event } from '@/client/events';
+import { AppEvent } from '@/client/events';
 import { useAppEventListener } from '@/client/hooks';
 
 //?—————————————————————————————————————————————————————————————————————————————————————————————?//
@@ -154,7 +154,7 @@ export const useSettingPersistence = <T>(
         onPersist
     ]);
 
-    useAppEventListener(Event.CONSENT_CHANGED, () => {
+    useAppEventListener(AppEvent.CONSENT_CHANGED, () => {
         if (typeof window === 'undefined' || canPersist) return;
 
         window.localStorage.removeItem(storageKey);

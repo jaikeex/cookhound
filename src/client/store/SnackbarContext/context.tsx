@@ -93,7 +93,7 @@ export const SnackbarProvider: React.FC<SnackbarProviderProps> = ({
                         <div
                             key={alertObj.id}
                             style={{
-                                width: '50%',
+                                width: '384px',
                                 margin: '0 auto',
                                 position: 'fixed',
                                 top: `${16 + index * 70}px`, // 16px initial offset + 70px per snackbar

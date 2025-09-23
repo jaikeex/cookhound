@@ -34,11 +34,24 @@ export const useGoogleSignIn: UseGoogleSignInType = ({ onSuccess }) => {
     });
 
     const signInUserWithGoogleOauth = useCallback(() => {
-        window.open(
-            GOOGLE_SIGNIN_REDIRECT_URL,
-            'GoogleSignInPopup',
-            'width=500,height=600,scrollbars=yes,resizable=yes,popup=true'
-        );
+        const screenLeft = window.screenLeft ?? window.screenX ?? 0;
+        const screenTop = window.screenTop ?? window.screenY ?? 0;
+
+        // Fallbacks handle browser differences (outerWidth/outerHeight vs. screen)
+        const width = window.outerWidth ?? window.screen.width;
+        const height = window.outerHeight ?? window.screen.height;
+
+        const features = [
+            `left=${screenLeft}`,
+            `top=${screenTop}`,
+            `width=${width}`,
+            `height=${height}`,
+            'scrollbars=yes',
+            'resizable=yes',
+            'popup=true'
+        ].join(',');
+
+        window.open(GOOGLE_SIGNIN_REDIRECT_URL, 'GoogleSignInPopup', features);
     }, []);
 
     const handleGoogleSignIn = useCallback(

@@ -32,7 +32,7 @@ export const createRecipeSchema = z.object({
 //$                                          COMPONENT                                          $//
 //~---------------------------------------------------------------------------------------------~//
 
-export const RecipeCreate: React.FC = () => {
+export const RecipeCreateTemplate: React.FC = () => {
     const controller = useRecipeFormController({ mode: 'create' });
 
     return (
