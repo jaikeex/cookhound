@@ -34,6 +34,7 @@ export const DesktopRecipeBody: React.FC<DesktopRecipeBodyProps> = ({
                     {t('app.recipe.ingredients')}
                 </Typography>
                 <IngredientsListView
+                    isPreview={isPreview}
                     key={`${recipe.id}-ingredients-list-view-desktop`}
                     ingredients={recipe.ingredients}
                     className={'mt-4'}

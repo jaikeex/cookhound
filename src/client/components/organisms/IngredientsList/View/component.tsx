@@ -21,12 +21,14 @@ const classConfig = {
 type IngredientsListViewProps = Readonly<{
     className?: string;
     ingredients: Ingredient[];
+    isPreview?: boolean;
     variant?: 'desktop' | 'mobile';
 }>;
 
 export const IngredientsListView: React.FC<IngredientsListViewProps> = ({
     className,
     ingredients,
+    isPreview = false,
     variant = 'desktop'
 }) => {
     const { selectIngredient, deselectIngredient, selectedIngredients } =
@@ -44,6 +46,7 @@ export const IngredientsListView: React.FC<IngredientsListViewProps> = ({
         <div className={`${classConfig.spacing[variant]} ${className}`}>
             {ingredientsToDisplay.map((ingredient, index) => (
                 <IngredientRowView
+                    disabled={isPreview}
                     ingredient={ingredient}
                     key={index}
                     onDeselected={deselectIngredient}

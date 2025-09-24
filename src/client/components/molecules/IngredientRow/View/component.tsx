@@ -22,8 +22,8 @@ const classConfig = {
 
 export type IngredientRowViewProps = Readonly<{
     className?: string;
-    ingredient: Ingredient;
     disabled?: boolean;
+    ingredient: Ingredient;
     onDeselected?: (ingredient: Ingredient) => void;
     onSelected?: (ingredient: Ingredient) => void;
     selected?: boolean;

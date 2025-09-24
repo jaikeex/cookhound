@@ -35,6 +35,7 @@ export const MobileRecipeBody: React.FC<MobileRecipeBodyProps> = ({
             content: (
                 <React.Fragment>
                     <IngredientsListView
+                        isPreview={isPreview}
                         key={`${recipe.id}-ingredients-list-view-mobile`}
                         ingredients={recipe.ingredients}
                         className={'py-4'}
