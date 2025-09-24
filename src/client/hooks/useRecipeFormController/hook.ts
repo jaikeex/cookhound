@@ -9,11 +9,10 @@ import {
     recipeFormSchema,
     extractFormData,
     createRecipePlaceholder,
-    fileToByteArray,
     lowerCaseFirstLetter,
     validateFormData,
-    generateUuid,
-    type ExtractedRecipeFormData
+    type ExtractedRecipeFormData,
+    generateUuid
 } from '@/client/utils';
 import type {
     Ingredient,
@@ -100,10 +99,9 @@ export const useRecipeFormController = ({
                 const imageFile = data.get('recipe-image') as File;
 
                 if (imageFile && imageFile.size > 0) {
-                    const imageBytes = await fileToByteArray(imageFile);
                     const response = await uploadImageMutation({
-                        bytes: imageBytes,
-                        fileName: `recipe-image-${generateUuid()}`
+                        fileName: `recipe-image-${generateUuid()}`,
+                        file: imageFile
                     });
 
                     image_url = response.objectUrl;

@@ -168,9 +168,15 @@ class ApiRequestWrapper {
         //                       REQUEST CONSTRUCTION                     //
         //?--------------------------------------------------------------?//
 
-        const headers = new Headers({
-            'Content-Type': 'application/json'
-        }) as HeadersInit;
+        // Build headers: default to JSON unless FormData is being sent
+        const defaultHeaders: HeadersInit = {};
+
+        // Only set JSON content type when the payload is not FormData.
+        if (!(config.data instanceof FormData)) {
+            defaultHeaders['Content-Type'] = 'application/json';
+        }
+
+        const headers = new Headers({ ...defaultHeaders, ...config.headers });
 
         const options: RequestInit = {
             method,
@@ -186,15 +192,6 @@ class ApiRequestWrapper {
             options.cache = config.cache;
         }
 
-        if (config.headers) {
-            Object.entries(config.headers).forEach(([key, value]) => {
-                if (typeof value === 'string') {
-                    (headers as Headers).set(key, value);
-                }
-            });
-            options.headers = headers;
-        }
-
         if (
             config.data &&
             (method === 'POST' ||
@@ -202,7 +199,10 @@ class ApiRequestWrapper {
                 method === 'PATCH' ||
                 method === 'DELETE')
         ) {
-            options.body = JSON.stringify(config.data);
+            options.body =
+                config.data instanceof FormData
+                    ? (config.data as FormData)
+                    : JSON.stringify(config.data);
         }
 
         const url = new URL(this.API_URL + config.url);

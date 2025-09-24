@@ -4,7 +4,7 @@ import React, { useCallback } from 'react';
 import { ImageInput } from '@/client/components';
 import { chqc, QUERY_KEYS } from '@/client/request/queryClient';
 import { useAuth, useLocale, useSnackbar } from '@/client/store';
-import { fileToByteArray, generateUuid } from '@/client/utils';
+import { generateUuid } from '@/client/utils';
 import { useQueryClient } from '@tanstack/react-query';
 
 export type AvatarInputProps = Readonly<{
@@ -48,11 +48,9 @@ export const AvatarInput: React.FC<AvatarInputProps> = ({ className }) => {
         async (file: File) => {
             try {
                 if (file && file.size > 0) {
-                    const imageBytes = await fileToByteArray(file);
-
                     const response = await uploadAvatarImage({
-                        bytes: imageBytes,
-                        fileName: `avatar-image-${generateUuid()}.webp`
+                        fileName: `avatar-image-${generateUuid()}`,
+                        file
                     });
 
                     const imageUrl = response.objectUrl;

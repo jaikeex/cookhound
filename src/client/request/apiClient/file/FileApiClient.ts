@@ -18,9 +18,12 @@ class FileApiClient {
         data: FileForUpload,
         config?: RequestConfig
     ): Promise<FileUploadResponse> {
+        const formData = new FormData();
+        formData.append('recipe-image', data.file, data.fileName);
+
         return await apiRequestWrapper.post({
             url: '/file/recipe-img',
-            data: data,
+            data: formData,
             ...config
         });
     }
@@ -37,9 +40,12 @@ class FileApiClient {
         data: FileForUpload,
         config?: RequestConfig
     ): Promise<FileUploadResponse> {
+        const formData = new FormData();
+        formData.append('avatar-image', data.file, data.fileName);
+
         return await apiRequestWrapper.post({
             url: '/file/avatar-img',
-            data: data,
+            data: formData,
             ...config
         });
     }

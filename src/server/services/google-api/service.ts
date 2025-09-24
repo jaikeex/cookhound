@@ -7,30 +7,50 @@ import { Logger, LogServiceMethod } from '@/server/logger';
 const log = Logger.getInstance('google-api-service');
 
 class GoogleApiService {
-    @LogServiceMethod({ names: ['fileName', 'data'] })
-    async uploadRecipeImage(fileName: string, data: number[] | BodyInit) {
+    @LogServiceMethod({ names: ['fileName'] })
+    async uploadRecipeImage(
+        fileName: string,
+        data: number[] | Uint8Array | BodyInit
+    ) {
         const bucket = ENV_CONFIG_PRIVATE.GOOGLE_STORAGE_BUCKET_RECIPE_IMAGES;
 
-        // Convert array of numbers to Uint8Array if needed
-        const binaryData = Array.isArray(data) ? new Uint8Array(data) : data;
+        let body: BodyInit;
+
+        if (Array.isArray(data)) {
+            body = new Uint8Array(data) as unknown as BodyInit;
+        } else if (data instanceof Uint8Array) {
+            body = data as unknown as BodyInit;
+        } else {
+            body = data;
+        }
 
         const response = await googleApiClient
             .getStorageService()
-            .upload(fileName, binaryData, bucket, 'image/webp');
+            .upload(fileName, body, bucket, 'image/webp');
 
         return response;
     }
 
-    @LogServiceMethod({ names: ['fileName', 'data'] })
-    async uploadAvatarImage(fileName: string, data: number[] | BodyInit) {
+    @LogServiceMethod({ names: ['fileName'] })
+    async uploadAvatarImage(
+        fileName: string,
+        data: number[] | Uint8Array | BodyInit
+    ) {
         const bucket = ENV_CONFIG_PRIVATE.GOOGLE_STORAGE_BUCKET_AVATAR_IMAGES;
 
-        // Convert array of numbers to Uint8Array if needed
-        const binaryData = Array.isArray(data) ? new Uint8Array(data) : data;
+        let body: BodyInit;
+
+        if (Array.isArray(data)) {
+            body = new Uint8Array(data) as unknown as BodyInit;
+        } else if (data instanceof Uint8Array) {
+            body = data as unknown as BodyInit;
+        } else {
+            body = data;
+        }
 
         const response = await googleApiClient
             .getStorageService()
-            .upload(fileName, binaryData, bucket, 'image/webp');
+            .upload(fileName, body, bucket, 'image/webp');
 
         return response;
     }

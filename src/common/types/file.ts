@@ -1,6 +1,6 @@
 export type FileForUpload = {
-    bytes: number[];
     fileName: string;
+    file: File;
 };
 
 export type FileUploadResponse = {

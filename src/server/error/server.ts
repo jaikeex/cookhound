@@ -14,7 +14,8 @@ export enum ServerErrorName {
     AuthErrorForbidden = 'AuthErrorForbidden',
     NotFoundError = 'NotFoundError',
     ConflictError = 'ConflictError',
-    PayloadTooLargeError = 'PayloadTooLargeError'
+    PayloadTooLargeError = 'PayloadTooLargeError',
+    UnsupportedMediaTypeError = 'UnsupportedMediaTypeError'
 }
 
 const serverErrorNames = Object.values(ServerErrorName);
@@ -149,6 +150,18 @@ export class PayloadTooLargeError extends ClientError {
     ) {
         super(message, 413, code, cause);
         this.name = 'PayloadTooLargeError';
+    }
+}
+
+/** 415 – Unsupported Media Type */
+export class UnsupportedMediaTypeError extends ClientError {
+    constructor(
+        message: I18nMessage = 'app.error.unsupported-media-type',
+        code: ApplicationErrorCode = ApplicationErrorCode.UNSUPPORTED_MEDIA_TYPE,
+        cause?: unknown
+    ) {
+        super(message, 415, code, cause);
+        this.name = 'UnsupportedMediaTypeError';
     }
 }
 
