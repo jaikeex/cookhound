@@ -96,7 +96,7 @@ export const useRecipeDiscovery = (
 
     /**
      * Select the active query depending on the mode above.
-     *~ Only call activeQuery aftier from this point onwards.
+     *~ Only call activeQuery from this point onwards.
      */
     const activeQuery = isSearchMode ? searchInfiniteQuery : listInfiniteQuery;
 

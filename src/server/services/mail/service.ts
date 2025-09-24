@@ -32,8 +32,6 @@ class MailService {
             to: { name: username, address: email },
             locale: RequestContext.getUserLocale() ?? DEFAULT_LOCALE
         });
-
-        return;
     }
 
     /**
@@ -50,8 +48,6 @@ class MailService {
             to: { name: username, address: email },
             locale: RequestContext.getUserLocale() ?? DEFAULT_LOCALE
         });
-
-        return;
     }
 
     @LogServiceMethod({ names: ['email', 'username', 'token'] })
