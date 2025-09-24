@@ -11,7 +11,6 @@ const log = Logger.getInstance('mail-service');
 
 /**
  * Service class for sending emails.
- * It provides methods for sending different types of emails, such as verification emails.
  */
 class MailService {
     /**
