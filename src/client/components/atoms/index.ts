@@ -15,3 +15,4 @@ export * from './Skeleton';
 export * from './Star';
 export * from './Tooltip';
 export * from './Typography';
+export * from './Radio';
