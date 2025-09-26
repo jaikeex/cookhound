@@ -8,6 +8,12 @@ generator client {
   previewFeatures = ["typedSql"]
 }
 
+enum CookbookVisibility {
+  PUBLIC
+  PRIVATE
+  UNLISTED
+}
+
 model User {
   id                        Int       @id @default(autoincrement())
   username                  String    @unique @db.VarChar(128)
@@ -27,17 +33,19 @@ model User {
   lastLogin                 DateTime? @map("last_login") @db.Timestamp(3)
   lastPasswordReset         DateTime? @map("last_password_reset") @db.Timestamp(3)
 
-  // Relations
-  recipes        Recipe[]                 @relation("AuthoredRecipes")
-  visitedRecipes UserVisitedRecipe[]
-  ratings        Rating[]
-  shoppingList   ShoppingListIngredient[]
-  flags          RecipeFlag[]
-  preferences     UserPreference?
-  cookieConsent  CookieConsent[]
+  /// Relations
+  recipes            Recipe[]                 @relation("AuthoredRecipes")
+  visitedRecipes     UserVisitedRecipe[]
+  ratings            Rating[]
+  shoppingList       ShoppingListIngredient[]
+  flags              RecipeFlag[]
+  preferences        UserPreference?
+  cookieConsent      CookieConsent[]
   emailChangeRequest EmailChangeRequest?
+  cookbooks          Cookbook[]
+  bookmarks          CookbookBookmark[]
 
-  // Indexes
+  /// Indexes
   @@index([username])
   @@index([email])
   @@index([emailVerificationToken])
@@ -58,36 +66,36 @@ model CookieConsent {
   updatedAt     DateTime  @updatedAt @map("updated_at") @db.Timestamp(3)
   proofHash     String    @map("proof_hash") @db.VarChar(255)
 
-  // Relations
+  /// Relations
   user User @relation(fields: [userId], references: [id])
 
-  // Indexes
+  /// Indexes
   @@index([id, userId])
   @@map("cookie_consents")
 }
 
 model UserPreference {
-  userId      Int      @id @map("user_id")
-  settings    Json     @default("{}")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+  userId    Int      @id @map("user_id")
+  settings  Json     @default("{}")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
-  // Relations
+  /// Relations
   user User @relation(fields: [userId], references: [id])
 
-  // Indexes
+  /// Indexes
   @@index([userId])
   @@map("user_preferences")
 }
 
 model EmailChangeRequest {
-  id         Int      @id @default(autoincrement())
-  userId     Int      @unique        
-  newEmail   String   @unique        
-  token      String   @unique @db.VarChar(36)
-  expiresAt  DateTime
-  createdAt  DateTime @default(now())
+  id        Int      @id @default(autoincrement())
+  userId    Int      @unique
+  newEmail  String   @unique
+  token     String   @unique @db.VarChar(36)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
 
-  // Relations
+  /// Relations
   user User @relation(fields: [userId], references: [id])
 
   @@index([token, expiresAt])
@@ -110,17 +118,18 @@ model Recipe {
   createdAt   DateTime @default(now()) @map("created_at") @db.Timestamp(3)
   updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamp(3)
 
-  // Relations
-  author       User                     @relation("AuthoredRecipes", fields: [authorId], references: [id])
-  instructions Instruction[]
-  ingredients  RecipeIngredient[]
-  ratings      Rating[]
-  shoppingList ShoppingListIngredient[]
-  visitedBy    UserVisitedRecipe[]
-  tags         RecipeTag[]
-  flags        RecipeFlag[]
+  /// Relations
+  author         User                     @relation("AuthoredRecipes", fields: [authorId], references: [id])
+  instructions   Instruction[]
+  ingredients    RecipeIngredient[]
+  ratings        Rating[]
+  shoppingList   ShoppingListIngredient[]
+  visitedBy      UserVisitedRecipe[]
+  tags           RecipeTag[]
+  flags          RecipeFlag[]
+  CookbookRecipe CookbookRecipe[]
 
-  // Indexes
+  /// Indexes
   @@index([authorId])
   @@index([displayId])
   @@index([language])
@@ -137,10 +146,10 @@ model Instruction {
   step     Int
   text     String @db.Text
 
-  // Relations
+  /// Relations
   recipe Recipe @relation(fields: [recipeId], references: [id])
 
-  // Composite primary key
+  /// Composite primary key
   @@id([recipeId, step])
   @@index([recipeId])
   @@index([step])
@@ -152,13 +161,13 @@ model Ingredient {
   language String @db.VarChar(2)
   name     String @db.VarChar(50)
 
-  // Relations
+  /// Relations
   recipes       RecipeIngredient[]
   shoppingLists ShoppingListIngredient[]
 
-  // Unique constraint
+  /// Unique constraint
   @@unique([language, name], name: "unique_ingredient_language_name")
-  // Indexes
+  /// Indexes
   @@index([language])
   @@index([name])
   @@map("ingredients")
@@ -170,11 +179,11 @@ model RecipeIngredient {
   quantity        String? @db.VarChar(256)
   ingredientOrder Int     @map("ingredient_order")
 
-  // Relations
+  /// Relations
   recipe     Recipe     @relation(fields: [recipeId], references: [id])
   ingredient Ingredient @relation(fields: [ingredientId], references: [id])
 
-  // Composite primary key
+  /// Composite primary key
   @@id([recipeId, ingredientId])
   @@index([recipeId])
   @@index([ingredientId])
@@ -189,12 +198,12 @@ model ShoppingListIngredient {
   marked          Boolean @default(false)
   ingredientOrder Int     @map("ingredient_order")
 
-  // Relations
+  /// Relations
   user       User       @relation(fields: [userId], references: [id])
   recipe     Recipe     @relation(fields: [recipeId], references: [id])
   ingredient Ingredient @relation(fields: [ingredientId], references: [id])
 
-  // Composite primary key
+  /// Composite primary key
   @@id([userId, ingredientId, recipeId])
   @@index([userId, recipeId])
   @@index([userId])
@@ -210,11 +219,11 @@ model Rating {
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(3)
   updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamp(3)
 
-  // Relations
+  /// Relations
   recipe Recipe @relation(fields: [recipeId], references: [id])
   user   User   @relation(fields: [userId], references: [id])
 
-  // Unique constraint
+  /// Unique constraint
   @@unique([recipeId, userId], name: "unique_recipe_user")
   @@index([recipeId])
   @@index([userId])
@@ -226,11 +235,11 @@ model UserVisitedRecipe {
   recipeId  Int      @map("recipe_id")
   visitedAt DateTime @default(now()) @map("visited_at") @db.Timestamp(3)
 
-  // Relations
+  /// Relations
   user   User   @relation(fields: [userId], references: [id])
   recipe Recipe @relation(fields: [recipeId], references: [id])
 
-  // Unique constraint to prevent duplicate visits (can be updated with new timestamp)
+  /// Unique constraint to prevent duplicate visits (can be updated with new timestamp)
   @@unique([userId, recipeId], name: "unique_user_recipe_visit")
   @@index([userId, visitedAt])
   @@index([userId])
@@ -248,11 +257,11 @@ model RecipeFlag {
   resolvedAt DateTime? @map("resolved_at") @db.Timestamp(3)
   createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamp(3)
 
-  // Relations
+  /// Relations
   user   User   @relation(fields: [userId], references: [id])
   recipe Recipe @relation(fields: [recipeId], references: [id])
 
-  // Indexes
+  /// Indexes
   @@index([userId])
   @@index([recipeId])
   @@map("recipe_flags")
@@ -262,10 +271,10 @@ model TagCategory {
   id   Int    @id @default(autoincrement())
   name String @unique @db.VarChar(50)
 
-  // Relations
+  /// Relations
   tags Tag[]
 
-  // Indexes
+  /// Indexes
   @@index([name])
   @@map("tag_categories")
 }
@@ -275,12 +284,12 @@ model Tag {
   slug       String @unique @db.VarChar(50)
   categoryId Int    @map("category_id")
 
-  // Relations
+  /// Relations
   category     TagCategory      @relation(fields: [categoryId], references: [id])
   recipes      RecipeTag[]
   translations TagTranslation[]
 
-  // Indexes
+  /// Indexes
   @@index([categoryId])
   @@index([slug])
   @@map("tags")
@@ -290,11 +299,11 @@ model RecipeTag {
   recipeId Int @map("recipe_id")
   tagId    Int @map("tag_id")
 
-  // Relations
+  /// Relations
   recipe Recipe @relation(fields: [recipeId], references: [id])
   tag    Tag    @relation(fields: [tagId], references: [id])
 
-  // Composite primary key
+  /// Composite primary key
   @@id([recipeId, tagId])
   @@index([tagId])
   @@map("recipes_tags")
@@ -305,11 +314,73 @@ model TagTranslation {
   language String @db.VarChar(2)
   name     String @db.VarChar(50)
 
-  // Relations
+  /// Relations
   tag Tag @relation(fields: [tagId], references: [id])
 
-  // Composite primary key to ensure single translation per language
+  /// Composite primary key
   @@id([tagId, language])
   @@index([language])
   @@map("tag_translations")
+}
+
+model Cookbook {
+  id            Int                @id @default(autoincrement())
+  displayId     String             @unique @map("display_id") @db.VarChar(36)
+  ownerId       Int                @map("owner_id")
+  title         String             @db.VarChar(255)
+  description   String?            @db.Text
+  language      String             @default("cs") @db.VarChar(2)
+  coverImageUrl String?            @map("cover_image_url") @db.VarChar(255)
+  visibility    CookbookVisibility @default(PRIVATE)
+  ownerOrder    Int?               @map("owner_order")
+  createdAt     DateTime           @default(now()) @map("created_at") @db.Timestamp(3)
+  updatedAt     DateTime           @updatedAt @map("updated_at") @db.Timestamp(3)
+
+  /// Relations
+  owner     User               @relation(fields: [ownerId], references: [id])
+  recipes   CookbookRecipe[]
+  bookmarks CookbookBookmark[]
+
+  @@unique([ownerId, ownerOrder])
+  /// Indexes
+  @@index([ownerId])
+  @@index([title])
+  @@index([visibility])
+  @@map("cookbooks")
+}
+
+model CookbookRecipe {
+  cookbookId  Int      @map("cookbook_id")
+  recipeId    Int      @map("recipe_id")
+  recipeOrder Int      @map("recipe_order")
+  addedAt     DateTime @default(now()) @map("added_at") @db.Timestamp(3)
+
+  /// Relations
+  cookbook Cookbook @relation(fields: [cookbookId], references: [id])
+  recipe   Recipe   @relation(fields: [recipeId], references: [id])
+
+  /// Composite primary key
+  @@id([cookbookId, recipeId])
+  /// Unique order within a cookbook
+  @@unique([cookbookId, recipeOrder])
+  /// Indexes
+  @@index([recipeId])
+  @@map("cookbooks_recipes")
+}
+
+model CookbookBookmark {
+  userId        Int      @map("user_id")
+  cookbookId    Int      @map("cookbook_id")
+  bookmarkOrder Int      @map("bookmark_order")
+  addedAt       DateTime @default(now()) @map("added_at") @db.Timestamp(3)
+
+  /// Relations
+  user     User     @relation(fields: [userId], references: [id])
+  cookbook Cookbook @relation(fields: [cookbookId], references: [id])
+
+  /// Constraints
+  @@id([userId, cookbookId])
+  @@unique([userId, bookmarkOrder])
+  @@index([cookbookId])
+  @@map("cookbook_bookmarks")
 }

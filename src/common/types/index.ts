@@ -5,5 +5,6 @@ export * from './shopping-list';
 export * from './tags';
 export * from './user';
 export * from './general';
+export * from './cookbook';
 
 export * from './dto';

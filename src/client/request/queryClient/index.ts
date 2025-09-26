@@ -2,6 +2,7 @@ import { userQueryClient, USER_QUERY_KEYS } from './user';
 import { authQueryClient, AUTH_QUERY_KEYS } from './auth';
 import { recipeQueryClient, RECIPE_QUERY_KEYS } from './recipe';
 import { tagQueryClient, TAG_QUERY_KEYS } from './tag';
+import { cookbookQueryClient, COOKBOOK_QUERY_KEYS } from './cookbook';
 import { fileQueryClient } from './file';
 
 /**
@@ -16,12 +17,14 @@ export const chqc = {
     auth: authQueryClient,
     recipe: recipeQueryClient,
     tag: tagQueryClient,
-    file: fileQueryClient
+    file: fileQueryClient,
+    cookbook: cookbookQueryClient
 };
 
 export const QUERY_KEYS = {
     user: USER_QUERY_KEYS,
     auth: AUTH_QUERY_KEYS,
     recipe: RECIPE_QUERY_KEYS,
-    tag: TAG_QUERY_KEYS
+    tag: TAG_QUERY_KEYS,
+    cookbook: COOKBOOK_QUERY_KEYS
 };
