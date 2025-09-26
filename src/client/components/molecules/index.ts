@@ -1,3 +1,4 @@
+export * from './Accordion';
 export * from './Button';
 export * from './Card';
 export * from './ConsentRow';
@@ -12,6 +13,7 @@ export * from './Popup';
 export * from './Profile';
 export * from './Rating';
 export * from './RecipeInfo';
+export * from './RecipeLink';
 export * from './Sidebar';
 export * from './Snackbar';
 export * from './Switch';

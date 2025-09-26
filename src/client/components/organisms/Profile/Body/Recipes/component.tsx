@@ -1,4 +1,3 @@
-import type { RecipeForDisplayDTO } from '@/common/types';
 import React from 'react';
 import { RecipeCardList } from '@/client/components';
 import { SkeletonCard } from '@/client/components';
@@ -12,19 +11,17 @@ export type RecipesProps = Readonly<{
     className?: string;
     cols?: RecipeCardListGridColumns;
     isCurrentUser: boolean;
-    recipes: RecipeForDisplayDTO[];
     userId: number;
 }>;
 
 export const Recipes: React.FC<RecipesProps> = ({
     className,
     cols,
-    recipes: initialRecipes,
     userId,
     isCurrentUser
 }) => {
     const { recipes, loadMore, hasMore, isLoading } = useRecipeDiscovery(
-        initialRecipes,
+        [],
         '',
         userId.toString()
     );

@@ -6,8 +6,7 @@ import { DesktopProfileTemplate } from './Desktop';
 import { MobileProfileTemplate } from './Mobile';
 import { ProfileTab, type ProfileNavigationItem } from '@/client/types/core';
 import type { UserDTO } from '@/common/types';
-import { ProfileBodyInfo, Recipes } from '@/client/components';
-import { ComingSoon } from '@/client/components';
+import { Cookbooks, ProfileBodyInfo, Recipes } from '@/client/components';
 import { useRouter } from 'next/navigation';
 import { GRID_COLS } from '@/client/constants';
 import { useRunOnce } from '@/client/hooks';
@@ -54,7 +53,6 @@ export const ProfileTemplate: React.FC<ProfileProps> = ({
                         xl: GRID_COLS[3]
                     }}
                     isCurrentUser={isCurrentUser}
-                    recipes={[]}
                     userId={currentUser?.id ?? userResolved.id}
                 />
             )
@@ -62,7 +60,12 @@ export const ProfileTemplate: React.FC<ProfileProps> = ({
         {
             param: ProfileTab.Cookbooks,
             label: t('app.profile.cookbooks'),
-            content: <ComingSoon className="max-w-96" />
+            content: (
+                <Cookbooks
+                    isCurrentUser={isCurrentUser}
+                    userId={currentUser?.id ?? userResolved.id}
+                />
+            )
         }
     ];
 
