@@ -15,6 +15,7 @@ import ErrorIcon from './error.svg';
 import ExitIcon from './exit.svg';
 import HomeIcon from './home.svg';
 import InfoIcon from './info.svg';
+import LinkIcon from './link.svg';
 import MoonIcon from './moon.svg';
 import PlusIcon from './plus.svg';
 import ShoppingListIcon from './shopping-list.svg';
@@ -44,6 +45,7 @@ export const basicSvg = {
     ExitIcon,
     HomeIcon,
     InfoIcon,
+    LinkIcon,
     MoonIcon,
     PlusIcon,
     SearchIcon,

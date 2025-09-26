@@ -19,6 +19,7 @@ export const icons = {
     home: iconsSvg.HomeIcon,
     google: iconsSvg.GoogleIcon,
     info: iconsSvg.InfoIcon,
+    link: iconsSvg.LinkIcon,
     moon: iconsSvg.MoonIcon,
     plus: iconsSvg.PlusIcon,
     servings: iconsSvg.ServingsIcon,
