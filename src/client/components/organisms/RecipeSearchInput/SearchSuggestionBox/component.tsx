@@ -2,7 +2,7 @@ import React, { type ReactNode } from 'react';
 import { Typography } from '@/client/components';
 import { classNames } from '@/client/utils';
 import type { RecipeForDisplayDTO } from '@/common/types';
-import { SuggestionItem } from '@/client/components/organisms/RecipeSearchInput/SuggestionItem';
+import { RecipeLink } from '@/client/components';
 
 export type SearchSuggestionBoxProps = Readonly<{
     suggestions: RecipeForDisplayDTO[];
@@ -57,10 +57,11 @@ export const SearchSuggestionBox: React.FC<SearchSuggestionBoxProps> = ({
         return (
             <div className="py-1">
                 {suggestions.map((s) => (
-                    <SuggestionItem
+                    <RecipeLink
                         key={s.id}
-                        suggestion={s}
-                        onSuggestionClick={onSuggestionClick}
+                        recipe={s}
+                        onClick={onSuggestionClick}
+                        className="px-4 py-1"
                     />
                 ))}
             </div>

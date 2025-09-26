@@ -33,7 +33,7 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({
                     alt={`${title} image`}
                     width={280}
                     height={160}
-                    className="flex-shrink-0 object-cover w-full aspect-video"
+                    className="flex-shrink-0 object-cover w-full aspect-video rounded-t-md rounded-b-none"
                 />
                 <div className="flex flex-col justify-between h-full p-2 space-y-2">
                     <Typography

@@ -26,7 +26,7 @@ export const DeleteRecipeConfirmationModal: React.FC<
     }, [onDelete, close]);
 
     return (
-        <div className="flex flex-col w-full h-full max-h-[85dvh] md:max-h-[70dvh] max-w-[80dvh] md:max-w-[80dvh] xl:max-w-[70dvh] px-4">
+        <div className="flex flex-col w-full h-full max-h-[85dvh] md:max-h-[70dvh] max-w-[80dvw] md:max-w-[80dvw] xl:max-w-[70dvw] px-4">
             <h1>{t('app.recipe.delete-confirmation', { recipeTitle })}</h1>
             <div className="flex-shrink-0 flex w-full gap-3 mt-4 pt-4">
                 <ButtonBase

@@ -61,7 +61,7 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = () => {
                 <Icon name="home" label={t('app.general.home')} />
             </Link>
             <Link
-                href={'/'}
+                href={`/user/${user?.id}?tab=cookbooks`}
                 aria-label={t('app.general.cookbooks')}
                 tabIndex={isLoggedin ? 0 : -1}
                 className={classNames(!isLoggedin && 'link-disabled')}

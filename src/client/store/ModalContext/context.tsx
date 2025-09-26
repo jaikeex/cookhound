@@ -26,6 +26,7 @@ type ModalRenderer = (close: () => void) => React.ReactNode;
 
 type ModalOptions = Readonly<{
     hideCloseButton?: boolean;
+    disableBackdropClick?: boolean;
 }>;
 
 interface Modal {
@@ -223,7 +224,8 @@ const modalVariants = {
 const ModalWrapper: React.FC<ModalWrapperProps> = ({
     children,
     onClose,
-    hideCloseButton
+    hideCloseButton,
+    disableBackdropClick
 }) => {
     return (
         <motion.div
@@ -236,7 +238,7 @@ const ModalWrapper: React.FC<ModalWrapperProps> = ({
             <motion.div
                 variants={backdropVariants}
                 className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-                onClick={onClose}
+                onClick={disableBackdropClick ? undefined : onClose}
             />
 
             {/* Modal */}
