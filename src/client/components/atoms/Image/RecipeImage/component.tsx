@@ -22,7 +22,7 @@ export const RecipeImage: React.FC<RecipeImageProps> = ({
             src={src || '/img/recipe-placeholder.webp'}
             alt={alt || 'recipe image'}
             className={classNames(
-                'object-cover w-full rounded-md aspect-video',
+                'object-cover w-full rounded-md aspect-video pointer-events-none',
                 className
             )}
             width={width}

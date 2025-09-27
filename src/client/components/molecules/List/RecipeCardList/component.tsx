@@ -19,7 +19,7 @@ type RecipeCardListProps = Readonly<{
     cols?: RecipeCardListGridColumns;
     hasMore: boolean;
     isLoading?: boolean;
-    loadMore: () => void;
+    loadMore?: () => void;
     recipes: RecipeForDisplayDTO[];
     withHandling?: boolean;
 }>;
@@ -34,7 +34,7 @@ export const RecipeCardList: React.FC<RecipeCardListProps> = ({
     },
     hasMore,
     isLoading,
-    loadMore,
+    loadMore = () => {},
     recipes,
     withHandling = false
 }) => {

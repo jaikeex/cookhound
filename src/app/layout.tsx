@@ -20,16 +20,15 @@ import { classNames } from '@/client/utils';
 import { pickMostRecentConsent } from '@/common/utils';
 import { cookies, headers } from 'next/headers';
 import type { UserDTO } from '@/common/types';
-import { apiClient } from '@/client/request';
 import { getUserLocale } from '@/common/utils';
 import { CONTENT_WRAPPER_ID, MAIN_PAGE_ID } from '@/client/constants';
 import { QueryClient, dehydrate } from '@tanstack/react-query';
 import { QUERY_KEYS } from '@/client/request/queryClient';
-import { SESSION_COOKIE_NAME } from '@/common/constants/general';
 import { ConsentProvider } from '@/client/store';
 import { ConsentBanner } from '@/client/components';
 import { ClientShell } from './ClientShell';
 import type { CookieConsent } from '@/common/types/cookie-consent';
+import { getCurrentUser } from './actions';
 
 const openSans = Open_Sans({
     subsets: ['latin'],
@@ -84,15 +83,7 @@ export default async function RootLayout({
             throw new Error('Cannot get user like this in a browser');
         }
 
-        const sessionId = cookieStore.get(SESSION_COOKIE_NAME)?.value;
-
-        if (!sessionId) {
-            throw new Error('No token found');
-        }
-
-        user = await apiClient.auth.getCurrentUser({
-            headers: { 'Cookie': `session=${sessionId}` }
-        });
+        user = await getCurrentUser();
     } catch (error: unknown) {
         user = null;
     }

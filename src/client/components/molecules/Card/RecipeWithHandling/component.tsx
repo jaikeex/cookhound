@@ -89,6 +89,7 @@ export const RecipeWithHandling: React.FC<RecipeCardProps> = ({
             color: 'danger'
         }
     ];
+
     return (
         <div className="relative">
             <RecipeCard
