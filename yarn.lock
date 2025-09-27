@@ -3528,6 +3528,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"array-move@npm:^3.0.1":
+  version: 3.0.1
+  resolution: "array-move@npm:3.0.1"
+  checksum: 10c0/c8c33c987a98026ffab27f7a9be72a8b3198b05d16feb5fe7623f3ac0d7b4c97ad4275053238b130fbccb1e6da8cedff494004329411d27b9e7c67f9c33b6a73
+  languageName: node
+  linkType: hard
+
 "array-union@npm:^2.1.0":
   version: 2.1.0
   resolution: "array-union@npm:2.1.0"
@@ -4308,6 +4315,7 @@ __metadata:
     prisma: "npm:^6.16.1"
     react: "npm:^19.1.1"
     react-dom: "npm:^19.1.1"
+    react-easy-sort: "npm:^1.7.0"
     react-image-crop: "npm:^11.0.10"
     reflect-metadata: "npm:^0.2.2"
     tailwindcss: "npm:^3.4.17"
@@ -8374,6 +8382,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-easy-sort@npm:^1.7.0":
+  version: 1.7.0
+  resolution: "react-easy-sort@npm:1.7.0"
+  dependencies:
+    array-move: "npm:^3.0.1"
+    tslib: "npm:2.0.1"
+  peerDependencies:
+    react: ">=16.4.0"
+    react-dom: ">=16.4.0"
+  checksum: 10c0/4c4e0798fc28f515b0997ecc95013a62800733590a193b4fe499c6808197875e341e101ee05f046f9155e07dd4a904dfb1f77f994fe1a2505d5f5ddcd74590c0
+  languageName: node
+  linkType: hard
+
 "react-image-crop@npm:^11.0.10":
   version: 11.0.10
   resolution: "react-image-crop@npm:11.0.10"
@@ -9598,6 +9619,13 @@ __metadata:
     minimist: "npm:^1.2.6"
     strip-bom: "npm:^3.0.0"
   checksum: 10c0/5b4f301a2b7a3766a986baf8fc0e177eb80bdba6e396792ff92dc23b5bca8bb279fc96517dcaaef63a3b49bebc6c4c833653ec58155780bc906bdbcf7dda0ef5
+  languageName: node
+  linkType: hard
+
+"tslib@npm:2.0.1":
+  version: 2.0.1
+  resolution: "tslib@npm:2.0.1"
+  checksum: 10c0/5f370da8ac0e9c7f2440a3fd8013682c042a8eeace93849a44a8d4252770e4830fce3201b0bc5a6045c7e28b80eaebe3a3b48e656aa7b4f9681b9a9d7263cfaf
   languageName: node
   linkType: hard
 
