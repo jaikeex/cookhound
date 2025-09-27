@@ -5,6 +5,7 @@ export type RecipeCardProps = Readonly<{
     index?: number;
     portionSize: number | null;
     rating: number | null;
-    time: number;
+    time: number | null;
     title: string;
+    cookbookId?: number | null;
 }>;

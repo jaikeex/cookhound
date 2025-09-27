@@ -248,5 +248,7 @@
     "app.cookbook.validation.description-max-length": "Popis kuchařky může mít maximálně 1400 znaků",
     "app.cookbook.no-recipes": "V této kuchařce nejsou žádné recepty",
     "app.cookbook.view": "Otevřít",
-    "app.cookbook.see-more": "a ještě {{count}} dalších receptů... otevřete kuchařku pro jejich zobrazení"
+    "app.cookbook.see-more": "a ještě {{count}} dalších receptů... otevřete kuchařku pro jejich zobrazení",
+    "app.success.remove-recipe": "Recept byl úspěšně odstraněn ze seznamu",
+    "app.recipe.remove-from-cookbook-confirmation": "Opravdu chcete odstranit tento recept ze seznamu?"
 }

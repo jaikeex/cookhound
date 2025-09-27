@@ -8,11 +8,11 @@ import { Typography } from '@/client/components';
 import { classNames } from '@/client/utils';
 import { useLocale } from '@/client/store';
 
-type CookbookRecipeListProps = Readonly<{
+type CookbookRecipeLinkListProps = Readonly<{
     recipes: RecipeForDisplayDTO[];
 }>;
 
-export const CookbookRecipeList: React.FC<CookbookRecipeListProps> = ({
+export const CookbookRecipeLinkList: React.FC<CookbookRecipeLinkListProps> = ({
     recipes = []
 }) => {
     const { isMobile } = useScreenSize();

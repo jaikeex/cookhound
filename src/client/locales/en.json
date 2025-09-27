@@ -248,5 +248,7 @@
     "app.cookbook.validation.description-max-length": "Description can have a maximum of 1400 characters",
     "app.cookbook.no-recipes": "No recipes in this cookbook",
     "app.cookbook.view": "Open",
-    "app.cookbook.see-more": "and {{count}} more recipes... open the cookbook to see all of them"
+    "app.cookbook.see-more": "and {{count}} more recipes... open the cookbook to see all of them",
+    "app.success.remove-recipe": "Recipe removed from cookbook successfully",
+    "app.recipe.remove-from-cookbook-confirmation": "Are you sure you want to remove this recipe from the cookbook?"
 }

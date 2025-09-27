@@ -8,7 +8,7 @@ import {
     Icon,
     Typography
 } from '@/client/components';
-import { CookbookRecipeList } from '@/client/components';
+import { CookbookRecipeLinkList } from '@/client/components';
 import { chqc } from '@/client/request/queryClient';
 import type { CookbookDTO } from '@/common/types';
 import Link from 'next/link';
@@ -72,7 +72,7 @@ export const Cookbooks: React.FC<CookbooksProps> = ({
                         {t('app.cookbook.no-recipes')}
                     </Typography>
                 ) : (
-                    <CookbookRecipeList recipes={cookbook?.recipes ?? []} />
+                    <CookbookRecipeLinkList recipes={cookbook?.recipes ?? []} />
                 )}
             </React.Fragment>
         );
