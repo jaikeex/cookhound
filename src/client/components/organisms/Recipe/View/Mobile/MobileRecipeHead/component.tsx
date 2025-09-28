@@ -7,11 +7,11 @@ import {
     Tooltip,
     Typography,
     RecipeInfo,
-    RecipeImage,
     TagList
 } from '@/client/components';
 import { useAuth, useLocale } from '@/client/store';
 import { classNames } from '@/client/utils';
+import { RecipeViewImage } from '@/client/components/molecules/Image/RecipeView/component';
 
 export type MobileRecipeHeadProps = Readonly<{
     isPreview?: boolean;
@@ -29,11 +29,14 @@ export const MobileRecipeHead: React.FC<MobileRecipeHeadProps> = ({
 
     return (
         <React.Fragment>
-            <RecipeImage
+            <RecipeViewImage
                 src={recipe.imageUrl}
                 alt={recipe.title}
-                className={'mx-auto max-w-[480px]'}
+                recipeId={recipe.id}
+                wrapperClassName={'mx-auto max-w-[480px]'}
+                className={'min-w-auto max-w-auto'}
             />
+
             <Typography variant={'heading-xl'} className={'text-center'}>
                 {recipe.title}
             </Typography>

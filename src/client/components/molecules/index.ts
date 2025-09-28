@@ -3,6 +3,7 @@ export * from './Button';
 export * from './Card';
 export * from './ConsentRow';
 export * from './Form';
+export * from './Image';
 export * from './IngredientRow';
 export * from './InstructionRow';
 export * from './Instructions';

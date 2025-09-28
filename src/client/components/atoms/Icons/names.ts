@@ -6,6 +6,7 @@ export const icons = {
     cancel: iconsSvg.CancelIcon,
     cart: iconsSvg.CartIcon,
     checkmark: iconsSvg.CheckmarkIcon,
+    chevronDown: iconsSvg.ChevronDownIcon,
     chevronDoubleUp: iconsSvg.ChevronDoubleUpIcon,
     chevronDoubleDown: iconsSvg.ChevronDoubleDownIcon,
     chevronDoubleLeft: iconsSvg.ChevronDoubleLeftIcon,

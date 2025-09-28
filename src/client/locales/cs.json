@@ -249,6 +249,11 @@
     "app.cookbook.no-recipes": "V této kuchařce nejsou žádné recepty",
     "app.cookbook.view": "Otevřít",
     "app.cookbook.see-more": "a ještě {{count}} dalších receptů... otevřete kuchařku pro jejich zobrazení",
+    "app.cookbook.select-title": "Vyberte kuchařku",
+    "app.cookbook.select-description": "Vyberte kuchařku, do které chcete tento recept přidat. Kuchařky nemohou obsahovat stejný recept vícekrát.",
+    "app.cookbook.select-label": "Kuchařka",
+    "app.cookbook.select-placeholder": "Vyberte kuchařku...",
+    "app.cookbook.add-recipe-success": "Recept byl úspěšně přidán do kuchařky",
     "app.success.remove-recipe": "Recept byl úspěšně odstraněn ze seznamu",
     "app.recipe.remove-from-cookbook-confirmation": "Opravdu chcete odstranit tento recept ze seznamu?"
 }

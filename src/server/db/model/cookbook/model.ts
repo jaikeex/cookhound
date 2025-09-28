@@ -96,6 +96,8 @@ class CookbookModel {
             ownerId: data.ownerId
         });
 
+        await this.invalidateUserCookbookCache(data.ownerId);
+
         return await prisma.$transaction(async (tx) => {
             // Determine next position in owner's list (append)
             const { _max } = (await tx.cookbook.aggregate({
@@ -135,6 +137,7 @@ class CookbookModel {
     async addRecipeToCookbook(
         cookbookId: number,
         recipeId: number,
+        userId: number,
         position?: number
     ): Promise<void> {
         log.trace('Adding recipe to cookbook', {
@@ -184,7 +187,7 @@ class CookbookModel {
         });
 
         await this.invalidateCookbookCache({ id: cookbookId });
-        await this.invalidateUserCookbookCache(cookbookId);
+        await this.invalidateUserCookbookCache(userId);
     }
 
     /**
@@ -192,7 +195,8 @@ class CookbookModel {
      */
     async removeRecipeFromCookbook(
         cookbookId: number,
-        recipeId: number
+        recipeId: number,
+        userId: number
     ): Promise<void> {
         log.trace('Removing recipe from cookbook', {
             cookbookId,
@@ -227,7 +231,7 @@ class CookbookModel {
         });
 
         await this.invalidateCookbookCache({ id: cookbookId });
-        await this.invalidateUserCookbookCache(cookbookId);
+        await this.invalidateUserCookbookCache(userId);
     }
 
     /**
@@ -235,7 +239,8 @@ class CookbookModel {
      */
     async reorderCookbookRecipes(
         cookbookId: number,
-        orderedRecipeIds: ReadonlyArray<number>
+        orderedRecipeIds: ReadonlyArray<number>,
+        userId: number
     ): Promise<void> {
         if (orderedRecipeIds.length === 0) return;
 
@@ -254,7 +259,7 @@ class CookbookModel {
         });
 
         await this.invalidateCookbookCache({ id: cookbookId });
-        await this.invalidateUserCookbookCache(cookbookId);
+        await this.invalidateUserCookbookCache(userId);
     }
 
     /**
@@ -295,9 +300,11 @@ class CookbookModel {
     }
 
     private async invalidateUserCookbookCache(userId: number) {
-        await invalidateCacheByPattern(
-            `prisma:cookbook:findManyByOwnerId:${userId}`
-        );
+        const cacheKey = generateCacheKey('cookbook', 'findManyByOwnerId', {
+            where: { ownerId: userId }
+        });
+
+        await invalidateCacheByPattern(cacheKey);
     }
 }
 

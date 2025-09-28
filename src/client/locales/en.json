@@ -249,6 +249,11 @@
     "app.cookbook.no-recipes": "No recipes in this cookbook",
     "app.cookbook.view": "Open",
     "app.cookbook.see-more": "and {{count}} more recipes... open the cookbook to see all of them",
+    "app.cookbook.select-title": "Select a cookbook",
+    "app.cookbook.select-description": "Select a cookbook to add the recipe to. Cookbooks cannot contain the same recipe more than once.",
+    "app.cookbook.select-label": "Cookbook",
+    "app.cookbook.select-placeholder": "Select a cookbook...",
+    "app.cookbook.add-recipe-success": "Recipe added to cookbook successfully",
     "app.success.remove-recipe": "Recipe removed from cookbook successfully",
     "app.recipe.remove-from-cookbook-confirmation": "Are you sure you want to remove this recipe from the cookbook?"
 }

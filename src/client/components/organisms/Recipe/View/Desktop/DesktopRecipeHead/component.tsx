@@ -7,7 +7,7 @@ import {
     Tooltip,
     Rating,
     RecipeInfo,
-    RecipeImage,
+    RecipeViewImage,
     TagList
 } from '@/client/components';
 import { useAuth, useLocale } from '@/client/store';
@@ -71,10 +71,11 @@ export const DesktopRecipeHead: React.FC<DesktopRecipeHeadProps> = ({
                 />
             </div>
 
-            <RecipeImage
+            <RecipeViewImage
                 alt={recipe.title}
                 className="max-h-[180px] max-w-80"
                 src={recipe.imageUrl}
+                recipeId={recipe.id}
             />
         </div>
     );

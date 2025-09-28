@@ -3,6 +3,7 @@ import BookIcon from './book.svg';
 import CancelIcon from './cancel.svg';
 import CartIcon from './cart.svg';
 import CheckmarkIcon from './checkmark.svg';
+import ChevronDownIcon from './chevron-down.svg';
 import ChevronDoubleUpIcon from './chevron-double-up.svg';
 import ChevronDoubleDownIcon from './chevron-double-down.svg';
 import ChevronDoubleLeftIcon from './chevron-double-left.svg';
@@ -33,6 +34,7 @@ export const basicSvg = {
     CancelIcon,
     CartIcon,
     CheckmarkIcon,
+    ChevronDownIcon,
     ChevronDoubleUpIcon,
     ChevronDoubleDownIcon,
     ChevronDoubleLeftIcon,

@@ -87,9 +87,10 @@ class CookbookService {
         recipeId: number
     ): Promise<{ success: boolean }> {
         await verifyCookbookOwnership(cookbookId);
+        const userId = assertAuthenticated();
 
         try {
-            await db.cookbook.addRecipeToCookbook(cookbookId, recipeId);
+            await db.cookbook.addRecipeToCookbook(cookbookId, recipeId, userId);
 
             return { success: true };
         } catch (error: unknown) {
@@ -117,8 +118,13 @@ class CookbookService {
         recipeId: number
     ): Promise<void> {
         await verifyCookbookOwnership(cookbookId);
+        const userId = assertAuthenticated();
 
-        await db.cookbook.removeRecipeFromCookbook(cookbookId, recipeId);
+        await db.cookbook.removeRecipeFromCookbook(
+            cookbookId,
+            recipeId,
+            userId
+        );
     }
 
     @LogServiceMethod({ names: ['cookbookId', 'orderedRecipeIds'] })
@@ -127,8 +133,13 @@ class CookbookService {
         orderedRecipeIds: number[]
     ): Promise<void> {
         await verifyCookbookOwnership(cookbookId);
+        const userId = assertAuthenticated();
 
-        await db.cookbook.reorderCookbookRecipes(cookbookId, orderedRecipeIds);
+        await db.cookbook.reorderCookbookRecipes(
+            cookbookId,
+            orderedRecipeIds,
+            userId
+        );
     }
 
     @LogServiceMethod({ names: ['ownerId', 'orderedCookbookIds'] })
