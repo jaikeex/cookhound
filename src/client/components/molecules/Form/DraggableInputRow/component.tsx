@@ -2,8 +2,7 @@
 
 import React, { useCallback } from 'react';
 import { Icon, IconButton } from '@/client/components';
-import { Reorder, useDragControls } from 'framer-motion';
-import type { PanInfo } from 'framer-motion';
+import { Reorder, useDragControls, type PanInfo } from 'framer-motion';
 import { useDisableMobileScroll, useKeyboardOpen } from '@/client/hooks';
 
 type DraggableInputRowProps = Readonly<{

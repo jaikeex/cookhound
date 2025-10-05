@@ -1,11 +1,9 @@
 'use client';
 
 import React, { useCallback, useEffect, useState } from 'react';
-import { BaseInput } from '@/client/components';
-import { DraggableInputRow } from '@/client/components/molecules/Form/DraggableInputRow';
+import { BaseInput, DraggableInputRow } from '@/client/components';
 import type { Ingredient } from '@/common/types';
-import { useCreateRecipeStore } from '@/client/store/app-store/useCreateRecipeStore';
-import { useLocale } from '@/client/store';
+import { useCreateRecipeStore, useLocale } from '@/client/store';
 
 type IngredientRowCreateProps = Readonly<{
     className?: string;

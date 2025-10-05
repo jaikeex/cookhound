@@ -3,7 +3,7 @@
 import { classNames } from '@/client/utils';
 import React, { useEffect, useRef, useCallback } from 'react';
 import { useSidebar } from './useSidebar';
-import { IconButton } from '@/client/components/atoms';
+import { IconButton } from '@/client/components';
 
 type SidebarProps = Readonly<{
     className?: string;

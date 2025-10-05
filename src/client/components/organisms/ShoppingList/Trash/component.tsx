@@ -1,14 +1,14 @@
 'use client';
 
-import { Typography } from '@/client/components/atoms/Typography';
-import { DraggableIngredientRow } from '@/client/components/molecules/IngredientRow/Draggable';
-import { DraggableList } from '@/client/components/molecules/List/DraggableList';
+import { Typography } from '@/client/components';
+import { DraggableIngredientRow } from '@/client/components';
+import { DraggableList } from '@/client/components';
 import type { ShoppingListIngredientDTO } from '@/common/types';
 import type { PanInfo } from 'framer-motion';
 import * as React from 'react';
 import { classNames } from '@/client/utils';
 import { useLocale } from '@/client/store';
-import { Divider } from '@/client/components/atoms/Divider';
+import { Divider } from '@/client/components';
 
 type TrashProps = Readonly<{
     className?: string;

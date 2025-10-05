@@ -1,8 +1,7 @@
 'use client';
 
 import React, { useCallback, useEffect, useState } from 'react';
-import { classNames } from '@/client/utils';
-import { convertImgToWebP, verifyImgSize } from '@/client/utils';
+import { classNames, convertImgToWebP, verifyImgSize } from '@/client/utils';
 import { Icon, ImageCropperModal, Loader } from '@/client/components';
 import { useLocale, useSnackbar, useModal } from '@/client/store';
 import Image from 'next/image';

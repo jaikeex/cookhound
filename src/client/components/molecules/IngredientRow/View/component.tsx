@@ -2,8 +2,7 @@
 
 import React, { useCallback, useEffect, useState } from 'react';
 import type { Ingredient } from '@/common/types';
-import type { TypographyVariant } from '@/client/components';
-import { Icon, Typography } from '@/client/components';
+import { Icon, Typography, type TypographyVariant } from '@/client/components';
 import { classNames } from '@/client/utils';
 
 //~---------------------------------------------------------------------------------------------~//

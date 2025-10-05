@@ -2,8 +2,7 @@
 
 import React from 'react';
 import type { Ingredient } from '@/common/types';
-import { IngredientRowView } from '@/client/components/molecules/IngredientRow/View';
-import { DraggableInputRow } from '@/client/components';
+import { IngredientRowView, DraggableInputRow } from '@/client/components';
 import type { PanInfo } from 'framer-motion';
 import { classNames } from '@/client/utils';
 

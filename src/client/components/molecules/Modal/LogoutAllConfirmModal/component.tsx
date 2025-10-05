@@ -2,10 +2,9 @@
 
 import React, { useCallback, useState } from 'react';
 import type { ModalProps } from '@/client/components/molecules/Modal/types';
-import { ButtonBase, Typography } from '@/client/components';
+import { ButtonBase, Typography, PasswordInput } from '@/client/components';
 import { useLocale, useSnackbar, useAuth } from '@/client/store';
 import { AuthType } from '@/common/types';
-import { PasswordInput } from '@/client/components/molecules/Form/PasswordInput/component';
 import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { chqc } from '@/client/request/queryClient';

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { forwardRef } from 'react';
-import { icons } from '@/client/components/atoms/Icons/names';
+import { icons } from '@/client/components';
 import type { IconName } from '@/client/types';
 import { classNames } from '@/client/utils';
 import { Typography } from '@/client/components';

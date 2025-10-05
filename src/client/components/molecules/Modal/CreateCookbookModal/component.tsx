@@ -4,8 +4,10 @@ import React, { useCallback, useState } from 'react';
 import type { ModalProps } from '@/client/components/molecules/Modal/types';
 import {
     CookbookForm,
-    type CookbookFormErrors
-} from '@/client/components/organisms/Form/Cookbook/component';
+    type CookbookFormErrors,
+    ButtonBase,
+    Submit
+} from '@/client/components';
 import { useLocale, useSnackbar } from '@/client/store';
 import type { I18nMessage } from '@/client/locales';
 import { chqc, QUERY_KEYS } from '@/client/request/queryClient';
@@ -15,8 +17,7 @@ import {
 } from '@/common/types';
 import { useQueryClient } from '@tanstack/react-query';
 import { z } from 'zod';
-import { validateFormData } from '@/client/utils/form';
-import { ButtonBase, Submit } from '@/client/components';
+import { validateFormData } from '@/client/utils';
 
 //~---------------------------------------------------------------------------------------------~//
 //$                                          VALIDATION                                         $//

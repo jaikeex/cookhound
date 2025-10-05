@@ -2,9 +2,9 @@ import React from 'react';
 import { apiClient } from '@/client/request';
 import { RecipeEditTemplate } from '@/client/components';
 import { cookies } from 'next/headers';
-import { SESSION_COOKIE_NAME } from '@/common/constants/general';
+import { SESSION_COOKIE_NAME } from '@/common/constants';
 import { verifySessionFromCookie } from '@/server/utils/session';
-import { ClientRedirect } from '@/client/components/atoms/ClientRedirect/component';
+import { ClientRedirect } from '@/client/components';
 
 type RecipePageParams = {
     readonly params: Promise<

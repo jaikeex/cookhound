@@ -2,7 +2,7 @@
 
 import React, { useMemo, useRef, useCallback } from 'react';
 import { classNames } from '@/client/utils';
-import { Typography } from '@/client/components/atoms';
+import { Typography } from '@/client/components';
 
 export type SidebarHandleProps = Readonly<{
     onOpen: () => void;

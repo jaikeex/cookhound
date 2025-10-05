@@ -1,5 +1,6 @@
 export * from './Avatar';
 export * from './Button';
+export * from './ClientRedirect';
 export * from './ComingSoon';
 export * from './Divider';
 export * from './Checkbox';

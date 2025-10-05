@@ -3,9 +3,13 @@
 import React, { useCallback, useState } from 'react';
 import type { RecipeTagDTO, TagListDTO } from '@/common/types';
 import type { ModalProps } from '@/client/components/molecules/Modal/types';
-import { ButtonBase, Loader, TagSelectionList } from '@/client/components';
+import {
+    ButtonBase,
+    Loader,
+    TagSelectionList,
+    TagSelectionBox
+} from '@/client/components';
 import { useCreateRecipeStore, useLocale, useSnackbar } from '@/client/store';
-import { TagSelectionBox } from '@/client/components';
 import type { RequestError } from '@/client/error';
 import { MAX_TAGS, RECIPE_TAG_CATEGORY_LIMITS_BY_ID } from '@/common/constants';
 import { chqc } from '@/client/request/queryClient';

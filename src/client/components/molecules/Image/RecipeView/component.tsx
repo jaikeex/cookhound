@@ -1,9 +1,12 @@
 'use client';
 
-import { IconButton, RecipeImage } from '@/client/components/atoms';
-import classNames from '@/client/utils/classnames';
+import {
+    IconButton,
+    RecipeImage,
+    AddRecipeToCookbookModal
+} from '@/client/components';
+import { classNames } from '@/client/utils';
 import React, { useCallback, useMemo } from 'react';
-import { AddRecipeToCookbookModal } from '@/client/components/molecules/Modal';
 import { useAuth, useModal } from '@/client/store';
 import { chqc } from '@/client/request/queryClient';
 

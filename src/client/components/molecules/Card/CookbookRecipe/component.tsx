@@ -1,12 +1,15 @@
 'use client';
 
 import React, { useCallback } from 'react';
-import { IconButton, RecipeCard } from '@/client/components';
+import {
+    IconButton,
+    RecipeCard,
+    DeleteFromCookbookConfirmationModal
+} from '@/client/components';
 import type { RecipeCardProps } from '@/client/components/molecules/Card/types';
 import { useModal, useLocale, useSnackbar } from '@/client/store';
 import { chqc, QUERY_KEYS } from '@/client/request/queryClient';
 import { useQueryClient } from '@tanstack/react-query';
-import { DeleteFromCookbookConfirmationModal } from '@/client/components/molecules/Modal/DeleteFromCookbookConfirmationModal';
 import { SortableItem, SortableKnob } from 'react-easy-sort';
 
 export type CookbookRecipeCardProps = Readonly<

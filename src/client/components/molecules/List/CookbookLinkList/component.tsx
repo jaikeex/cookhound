@@ -3,8 +3,7 @@
 import React, { useMemo } from 'react';
 import type { RecipeForDisplayDTO } from '@/common/types';
 import { useScreenSize } from '@/client/hooks';
-import { RecipeLink } from '@/client/components';
-import { Typography } from '@/client/components';
+import { RecipeLink, Typography } from '@/client/components';
 import { classNames } from '@/client/utils';
 import { useLocale } from '@/client/store';
 

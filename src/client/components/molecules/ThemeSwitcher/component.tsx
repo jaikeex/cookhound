@@ -2,8 +2,12 @@
 
 import React, { useCallback, useMemo, useEffect, useState } from 'react';
 import { useTheme } from 'next-themes';
-import type { IconButtonProps, SwitchProps } from '@/client/components';
-import { IconButton, Switch } from '@/client/components';
+import {
+    IconButton,
+    Switch,
+    type IconButtonProps,
+    type SwitchProps
+} from '@/client/components';
 import { useLocale } from '@/client/store';
 
 type ThemeSwitcherIconProps = Omit<IconButtonProps, 'icon' | 'onClick'>;

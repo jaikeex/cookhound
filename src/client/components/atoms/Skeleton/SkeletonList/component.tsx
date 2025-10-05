@@ -1,5 +1,5 @@
 import React from 'react';
-import { SkeletonBox } from '@/client/components/atoms/Skeleton';
+import { SkeletonBox } from '@/client/components';
 
 const classConfig = {
     size: {

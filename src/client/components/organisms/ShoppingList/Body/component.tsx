@@ -1,12 +1,7 @@
 'use client';
 
 import React, { forwardRef } from 'react';
-import {
-    Divider,
-    Typography,
-    Tooltip,
-    IconButton
-} from '@/client/components/atoms';
+import { Divider, Typography, Tooltip, IconButton } from '@/client/components';
 import {
     RecipeInfo,
     DraggableIngredientRow,
@@ -16,7 +11,7 @@ import Link from 'next/link';
 import type { Ingredient, ShoppingListDTO } from '@/common/types';
 import type { PanInfo } from 'framer-motion';
 import { useLocale } from '@/client/store';
-import { DraggableList } from '@/client/components/molecules/List/DraggableList';
+import { DraggableList } from '@/client/components';
 
 type ShoppingListBodyProps = Readonly<{
     editing?: boolean;

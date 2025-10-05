@@ -2,9 +2,8 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import type { RecipeForDisplayDTO } from '@/common/types';
-import { generateImgPlaceholder } from '@/client/utils';
+import { generateImgPlaceholder, classNames } from '@/client/utils';
 import { Typography } from '@/client/components';
-import { classNames } from '@/client/utils';
 
 export type RecipeLinkProps = Readonly<{
     className?: string;

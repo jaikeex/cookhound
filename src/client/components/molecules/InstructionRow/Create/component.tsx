@@ -2,7 +2,7 @@
 
 import React, { useCallback, useEffect, useState } from 'react';
 import { BaseTextarea, DraggableInputRow } from '@/client/components';
-import { useCreateRecipeStore } from '@/client/store/app-store/useCreateRecipeStore';
+import { useCreateRecipeStore } from '@/client/store';
 
 type InstructionRowCreateProps = Readonly<{
     className?: string;

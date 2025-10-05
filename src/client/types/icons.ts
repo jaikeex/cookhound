@@ -1,3 +1,3 @@
-import type { icons } from '@/client/components/atoms/Icons/names';
+import type { icons } from '@/client/components';
 
 export type IconName = keyof typeof icons;

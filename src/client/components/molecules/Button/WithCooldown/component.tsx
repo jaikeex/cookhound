@@ -1,8 +1,11 @@
 'use client';
 
 import React, { useCallback, useEffect } from 'react';
-import type { BaseButtonProps } from '@/client/components/atoms/Button';
-import { ButtonBase, Typography } from '@/client/components';
+import {
+    ButtonBase,
+    Typography,
+    type BaseButtonProps
+} from '@/client/components';
 
 type ButtonWithCooldownProps = Readonly<{
     cooldown: number;

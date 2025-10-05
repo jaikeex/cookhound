@@ -1,8 +1,7 @@
 'use client';
 
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState, type ReactNode } from 'react';
 import { BaseInput, ButtonBase, InputLabel, Loader } from '@/client/components';
-import type { ReactNode } from 'react';
 import type { FormInputProps } from '@/client/components/molecules/Form/types';
 import { classNames } from '@/client/utils';
 import { useLocale } from '@/client/store';

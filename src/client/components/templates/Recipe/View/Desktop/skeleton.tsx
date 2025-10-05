@@ -1,9 +1,5 @@
 import React from 'react';
-import {
-    SkeletonBox,
-    SkeletonImage,
-    SkeletonList
-} from '@/client/components/atoms/Skeleton';
+import { SkeletonBox, SkeletonImage, SkeletonList } from '@/client/components';
 
 export type DesktopRecipeViewSkeletonProps = Readonly<{
     className?: string;

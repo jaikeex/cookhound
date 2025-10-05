@@ -1,6 +1,5 @@
-import { ButtonBase } from '@/client/components/atoms/Button';
-import { Typography } from '@/client/components/atoms/Typography';
-import classNames from '@/client/utils/classnames';
+import { ButtonBase, Typography } from '@/client/components';
+import { classNames } from '@/client/utils';
 import React from 'react';
 
 type ButtonRowProps = Readonly<{

@@ -1,8 +1,7 @@
 'use client';
 
 import React from 'react';
-import type { TypographyVariant } from '@/client/components';
-import { Icon, Typography } from '@/client/components';
+import { Icon, Typography, type TypographyVariant } from '@/client/components';
 import { useLocale } from '@/client/store';
 import { classNames } from '@/client/utils';
 
