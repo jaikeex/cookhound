@@ -58,6 +58,7 @@
         "@typescript-eslint/eslint-plugin": "^7.7.1",
         "@typescript-eslint/parser": "^7.7.1",
         "autoprefixer": "^10.4.21",
+        "critters": "^0.0.25",
         "eslint": "^8",
         "eslint-config-next": "14.2.13",
         "eslint-config-prettier": "^9.1.0",
@@ -80,5 +81,9 @@
         "schema": "src/server/db/schema.prisma",
         "seed": "tsx prisma/seed.ts"
     },
+    "browserslist": [
+        "defaults and fully supports es6-module",
+        "maintained node versions"
+    ],
     "packageManager": "yarn@4.1.0"
 }

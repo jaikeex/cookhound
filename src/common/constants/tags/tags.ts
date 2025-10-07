@@ -11,6 +11,15 @@ export const CATEGORY_TRANSLATIONS = {
     diet: 'app.recipe.tags.category.diet'
 } as const satisfies Record<string, string>;
 
+export const CATEGORY_IDS = {
+    cuisine: 1,
+    difficulty: 2,
+    season: 3,
+    definedBy: 4,
+    type: 5,
+    diet: 6
+} as const satisfies Record<keyof typeof RECIPE_CATEGORY_TAGS, number>;
+
 export const RECIPE_CATEGORY_TAGS = {
     cuisine: [
         'american',

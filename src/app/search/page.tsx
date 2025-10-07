@@ -1,12 +1,20 @@
-import { FrontPageSkeleton } from '@/client/components/templates/Dashboard/FrontPage/skeleton';
+import type { Metadata } from 'next';
 import { SearchTemplate } from '@/client/components/templates/Dashboard/Search';
 import { apiClient } from '@/client/request';
 import { getUserLocale } from '@/common/utils';
 import { cookies, headers } from 'next/headers';
-import React, { Suspense } from 'react';
-import { SESSION_COOKIE_NAME } from '@/common/constants/general';
+import React from 'react';
+import { SESSION_COOKIE_NAME, ENV_CONFIG_PUBLIC } from '@/common/constants';
+import {
+    generateBreadcrumbSchema,
+    getLocalizedMetadata
+} from '@/server/utils/seo';
+import { StructuredData } from '@/client/components';
+import { tServer } from '@/server/utils/locales';
 
 export const dynamic = 'force-dynamic';
+
+//|=============================================================================================|//
 
 export default async function SearchPage({
     searchParams
@@ -31,12 +39,75 @@ export default async function SearchPage({
           })
         : Promise.resolve([]);
 
+    // Generate breadcrumb schema: Home > Search Results
+    const breadcrumbItems = [
+        {
+            name: tServer(locale, 'app.general.home'),
+            url: ENV_CONFIG_PUBLIC.ORIGIN
+        },
+        {
+            name: searchQuery ? `Search: ${searchQuery}` : 'Search',
+            url: searchQuery
+                ? `${ENV_CONFIG_PUBLIC.ORIGIN}/search?query=${encodeURIComponent(searchQuery)}`
+                : `${ENV_CONFIG_PUBLIC.ORIGIN}/search`
+        }
+    ];
+
+    const breadcrumbSchema = generateBreadcrumbSchema(breadcrumbItems);
+
     return (
-        <Suspense fallback={<FrontPageSkeleton />}>
+        <React.Fragment>
+            <StructuredData schema={breadcrumbSchema} id="breadcrumb-jsonld" />
             <SearchTemplate
                 initialRecipes={recipesForDisplay}
                 initialQuery={searchQuery}
             />
-        </Suspense>
+        </React.Fragment>
     );
+}
+
+//|=============================================================================================|//
+
+export async function generateMetadata({
+    searchParams
+}: {
+    searchParams: Promise<{ query?: string }>;
+}): Promise<Metadata> {
+    const { query } = await searchParams;
+    const q = query ?? '';
+    const cookieStore = await cookies();
+    const headerList = await headers();
+
+    if (!q) {
+        return await getLocalizedMetadata(cookieStore, headerList, {
+            titleKey: 'meta.search.title',
+            descriptionKey: 'meta.search.description',
+            canonical: `${ENV_CONFIG_PUBLIC.ORIGIN}/search`,
+            noindex: true
+        });
+    }
+
+    const capitalised = q.charAt(0).toUpperCase() + q.slice(1);
+
+    const metadata = await getLocalizedMetadata(cookieStore, headerList, {
+        titleKey: 'meta.search.title',
+        descriptionKey: 'meta.search.description',
+        canonical: `${ENV_CONFIG_PUBLIC.ORIGIN}/search?query=${encodeURIComponent(q)}`,
+        noindex: true
+    });
+
+    // For specific queries, we override the title and description and keep noindex
+    return {
+        ...metadata,
+        title: `${capitalised} | ${metadata.title}`,
+        description: `Results for ${capitalised} recipes on Cookhound.`,
+        openGraph: {
+            ...metadata.openGraph,
+            title: `Search results for ${capitalised}`,
+            description: `Discover delicious ${capitalised} recipes shared by the community.`
+        },
+        twitter: {
+            card: 'summary'
+        }
+    };
 }

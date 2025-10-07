@@ -2,6 +2,9 @@ import React from 'react';
 import { ChangeEmailTemplate } from '@/client/components';
 import { verifySessionFromCookie } from '@/server/utils/session';
 import { redirectToRestrictedWithLogin } from '@/server/utils/reqwest';
+import type { Metadata } from 'next';
+
+//|=============================================================================================|//
 
 export default async function Page() {
     const result = await verifySessionFromCookie();
@@ -13,3 +16,14 @@ export default async function Page() {
 
     return <ChangeEmailTemplate />;
 }
+
+//|=============================================================================================|//
+
+export const metadata: Metadata = {
+    title: 'Change Email | Cookhound',
+    description: 'Update your email address on Cookhound.',
+    robots: {
+        index: false,
+        follow: false
+    }
+};

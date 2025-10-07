@@ -2,11 +2,12 @@
 
 import React, { useEffect } from 'react';
 import { ENV_CONFIG_PUBLIC } from '@/common/constants';
-import dynamic from 'next/dynamic';
 import { Loader, Typography } from '@/client/components';
 import { useLocale } from '@/client/store';
 
-function GoogleCallbackPage() {
+export const dynamic = 'force-dynamic';
+
+export default function GoogleCallbackPage() {
     const { t } = useLocale();
 
     useEffect(() => {
@@ -37,7 +38,3 @@ function GoogleCallbackPage() {
         </div>
     );
 }
-
-export default dynamic(() => Promise.resolve(GoogleCallbackPage), {
-    ssr: false
-});

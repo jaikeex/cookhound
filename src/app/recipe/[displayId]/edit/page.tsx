@@ -5,6 +5,7 @@ import { cookies } from 'next/headers';
 import { SESSION_COOKIE_NAME } from '@/common/constants';
 import { verifySessionFromCookie } from '@/server/utils/session';
 import { ClientRedirect } from '@/client/components';
+import type { Metadata } from 'next';
 
 type RecipePageParams = {
     readonly params: Promise<
@@ -61,3 +62,14 @@ export default async function Page({ params }: RecipePageParams) {
 
     return <RecipeEditTemplate recipe={recipe} />;
 }
+
+//|=============================================================================================|//
+
+export const metadata: Metadata = {
+    title: 'Edit Recipe | Cookhound',
+    description: 'Edit your recipe on Cookhound.',
+    robots: {
+        index: false,
+        follow: false
+    }
+};

@@ -1,13 +1,26 @@
-'use client';
-
 import React from 'react';
 import { LoginTemplate } from '@/client/components';
-import dynamic from 'next/dynamic';
+import type { Metadata } from 'next';
+import { cookies, headers } from 'next/headers';
+import { getLocalizedMetadata } from '@/server/utils/seo';
 
-function LoginPage() {
+export const dynamic = 'force-dynamic';
+
+//|=============================================================================================|//
+
+export default function LoginPage() {
     return <LoginTemplate />;
 }
 
-export default dynamic(() => Promise.resolve(LoginPage), {
-    ssr: false
-});
+//|=============================================================================================|//
+
+export async function generateMetadata(): Promise<Metadata> {
+    const cookieStore = await cookies();
+    const headerList = await headers();
+
+    return getLocalizedMetadata(cookieStore, headerList, {
+        titleKey: 'meta.auth.login.title',
+        descriptionKey: 'meta.auth.login.description',
+        noindex: true
+    });
+}
