@@ -39,12 +39,14 @@ const classConfig = {
 
 type LogoProps = Readonly<{
     className?: string;
+    priority?: boolean;
     size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
     withText?: boolean;
 }>;
 
 export const Logo: React.FC<LogoProps> = ({
     className,
+    priority = false,
     size = 'md',
     withText = true
 }) => {
@@ -58,6 +60,7 @@ export const Logo: React.FC<LogoProps> = ({
                 alt="logo"
                 width={classConfig[size].img}
                 height={classConfig[size].img}
+                priority={priority}
             />
             <Image
                 src={'/img/logo-dark.png'}
@@ -65,6 +68,7 @@ export const Logo: React.FC<LogoProps> = ({
                 alt="logo"
                 width={classConfig[size].img}
                 height={classConfig[size].img}
+                priority={priority}
             />
             {withText ? (
                 <span className={`font-kalam ${classConfig[size].text}`}>

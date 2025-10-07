@@ -1,16 +1,21 @@
 'use client';
 
 import React, { useCallback } from 'react';
-import {
-    IconButton,
-    RecipeCard,
-    DeleteFromCookbookConfirmationModal
-} from '@/client/components';
+import dynamic from 'next/dynamic';
+import { IconButton, RecipeCard } from '@/client/components';
 import type { RecipeCardProps } from '@/client/components/molecules/Card/types';
 import { useModal, useLocale, useSnackbar } from '@/client/store';
 import { chqc, QUERY_KEYS } from '@/client/request/queryClient';
 import { useQueryClient } from '@tanstack/react-query';
 import { SortableItem, SortableKnob } from 'react-easy-sort';
+
+const DeleteFromCookbookConfirmationModal = dynamic(
+    () =>
+        import(
+            '@/client/components/molecules/Modal/DeleteFromCookbookConfirmationModal'
+        ).then((mod) => mod.DeleteFromCookbookConfirmationModal),
+    { ssr: false }
+);
 
 export type CookbookRecipeCardProps = Readonly<
     RecipeCardProps & {

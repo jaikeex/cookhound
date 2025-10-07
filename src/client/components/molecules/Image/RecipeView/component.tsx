@@ -1,14 +1,19 @@
 'use client';
 
-import {
-    IconButton,
-    RecipeImage,
-    AddRecipeToCookbookModal
-} from '@/client/components';
+import { IconButton, RecipeImage } from '@/client/components';
 import { classNames } from '@/client/utils';
 import React, { useCallback, useMemo } from 'react';
+import dynamic from 'next/dynamic';
 import { useAuth, useModal } from '@/client/store';
 import { chqc } from '@/client/request/queryClient';
+
+const AddRecipeToCookbookModal = dynamic(
+    () =>
+        import(
+            '@/client/components/molecules/Modal/AddRecipeToCookbookModal'
+        ).then((mod) => mod.AddRecipeToCookbookModal),
+    { ssr: false }
+);
 
 export type RecipeViewImageProps = Readonly<{
     alt: string | null;
@@ -16,6 +21,7 @@ export type RecipeViewImageProps = Readonly<{
     src: string | null;
     recipeId: number;
     wrapperClassName?: string;
+    priority?: boolean;
 }>;
 
 export const RecipeViewImage: React.FC<RecipeViewImageProps> = ({
@@ -23,7 +29,8 @@ export const RecipeViewImage: React.FC<RecipeViewImageProps> = ({
     className,
     src,
     recipeId,
-    wrapperClassName
+    wrapperClassName,
+    priority = false
 }) => {
     const { openModal } = useModal();
     const { user } = useAuth();
@@ -58,7 +65,7 @@ export const RecipeViewImage: React.FC<RecipeViewImageProps> = ({
     return (
         <div
             className={classNames(
-                'relative min-w-max max-w-max',
+                'relative md:min-w-max max-w-max',
                 wrapperClassName
             )}
         >
@@ -66,6 +73,7 @@ export const RecipeViewImage: React.FC<RecipeViewImageProps> = ({
                 alt={alt}
                 className={classNames('', className)}
                 src={src}
+                priority={priority}
             />
 
             <IconButton

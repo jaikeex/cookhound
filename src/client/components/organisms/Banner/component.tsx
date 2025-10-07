@@ -37,6 +37,7 @@ export const Banner: React.FC<BannerProps> = ({
                     alt="Recipe Finder"
                     width={1000}
                     height={266}
+                    priority
                 />
                 <div className="relative z-20 flex flex-col items-center justify-center h-full px-4 text-center">
                     <div className="flex flex-col gap-4 mt-12 mb-3 md:mt-16 md:mb-6">

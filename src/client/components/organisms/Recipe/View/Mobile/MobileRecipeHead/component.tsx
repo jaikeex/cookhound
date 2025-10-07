@@ -35,6 +35,7 @@ export const MobileRecipeHead: React.FC<MobileRecipeHeadProps> = ({
                 recipeId={recipe.id}
                 wrapperClassName={'mx-auto max-w-[480px]'}
                 className={'min-w-auto max-w-auto'}
+                priority={true}
             />
 
             <Typography variant={'heading-xl'} className={'text-center'}>

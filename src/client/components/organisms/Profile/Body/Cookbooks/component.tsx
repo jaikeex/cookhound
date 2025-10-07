@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import dynamic from 'next/dynamic';
 import {
     Accordion,
     ButtonBase,
@@ -14,7 +15,14 @@ import type { CookbookDTO } from '@/common/types';
 import Link from 'next/link';
 import { useLocale } from '@/client/store';
 import { useModal } from '@/client/store/ModalContext';
-import { CreateCookbookModal } from '@/client/components';
+
+const CreateCookbookModal = dynamic(
+    () =>
+        import('@/client/components/molecules/Modal/CreateCookbookModal').then(
+            (mod) => mod.CreateCookbookModal
+        ),
+    { ssr: false }
+);
 
 type CookbooksProps = Readonly<{
     className?: string;

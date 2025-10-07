@@ -76,6 +76,7 @@ export const DesktopRecipeHead: React.FC<DesktopRecipeHeadProps> = ({
                 className="max-h-[180px] max-w-80"
                 src={recipe.imageUrl}
                 recipeId={recipe.id}
+                priority={true}
             />
         </div>
     );
