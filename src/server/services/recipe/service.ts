@@ -78,7 +78,9 @@ class RecipeService {
             timesRated: recipe.timesRated ?? 0,
             timesViewed: recipe.timesViewed ?? 0,
             ingredients: recipe.ingredients as Ingredient[],
-            instructions: recipe.instructions as string[]
+            instructions: recipe.instructions as string[],
+            createdAt: recipe.createdAt,
+            updatedAt: recipe.updatedAt
         };
 
         const flags = recipe.flags as unknown as RecipeFlagDTO[];
@@ -145,7 +147,9 @@ class RecipeService {
             timesViewed: (recipe.timesViewed ?? 0) + 1, // Include the increment we just made
             ingredients: recipe.ingredients as Ingredient[],
             instructions: recipe.instructions as string[],
-            flags: null
+            flags: null,
+            createdAt: recipe.createdAt,
+            updatedAt: recipe.updatedAt
         };
 
         const flags = recipe.flags as unknown as RecipeFlagDTO[];

@@ -85,7 +85,9 @@ class ReindexRecipesJob extends BaseJob {
                                 quantity: ri.quantity
                             })
                         ),
-                        instructions: recipe?.instructions as string[]
+                        instructions: recipe?.instructions as string[],
+                        createdAt: recipe.createdAt,
+                        updatedAt: recipe.updatedAt
                     };
 
                     try {

@@ -25,6 +25,8 @@ export function createRecipePlaceholder(
         notes: null,
         ingredients: [],
         instructions: [],
-        authorId: 0
+        authorId: 0,
+        createdAt: new Date(),
+        updatedAt: new Date()
     } as RecipeDTO;
 }

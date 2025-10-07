@@ -19,6 +19,8 @@ export type RecipeDTO = {
     timesRated: number;
     timesViewed: number;
     tags: RecipeTagDTO[] | null;
+    createdAt: Date;
+    updatedAt: Date;
 };
 
 export type RecipeForDisplayDTO = {
