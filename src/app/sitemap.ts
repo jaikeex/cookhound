@@ -1,9 +1,9 @@
 import type { MetadataRoute } from 'next';
-import { ENV_CONFIG_PUBLIC, ONE_DAY_IN_SECONDS } from '@/common/constants';
+import { ENV_CONFIG_PUBLIC } from '@/common/constants';
 import { prisma } from '@/server/integrations';
 import { Logger } from '@/server/logger';
 
-export const revalidate = ONE_DAY_IN_SECONDS;
+export const revalidate = 86400; // 24 hours
 
 const log = Logger.getInstance('sitemap');
 
@@ -49,6 +49,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
                     languages: {
                         en: `${baseUrl}/search`,
                         cs: `${baseUrl}/search`
+                    }
+                }
+            },
+            {
+                url: `${baseUrl}/terms`,
+                lastModified: new Date(),
+                changeFrequency: 'monthly',
+                priority: 0.5,
+                alternates: {
+                    languages: {
+                        en: `${baseUrl}/terms`,
+                        cs: `${baseUrl}/terms`
                     }
                 }
             }
