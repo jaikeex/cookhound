@@ -373,6 +373,9 @@ class RecipeSearchIndex {
         try {
             await this.client.collections(COLLECTION_NAME).delete();
 
+            // Reset the collection ready flag here
+            this.collectionReady = false;
+
             log.info(
                 'All documents deleted successfully in Typesense collection',
                 {
