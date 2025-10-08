@@ -3,3 +3,7 @@ export * from './email-changed-audit';
 export * from './email-change-notice';
 export * from './email-verification';
 export * from './reset-password';
+export * from './account-deletion-confirmation';
+export * from './account-deletion-reminder';
+export * from './account-deletion-cancelled';
+export * from './account-deleted';

@@ -4,6 +4,7 @@ import {
     EVALUATION_QUEUE_NAME,
     QUEUE_NAME as RECIPES_QUEUE_NAME
 } from './recipes/constants';
+import { QUEUE_NAME as ACCOUNTS_QUEUE_NAME } from './accounts/constants';
 
 //?—————————————————————————————————————————————————————————————————————————————————————————————?//
 //?                                       IMPORTANT INFO                                        ?//
@@ -28,6 +29,10 @@ export const JOB_NAMES = Object.freeze({
     SEND_EMAIL_CHANGE_CONFIRMATION: 'send-email-change-confirmation',
     SEND_EMAIL_CHANGE_NOTICE: 'send-email-change-notice',
     SEND_EMAIL_CHANGED_AUDIT: 'send-email-changed-audit',
+    SEND_ACCOUNT_DELETION_CONFIRMATION: 'send-account-deletion-confirmation',
+    SEND_ACCOUNT_DELETION_REMINDER: 'send-account-deletion-reminder',
+    SEND_ACCOUNT_DELETION_CANCELLED: 'send-account-deletion-cancelled',
+    SEND_ACCOUNT_DELETED: 'send-account-deleted',
 
     //|-------------------------------------------------------------------------------------|//
     //?                                      SEARCH                                         ?//
@@ -40,12 +45,19 @@ export const JOB_NAMES = Object.freeze({
     //|-------------------------------------------------------------------------------------|//
 
     REGISTER_RECIPE_VISIT: 'register-recipe-visit',
-    EVALUATE_RECIPE: 'evaluate-recipe'
+    EVALUATE_RECIPE: 'evaluate-recipe',
+
+    //|-------------------------------------------------------------------------------------|//
+    //?                                      ACCOUNTS                                       ?//
+    //|-------------------------------------------------------------------------------------|//
+
+    PROCESS_ACCOUNT_DELETIONS: 'process-account-deletions'
 });
 
 export const QUEUE_NAMES = Object.freeze({
     EMAILS: EMAILS_QUEUE_NAME,
     SEARCH: SEARCH_QUEUE_NAME,
     RECIPES: RECIPES_QUEUE_NAME,
-    RECIPE_EVALUATION: EVALUATION_QUEUE_NAME
+    RECIPE_EVALUATION: EVALUATION_QUEUE_NAME,
+    ACCOUNTS: ACCOUNTS_QUEUE_NAME
 });

@@ -35,6 +35,10 @@ export * from './emails/SendPasswordResetEmailJob';
 export * from './emails/SendEmailChangeConfirmationJob';
 export * from './emails/SendEmailChangeNoticeJob';
 export * from './emails/SendEmailChangedAuditJob';
+export * from './emails/SendAccountDeletionConfirmationJob';
+export * from './emails/SendAccountDeletionReminderJob';
+export * from './emails/SendAccountDeletionCancelledJob';
+export * from './emails/SendAccountDeletedJob';
 
 //|-----------------------------------------------------------------------------------------|//
 //?                                        SEARCH                                          ?//
@@ -48,3 +52,9 @@ export * from './search/ReindexRecipesJob';
 
 export * from './recipes/RegisterRecipeVisitJob';
 export * from './recipes/EvaluateRecipeJob';
+
+//|-----------------------------------------------------------------------------------------|//
+//?                                       ACCOUNTS                                         ?//
+//|-----------------------------------------------------------------------------------------|//
+
+export * from './accounts/ProcessAccountDeletionsJob';

@@ -12,6 +12,12 @@ const CRON_JOBS = [
         queueName: QUEUE_NAMES.SEARCH,
         cron: '0 1 * * *', // 1:00 AM
         enabled: true
+    },
+    {
+        name: JOB_NAMES.PROCESS_ACCOUNT_DELETIONS,
+        queueName: QUEUE_NAMES.ACCOUNTS,
+        cron: '0 2 * * *', // 2:00 AM daily
+        enabled: true
     }
 ];
 
