@@ -45,9 +45,7 @@ export const Cookbooks: React.FC<CookbooksProps> = ({
         });
     }, [openModal]);
 
-    const { data: cookbooks } = chqc.cookbook.useCookbooksByUser(userId, {
-        enabled: isCurrentUser
-    });
+    const { data: cookbooks } = chqc.cookbook.useCookbooksByUser(userId, {});
 
     const isEmpty = cookbooks?.length === 0;
 
@@ -93,14 +91,16 @@ export const Cookbooks: React.FC<CookbooksProps> = ({
                     {t('app.profile.cookbooks')}
                 </Typography>
 
-                <ButtonBase
-                    color={isEmpty ? 'primary' : 'subtle'}
-                    outlined={!isEmpty}
-                    size="md"
-                    onClick={handleOpenCreateCookbook}
-                >
-                    {t('app.profile.create-cookbook')}
-                </ButtonBase>
+                {isCurrentUser ? (
+                    <ButtonBase
+                        color={isEmpty ? 'primary' : 'subtle'}
+                        outlined={!isEmpty}
+                        size="md"
+                        onClick={handleOpenCreateCookbook}
+                    >
+                        {t('app.profile.create-cookbook')}
+                    </ButtonBase>
+                ) : null}
             </div>
 
             <Divider className="my-2" />

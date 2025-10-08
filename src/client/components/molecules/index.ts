@@ -15,6 +15,7 @@ export * from './Modal';
 export * from './Popup';
 export * from './Profile';
 export * from './Rating';
+export * from './RecipeAuthorLink';
 export * from './RecipeInfo';
 export * from './RecipeLink';
 export * from './Sidebar';

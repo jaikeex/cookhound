@@ -170,6 +170,7 @@
     "app.recipe.search-suggestions.title-last-viewed": "Last viewed",
     "app.recipe.search-suggestions.empty-last-viewed": "Start browsing recipes and this will show your last viewed",
     "app.recipe.delete-confirmation": "Are you sure you want to delete the recipe {{recipeTitle}}? This action cannot be undone.",
+    "app.recipe.age": "Age",
     "app.form.image-cropper.title": "Edit image",
     "app.form.image-cropper.description": "Edit the image to the desired size.",
     "app.form.processing-image": "Processing image, please wait...",

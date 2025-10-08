@@ -10,6 +10,7 @@ import {
     RecipeViewImage,
     TagList
 } from '@/client/components';
+import { RecipeAuthorLinkDesktop } from '@/client/components';
 import { useAuth, useLocale } from '@/client/store';
 
 export type DesktopRecipeHeadProps = Readonly<{
@@ -38,22 +39,29 @@ export const DesktopRecipeHead: React.FC<DesktopRecipeHeadProps> = ({
                         {recipe.title}
                     </Typography>
 
-                    <Tooltip
-                        className={'w-fit'}
-                        disabled={isPreview || !!user}
-                        position={'bottom'}
-                        text={t('app.general.anonymous')}
-                    >
-                        <Rating
-                            cooldown={60000}
-                            cooldownKey={recipe.displayId}
-                            disabled={isPreview || !user}
-                            fill={'gold'}
-                            iconSize={22}
-                            onClick={onRateRecipe}
-                            rating={recipe.rating}
+                    <div className="flex items-center justify-between gap-8 mt-2">
+                        <RecipeAuthorLinkDesktop
+                            authorId={recipe.authorId}
+                            createdAt={recipe.createdAt}
                         />
-                    </Tooltip>
+
+                        <Tooltip
+                            className={'w-fit'}
+                            disabled={isPreview || !!user}
+                            position={'bottom'}
+                            text={t('app.general.anonymous')}
+                        >
+                            <Rating
+                                cooldown={60000}
+                                cooldownKey={recipe.displayId}
+                                disabled={isPreview || !user}
+                                fill={'gold'}
+                                iconSize={22}
+                                onClick={onRateRecipe}
+                                rating={recipe.rating}
+                            />
+                        </Tooltip>
+                    </div>
 
                     <TagList
                         className="mt-2"
@@ -77,6 +85,8 @@ export const DesktopRecipeHead: React.FC<DesktopRecipeHeadProps> = ({
                 src={recipe.imageUrl}
                 recipeId={recipe.id}
                 priority={true}
+                authorId={recipe.authorId}
+                createdAt={recipe.createdAt}
             />
         </div>
     );

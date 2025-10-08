@@ -1,11 +1,16 @@
 'use client';
 
-import { IconButton, RecipeImage } from '@/client/components';
+import {
+    IconButton,
+    RecipeAuthorLinkMobile,
+    RecipeImage
+} from '@/client/components';
 import { classNames } from '@/client/utils';
 import React, { useCallback, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import { useAuth, useModal } from '@/client/store';
 import { chqc } from '@/client/request/queryClient';
+import { useScreenSize } from '@/client/hooks';
 
 const AddRecipeToCookbookModal = dynamic(
     () =>
@@ -17,7 +22,9 @@ const AddRecipeToCookbookModal = dynamic(
 
 export type RecipeViewImageProps = Readonly<{
     alt: string | null;
+    authorId: number;
     className?: string;
+    createdAt: Date;
     src: string | null;
     recipeId: number;
     wrapperClassName?: string;
@@ -25,6 +32,7 @@ export type RecipeViewImageProps = Readonly<{
 }>;
 
 export const RecipeViewImage: React.FC<RecipeViewImageProps> = ({
+    authorId,
     alt,
     className,
     src,
@@ -34,6 +42,7 @@ export const RecipeViewImage: React.FC<RecipeViewImageProps> = ({
 }) => {
     const { openModal } = useModal();
     const { user } = useAuth();
+    const { isMobile } = useScreenSize();
 
     const { data: cookbooks = [] } = chqc.cookbook.useCookbooksByUser(
         user?.id ?? 0
@@ -62,6 +71,31 @@ export const RecipeViewImage: React.FC<RecipeViewImageProps> = ({
         ));
     }, [recipeId, openModal, options]);
 
+    const actionsContent = useMemo(() => {
+        const addToCookbook = (
+            <IconButton
+                icon="book"
+                className="bg-white dark:bg-gray-800"
+                onClick={handleOpenModal}
+            />
+        );
+
+        const author = <RecipeAuthorLinkMobile authorId={authorId} />;
+
+        return (
+            <div className="absolute top-2 right-2">
+                {isMobile ? (
+                    <div className="flex flex-col gap-2">
+                        {addToCookbook}
+                        {author}
+                    </div>
+                ) : (
+                    addToCookbook
+                )}
+            </div>
+        );
+    }, [handleOpenModal, authorId, isMobile]);
+
     return (
         <div
             className={classNames(
@@ -76,11 +110,7 @@ export const RecipeViewImage: React.FC<RecipeViewImageProps> = ({
                 priority={priority}
             />
 
-            <IconButton
-                icon="book"
-                className="bg-white dark:bg-gray-800 absolute top-2 right-2"
-                onClick={handleOpenModal}
-            />
+            {actionsContent}
         </div>
     );
 };

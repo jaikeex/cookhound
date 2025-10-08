@@ -162,6 +162,7 @@
     "app.recipe.search-suggestions.title-last-viewed": "Naposledy navštívené",
     "app.recipe.search-suggestions.empty-last-viewed": "Začněte procházet recepty a zde se zobrazí vaše naposledy navštívené",
     "app.recipe.delete-confirmation": "Opravdu chcete odstranit recept {{recipeTitle}}? Tuto akci nelze vrátit zpět.",
+    "app.recipe.age": "Stáří",
     "app.form.image-cropper.title": "Upravit obrázek",
     "app.form.image-cropper.description": "Upravte obrázek na požadovanou velikost.",
     "app.form.processing-image": "Zpracovávám obrázek, počkejte prosím...",
