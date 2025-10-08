@@ -2,6 +2,7 @@ export * from './Accordion';
 export * from './Button';
 export * from './Card';
 export * from './ConsentRow';
+export * from './Footer';
 export * from './Form';
 export * from './Image';
 export * from './IngredientRow';

@@ -217,6 +217,7 @@
     "app.cookies.error.failed-to-save": "We could not save your cookie-consent. Please try again.",
     "app.footer.cookie-settings": "Cookie Settings",
     "app.footer.copyright": "© {{year}} Cookhound.",
+    "app.footer.terms-of-use": "Terms of Use",
     "app.profile.settings.section-credentials": "Credentials",
     "app.profile.settings.section-privacy": "Privacy",
     "app.profile.settings.section-danger-zone": "Danger Zone",

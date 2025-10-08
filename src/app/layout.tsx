@@ -14,7 +14,8 @@ import {
     BottomNavigation,
     TopNavigation,
     ScrollToTop,
-    Head
+    Head,
+    Footer
 } from '@/client/components';
 import { locales } from '@/client/locales';
 import { classNames } from '@/client/utils';
@@ -169,7 +170,7 @@ export default async function RootLayout({
                                             <ScrollToTop />
                                             <div
                                                 id={MAIN_PAGE_ID}
-                                                className="flex flex-col typography-base"
+                                                className="flex flex-col typography-base min-h-screen"
                                             >
                                                 <div className="fixed top-0 left-0 w-screen h-screen page-background z-[-10]" />
                                                 {/* DO NOT CHANGE THE ORDER OF THESE COMPONENTS */}
@@ -178,12 +179,13 @@ export default async function RootLayout({
                                                 <div
                                                     id={CONTENT_WRAPPER_ID}
                                                     className={classNames(
-                                                        'flex-1 px-2 pt-16 pb-16 md:px-4 md:pt-24 min-h-screen',
+                                                        'flex-1 px-2 pt-16 md:px-4 md:pt-24',
                                                         'relative'
                                                     )}
                                                 >
                                                     {children}
                                                 </div>
+                                                <Footer />
                                             </div>
                                         </ModalProvider>
                                     </SnackbarProvider>

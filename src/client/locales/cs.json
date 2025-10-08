@@ -209,6 +209,7 @@
     "app.cookies.error.failed-to-save": "Bohužel se nám nepodařilo uložit vaše nastavení cookies. Zkuste to prosím znovu.",
     "app.footer.cookie-settings": "Nastavení Cookies",
     "app.footer.copyright": "© {{year}} Cookhound.",
+    "app.footer.terms-of-use": "Obchodní podmínky",
     "app.profile.settings.section-credentials": "Přihlašovací údaje",
     "app.profile.settings.section-privacy": "Soukromí",
     "app.profile.settings.section-danger-zone": "Nebezpečná zóna",
