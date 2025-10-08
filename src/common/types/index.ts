@@ -6,5 +6,6 @@ export * from './tags';
 export * from './user';
 export * from './general';
 export * from './cookbook';
+export * from './terms-acceptance';
 
 export * from './dto';

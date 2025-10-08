@@ -7,9 +7,12 @@ import {
     readJson,
     validatePayload
 } from '@/server/utils/reqwest';
-import { AuthErrorForbidden } from '@/server/error';
+import { AuthErrorForbidden, ValidationError } from '@/server/error';
 import { z } from 'zod';
 import { ApplicationErrorCode } from '@/server/error/codes';
+import { TERMS_VERSION, TERMS_HASHES } from '@/common/constants';
+import type { TermsAcceptanceForCreate } from '@/common/types';
+import { RequestContext } from '@/server/utils/reqwest/context';
 
 //|=============================================================================================|//
 //?                                     VALIDATION SCHEMAS                                      ?//
@@ -18,7 +21,8 @@ import { ApplicationErrorCode } from '@/server/error/codes';
 const UserForCreateSchema = z.strictObject({
     email: z.email().trim(),
     password: z.string().trim().min(6).max(40),
-    username: z.string().trim().min(3).max(40)
+    username: z.string().trim().min(3).max(40),
+    termsAccepted: z.boolean()
 });
 
 //|=============================================================================================|//
@@ -50,7 +54,30 @@ async function postHandler(request: NextRequest) {
 
     const payload = validatePayload(UserForCreateSchema, rawPayload);
 
+    if (!payload.termsAccepted) {
+        throw new ValidationError(
+            'auth.error.terms-required',
+            ApplicationErrorCode.VALIDATION_FAILED
+        );
+    }
+
     const user = await userService.createUser(payload);
+
+    const userIpAddress = RequestContext.getIp() || '';
+    const userAgent = RequestContext.getUserAgent() || '';
+
+    const termsAcceptancePayload: TermsAcceptanceForCreate = {
+        version: TERMS_VERSION,
+        createdAt: new Date(),
+        userIpAddress,
+        userAgent,
+        proofHash: TERMS_HASHES[TERMS_VERSION]
+    };
+
+    await userService.createUserTermsAcceptance(
+        user.id,
+        termsAcceptancePayload
+    );
 
     return created(user);
 }

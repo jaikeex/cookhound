@@ -97,21 +97,17 @@ export async function generateMetadata({
     const headerList = await headers();
 
     if (isNaN(numericId)) {
-        const metadata = await getLocalizedMetadata(cookieStore, headerList, {
+        return await getLocalizedMetadata(cookieStore, headerList, {
             titleKey: 'meta.user.fallback.title',
-            descriptionKey: 'meta.user.fallback.description'
+            descriptionKey: 'meta.user.fallback.description',
+            noindex: true
         });
-
-        return {
-            ...metadata,
-            robots: 'noindex'
-        };
     }
 
     try {
         const user = await apiClient.user.getUserById(numericId, {});
 
-        return getLocalizedMetadata(cookieStore, headerList, {
+        return await getLocalizedMetadata(cookieStore, headerList, {
             titleKey: 'meta.user.title',
             descriptionKey: 'meta.user.description',
             images: user.avatarUrl ? [user.avatarUrl] : ['/img/anonymous.webp'],
@@ -121,14 +117,10 @@ export async function generateMetadata({
             type: 'profile'
         });
     } catch {
-        const metadata = await getLocalizedMetadata(cookieStore, headerList, {
+        return await getLocalizedMetadata(cookieStore, headerList, {
             titleKey: 'meta.user.fallback.title',
-            descriptionKey: 'meta.user.fallback.description'
+            descriptionKey: 'meta.user.fallback.description',
+            noindex: true
         });
-
-        return {
-            ...metadata,
-            robots: 'noindex'
-        };
     }
 }

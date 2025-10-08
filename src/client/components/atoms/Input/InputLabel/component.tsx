@@ -6,7 +6,7 @@ export type InputLabelProps = Readonly<{
     className?: string;
     disabled?: boolean;
     htmlFor: string;
-    text: string;
+    text: string | React.ReactNode;
 }>;
 
 export const InputLabel: React.FC<InputLabelProps> = ({

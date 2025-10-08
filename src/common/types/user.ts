@@ -4,6 +4,7 @@ export type UserForCreatePayload = {
     username: string;
     email: string;
     password: string;
+    termsAccepted: boolean;
 };
 
 export type UserForGoogleCreatePayload = {

@@ -3,6 +3,7 @@
 import React from 'react';
 import {
     ErrorList,
+    FormCheckbox,
     PasswordInput,
     Submit,
     TextInput,
@@ -10,12 +11,14 @@ import {
 } from '@/client/components';
 import { useLocale } from '@/client/store';
 import type { I18nMessage } from '@/client/locales';
+import Link from 'next/link';
 // import { useFormStatus } from 'react-dom';
 
 export type RegisterFormErrors = {
     email?: I18nMessage;
     password?: I18nMessage;
     repeatPassword?: I18nMessage;
+    termsAccepted?: I18nMessage;
     server?: I18nMessage;
     username?: I18nMessage;
 };
@@ -36,6 +39,20 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
     const { t } = useLocale();
 
     const errorsToDisplay = Object.values(errors).map((error) => t(error));
+
+    const termsLabel = (
+        <>
+            {t('auth.form.accept-terms')}{' '}
+            <Link
+                href="/terms"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 dark:text-blue-400 hover:underline"
+            >
+                {t('auth.form.terms-of-use')}
+            </Link>
+        </>
+    );
 
     return (
         <div className="base-form">
@@ -65,6 +82,14 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
                 id="repeat-password"
                 label={t('auth.form.repeat-password')}
                 name="repeat-password"
+            />
+
+            <FormCheckbox
+                className="mt-2 w-full"
+                disabled={pending}
+                id="terms-accepted"
+                name="terms-accepted"
+                label={termsLabel}
             />
 
             <ErrorList className="self-start" errors={errorsToDisplay} />

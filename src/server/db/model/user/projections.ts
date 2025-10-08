@@ -29,6 +29,11 @@ export const USER_SELECT: Record<UserVisibilityGroup, UserSelect> = {
             where: { revokedAt: null },
             orderBy: { createdAt: 'desc' },
             take: 1
+        },
+        termsAcceptance: {
+            where: { revokedAt: null },
+            orderBy: { createdAt: 'desc' },
+            take: 1
         }
     },
     admin: {
@@ -49,6 +54,11 @@ export const USER_SELECT: Record<UserVisibilityGroup, UserSelect> = {
             }
         },
         cookieConsent: {
+            where: { revokedAt: null },
+            orderBy: { createdAt: 'desc' },
+            take: 1
+        },
+        termsAcceptance: {
             where: { revokedAt: null },
             orderBy: { createdAt: 'desc' },
             take: 1

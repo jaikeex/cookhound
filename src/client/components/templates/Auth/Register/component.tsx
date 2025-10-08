@@ -46,11 +46,16 @@ export const registerSchema = z
         repeatPassword: z
             .string()
             .trim()
-            .min(1, 'auth.error.repeat-password-required')
+            .min(1, 'auth.error.repeat-password-required'),
+        termsAccepted: z.boolean()
     })
     .refine((data) => data.password === data.repeatPassword, {
         message: 'auth.error.passwords-dont-match',
         path: ['repeatPassword']
+    })
+    .refine((data) => data.termsAccepted === true, {
+        message: 'auth.error.terms-required',
+        path: ['termsAccepted']
     });
 
 //~---------------------------------------------------------------------------------------------~//
@@ -64,6 +69,7 @@ type UserForCreateFormData = {
     email: string;
     password: string;
     repeatPassword: string;
+    termsAccepted: boolean;
 };
 
 export const RegisterTemplate: React.FC<RegisterTemplateProps> = () => {
@@ -161,7 +167,8 @@ export const RegisterTemplate: React.FC<RegisterTemplateProps> = () => {
             const userForCreate: UserForCreatePayload = {
                 username: formData.username,
                 email: formData.email,
-                password: formData.password
+                password: formData.password,
+                termsAccepted: formData.termsAccepted
             };
 
             createUser(userForCreate);
@@ -211,6 +218,7 @@ function extractFormData(data: FormData): UserForCreateFormData {
         username: data.get('username') as string,
         email: data.get('email') as string,
         password: data.get('password') as string,
-        repeatPassword: data.get('repeat-password') as string
+        repeatPassword: data.get('repeat-password') as string,
+        termsAccepted: data.get('terms-accepted') === 'on'
     };
 }

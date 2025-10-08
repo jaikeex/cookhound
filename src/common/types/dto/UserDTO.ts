@@ -6,6 +6,7 @@ import {
     UserRole
 } from '@/common/types';
 import type { CookieConsentFromDb } from '@/common/types/cookie-consent';
+import type { TermsAcceptanceFromDb } from '@/common/types/terms-acceptance';
 
 export class UserDTO {
     @Expose()
@@ -26,6 +27,9 @@ export class UserDTO {
 
     @Expose({ groups: ['self', 'admin'] })
     cookieConsent: CookieConsentFromDb[] | null = null;
+
+    @Expose({ groups: ['self', 'admin'] })
+    termsAcceptance: TermsAcceptanceFromDb[] | null = null;
 
     @Expose({ groups: ['self', 'admin'] })
     preferences: UserPreferences = {};

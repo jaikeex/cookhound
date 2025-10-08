@@ -29,6 +29,7 @@ import type {
     CookieConsent,
     CookieConsentForCreate
 } from '@/common/types/cookie-consent';
+import type { TermsAcceptanceForCreate } from '@/common/types';
 import { ONE_DAY_IN_MILLISECONDS } from '@/common/constants';
 import { areConsentsEqual } from '@/common/utils';
 
@@ -484,6 +485,74 @@ class UserService {
         };
 
         return consentDto;
+    }
+
+    //~-----------------------------------------------------------------------------------------~//
+    //$                                  CREATE TERMS ACCEPTANCE                                $//
+    //~-----------------------------------------------------------------------------------------~//
+
+    @LogServiceMethod({ names: ['userId', 'payload'] })
+    async createUserTermsAcceptance(
+        userId: number,
+        payload: TermsAcceptanceForCreate
+    ): Promise<void> {
+        const user = await this.getUserById(userId);
+
+        if (!user) {
+            log.warn('createUserTermsAcceptance - user not found', { userId });
+            throw new NotFoundError(
+                'app.error.not-found',
+                ApplicationErrorCode.USER_NOT_FOUND
+            );
+        }
+
+        // Get the latest active terms acceptance if any
+        const latestTermsAcceptance =
+            user.termsAcceptance &&
+            Array.isArray(user.termsAcceptance) &&
+            user.termsAcceptance.length > 0
+                ? user.termsAcceptance[0]
+                : null;
+
+        try {
+            if (latestTermsAcceptance) {
+                await db.user.revokeUserTermsAcceptance(
+                    Number(latestTermsAcceptance.id),
+                    userId
+                );
+            }
+        } catch (error) {
+            log.error(
+                'createUserTermsAcceptance - error revoking previous terms acceptance',
+                { userId, error }
+            );
+
+            /**
+             * Do NOT continue if the revocation fails.
+             * Allowing this to continue would result in multiple active terms acceptances.
+             */
+            throw new ServerError(
+                'app.error.default',
+                500,
+                ApplicationErrorCode.DEFAULT
+            );
+        }
+
+        // Create the record
+        try {
+            await db.user.createUserTermsAcceptance(userId, payload);
+        } catch (error) {
+            log.error(
+                'createUserTermsAcceptance - error creating terms acceptance',
+                { userId, error }
+            );
+
+            throw new ServerError(
+                'app.error.default',
+                500,
+                ApplicationErrorCode.DEFAULT
+            );
+        }
     }
 
     //~-----------------------------------------------------------------------------------------~//

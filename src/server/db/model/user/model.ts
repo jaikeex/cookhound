@@ -11,6 +11,7 @@ import { Logger } from '@/server/logger';
 import type {
     CookieConsent,
     Prisma,
+    TermsAcceptance,
     User,
     UserPreference,
     EmailChangeRequest
@@ -430,6 +431,45 @@ class UserModel {
         await this.invalidateUserCache({ id: userId });
 
         return consent;
+    }
+
+    /**
+     * Create a new user terms acceptance record
+     * Write class -> W3
+     */
+    async createUserTermsAcceptance(
+        userId: number,
+        data: Omit<Prisma.TermsAcceptanceCreateInput, 'user'>
+    ): Promise<TermsAcceptance> {
+        log.trace('Creating user terms acceptance', { data });
+
+        const termsAcceptance = await prisma.termsAcceptance.create({
+            data: { ...data, userId }
+        });
+
+        await this.invalidateUserCache({ id: userId });
+
+        return termsAcceptance;
+    }
+
+    /**
+     * Revoke a user's terms acceptance
+     * Write class -> W3
+     */
+    async revokeUserTermsAcceptance(
+        id: number,
+        userId: number
+    ): Promise<TermsAcceptance> {
+        log.trace('Revoking user terms acceptance', { id, userId });
+
+        const termsAcceptance = await prisma.termsAcceptance.update({
+            where: { id, userId },
+            data: { revokedAt: new Date() }
+        });
+
+        await this.invalidateUserCache({ id: userId });
+
+        return termsAcceptance;
     }
 
     /**

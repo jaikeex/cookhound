@@ -7,7 +7,7 @@ export type FormInputProps = Readonly<{
     disabled?: boolean;
     error?: string;
     id: string;
-    label: string;
+    label: string | React.ReactNode;
     name: string;
     onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
     onKeyDown?: (event: React.KeyboardEvent<HTMLInputElement>) => void;
