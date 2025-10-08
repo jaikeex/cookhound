@@ -40,7 +40,7 @@ export const createCookbookSchema = z.object({
 //~---------------------------------------------------------------------------------------------~//
 
 export type CreateCookbookModalProps = Readonly<{
-    onCreate?: () => void;
+    onCreate?: (cookbookId: number) => void;
 }> &
     ModalProps;
 
@@ -60,7 +60,7 @@ export const CreateCookbookModal: React.FC<CreateCookbookModalProps> = ({
 
     const { mutateAsync: createCookbook, isPending } =
         chqc.cookbook.useCreateCookbook({
-            onSuccess: () => {
+            onSuccess: (cookbook) => {
                 queryClient.invalidateQueries({
                     predicate: (query) =>
                         query.queryKey[0] !== QUERY_KEYS.cookbook.namespace
@@ -71,7 +71,7 @@ export const CreateCookbookModal: React.FC<CreateCookbookModalProps> = ({
                     variant: 'success'
                 });
 
-                onCreate?.();
+                onCreate?.(cookbook.id);
                 close();
             },
             onError: () => {
