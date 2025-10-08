@@ -34,7 +34,7 @@ ssh -i ssh/cookhound-digitalocean root@209.38.197.52
 Substitute the date with the date of the logs you want to download.
 
 ```bash
-scp -i ssh/cookhound-digitalocean root@209.38.197.52:/var/log/cookhound/cookhound-api-2025-09-24.log logs/cookhound-api-2025-09-24.log
+scp -i ssh/cookhound-digitalocean root@209.38.197.52:/var/log/cookhound/cookhound-api-2025-10-08.log logs-droplet/cookhound-api-2025-10-08.log
 ```
 
 ### bash into a container
