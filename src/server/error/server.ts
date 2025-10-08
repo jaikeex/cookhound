@@ -64,9 +64,7 @@ export class ServerError extends Error {
 //~=========================================================================================~//
 
 /**
- * Base class for _expected_ client-side failures (4xx). Extends `ServerError` so existing
- * error-handling code continues to work unchanged. Each subclass hard-codes the correct
- * HTTP status so callers no longer have to remember numbers.
+ * Base class for expected client-side failures.
  */
 export class ClientError extends ServerError {
     constructor(

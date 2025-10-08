@@ -1,6 +1,8 @@
 import { z } from 'zod';
 import type { CookieConsent } from '@/common/types/cookie-consent';
 
+type ConsentForComparison = Omit<CookieConsent, 'id' | 'userId' | 'proofHash'>;
+
 const ConsentSchema = z.looseObject({
     createdAt: z.preprocess(
         (v) => new Date(v as string | number | Date),
@@ -31,8 +33,8 @@ export function pickMostRecentConsent(
 }
 
 export function areConsentsEqual(
-    a: CookieConsent | null,
-    b: CookieConsent | null
+    a: ConsentForComparison | null,
+    b: ConsentForComparison | null
 ): boolean {
     if (!a && !b) return true;
     if (!a || !b) return false;

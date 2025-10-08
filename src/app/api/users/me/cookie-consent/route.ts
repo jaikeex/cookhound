@@ -11,7 +11,10 @@ import {
 import { RequestContext } from '@/server/utils/reqwest/context';
 import type { NextRequest } from 'next/server';
 import { z } from 'zod';
-import { CONSENT_HASHES } from '@/common/constants';
+import { generateProofHash } from '@/server/utils/crypto';
+import { serializeConsentContent } from '@/server/utils/consent';
+import { ValidationError } from '@/server/error';
+import { ApplicationErrorCode } from '@/server/error/codes';
 
 //|=============================================================================================|//
 //?                                     VALIDATION SCHEMAS                                      ?//
@@ -21,6 +24,7 @@ const UserCookieConsentForCreateSchema = z.strictObject({
     consent: z.boolean(),
     version: z.string(),
     createdAt: z.coerce.date(),
+    userId: z.string().optional(),
     accepted: z.array(
         z.enum(['essential', 'preferences', 'analytics', 'marketing'])
     )
@@ -48,15 +52,30 @@ async function postHandler(request: NextRequest) {
         rawPayload
     );
 
+    if (payload.userId && payload.userId !== userId.toString()) {
+        throw new ValidationError(
+            'app.error.bad-request',
+            ApplicationErrorCode.MISSING_FIELD
+        );
+    }
+
     const userIpAddress = RequestContext.getIp() || '';
     const userAgent = RequestContext.getUserAgent() || '';
+
+    const consentText = serializeConsentContent();
+
+    const proofHash = generateProofHash({
+        text: consentText,
+        userId,
+        timestamp: payload.createdAt,
+        accepted: payload.accepted
+    });
 
     const payloadWithServerData: CookieConsentForCreate = {
         ...payload,
         userIpAddress,
         userAgent,
-        proofHash:
-            CONSENT_HASHES[payload.version as keyof typeof CONSENT_HASHES]
+        proofHash
     };
 
     const cookieConsent = await userService.createUserCookieConsent(

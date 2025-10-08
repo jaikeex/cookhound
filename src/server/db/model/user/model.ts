@@ -239,6 +239,23 @@ class UserModel {
         return consent;
     }
 
+    /**
+     * Get the latest user terms acceptance
+     * Query class -> C3
+     */
+    async getLatestUserTermsAcceptance(
+        userId: number
+    ): Promise<TermsAcceptance | null> {
+        log.trace('Getting latest user terms acceptance', { userId });
+
+        const termsAcceptance = await prisma.termsAcceptance.findFirst({
+            where: { userId },
+            orderBy: { createdAt: 'desc' }
+        });
+
+        return termsAcceptance;
+    }
+
     //~=========================================================================================~//
     //$                               EMAIL CHANGE REQUEST METHODS                              $//
     //~=========================================================================================~//
@@ -404,11 +421,15 @@ class UserModel {
     ): Promise<CookieConsent> {
         log.trace('Creating user consent', { data });
 
+        const user = await prisma.user.findUnique({
+            where: { id: userId }
+        });
+
         const consent = await prisma.cookieConsent.create({
             data: { ...data, userId }
         });
 
-        await this.invalidateUserCache({ id: userId });
+        await this.invalidateUserCache({ ...user });
 
         return consent;
     }

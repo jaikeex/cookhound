@@ -32,6 +32,9 @@ import type {
 import type { TermsAcceptanceForCreate } from '@/common/types';
 import { ONE_DAY_IN_MILLISECONDS } from '@/common/constants';
 import { areConsentsEqual } from '@/common/utils';
+import { generateProofHash } from '@/server/utils/crypto';
+import { serializeTermsContent } from '@/server/utils/terms';
+import { serializeConsentContent } from '@/server/utils/consent';
 
 //|=============================================================================================|//
 
@@ -553,6 +556,182 @@ class UserService {
                 ApplicationErrorCode.DEFAULT
             );
         }
+    }
+
+    //~-----------------------------------------------------------------------------------------~//
+    //$                              VERIFY TERMS ACCEPTANCE HASH                               $//
+    //~-----------------------------------------------------------------------------------------~//
+
+    /**
+     * Verifies the proof hash of a terms acceptance record by regenerating
+     * the hash from the stored data and comparing it with the stored hash.
+     *
+     * @param userId - The ID of the user who owns the terms acceptance
+     * @param acceptanceId - The ID of the terms acceptance record to verify
+     * @returns Verification result with validity status and details
+     */
+    @LogServiceMethod({ names: ['userId', 'acceptanceId'] })
+    async verifyTermsAcceptanceHash(
+        userId: number,
+        acceptanceId: number
+    ): Promise<{
+        valid: boolean;
+        details: {
+            version: string;
+            createdAt: Date;
+            verified: Date;
+            storedHash: string;
+            computedHash?: string;
+        };
+    }> {
+        const termsAcceptance =
+            await db.user.getLatestUserTermsAcceptance(userId);
+
+        if (!termsAcceptance) {
+            log.warn('verifyTermsAcceptanceHash - record not found', {
+                userId,
+                acceptanceId
+            });
+            throw new NotFoundError(
+                'app.error.not-found',
+                ApplicationErrorCode.NOT_FOUND
+            );
+        }
+
+        if (termsAcceptance.userId !== userId) {
+            log.warn('verifyTermsAcceptanceHash - unauthorized access', {
+                userId,
+                acceptanceId,
+                recordUserId: termsAcceptance.userId
+            });
+            throw new AuthErrorForbidden(
+                'auth.error.forbidden',
+                ApplicationErrorCode.FORBIDDEN
+            );
+        }
+
+        const storedHash = termsAcceptance.proofHash;
+
+        const termsText = serializeTermsContent();
+        const computedHash = generateProofHash({
+            text: termsText,
+            userId: termsAcceptance.userId,
+            timestamp: termsAcceptance.createdAt
+        });
+
+        const valid = storedHash === computedHash;
+
+        log.trace('verifyTermsAcceptanceHash - verification complete', {
+            userId,
+            acceptanceId,
+            valid,
+            storedHash,
+            computedHash
+        });
+
+        return {
+            valid,
+            details: {
+                version: termsAcceptance.version,
+                createdAt: termsAcceptance.createdAt,
+                verified: new Date(),
+                storedHash,
+                computedHash: valid ? undefined : computedHash
+            }
+        };
+    }
+
+    //~-----------------------------------------------------------------------------------------~//
+    //$                              VERIFY COOKIE CONSENT HASH                                 $//
+    //~-----------------------------------------------------------------------------------------~//
+
+    /**
+     * Verifies the proof hash of a cookie consent record by regenerating
+     * the hash from the stored data and comparing it with the stored hash.
+     *
+     * @param userId - The ID of the user who owns the cookie consent
+     * @param consentId - The ID of the cookie consent record to verify
+     * @returns Verification result with validity status and details
+     */
+    @LogServiceMethod({ names: ['userId', 'consentId'] })
+    async verifyCookieConsentHash(
+        userId: number,
+        consentId: number
+    ): Promise<{
+        valid: boolean;
+        details: {
+            version: string;
+            createdAt: Date;
+            verified: Date;
+            accepted: string[];
+            storedHash: string;
+            computedHash?: string;
+        };
+    }> {
+        const cookieConsent = await db.user.getLatestUserCookieConsent(userId);
+
+        console.log(cookieConsent);
+        console.log(userId);
+        console.log(consentId);
+
+        if (!cookieConsent) {
+            log.warn('verifyCookieConsentHash - record not found', {
+                userId,
+                consentId
+            });
+            throw new NotFoundError(
+                'app.error.not-found',
+                ApplicationErrorCode.NOT_FOUND
+            );
+        }
+
+        if (cookieConsent.userId !== userId) {
+            log.warn('verifyCookieConsentHash - unauthorized access', {
+                userId,
+                consentId,
+                recordUserId: cookieConsent.userId
+            });
+
+            throw new AuthErrorForbidden(
+                'auth.error.forbidden',
+                ApplicationErrorCode.FORBIDDEN
+            );
+        }
+
+        const storedHash = cookieConsent.proofHash;
+
+        // Regenerate the hash from stored data
+        const consentText = serializeConsentContent();
+        const computedHash = generateProofHash({
+            text: consentText,
+            userId: cookieConsent.userId,
+            timestamp: cookieConsent.createdAt,
+            accepted: cookieConsent.accepted
+        });
+        console.log(storedHash);
+        console.log(computedHash);
+
+        const valid = storedHash === computedHash;
+
+        log.trace('verifyCookieConsentHash - verification complete', {
+            userId,
+            consentId,
+            valid,
+            storedHash,
+            computedHash
+        });
+
+        return {
+            valid,
+            details: {
+                version: cookieConsent.version,
+                createdAt: cookieConsent.createdAt,
+                verified: new Date(),
+                accepted: cookieConsent.accepted,
+                storedHash,
+                computedHash: valid ? undefined : computedHash
+            }
+        };
     }
 
     //~-----------------------------------------------------------------------------------------~//

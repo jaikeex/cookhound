@@ -10,9 +10,11 @@ import {
 import { AuthErrorForbidden, ValidationError } from '@/server/error';
 import { z } from 'zod';
 import { ApplicationErrorCode } from '@/server/error/codes';
-import { TERMS_VERSION, TERMS_HASHES } from '@/common/constants';
+import { TERMS_VERSION } from '@/common/constants';
 import type { TermsAcceptanceForCreate } from '@/common/types';
 import { RequestContext } from '@/server/utils/reqwest/context';
+import { generateProofHash } from '@/server/utils/crypto';
+import { serializeTermsContent } from '@/server/utils/terms';
 
 //|=============================================================================================|//
 //?                                     VALIDATION SCHEMAS                                      ?//
@@ -66,12 +68,22 @@ async function postHandler(request: NextRequest) {
     const userIpAddress = RequestContext.getIp() || '';
     const userAgent = RequestContext.getUserAgent() || '';
 
+    const acceptanceTimestamp = new Date();
+
+    const termsText = serializeTermsContent();
+
+    const proofHash = generateProofHash({
+        text: termsText,
+        userId: user.id,
+        timestamp: acceptanceTimestamp
+    });
+
     const termsAcceptancePayload: TermsAcceptanceForCreate = {
         version: TERMS_VERSION,
-        createdAt: new Date(),
+        createdAt: acceptanceTimestamp,
         userIpAddress,
         userAgent,
-        proofHash: TERMS_HASHES[TERMS_VERSION]
+        proofHash
     };
 
     await userService.createUserTermsAcceptance(

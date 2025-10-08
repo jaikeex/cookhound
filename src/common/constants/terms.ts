@@ -1,10 +1,4 @@
-import { ENV_CONFIG_PRIVATE } from './env';
-
 export const TERMS_VERSION = '2025-10-07';
-
-export const TERMS_HASHES = {
-    '2025-10-07': ENV_CONFIG_PRIVATE.TERMS_ACCEPTANCE_HASH_V2025_10_07
-} as const;
 
 export type TERMS_CONTENT_TYPE = {
     title: string;
@@ -106,7 +100,7 @@ export const TERMS_CONTENT = [
             {
                 title: '4.3. Předávání údajů do třetích zemí:',
                 content: `
-                Využíváním služeb společností Google a OpenAI může docházet k předávání osobních údajů do Spojených států amerických. Toto předávání je založeno na rozhodnutí Evropské komise o odpovídající úrovni ochrany osobních údajů v rámci programu "Data Privacy Framework" (Rámec ochrany soukromí mezi EU a USA).[4][5] Tím je zajištěna úroveň ochrany srovnatelná s ochranou v Evropské unii.[4]
+                Využíváním služeb společností Google a OpenAI může docházet k předávání osobních údajů do Spojených států amerických. Toto předávání je založeno na rozhodnutí Evropské komise o odpovídající úrovni ochrany osobních údajů v rámci programu "Data Privacy Framework" (Rámec ochrany soukromí mezi EU a USA). Tím je zajištěna úroveň ochrany srovnatelná s ochranou v Evropské unii.
                 `
             }
         ]

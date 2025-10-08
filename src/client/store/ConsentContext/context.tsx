@@ -20,7 +20,7 @@ import { getCookie } from '@/client/utils';
 import { eventBus } from '@/client/events';
 import { AppEvent } from '@/client/events';
 import { chqc, QUERY_KEYS } from '@/client/request/queryClient';
-import { CONSENT_VERSION, COOKIE_NAME } from '@/common/constants';
+import { CONSENT_VERSION, CONSENT_COOKIE_NAME } from '@/common/constants';
 import { setConsentCookie } from '@/app/actions';
 import { useAppEventListener } from '@/client/hooks';
 import { useQueryClient } from '@tanstack/react-query';
@@ -154,7 +154,8 @@ export const ConsentProvider: React.FC<ConsentProviderProps> = ({
                 consent,
                 version: CONSENT_VERSION,
                 accepted,
-                createdAt: now
+                createdAt: now,
+                userId: user?.id.toString() ?? null
             };
 
             const previousConsent = consentRef.current;
@@ -333,7 +334,7 @@ function readConsentCookie(): CookieConsent | null {
     if (typeof window === 'undefined') return null;
 
     try {
-        const raw = getCookie(COOKIE_NAME);
+        const raw = getCookie(CONSENT_COOKIE_NAME);
 
         if (!raw) {
             return null;

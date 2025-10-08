@@ -9,6 +9,7 @@ export type CookieConsentFromBrowser = {
     version: string;
     createdAt: Date;
     accepted: ConsentCategory[];
+    userId: string | null;
 };
 
 export type CookieConsentFromDb = {
