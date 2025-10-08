@@ -34,9 +34,7 @@ export const ProfileTemplate: React.FC<ProfileProps> = ({
                   {
                       param: ProfileTab.Dashboard,
                       label: t('app.profile.dashboard'),
-                      content: (
-                          <ProfileBodyInfo user={currentUser ?? userResolved} />
-                      )
+                      content: <ProfileBodyInfo user={userResolved} />
                   }
               ]
             : []),
@@ -53,7 +51,7 @@ export const ProfileTemplate: React.FC<ProfileProps> = ({
                         xl: GRID_COLS[3]
                     }}
                     isCurrentUser={isCurrentUser}
-                    userId={currentUser?.id ?? userResolved.id}
+                    userId={userResolved.id}
                 />
             )
         },
@@ -63,7 +61,7 @@ export const ProfileTemplate: React.FC<ProfileProps> = ({
             content: (
                 <Cookbooks
                     isCurrentUser={isCurrentUser}
-                    userId={currentUser?.id ?? userResolved.id}
+                    userId={userResolved.id}
                 />
             )
         }
@@ -107,14 +105,14 @@ export const ProfileTemplate: React.FC<ProfileProps> = ({
             <DesktopProfileTemplate
                 className={'hidden md:block'}
                 items={profileNavigationItems}
-                user={currentUser ?? userResolved}
+                user={userResolved}
                 isCurrentUser={isCurrentUser}
                 initialTab={initialTab}
             />
             <MobileProfileTemplate
                 className={'md:hidden'}
                 items={profileNavigationItems}
-                user={currentUser ?? userResolved}
+                user={userResolved}
                 isCurrentUser={isCurrentUser}
             />
         </React.Fragment>

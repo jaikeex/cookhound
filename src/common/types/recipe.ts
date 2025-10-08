@@ -23,6 +23,12 @@ export type RecipeDTO = {
     updatedAt: Date;
 };
 
+// Used on the client with real date objects
+export type Recipe = Omit<RecipeDTO, 'createdAt' | 'updatedAt'> & {
+    createdAt: Date;
+    updatedAt: Date;
+};
+
 export type RecipeForDisplayDTO = {
     id: number;
     displayId: string;

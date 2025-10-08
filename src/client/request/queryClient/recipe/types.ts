@@ -1,4 +1,4 @@
-import type { Locale } from '@/common/types';
+import type { Locale, Recipe } from '@/common/types';
 import type {
     RecipeDTO,
     RecipeForCreatePayload,
@@ -128,9 +128,9 @@ export const RECIPE_QUERY_KEYS = Object.freeze({
 
 export type RecipeByDisplayIdOptions = Omit<
     UseQueryOptions<
-        RecipeDTO,
+        Recipe,
         RequestError,
-        RecipeDTO,
+        Recipe,
         ReturnType<typeof RECIPE_QUERY_KEYS.byDisplayId>
     >,
     'queryKey' | 'queryFn'
@@ -138,9 +138,9 @@ export type RecipeByDisplayIdOptions = Omit<
 
 export type RecipeByIdOptions = Omit<
     UseQueryOptions<
-        RecipeDTO,
+        Recipe,
         RequestError,
-        RecipeDTO,
+        Recipe,
         ReturnType<typeof RECIPE_QUERY_KEYS.byId>
     >,
     'queryKey' | 'queryFn'

@@ -1,4 +1,4 @@
-import type { Locale } from '@/common/types';
+import type { Locale, Recipe } from '@/common/types';
 import type { RequestConfig } from '@/client/request/apiClient/ApiRequestWrapper';
 import { apiRequestWrapper } from '@/client/request/apiClient/ApiRequestWrapper';
 import type {
@@ -6,6 +6,7 @@ import type {
     RecipeForCreatePayload,
     RecipeForDisplayDTO
 } from '@/common/types';
+import { reviveRecipeDates } from './utils';
 
 /**
  * Service for recipe-related operations.
@@ -41,11 +42,13 @@ class RecipeApiClient {
     async getRecipeByDisplayId(
         displayId: string,
         config?: RequestConfig
-    ): Promise<RecipeDTO> {
-        return await apiRequestWrapper.get({
+    ): Promise<Recipe> {
+        const recipeFromServer: RecipeDTO = await apiRequestWrapper.get({
             url: `/recipes/display/${displayId}`,
             ...config
         });
+
+        return reviveRecipeDates(recipeFromServer);
     }
 
     /**
@@ -61,10 +64,12 @@ class RecipeApiClient {
         id: string,
         config?: RequestConfig
     ): Promise<RecipeDTO> {
-        return await apiRequestWrapper.get({
+        const recipeFromServer: RecipeDTO = await apiRequestWrapper.get({
             url: `/recipes/${id}`,
             ...config
         });
+
+        return reviveRecipeDates(recipeFromServer);
     }
 
     /**

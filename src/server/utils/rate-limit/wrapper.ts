@@ -97,12 +97,13 @@ function getAppRouterClientIdentifier(req: NextRequest): string {
     }
 
     if (ip === 'unknown') {
-        //TODO: I don't really know what happens here, since the error thrown here
-        //TODO: would not be caught by the handler, and it is not straightforward
-        //TODO: to test this...
+        // I don't really know what happens here, since the error thrown here
+        // would not be caught by the handler, and it is not straightforward
+        // to test this...
         logger.error('getAppRouterClientIdentifier - Unknown IP address', {
             ip
         });
+
         throw new InfrastructureError(
             InfrastructureErrorCode.RATE_LIMIT_UNKNOWN_IP
         );
