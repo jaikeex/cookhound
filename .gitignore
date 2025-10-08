@@ -47,3 +47,5 @@ next-env.d.ts
 ssh
 
 docs/**.md
+
+.cursor/plans/
