@@ -605,6 +605,215 @@ class UserModel {
     }
 
     //~=========================================================================================~//
+    //$                                  ACCOUNT DELETION METHODS                               $//
+    //~=========================================================================================~//
+
+    /**
+     * Marks user for deletion
+     * Write class -> W2
+     */
+    async markForDeletion(
+        userId: number,
+        scheduledFor: Date
+    ): Promise<User | null> {
+        log.trace('Marking user for deletion', { userId, scheduledFor });
+
+        const user = await prisma.user.update({
+            where: { id: userId },
+            data: {
+                status: 'pending_deletion',
+                deletedAt: new Date(),
+                deletionScheduledFor: scheduledFor
+            }
+        });
+
+        await this.invalidateUserCache(user);
+
+        return this.reviveUserDates(user);
+    }
+
+    /**
+     * Cancel deletion
+     * Write class -> W2
+     */
+    async cancelDeletion(userId: number): Promise<User | null> {
+        log.trace('Cancelling user deletion', { userId });
+
+        const user = await prisma.user.update({
+            where: { id: userId },
+            data: {
+                status: 'active',
+                deletedAt: null,
+                deletionScheduledFor: null
+            }
+        });
+
+        await this.invalidateUserCache(user);
+
+        return this.reviveUserDates(user);
+    }
+
+    /**
+     * Get users pending hard deletion (past the grace period)
+     * Query class -> C3
+     */
+    async getUsersPendingHardDeletion(): Promise<User[]> {
+        log.trace('Getting users pending hard deletion');
+
+        const users = await prisma.user.findMany({
+            where: {
+                status: 'pending_deletion',
+                deletionScheduledFor: {
+                    lte: new Date()
+                }
+            }
+        });
+
+        return users.map((user) => this.reviveUserDates(user) as User);
+    }
+
+    /**
+     * Anonymize user's recipes by changing authorId to -1
+     * Write class -> W2
+     */
+    async anonymizeUserRecipes(userId: number): Promise<void> {
+        log.trace('Anonymizing user recipes', { userId });
+
+        await prisma.recipe.updateMany({
+            where: { authorId: userId },
+            data: { authorId: -1 }
+        });
+
+        return;
+    }
+
+    /**
+     * Anonymize user's cookbooks by changing ownerId to -1
+     * Write class -> W2
+     */
+    async anonymizeUserCookbooks(userId: number): Promise<void> {
+        log.trace('Anonymizing user cookbooks', { userId });
+
+        await prisma.cookbook.updateMany({
+            where: { ownerId: userId },
+            data: { ownerId: -1 }
+        });
+
+        return;
+    }
+
+    /**
+     * Hard delete user
+     * Write class -> W1
+     */
+    async hardDeleteUser(userId: number): Promise<void> {
+        log.trace('Hard deleting user', { userId });
+
+        await prisma.user.delete({
+            where: { id: userId }
+        });
+
+        await this.invalidateUserCache({ id: userId });
+
+        return;
+    }
+
+    /**
+     * Execute complete hard deletion of a user and all related data
+     * This includes anonymizing content, deleting personal data, and removing the user record
+     * Write class -> W1
+     */
+    async executeHardDeletion(userId: number): Promise<void> {
+        log.trace('Executing hard deletion for user', { userId });
+
+        await prisma.$transaction(async (tx) => {
+            // Mark audit record as completed before deletion
+            const auditRecord = await tx.accountDeletionRequest.findFirst({
+                where: { userId },
+                orderBy: { requestedAt: 'desc' }
+            });
+
+            if (auditRecord) {
+                await tx.accountDeletionRequest.update({
+                    where: { id: auditRecord.id },
+                    data: { completedAt: new Date() }
+                });
+            }
+
+            // Anonymize recipes (change authorId to -1)
+            await tx.recipe.updateMany({
+                where: { authorId: userId },
+                data: { authorId: -1 }
+            });
+
+            // Anonymize cookbooks (change ownerId to -1)
+            await tx.cookbook.updateMany({
+                where: { ownerId: userId },
+                data: { ownerId: -1 }
+            });
+
+            // Delete shopping list
+            await tx.shoppingListIngredient.deleteMany({
+                where: { userId }
+            });
+
+            // Delete ratings
+            await tx.rating.deleteMany({
+                where: { userId }
+            });
+
+            // Delete flags
+            await tx.recipeFlag.deleteMany({
+                where: { userId }
+            });
+
+            // Delete visited recipes
+            await tx.userVisitedRecipe.deleteMany({
+                where: { userId }
+            });
+
+            // Delete user preferences
+            await tx.userPreference.deleteMany({
+                where: { userId }
+            });
+
+            // Delete cookie consents
+            await tx.cookieConsent.deleteMany({
+                where: { userId }
+            });
+
+            // Delete terms acceptances
+            await tx.termsAcceptance.deleteMany({
+                where: { userId }
+            });
+
+            // Delete email change requests
+            await tx.emailChangeRequest.deleteMany({
+                where: { userId }
+            });
+
+            // Delete cookbook bookmarks
+            await tx.cookbookBookmark.deleteMany({
+                where: { userId }
+            });
+
+            // Delete account deletion requests (audit records will be removed by cascade)
+            await tx.accountDeletionRequest.deleteMany({
+                where: { userId }
+            });
+
+            // Hard delete user
+            await tx.user.delete({
+                where: { id: userId }
+            });
+        });
+
+        await this.invalidateUserCache({ id: userId });
+
+        return;
+    }
+
+    //~=========================================================================================~//
     //$                                      PRIVATE METHODS                                    $//
     //~=========================================================================================~//
 
@@ -639,6 +848,12 @@ class UserModel {
             passwordResetTokenExpires: user.passwordResetTokenExpires
                 ? new Date(user.passwordResetTokenExpires)
                 : user.passwordResetTokenExpires,
+            deletedAt: user.deletedAt
+                ? new Date(user.deletedAt)
+                : user.deletedAt,
+            deletionScheduledFor: user.deletionScheduledFor
+                ? new Date(user.deletionScheduledFor)
+                : user.deletionScheduledFor,
             updatedAt: user.updatedAt
                 ? new Date(user.updatedAt)
                 : user.updatedAt

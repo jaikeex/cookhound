@@ -15,11 +15,15 @@ export const USER_SELECT: Record<UserVisibilityGroup, UserSelect> = {
         authType: true,
         email: true,
         avatarUrl: true,
+        role: true,
+        status: true,
         createdAt: true,
         lastLogin: true,
         lastVisitedAt: true,
         emailVerified: true,
         passwordHash: true,
+        deletedAt: true,
+        deletionScheduledFor: true,
         preferences: {
             select: {
                 settings: true
@@ -48,6 +52,8 @@ export const USER_SELECT: Record<UserVisibilityGroup, UserSelect> = {
         lastLogin: true,
         lastVisitedAt: true,
         passwordHash: true,
+        deletedAt: true,
+        deletionScheduledFor: true,
         preferences: {
             select: {
                 settings: true

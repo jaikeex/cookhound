@@ -60,4 +60,10 @@ export class UserDTO {
 
     @Expose({ groups: ['self', 'admin'] })
     lastVisitedAt: string | null = null;
+
+    @Expose({ groups: ['self', 'admin'] })
+    deletedAt: string | null = null;
+
+    @Expose({ groups: ['self', 'admin'] })
+    deletionScheduledFor: string | null = null;
 }

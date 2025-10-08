@@ -5,6 +5,7 @@ import recipeTagModel from './recipe-tag/model';
 import shoppingListModel from './shopping-list/model';
 import userModel from './user/model';
 import cookbookModel from './cookbook/model';
+import accountDeletionRequestModel from './account-deletion-request/model';
 
 //|---------------------------------------------------------------------------------------------|//
 //?                                           MODELS                                            ?//
@@ -17,7 +18,8 @@ const dbModel = {
     shoppingList: shoppingListModel,
     recipeTag: recipeTagModel,
     user: userModel,
-    cookbook: cookbookModel
+    cookbook: cookbookModel,
+    accountDeletionRequest: accountDeletionRequestModel
 };
 
 export default dbModel;

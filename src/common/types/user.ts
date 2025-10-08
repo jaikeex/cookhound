@@ -24,6 +24,16 @@ export type UserForLogin = {
     keepLoggedIn: boolean;
 };
 
+export type AccountDeletionPayload = {
+    password: string;
+    reason?: string;
+};
+
+export type AccountDeletionResponse = {
+    scheduledFor: string;
+    daysRemaining: number;
+};
+
 export type UserVisibilityGroup = 'public' | 'self' | 'admin';
 
 export type UserPreferences = {
@@ -38,7 +48,8 @@ export enum UserRole {
 }
 
 export enum Status {
-    Active = 'active'
+    Active = 'active',
+    PendingDeletion = 'pending_deletion'
 }
 
 export enum AuthType {
