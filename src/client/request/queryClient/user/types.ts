@@ -8,7 +8,9 @@ import type {
     ResetPasswordEmailPayload,
     ResetPasswordPayload,
     UserForUpdatePayload,
-    UserPreferences
+    UserPreferences,
+    AccountDeletionPayload,
+    AccountDeletionResponse
 } from '@/common/types';
 import type {
     CookieConsent,
@@ -144,5 +146,19 @@ export type SendResetPasswordEmailOptions = Omit<
 
 export type ResetPasswordOptions = Omit<
     UseMutationOptions<void, RequestError, ResetPasswordPayload>,
+    'mutationFn'
+>;
+
+export type InitiateAccountDeletionOptions = Omit<
+    UseMutationOptions<
+        AccountDeletionResponse,
+        RequestError,
+        AccountDeletionPayload
+    >,
+    'mutationFn'
+>;
+
+export type CancelAccountDeletionOptions = Omit<
+    UseMutationOptions<void, RequestError, undefined>,
     'mutationFn'
 >;

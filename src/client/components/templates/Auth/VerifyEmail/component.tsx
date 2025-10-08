@@ -25,8 +25,6 @@ export const VerifyEmailTemplate: React.FC<VerifyEmailTemplateProps> = ({
         resendVerificationEmail(email);
     }, [resendVerificationEmail]);
 
-    //TODO: Display a success message after the email is sent.
-
     return (
         <div className="w-full max-w-md mx-auto text-center space-y-8 flex items-center flex-col">
             <Typography>

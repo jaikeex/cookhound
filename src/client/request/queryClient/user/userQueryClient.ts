@@ -19,7 +19,9 @@ import type {
     CreateUserCookieConsentOptions,
     UpdateUserPreferencesOptions,
     InitiateEmailChangeOptions,
-    ConfirmEmailChangeOptions
+    ConfirmEmailChangeOptions,
+    InitiateAccountDeletionOptions,
+    CancelAccountDeletionOptions
 } from './types';
 import { USER_QUERY_KEYS } from './types';
 
@@ -187,6 +189,20 @@ class UserQueryClient {
      */
     useResetPassword = (options?: Partial<ResetPasswordOptions>) =>
         useAppMutation(apiClient.user.resetPassword, options);
+
+    /**
+     * Initiates account deletion.
+     */
+    useInitiateAccountDeletion = (
+        options?: Partial<InitiateAccountDeletionOptions>
+    ) => useAppMutation(apiClient.user.initiateAccountDeletion, options);
+
+    /**
+     * Cancels account deletion.
+     */
+    useCancelAccountDeletion = (
+        options?: Partial<CancelAccountDeletionOptions>
+    ) => useAppMutation(() => apiClient.user.cancelAccountDeletion(), options);
 }
 
 export const userQueryClient = new UserQueryClient();

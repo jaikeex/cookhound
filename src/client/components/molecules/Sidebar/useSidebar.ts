@@ -152,7 +152,6 @@ export const useSidebar = (config: SidebarConfig = {}) => {
         //#
         //?  This unfortunately seems like the best place to put it. If called from the url
         //?  management functions then multiple cases would be left out...
-        //TODO: Can this be solved in some other way?
         ///
         //?—————————————————————————————————————————————————————————————————————————————————————?//
 

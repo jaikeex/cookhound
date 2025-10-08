@@ -16,6 +16,10 @@ import type {
     CookieConsent,
     CookieConsentPayload
 } from '@/common/types/cookie-consent';
+import type {
+    AccountDeletionPayload,
+    AccountDeletionResponse
+} from '@/common/types';
 
 /**
  * Service for user-related operations.
@@ -313,6 +317,39 @@ class UserApiClient {
         return await apiRequestWrapper.put({
             url: '/users/me/email',
             params: { token },
+            ...config
+        });
+    }
+
+    /**
+     * Initiates account deletion by calling `POST /api/users/me/delete`.
+     *
+     * @param data - The password and optional reason for account deletion.
+     * @param config - Optional fetch request configuration.
+     * @returns A promise that resolves with the scheduled deletion date.
+     * @throws {Error} Throws an error if the request fails.
+     */
+    async initiateAccountDeletion(
+        data: AccountDeletionPayload,
+        config?: RequestConfig
+    ): Promise<AccountDeletionResponse> {
+        return await apiRequestWrapper.post({
+            url: '/users/me/delete',
+            data,
+            ...config
+        });
+    }
+
+    /**
+     * Cancels account deletion by calling `DELETE /api/users/me/delete`.
+     *
+     * @param config - Optional fetch request configuration.
+     * @returns A promise that resolves when the account deletion is cancelled.
+     * @throws {Error} Throws an error if the request fails.
+     */
+    async cancelAccountDeletion(config?: RequestConfig): Promise<void> {
+        await apiRequestWrapper.delete({
+            url: '/users/me/delete',
             ...config
         });
     }

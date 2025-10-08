@@ -108,7 +108,6 @@ export const Popup: React.FC<PopupProps> = ({
         onClose?.();
     }, [onClose]);
 
-    // TODO: Use useOutsideClick hook
     useEffect(() => {
         if (!isOpen || !closeOnClickOutside) return;
 

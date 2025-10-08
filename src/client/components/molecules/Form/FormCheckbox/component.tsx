@@ -14,13 +14,20 @@ export const FormCheckbox: React.FC<FormCheckboxProps> = ({
     className,
     disabled,
     name,
-    size = 'md'
+    size = 'md',
+    ...props
 }) => {
     return (
         <div
             className={classNames('w-full flex items-center gap-2', className)}
         >
-            <Checkbox id={id} name={name} disabled={disabled} size={size} />
+            <Checkbox
+                {...props}
+                id={id}
+                name={name}
+                disabled={disabled}
+                size={size}
+            />
             <InputLabel
                 htmlFor={id}
                 text={label}

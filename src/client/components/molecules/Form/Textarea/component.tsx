@@ -8,8 +8,9 @@ export type TextareaProps = Readonly<{
     onChange?: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
     onKeyDown?: (event: React.KeyboardEvent<HTMLTextAreaElement>) => void;
     placeholder?: string;
+    rows?: number;
 }> &
-    Omit<FormInputProps, 'defaultValue'>;
+    Omit<FormInputProps, 'defaultValue' | 'onChange'>;
 
 export const Textarea: React.FC<TextareaProps> = ({
     className,
@@ -21,12 +22,15 @@ export const Textarea: React.FC<TextareaProps> = ({
     name,
     onChange,
     onKeyDown,
-    placeholder
+    placeholder,
+    rows,
+    ...props
 }) => {
     return (
         <div className={classNames('w-full relative', className)}>
             <InputLabel htmlFor={id} text={label} disabled={disabled} />
             <BaseTextarea
+                {...props}
                 defaultValue={defaultValue}
                 placeholder={placeholder}
                 className={className}
@@ -36,6 +40,7 @@ export const Textarea: React.FC<TextareaProps> = ({
                 onKeyDown={onKeyDown}
                 disabled={disabled}
                 autoComplete={name}
+                rows={rows}
             />
             {error ? <InputError message={error} /> : null}
         </div>

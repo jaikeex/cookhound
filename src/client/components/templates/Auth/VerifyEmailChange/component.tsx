@@ -29,8 +29,6 @@ export const VerifyEmailChangeTemplate: React.FC = () => {
                     query.queryKey[0] === QUERY_KEYS.user.namespace ||
                     query.queryKey[0] === QUERY_KEYS.auth.namespace
             });
-
-            //TODO: LOGOUT FROM EVERYWHERE
         }
     });
 

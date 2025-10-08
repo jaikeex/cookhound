@@ -5,8 +5,10 @@ import { AuthType, type UserDTO } from '@/common/types';
 import {
     ButtonBase,
     ButtonRow,
+    DangerZone,
     Divider,
     LinkRow,
+    PendingDeletionBanner,
     TextInputRow,
     Typography
 } from '@/client/components';
@@ -73,6 +75,12 @@ export const ProfileBodyInfo: React.FC<ProfileBodyInfoProps> = ({ user }) => {
 
     return (
         <div className="space-y-4">
+            {user.deletionScheduledFor ? (
+                <PendingDeletionBanner
+                    deletionScheduledFor={user.deletionScheduledFor}
+                />
+            ) : null}
+
             <section>
                 <Typography variant="heading-sm">
                     {t('app.profile.settings.section-credentials')}
@@ -154,13 +162,9 @@ export const ProfileBodyInfo: React.FC<ProfileBodyInfoProps> = ({ user }) => {
                     onClick={handleCookieSettings}
                 />
 
-                {/* <Divider subtle className="mt-3" />
+                <Divider subtle className="mt-3" />
 
-                <Typography variant="heading-sm" className="mt-6">
-                    {t('app.profile.settings.section-danger-zone')}
-                </Typography>
-
-                <Divider className="mt-1" /> */}
+                <DangerZone className="mt-6" />
             </section>
         </div>
     );
