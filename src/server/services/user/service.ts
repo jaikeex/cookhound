@@ -1060,6 +1060,284 @@ class UserService {
 
         return createUserDTO(updated);
     }
+
+    //~-----------------------------------------------------------------------------------------~//
+    //$                                  ACCOUNT DELETION LIFECYCLE                              $//
+    //~-----------------------------------------------------------------------------------------~//
+
+    /**
+     * Initiate account deletion for a user
+     *
+     * @param userId - The ID of the user requesting deletion
+     * @param password - The user's current password (for local auth)
+     * @param reason - Optional reason for deletion
+     * @param ipAddress - IP address of the request
+     * @param userAgent - User agent of the request
+     * @returns Deletion scheduled date and days remaining
+     */
+    @LogServiceMethod({
+        success: 'notice',
+        names: ['userId', 'reason']
+    })
+    async initiateAccountDeletion(
+        userId: number,
+        password: string,
+        reason?: string,
+        ipAddress?: string,
+        userAgent?: string
+    ): Promise<{ scheduledFor: Date; daysRemaining: number }> {
+        //|-------------------------------------------------------------------------------------|//
+        //?                                       GUARDS                                        ?//
+        //|-------------------------------------------------------------------------------------|//
+
+        const user = await db.user.getOneById(userId, {
+            id: true,
+            email: true,
+            username: true,
+            passwordHash: true,
+            authType: true,
+            status: true
+        });
+
+        if (!user) {
+            log.warn('initiateAccountDeletion - user not found', { userId });
+            throw new NotFoundError(
+                'app.error.not-found',
+                ApplicationErrorCode.USER_NOT_FOUND
+            );
+        }
+
+        if (user.status === 'pending_deletion') {
+            log.warn('initiateAccountDeletion - deletion already pending', {
+                userId
+            });
+            throw new ConflictError(undefined, ApplicationErrorCode.CONFLICT);
+        }
+
+        // Verify password for local auth users
+        if (user.authType === AuthType.Local) {
+            if (!password) {
+                log.warn('initiateAccountDeletion - password required');
+                throw new ValidationError(
+                    'auth.error.password-required',
+                    ApplicationErrorCode.MISSING_FIELD
+                );
+            }
+
+            const matches = await bcrypt.compare(
+                password,
+                user.passwordHash ?? ''
+            );
+
+            if (!matches) {
+                log.warn('initiateAccountDeletion - invalid password');
+                throw new AuthErrorForbidden(
+                    undefined,
+                    ApplicationErrorCode.INVALID_PASSWORD
+                );
+            }
+        }
+
+        //|-------------------------------------------------------------------------------------|//
+        //?                                    SET DELETION                                     ?//
+        //|-------------------------------------------------------------------------------------|//
+
+        const GRACE_PERIOD_DAYS = 30;
+        const scheduledFor = new Date();
+        scheduledFor.setDate(scheduledFor.getDate() + GRACE_PERIOD_DAYS);
+
+        await db.user.markForDeletion(userId, scheduledFor);
+
+        const proofHash = await bcrypt.hash(
+            `${userId}-${scheduledFor.toISOString()}`,
+            10
+        );
+
+        await db.accountDeletionRequest.createOne({
+            user: { connect: { id: userId } },
+            ipAddress: ipAddress ?? null,
+            userAgent: userAgent ?? null,
+            reason: reason ?? null,
+            proofHash,
+            userEmail: user.email,
+            userName: user.username
+        });
+
+        //|-------------------------------------------------------------------------------------|//
+        //?                                   SEND EMAIL                                        ?//
+        //|-------------------------------------------------------------------------------------|//
+
+        try {
+            await mailService.sendAccountDeletionConfirmation(
+                user.email,
+                user.username,
+                scheduledFor.toISOString()
+            );
+        } catch (error) {
+            log.error('Failed to send account deletion confirmation email', {
+                error,
+                userId
+            });
+            // Don't fail the operation if email fails
+        }
+
+        return {
+            scheduledFor,
+            daysRemaining: GRACE_PERIOD_DAYS
+        };
+    }
+
+    /**
+     * Cancel account deletion for a user
+     * Restores Active status, clears deletion fields, updates audit record
+     *
+     * @param userId - The ID of the user canceling deletion
+     */
+    @LogServiceMethod({ success: 'notice', names: ['userId'] })
+    async cancelAccountDeletion(userId: number): Promise<void> {
+        //|-------------------------------------------------------------------------------------|//
+        //?                                       GUARDS                                        ?//
+        //|-------------------------------------------------------------------------------------|//
+
+        const user = await db.user.getOneById(userId, {
+            id: true,
+            email: true,
+            username: true,
+            status: true,
+            deletionScheduledFor: true
+        });
+
+        if (!user) {
+            log.warn('cancelAccountDeletion - user not found', { userId });
+            throw new NotFoundError(
+                'app.error.not-found',
+                ApplicationErrorCode.USER_NOT_FOUND
+            );
+        }
+
+        if (user.status !== 'pending_deletion') {
+            log.warn('cancelAccountDeletion - user not pending deletion', {
+                userId
+            });
+            throw new ValidationError(
+                undefined,
+                ApplicationErrorCode.PRECONDITION_FAILED
+            );
+        }
+
+        // Check if still within grace period
+        const deletionDate = user.deletionScheduledFor
+            ? new Date(user.deletionScheduledFor)
+            : null;
+        if (deletionDate && deletionDate < new Date()) {
+            log.warn('cancelAccountDeletion - grace period expired', {
+                userId
+            });
+            throw new ValidationError(
+                undefined,
+                ApplicationErrorCode.PRECONDITION_FAILED
+            );
+        }
+
+        //|-------------------------------------------------------------------------------------|//
+        //?                                  CANCEL DELETION                                    ?//
+        //|-------------------------------------------------------------------------------------|//
+
+        // Restore user to active status
+        await db.user.cancelDeletion(userId);
+
+        // Update audit record
+        const auditRecord =
+            await db.accountDeletionRequest.getLatestByUserId(userId);
+        if (auditRecord) {
+            await db.accountDeletionRequest.markAsCancelled(auditRecord.id);
+        }
+
+        //|-------------------------------------------------------------------------------------|//
+        //?                                   SEND EMAIL                                        ?//
+        //|-------------------------------------------------------------------------------------|//
+
+        try {
+            await mailService.sendAccountDeletionCancelled(
+                user.email,
+                user.username
+            );
+        } catch (error) {
+            log.error('Failed to send account deletion cancelled email', {
+                error,
+                userId
+            });
+            // Don't fail the operation if email fails
+        }
+
+        return;
+    }
+
+    /**
+     * Process scheduled deletions - hard delete users past their grace period
+     * This method should be called by a cron job
+     */
+    @LogServiceMethod({ success: 'notice' })
+    async processScheduledDeletions(): Promise<{
+        processed: number;
+        failed: number;
+    }> {
+        log.info('processScheduledDeletions - starting');
+
+        const usersPendingDeletion =
+            await db.user.getUsersPendingHardDeletion();
+
+        let processed = 0;
+        let failed = 0;
+
+        for (const user of usersPendingDeletion) {
+            try {
+                log.info('Processing hard deletion for user', {
+                    userId: user.id
+                });
+
+                // Execute complete hard deletion through the model layer
+                await db.user.executeHardDeletion(user.id);
+
+                processed++;
+
+                //|-------------------------------------------------------------------------------------|//
+                //?                                   SEND EMAIL                                        ?//
+                //|-------------------------------------------------------------------------------------|//
+
+                try {
+                    await mailService.sendAccountDeleted(
+                        user.email,
+                        user.username
+                    );
+                } catch (error) {
+                    log.error('Failed to send account deleted email', {
+                        error,
+                        userId: user.id
+                    });
+                    // Don't fail the operation if email fails
+                }
+
+                log.info('Successfully processed hard deletion for user', {
+                    userId: user.id
+                });
+            } catch (error) {
+                log.error('Failed to process hard deletion for user', {
+                    error,
+                    userId: user.id
+                });
+                failed++;
+            }
+        }
+
+        log.info('processScheduledDeletions - completed', {
+            total: usersPendingDeletion.length,
+            processed,
+            failed
+        });
+
+        return { processed, failed };
+    }
 }
 
 export const userService = new UserService();

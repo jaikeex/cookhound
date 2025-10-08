@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { type UserRole } from '@/common/types';
+import { type UserRole, Status } from '@/common/types';
 import { ENV_CONFIG_PUBLIC } from '@/common/constants';
 import { MiddlewareError } from '@/server/error';
 import { type ServerSession } from './manager';
@@ -64,6 +64,15 @@ function redirectToRestrictedWithLogin(pathname: string) {
                 `/error/restricted?${params.toString()}`,
                 ENV_CONFIG_PUBLIC.ORIGIN
             )
+        )
+    );
+}
+
+function redirectToProfile(userId: number) {
+    throw new MiddlewareError(
+        'Account pending deletion - access restricted to profile only',
+        NextResponse.redirect(
+            new URL(`/user/${userId}`, ENV_CONFIG_PUBLIC.ORIGIN)
         )
     );
 }
@@ -146,6 +155,18 @@ export const verifyRouteAccess: MiddlewareStepFunction = async (request) => {
     //?--------------------------------------------------------------------------------
     // From now on, the route is protected and the user is logged in and authenticated.
     //?--------------------------------------------------------------------------------
+
+    // Check if user has pending deletion status
+    if (session && session.status === Status.PendingDeletion) {
+        // Allow access to profile page and API routes
+        const isProfilePage = pathname.startsWith(`/user/${session.userId}`);
+        const isApiRoute = pathname.startsWith('/api/');
+
+        if (!isProfilePage && !isApiRoute) {
+            // Redirect to profile page for all other routes
+            return redirectToProfile(session.userId);
+        }
+    }
 
     if (!requiresAuth) {
         /**

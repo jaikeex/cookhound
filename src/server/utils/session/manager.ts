@@ -1,4 +1,4 @@
-import type { UserRole } from '@/common/types';
+import type { UserRole, Status } from '@/common/types';
 import { redisClient } from '@/server/integrations/redis';
 import { randomUUID } from 'crypto';
 import type { Logger as LoggerType } from '@/server/logger';
@@ -17,6 +17,7 @@ export type ServerSession = {
     sessionId: string;
     userId: number;
     userRole: UserRole;
+    status: Status;
     createdAt: Date;
     lastAccessedAt: Date;
     expiresAt: Date;
@@ -27,6 +28,7 @@ export type ServerSession = {
 
 type CreateSessionOptions = {
     userRole: UserRole;
+    status: Status;
     ipAddress: string | null;
     userAgent: string | null;
     loginMethod: 'manual' | 'google';
@@ -90,7 +92,7 @@ class SessionManager {
         userId: number,
         options: CreateSessionOptions
     ): Promise<string> {
-        const { userRole, ipAddress, userAgent, loginMethod } = options;
+        const { userRole, status, ipAddress, userAgent, loginMethod } = options;
 
         if (!userId || userId <= 0) {
             throw new ValidationError();
@@ -106,6 +108,7 @@ class SessionManager {
             sessionId,
             userId,
             userRole,
+            status,
             createdAt: now,
             lastAccessedAt: now,
             expiresAt,

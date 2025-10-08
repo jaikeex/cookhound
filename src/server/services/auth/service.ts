@@ -1,4 +1,9 @@
-import type { UserDTO, UserRole, UserVisibilityGroup } from '@/common/types';
+import type {
+    UserDTO,
+    UserRole,
+    UserVisibilityGroup,
+    Status
+} from '@/common/types';
 import type {
     UserForLogin,
     AuthResponse,
@@ -108,6 +113,7 @@ class AuthService {
             ipAddress: RequestContext.getIp(),
             userAgent: RequestContext.getUserAgent(),
             userRole: user.role as UserRole,
+            status: user.status as Status,
             loginMethod: 'manual'
         });
 
@@ -222,7 +228,8 @@ class AuthService {
             ipAddress: RequestContext.getIp(),
             userAgent: RequestContext.getUserAgent(),
             userRole: user.role as UserRole,
-            loginMethod: 'manual'
+            status: user.status as Status,
+            loginMethod: 'google'
         });
 
         return { token, user };
