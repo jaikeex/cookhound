@@ -67,7 +67,8 @@ export const ENV_CONFIG_PRIVATE = createConfig(
         OPENAI_API_KEY: process.env.OPENAI_API_KEY,
         ALLOWED_ORIGINS: process.env.ALLOWED_ORIGINS,
         MAIL_DRIVER: process.env.MAIL_DRIVER,
-        MAIL_GMAIL_FROM: process.env.MAIL_GMAIL_FROM
+        MAIL_GMAIL_FROM: process.env.MAIL_GMAIL_FROM,
+        CONTACT_EMAIL: process.env.CONTACT_EMAIL
     },
     'ENV_CONFIG_PRIVATE',
     process.env.NEXT_PUBLIC_ENV !== 'test' && typeof window === 'undefined'

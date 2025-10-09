@@ -5,3 +5,4 @@ export * from './ResetPassword';
 export * from './SimpleEmailForm';
 export * from './ChangeEmail';
 export * from './Cookbook';
+export * from './Contact';

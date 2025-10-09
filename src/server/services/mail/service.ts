@@ -158,6 +158,30 @@ class MailService {
             locale: RequestContext.getUserLocale() ?? DEFAULT_LOCALE
         });
     }
+
+    /**
+     * Sends a contact form submission to the support team.
+     *
+     * @param name - The sender's name.
+     * @param email - The sender's email address.
+     * @param subject - The contact form subject.
+     * @param message - The contact form message.
+     */
+    @LogServiceMethod({ names: ['name', 'email', 'subject'] })
+    async sendContactForm(
+        name: string,
+        email: string,
+        subject: string,
+        message: string
+    ) {
+        await queueManager.addJob(JOB_NAMES.SEND_CONTACT_FORM, {
+            name,
+            email,
+            subject,
+            message,
+            locale: RequestContext.getUserLocale() ?? DEFAULT_LOCALE
+        });
+    }
 }
 
 export const mailService = new MailService();
