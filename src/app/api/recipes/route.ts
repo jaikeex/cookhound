@@ -27,7 +27,8 @@ const FrontPageRecipesSchema = z.strictObject({
 
 const IngredientForCreateSchema = z.strictObject({
     name: z.string().trim().min(1).max(100),
-    quantity: z.string().trim().max(50).nullable()
+    quantity: z.string().trim().max(50).nullable(),
+    category: z.string().trim().max(100).nullable().optional()
 });
 
 const RecipeForCreatePayloadSchema = z.strictObject({

@@ -4,7 +4,8 @@ import React, { useCallback, useEffect, useState, useMemo } from 'react';
 import {
     ButtonBase,
     DraggableList,
-    IngredientRowCreate
+    IngredientRowCreate,
+    CategoryHeader
 } from '@/client/components';
 import type { Ingredient } from '@/common/types';
 import { useLocale } from '@/client/store';
@@ -14,140 +15,490 @@ type IngredientsListCreateProps = Readonly<{
     onChange?: (value: Ingredient[]) => void;
 }>;
 
+type IngredientByCategory = Map<string | null, Ingredient[]>;
+type DragKeysByCategory = Map<string | null, number[]>;
+
 export const IngredientsListCreate: React.FC<IngredientsListCreateProps> = ({
     defaultIngredients,
     onChange
 }) => {
+    //|-----------------------------------------------------------------------------------------|//
+    //?                                          STATE                                          ?//
+    //|-----------------------------------------------------------------------------------------|//
+
     const { t } = useLocale();
 
-    // used only for the draggable list - should not be used to determine the order of ingredients
-    const [ingredients, setIngredients] = useState<number[]>(() =>
-        defaultIngredients && defaultIngredients.length > 0
-            ? defaultIngredients?.map((_, idx) => idx)
-            : [0]
-    );
+    const [categories, setCategories] = useState<string[]>([]);
+    const [ingredientsByCategory, setIngredientsByCategory] =
+        useState<IngredientByCategory>(
+            new Map([
+                [
+                    null,
+                    [{ name: '', quantity: null, category: null } as Ingredient]
+                ]
+            ])
+        );
 
-    // used to store the actual ingredient values in the correct order
-    const [ingredientValues, setIngredientValues] = useState<Ingredient[]>(
-        () => defaultIngredients ?? []
-    );
+    const [dragKeysByCategory, setDragKeysByCategory] =
+        useState<DragKeysByCategory>(new Map([[null, [0]]]));
+
+    //|-----------------------------------------------------------------------------------------|//
+    //?                                     INITIALIZATION                                      ?//
+    //|-----------------------------------------------------------------------------------------|//
 
     useEffect(() => {
-        if (!defaultIngredients) return;
+        if (!defaultIngredients || defaultIngredients.length === 0) return;
 
-        setIngredients(defaultIngredients.map((_, idx) => idx));
-        setIngredientValues(defaultIngredients);
-    }, [defaultIngredients]);
+        const categoriesSet = new Set<string>();
+        const categoryList: string[] = [];
 
-    const handleAddIngredient = useCallback(() => {
-        setIngredients((prev) => {
-            // Find the smallest missing index in the array, starting from 0
-            const newIngredient = prev.length > 0 ? Math.max(...prev) + 1 : 0;
-            return [...prev, newIngredient];
+        defaultIngredients.forEach((ing) => {
+            if (ing.category && !categoriesSet.has(ing.category)) {
+                categoriesSet.add(ing.category);
+                categoryList.push(ing.category);
+            }
         });
 
-        setIngredientValues((prev) => [...prev, {} as Ingredient]);
+        const grouped = new Map<string | null, Ingredient[]>();
+        grouped.set(null, []); //uncategorized
 
-        /**
-         * The autofocus on mobile is quite annoying, so it is disabled there for now.
-         * Use lazy evaluation of window size to prevent re-renders on resize.
-         */
-        if (typeof window !== 'undefined' && window.innerWidth >= 1140) {
-            // Focus the new ingredient
-            setTimeout(() => {
-                const ingredient = document.getElementById(
-                    'ingredient-name-' + ingredients.length
-                );
-                ingredient?.focus();
-            }, 0);
-        }
-    }, [ingredients.length]);
+        categoryList.forEach((cat) => grouped.set(cat, []));
 
-    const handleRemoveIngredient = useCallback(
-        (key: number) => (index: number) => {
-            setIngredients((prev) => prev.filter((i) => i !== key));
-            setIngredientValues((prev) =>
-                prev.filter((i, idx) => idx !== index)
+        defaultIngredients.forEach((ing) => {
+            const category = ing.category || null;
+            grouped.get(category)!.push(ing);
+        });
+
+        const dragKeys = new Map<string | null, number[]>();
+        let globalIndex = 0;
+        grouped.forEach((ingredients, cat) => {
+            const keys = ingredients.map(() => globalIndex++);
+            dragKeys.set(cat, keys);
+        });
+
+        setCategories(categoryList);
+        setIngredientsByCategory(grouped);
+        setDragKeysByCategory(dragKeys);
+    }, [defaultIngredients]);
+
+    //|-----------------------------------------------------------------------------------------|//
+    //?                                         HANDLERS                                        ?//
+    //|-----------------------------------------------------------------------------------------|//
+
+    const notifyOnChange = useCallback(() => {
+        const flat: Ingredient[] = [];
+
+        console.log('NOTIFY');
+        // Uncategorized first
+        const uncategorized = ingredientsByCategory.get(null) || [];
+        flat.push(...uncategorized.map((ing) => ({ ...ing, category: null })));
+
+        // Then rest in order
+        categories.forEach((categoryName) => {
+            const ingredients = ingredientsByCategory.get(categoryName) || [];
+            flat.push(
+                ...ingredients.map((ing) => ({
+                    ...ing,
+                    category: categoryName
+                }))
             );
-        },
-        []
-    );
+        });
 
-    const handleRowChange = useCallback(
-        (index: number) => (ingredient: Ingredient) => {
-            setIngredientValues((prev) => {
-                const newIngredients = [...prev];
-                newIngredients[index] = ingredient;
-                return newIngredients;
-            });
-        },
-        []
-    );
+        onChange?.(flat);
+    }, [ingredientsByCategory, categories, onChange]);
 
     useEffect(() => {
-        onChange && onChange(ingredientValues);
-    }, [ingredientValues, onChange]);
+        notifyOnChange();
+    }, [notifyOnChange]);
 
-    const handleReorder = useCallback(
-        (newOrder: number[]) => {
-            // Reorder the ingredient keys first
-            setIngredients(newOrder);
+    const handleAddCategory = useCallback(() => {
+        let newName = t('app.recipe.section-title-default');
+        let counter = 1;
 
-            // Then reorder the actual ingredient values to keep them in sync
-            setIngredientValues((prevValues) => {
-                // Map the previous key -> value for quick lookup
-                const keyToValue = new Map<number, Ingredient>();
-                ingredients.forEach((key, idx) => {
-                    keyToValue.set(key, prevValues[idx]);
-                });
+        while (categories.includes(newName)) {
+            counter++;
+            newName = `${t('app.recipe.section-title-default')} ${counter}`;
+        }
 
-                return newOrder.map(
-                    (key) => keyToValue.get(key) ?? ({} as Ingredient)
+        setCategories((prev) => [...prev, newName]);
+        setIngredientsByCategory((prev) => new Map(prev).set(newName, []));
+        setDragKeysByCategory((prev) => new Map(prev).set(newName, []));
+    }, [categories, t]);
+
+    const handleRenameCategory = useCallback(
+        (oldName: string, newName: string) => {
+            setCategories((prev) =>
+                prev.map((c) => (c === oldName ? newName : c))
+            );
+
+            setIngredientsByCategory((prev) => {
+                const map = new Map(prev);
+                const ingredients = map.get(oldName) || [];
+                map.delete(oldName);
+                map.set(
+                    newName,
+                    ingredients.map((ing) => ({ ...ing, category: newName }))
                 );
+                return map;
+            });
+
+            setDragKeysByCategory((prev) => {
+                const map = new Map(prev);
+                const keys = map.get(oldName) || [];
+                map.delete(oldName);
+                map.set(newName, keys);
+                return map;
             });
         },
-        [ingredients]
+        []
     );
 
-    // Memoize the DraggableList to prevent unnecessary re-renders during screen size changes
-    const draggableList = useMemo(
-        () => (
-            <DraggableList onReorder={handleReorder} values={ingredients}>
-                {ingredients.map((key, index) => (
-                    <IngredientRowCreate
-                        defaultIngredient={ingredientValues[index]}
-                        dragIndex={key}
-                        index={index}
-                        key={key}
-                        onAddIngredient={handleAddIngredient}
-                        onChange={handleRowChange(index)}
-                        onRemove={handleRemoveIngredient(key)}
-                    />
-                ))}
-            </DraggableList>
-        ),
+    const handleRemoveCategory = useCallback(
+        (categoryName: string) => {
+            const ingredients = ingredientsByCategory.get(categoryName) || [];
+
+            if (ingredients.length > 0) {
+                return;
+            }
+
+            setCategories((prev) => prev.filter((c) => c !== categoryName));
+
+            setIngredientsByCategory((prev) => {
+                const map = new Map(prev);
+                map.delete(categoryName);
+                return map;
+            });
+
+            setDragKeysByCategory((prev) => {
+                const map = new Map(prev);
+                map.delete(categoryName);
+                return map;
+            });
+        },
+        [ingredientsByCategory]
+    );
+
+    const handleAddIngredient = useCallback(
+        (categoryName: string | null) => {
+            setIngredientsByCategory((prev) => {
+                const map = new Map(prev);
+                const ingredients = map.get(categoryName) || [];
+                map.set(categoryName, [
+                    ...ingredients,
+                    {
+                        name: '',
+                        quantity: null,
+                        category: categoryName
+                    } as Ingredient
+                ]);
+                return map;
+            });
+
+            setDragKeysByCategory((prev) => {
+                const map = new Map(prev);
+                const keys = map.get(categoryName) || [];
+                const allKeys = Array.from(prev.values()).flat();
+                const maxKey = allKeys.length > 0 ? Math.max(...allKeys) : 0;
+                map.set(categoryName, [...keys, maxKey + 1]);
+                return map;
+            });
+
+            /**
+             * The autofocus on mobile is quite annoying, so it is disabled there for now.
+             * Use lazy evaluation of window size to prevent re-renders on resize.
+             */
+            if (typeof window !== 'undefined' && window.innerWidth >= 1140) {
+                // Focus the new ingredient
+                setTimeout(() => {
+                    const currentIngredients =
+                        ingredientsByCategory.get(categoryName) || [];
+
+                    const ingredient = document.getElementById(
+                        'ingredient-name-' + currentIngredients.length
+                    );
+                    ingredient?.focus();
+                }, 0);
+            }
+        },
+        [ingredientsByCategory]
+    );
+
+    const handleRemoveIngredient = useCallback(
+        (
+            categoryName: string | null,
+            dragKey: number,
+            ingredientIndex: number
+        ) => {
+            setIngredientsByCategory((prev) => {
+                const map = new Map(prev);
+                const ingredients = map.get(categoryName) || [];
+                map.set(
+                    categoryName,
+                    ingredients.filter((_, idx) => idx !== ingredientIndex)
+                );
+                return map;
+            });
+
+            setDragKeysByCategory((prev) => {
+                const map = new Map(prev);
+                const keys = map.get(categoryName) || [];
+                map.set(
+                    categoryName,
+                    keys.filter((k) => k !== dragKey)
+                );
+                return map;
+            });
+        },
+        []
+    );
+
+    const handleIngredientChange = useCallback(
+        (categoryName: string | null, index: number) =>
+            (ingredient: Ingredient) => {
+                setIngredientsByCategory((prev) => {
+                    const map = new Map(prev);
+                    const ingredients = map.get(categoryName) || [];
+                    const updated = [...ingredients];
+                    updated[index] = { ...ingredient, category: categoryName };
+                    map.set(categoryName, updated);
+                    return map;
+                });
+            },
+        []
+    );
+
+    const handleReorder = useCallback(
+        (categoryName: string | null) => (newOrder: number[]) => {
+            setDragKeysByCategory((prev) => {
+                const map = new Map(prev);
+                map.set(categoryName, newOrder);
+                return map;
+            });
+
+            setIngredientsByCategory((prev) => {
+                const map = new Map(prev);
+                const ingredients = map.get(categoryName) || [];
+                const oldKeys = dragKeysByCategory.get(categoryName) || [];
+
+                const keyToValue = new Map<number, Ingredient>();
+
+                oldKeys.forEach((key, idx) => {
+                    keyToValue.set(key, ingredients[idx]);
+                });
+
+                const reordered = newOrder.map(
+                    (key) =>
+                        keyToValue.get(key) ||
+                        ({
+                            name: '',
+                            quantity: null,
+                            category: categoryName
+                        } as Ingredient)
+                );
+
+                map.set(categoryName, reordered);
+
+                return map;
+            });
+        },
+        [dragKeysByCategory]
+    );
+
+    const createCategoryRemoveHandler = useCallback(
+        (categoryName: string) => () => handleRemoveCategory(categoryName),
+        [handleRemoveCategory]
+    );
+
+    const createIngredientAddHandler = useCallback(
+        (categoryName: string | null) => () =>
+            handleAddIngredient(categoryName),
+        [handleAddIngredient]
+    );
+
+    const createIngredientRemoveHandler = useCallback(
+        (categoryName: string | null, key: number, index: number) => () =>
+            handleRemoveIngredient(categoryName, key, index),
+        [handleRemoveIngredient]
+    );
+
+    const handleAddUncategorizedIngredient = useCallback(
+        () => handleAddIngredient(null),
+        [handleAddIngredient]
+    );
+
+    //|-----------------------------------------------------------------------------------------|//
+    //?                                        INDEXING                                         ?//
+    //|-----------------------------------------------------------------------------------------|//
+
+    const getGlobalIndex = useCallback(
+        (categoryName: string | null, localIndex: number): number => {
+            let globalIndex = 0;
+
+            if (categoryName === null) {
+                return localIndex;
+            }
+
+            globalIndex += (ingredientsByCategory.get(null) || []).length;
+
+            for (const cat of categories) {
+                if (cat === categoryName) {
+                    return globalIndex + localIndex;
+                }
+                globalIndex += (ingredientsByCategory.get(cat) || []).length;
+            }
+
+            return globalIndex;
+        },
+        [categories, ingredientsByCategory]
+    );
+
+    //|-----------------------------------------------------------------------------------------|//
+    //?                                          RENDER                                         ?//
+    //|-----------------------------------------------------------------------------------------|//
+
+    const renderCategorySection = useCallback(
+        (categoryName: string | null) => {
+            const ingredients = ingredientsByCategory.get(categoryName) || [];
+            const dragKeys = dragKeysByCategory.get(categoryName) || [];
+            const isUncategorized = categoryName === null;
+            const canRemoveCategory =
+                !isUncategorized && ingredients.length === 0;
+
+            if (ingredients.length === 0 && isUncategorized) {
+                return null; // Don't render empty uncategorized section
+            }
+
+            const handleCategoryRemove =
+                !isUncategorized && categoryName
+                    ? createCategoryRemoveHandler(categoryName)
+                    : undefined;
+
+            const handleReorderCategory = handleReorder(categoryName);
+            const handleAddIngredientToCategory =
+                createIngredientAddHandler(categoryName);
+
+            return (
+                <div
+                    key={categoryName || 'uncategorized'}
+                    className="space-y-2"
+                >
+                    {!isUncategorized && categoryName && (
+                        <CategoryHeader
+                            categoryName={categoryName}
+                            ingredientCount={ingredients.length}
+                            canRemove={canRemoveCategory}
+                            onRename={handleRenameCategory}
+                            onRemove={handleCategoryRemove}
+                            existingCategoryNames={categories}
+                        />
+                    )}
+
+                    {ingredients.length > 0 && (
+                        <DraggableList
+                            onReorder={handleReorderCategory}
+                            values={dragKeys}
+                        >
+                            {dragKeys.map((key, localIndex) => {
+                                const globalIndex = getGlobalIndex(
+                                    categoryName,
+                                    localIndex
+                                );
+                                const handleChange = handleIngredientChange(
+                                    categoryName,
+                                    localIndex
+                                );
+                                const handleRemove =
+                                    createIngredientRemoveHandler(
+                                        categoryName,
+                                        key,
+                                        localIndex
+                                    );
+
+                                return (
+                                    <IngredientRowCreate
+                                        key={key}
+                                        dragIndex={key}
+                                        index={globalIndex}
+                                        category={categoryName}
+                                        defaultIngredient={
+                                            ingredients[localIndex]
+                                        }
+                                        onAddIngredient={
+                                            handleAddIngredientToCategory
+                                        }
+                                        onChange={handleChange}
+                                        onRemove={handleRemove}
+                                    />
+                                );
+                            })}
+                        </DraggableList>
+                    )}
+
+                    {!isUncategorized && (
+                        <ButtonBase
+                            className="w-full"
+                            color="subtle"
+                            icon="plus"
+                            onClick={handleAddIngredientToCategory}
+                            size="sm"
+                        >
+                            {t('app.recipe.add-ingredient')}
+                        </ButtonBase>
+                    )}
+                </div>
+            );
+        },
         [
-            ingredients,
-            ingredientValues,
+            categories,
+            ingredientsByCategory,
+            dragKeysByCategory,
+            handleRenameCategory,
+            createCategoryRemoveHandler,
             handleReorder,
-            handleAddIngredient,
-            handleRemoveIngredient,
-            handleRowChange
+            createIngredientAddHandler,
+            handleIngredientChange,
+            createIngredientRemoveHandler,
+            getGlobalIndex,
+            t
         ]
     );
 
+    const renderSections = useMemo(
+        () => (
+            <>
+                {renderCategorySection(null)}
+                <ButtonBase
+                    className="w-full"
+                    color="subtle"
+                    icon="plus"
+                    onClick={handleAddUncategorizedIngredient}
+                    size="sm"
+                >
+                    {t('app.recipe.add-ingredient')}
+                </ButtonBase>
+
+                {categories.map((categoryName) =>
+                    renderCategorySection(categoryName)
+                )}
+            </>
+        ),
+        [categories, handleAddUncategorizedIngredient, renderCategorySection, t]
+    );
+
     return (
-        <React.Fragment>
-            {draggableList}
+        <div className="space-y-6">
+            {renderSections}
+
             <ButtonBase
-                className={'w-full'}
-                color={'subtle'}
-                icon={'plus'}
-                onClick={handleAddIngredient}
-                size={'sm'}
+                className="w-full"
+                color="subtle"
+                icon="plus"
+                onClick={handleAddCategory}
+                size="sm"
+                outlined
             >
-                {t('app.recipe.add-ingredient')}
+                {t('app.recipe.add-section')}
             </ButtonBase>
-        </React.Fragment>
+        </div>
     );
 };

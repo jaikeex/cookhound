@@ -9,6 +9,7 @@ type IngredientRowCreateProps = Readonly<{
     className?: string;
     dragIndex: number;
     index: number;
+    category?: string | null;
     onAddIngredient?: () => void;
     onChange?: (ingredient: Ingredient) => void;
     onRemove?: (index: number) => void;
@@ -19,6 +20,7 @@ export const IngredientRowCreate: React.FC<IngredientRowCreateProps> = ({
     className,
     dragIndex,
     index,
+    category = null,
     onAddIngredient,
     onChange,
     onRemove,
@@ -67,24 +69,26 @@ export const IngredientRowCreate: React.FC<IngredientRowCreateProps> = ({
         (e: React.ChangeEvent<HTMLInputElement>) => {
             const newIngredient = {
                 ...ingredient,
-                quantity: e.target.value
+                quantity: e.target.value,
+                category
             };
             setIngredient(newIngredient);
             onChange && onChange(newIngredient);
         },
-        [ingredient, onChange]
+        [ingredient, onChange, category]
     );
 
     const handleNameChange = useCallback(
         (e: React.ChangeEvent<HTMLInputElement>) => {
             const newIngredient = {
                 ...ingredient,
-                name: e.target.value
+                name: e.target.value,
+                category
             };
             setIngredient(newIngredient);
             onChange && onChange(newIngredient);
         },
-        [ingredient, onChange]
+        [ingredient, onChange, category]
     );
     useEffect(() => {
         if (ingredient.name || ingredient.quantity) {
@@ -102,6 +106,12 @@ export const IngredientRowCreate: React.FC<IngredientRowCreateProps> = ({
             disableRemove={disableHandling}
             disableDrag={disableHandling}
         >
+            <input
+                type="hidden"
+                name={`ingredient-category-${index}`}
+                value={category || ''}
+            />
+
             <BaseInput
                 defaultValue={defaultIngredient?.name}
                 id={`ingredient-name-${index}`}
@@ -112,6 +122,7 @@ export const IngredientRowCreate: React.FC<IngredientRowCreateProps> = ({
                 onChange={handleNameChange}
                 onKeyDown={handleNameKeyPress}
             />
+
             <BaseInput
                 className={'w-1/4'}
                 defaultValue={defaultIngredient?.quantity}

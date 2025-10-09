@@ -44,6 +44,8 @@ export type Ingredient = {
     id: number;
     name: string;
     quantity: string | null;
+    category?: string | null;
+    categoryOrder?: number | null;
 };
 
 export type RecipeForCreatePayload = {
@@ -61,6 +63,14 @@ export type RecipeForCreatePayload = {
 export type IngredientForCreate = {
     name: string;
     quantity: string | null;
+    category?: string | null;
+};
+
+export type IngredientForUpdate = {
+    id?: number;
+    name: string;
+    quantity: string | null;
+    category?: string | null;
 };
 
 export type RecipeVisitPayload = {

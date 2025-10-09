@@ -32,10 +32,15 @@ export async function extractFormData(
                     .toLowerCase()
                     .trim() || '';
 
+            const quantity =
+                (data.get(`ingredient-quantity-${index}`) as string) || null;
+            const category =
+                (data.get(`ingredient-category-${index}`) as string) || null;
+
             return {
                 name,
-                quantity:
-                    (data.get(`ingredient-quantity-${index}`) as string) || null
+                quantity,
+                category: category && category.trim() ? category.trim() : null
             };
         })
         .filter((ingredient) => ingredient?.name && ingredient.name.length > 0);

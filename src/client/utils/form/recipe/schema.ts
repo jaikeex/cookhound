@@ -10,7 +10,8 @@ export const recipeFormSchema = z.object({
         .array(
             z.object({
                 name: z.string().trim().min(1).max(100),
-                quantity: z.string().trim().max(256)
+                quantity: z.string().trim().max(256).nullable(),
+                category: z.string().trim().max(100).nullable().optional()
             })
         )
         .min(1, 'app.recipe.error.ingredients-required'),

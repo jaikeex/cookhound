@@ -18,9 +18,11 @@ SELECT
             jsonb_build_object(
                 'id', i.id,
                 'name', i.name,
-                'quantity', ri.quantity
+                'quantity', ri.quantity,
+                'category', ri.category,
+                'categoryOrder', ri.category_order
             )
-            ORDER BY ri.ingredient_order
+            ORDER BY COALESCE(ri.category_order, 0), ri.ingredient_order
         )
         FROM recipes_ingredients ri
         JOIN ingredients i ON ri.ingredient_id = i.id

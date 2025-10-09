@@ -7,6 +7,7 @@ export * from './Footer';
 export * from './Form';
 export * from './Image';
 export * from './IngredientRow';
+export * from './IngredientCategory';
 export * from './InstructionRow';
 export * from './Instructions';
 export * from './Menu';

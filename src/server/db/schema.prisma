@@ -221,19 +221,24 @@ model Ingredient {
 }
 
 model RecipeIngredient {
+  id              Int     @id @default(autoincrement())
   recipeId        Int     @map("recipe_id")
   ingredientId    Int     @map("ingredient_id")
   quantity        String? @db.VarChar(256)
+  category        String? @db.VarChar(100)
+  categoryOrder   Int?    @map("category_order")
   ingredientOrder Int     @map("ingredient_order")
 
   /// Relations
   recipe     Recipe     @relation(fields: [recipeId], references: [id])
   ingredient Ingredient @relation(fields: [ingredientId], references: [id])
 
-  /// Composite primary key
-  @@id([recipeId, ingredientId])
+  /// Constraints
   @@index([recipeId])
   @@index([ingredientId])
+  @@index([recipeId, ingredientId])
+  @@index([recipeId, category])
+  @@index([recipeId, categoryOrder])
   @@map("recipes_ingredients")
 }
 

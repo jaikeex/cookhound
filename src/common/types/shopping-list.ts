@@ -5,6 +5,7 @@ export type ShoppingListIngredientDTO = {
     name: string;
     id: number;
     quantity: string | null;
+    category?: string | null;
     marked: boolean;
 };
 

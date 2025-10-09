@@ -197,11 +197,12 @@ export const useRecipeFormController = ({
 
     const handleFormChange = useCallback(
         (name: string, value: any) => {
-            let newValue: any = value;
+            let newValue: unknown = value;
 
             if (name === 'ingredients' && value) {
                 newValue = value.map((ingredient: Ingredient) => ({
                     quantity: ingredient?.quantity || null,
+                    category: ingredient?.category || null,
                     id: null,
                     name: lowerCaseFirstLetter(ingredient?.name)
                 }));

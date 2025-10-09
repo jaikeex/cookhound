@@ -18,7 +18,8 @@ import { z } from 'zod';
 
 const IngredientForCreateSchema = z.strictObject({
     name: z.string().trim().min(1).max(100),
-    quantity: z.string().trim().max(50).nullable()
+    quantity: z.string().trim().max(50).nullable(),
+    category: z.string().trim().max(100).nullable().optional()
 });
 
 const RecipeForUpdateSchema = z.strictObject({

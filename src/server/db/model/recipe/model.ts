@@ -330,7 +330,11 @@ class RecipeModel {
         >;
         authorId: number;
         instructions: string[];
-        ingredients: { name: string; quantity: string | null }[];
+        ingredients: {
+            name: string;
+            quantity: string | null;
+            category?: string | null;
+        }[];
         tags: { id: number }[];
     }): Promise<Recipe> {
         log.trace('Creating recipe', {
@@ -371,6 +375,14 @@ class RecipeModel {
             log.trace('Creating ingredients', { recipeId: recipe.id });
 
             if (data.ingredients.length > 0) {
+                // Calculate orders
+                const categoryOrders = calculateCategoryOrders(
+                    data.ingredients
+                );
+                const ingredientOrders = calculateIngredientOrders(
+                    data.ingredients
+                );
+
                 for (let i = 0; i < data.ingredients.length; i++) {
                     const ingredientData = data.ingredients[i];
 
@@ -400,7 +412,9 @@ class RecipeModel {
                             recipeId: recipe.id,
                             ingredientId: ingredient.id,
                             quantity: ingredientData.quantity,
-                            ingredientOrder: i + 1
+                            category: ingredientData.category || null,
+                            categoryOrder: categoryOrders[i],
+                            ingredientOrder: ingredientOrders[i]
                         }
                     });
                 }
@@ -452,7 +466,11 @@ class RecipeModel {
         id: number,
         data: Prisma.RecipeUpdateInput & {
             instructions?: string[];
-            ingredients?: { name: string; quantity: string | null }[];
+            ingredients?: {
+                name: string;
+                quantity: string | null;
+                category?: string | null;
+            }[];
             tags?: { id: number }[];
         }
     ): Promise<Recipe> {
@@ -508,6 +526,10 @@ class RecipeModel {
                     originalRecipe.language ??
                     DEFAULT_LOCALE;
 
+                // Calculate orders
+                const categoryOrders = calculateCategoryOrders(ingredients);
+                const ingredientOrders = calculateIngredientOrders(ingredients);
+
                 for (let i = 0; i < ingredients.length; i++) {
                     const ingredientData = ingredients[i];
 
@@ -532,7 +554,9 @@ class RecipeModel {
                             recipeId: id,
                             ingredientId: ingredient.id,
                             quantity: ingredientData.quantity,
-                            ingredientOrder: i + 1
+                            category: ingredientData.category || null,
+                            categoryOrder: categoryOrders[i],
+                            ingredientOrder: ingredientOrders[i]
                         }
                     });
                 }
@@ -663,6 +687,44 @@ class RecipeModel {
         await invalidateCacheByPattern(
             `prisma:recipe:findManyForUser:${userId}`
         );
+    }
+
+    /**
+     * Calculate categoryOrder for each ingredient based on category appearance order.
+     * Uncategorized ingredients get categoryOrder = null
+     */
+    private calculateCategoryOrders(
+        ingredients: { category?: string | null }[]
+    ): (number | null)[] {
+        const categoryMap = new Map<string, number>();
+        let nextOrder = 1;
+
+        return ingredients.map((ing) => {
+            if (!ing.category) return null;
+
+            if (!categoryMap.has(ing.category)) {
+                categoryMap.set(ing.category, nextOrder++);
+            }
+
+            return categoryMap.get(ing.category)!;
+        });
+    }
+
+    private calculateIngredientOrders(
+        ingredients: { category?: string | null }[]
+    ): number[] {
+        const categoryCounters = new Map<string | null, number>();
+
+        return ingredients.map((ing) => {
+            const category = ing.category || null;
+
+            const currentOrder = categoryCounters.get(category) || 0;
+            const nextOrder = currentOrder + 1;
+
+            categoryCounters.set(category, nextOrder);
+
+            return nextOrder;
+        });
     }
 }
 
