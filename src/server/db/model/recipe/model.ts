@@ -376,10 +376,10 @@ class RecipeModel {
 
             if (data.ingredients.length > 0) {
                 // Calculate orders
-                const categoryOrders = calculateCategoryOrders(
+                const categoryOrders = this.calculateCategoryOrders(
                     data.ingredients
                 );
-                const ingredientOrders = calculateIngredientOrders(
+                const ingredientOrders = this.calculateIngredientOrders(
                     data.ingredients
                 );
 
@@ -527,8 +527,10 @@ class RecipeModel {
                     DEFAULT_LOCALE;
 
                 // Calculate orders
-                const categoryOrders = calculateCategoryOrders(ingredients);
-                const ingredientOrders = calculateIngredientOrders(ingredients);
+                const categoryOrders =
+                    this.calculateCategoryOrders(ingredients);
+                const ingredientOrders =
+                    this.calculateIngredientOrders(ingredients);
 
                 for (let i = 0; i < ingredients.length; i++) {
                     const ingredientData = ingredients[i];
