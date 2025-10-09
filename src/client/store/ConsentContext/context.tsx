@@ -363,8 +363,6 @@ export const ConsentProvider: React.FC<ConsentProviderProps> = ({
                 createdAt: consent.createdAt ?? new Date()
             };
 
-            console.log('payloadForDb', payloadForDb);
-
             await createUserCookieConsent(payloadForDb);
 
             // Update cookie with userId

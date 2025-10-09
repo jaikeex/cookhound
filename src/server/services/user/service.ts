@@ -670,10 +670,6 @@ class UserService {
     }> {
         const cookieConsent = await db.user.getLatestUserCookieConsent(userId);
 
-        console.log(cookieConsent);
-        console.log(userId);
-        console.log(consentId);
-
         if (!cookieConsent) {
             log.warn('verifyCookieConsentHash - record not found', {
                 userId,
@@ -708,8 +704,6 @@ class UserService {
             timestamp: cookieConsent.createdAt,
             accepted: cookieConsent.accepted
         });
-        console.log(storedHash);
-        console.log(computedHash);
 
         const valid = storedHash === computedHash;
 

@@ -132,10 +132,6 @@ export default async function RootLayout({
         ? pickMostRecentConsent(validCookieConsent, validDbConsent)
         : null;
 
-    console.log('cookieConsent', cookieConsent);
-    console.log('dbConsent', dbConsent);
-    console.log('initialConsent', initialConsent);
-
     //|-----------------------------------------------------------------------------------------|//
     //?                                          THEME                                          ?//
     //|-----------------------------------------------------------------------------------------|//
