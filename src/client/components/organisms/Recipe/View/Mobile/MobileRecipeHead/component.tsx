@@ -38,6 +38,7 @@ export const MobileRecipeHead: React.FC<MobileRecipeHeadProps> = ({
                 priority={true}
                 authorId={recipe.authorId}
                 createdAt={recipe.createdAt}
+                isPreview={isPreview}
             />
 
             <Typography variant={'heading-xl'} className={'text-center'}>

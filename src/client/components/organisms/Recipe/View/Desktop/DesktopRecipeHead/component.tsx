@@ -40,10 +40,12 @@ export const DesktopRecipeHead: React.FC<DesktopRecipeHeadProps> = ({
                     </Typography>
 
                     <div className="flex items-center justify-between gap-8 mt-2">
-                        <RecipeAuthorLinkDesktop
-                            authorId={recipe.authorId}
-                            createdAt={recipe.createdAt}
-                        />
+                        {isPreview ? null : (
+                            <RecipeAuthorLinkDesktop
+                                authorId={recipe.authorId}
+                                createdAt={recipe.createdAt}
+                            />
+                        )}
 
                         <Tooltip
                             className={'w-fit'}
@@ -87,6 +89,7 @@ export const DesktopRecipeHead: React.FC<DesktopRecipeHeadProps> = ({
                 priority={true}
                 authorId={recipe.authorId}
                 createdAt={recipe.createdAt}
+                isPreview={isPreview}
             />
         </div>
     );

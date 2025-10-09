@@ -25,20 +25,22 @@ export type RecipeViewImageProps = Readonly<{
     authorId: number;
     className?: string;
     createdAt: Date;
+    isPreview?: boolean;
     src: string | null;
     recipeId: number;
-    wrapperClassName?: string;
     priority?: boolean;
+    wrapperClassName?: string;
 }>;
 
 export const RecipeViewImage: React.FC<RecipeViewImageProps> = ({
     authorId,
     alt,
     className,
+    isPreview,
     src,
     recipeId,
-    wrapperClassName,
-    priority = false
+    priority = false,
+    wrapperClassName
 }) => {
     const { openModal } = useModal();
     const { user } = useAuth();
@@ -72,6 +74,10 @@ export const RecipeViewImage: React.FC<RecipeViewImageProps> = ({
     }, [recipeId, openModal, options]);
 
     const actionsContent = useMemo(() => {
+        if (isPreview) {
+            return null;
+        }
+
         const addToCookbook = (
             <IconButton
                 icon="book"
@@ -94,7 +100,7 @@ export const RecipeViewImage: React.FC<RecipeViewImageProps> = ({
                 )}
             </div>
         );
-    }, [handleOpenModal, authorId, isMobile]);
+    }, [isPreview, handleOpenModal, authorId, isMobile]);
 
     return (
         <div
