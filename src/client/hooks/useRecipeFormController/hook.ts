@@ -214,7 +214,10 @@ export const useRecipeFormController = ({
 
             updateRecipeObject(name, newValue);
 
-            if (!changedFields.includes(name) && newValue?.length > 0) {
+            const hasLength =
+                (typeof newValue === 'string' || Array.isArray(newValue)) &&
+                newValue.length > 0;
+            if (!changedFields.includes(name) && hasLength) {
                 setChangedFields((prev) => [...prev, name]);
             }
         },
