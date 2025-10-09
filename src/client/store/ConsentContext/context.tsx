@@ -16,6 +16,7 @@ import type {
     CookieConsent,
     CookieConsentPayload
 } from '@/common/types/cookie-consent';
+import type { UserDTO } from '@/common/types';
 import { getCookie } from '@/client/utils';
 import { eventBus } from '@/client/events';
 import { AppEvent } from '@/client/events';
@@ -29,6 +30,30 @@ import { useSnackbar } from '@/client/store/SnackbarContext';
 import { useLocale } from '@/client/store';
 import { areConsentsEqual } from '@/common/utils';
 
+//?—————————————————————————————————————————————————————————————————————————————————————————————?//
+//?                                  CONSENT SOURCE OF TRUTH                                    ?//
+///
+//# Anonymous User:
+//#   → Browser cookie ONLY
+//#
+//# Logged-In User:
+//#   → Most recent timestamp between cookie and DB
+//#   → On conflict, newest ALWAYS wins
+//#   → Older one is synced to match
+//#
+//# Cookie Deleted:
+//#   → Treat as explicit opt-out
+//#   → Revoke in DB if user is logged in
+//#
+//# Version Mismatch:
+//#   → Discard both cookie and DB
+//#   → Force new consent dialog
+//#
+//# User Switch (Logout → Login):
+//#   → Clear userId from consent on logout
+//#   → Compare new user's DB consent with browser consent
+//#   → Use most recent consent
+///
 //?—————————————————————————————————————————————————————————————————————————————————————————————?//
 //?                                  HANDLING CONSENT CHANGE                                    ?//
 ///
@@ -207,24 +232,52 @@ export const ConsentProvider: React.FC<ConsentProviderProps> = ({
     //#     If the cookie is missing -> true bail out by user (sad...)
     //#                              -> essential only.
     //#     If cookie exists but differs -> wannabe developer
-    //#                                  -> re-hydrate from cookie (no revocation).
+    //#                                  -> re-hydrate from db (no revocation).
     ///
     //|-----------------------------------------------------------------------------------------|//
 
-    const verifyConsent = useCallback(() => {
+    const verifyConsent = useCallback(async () => {
         const cookie = readConsentCookie();
-
         const isConsentChanged = !areConsentsEqual(cookie, consent);
 
+        // Case 1: Cookie deleted by user (treat as explicit opt-out)
         if (!cookie) {
-            if (consent) rejectAll();
+            if (consent) {
+                await rejectAll();
+            }
             return;
         }
 
+        // Case 2: Cookie modified
         if (isConsentChanged) {
+            // For logged-in users, verify against DB as authoritative source
+            if (user?.id) {
+                try {
+                    // Fetch fresh user data to get latest consent
+                    const currentUserData = queryClient.getQueryData(
+                        QUERY_KEYS.auth.currentUser
+                    ) as UserDTO | null;
+
+                    const dbConsent = currentUserData?.cookieConsent?.[0];
+
+                    if (dbConsent && !dbConsent.revokedAt) {
+                        // DB is authoritative for logged-in users
+                        setConsentAndEmit(dbConsent);
+                        await setConsentCookie(dbConsent);
+                        return;
+                    }
+                } catch (error) {
+                    console.warn(
+                        'verifyConsent - failed to verify against DB',
+                        { error }
+                    );
+                }
+            }
+
+            // Fall back to cookie value for anonymous users or if DB check fails
             setConsentAndEmit(cookie);
         }
-    }, [consent, rejectAll, setConsentAndEmit]);
+    }, [consent, user, rejectAll, setConsentAndEmit, queryClient]);
 
     useEffect(() => {
         window.addEventListener('focus', verifyConsent);
@@ -264,8 +317,45 @@ export const ConsentProvider: React.FC<ConsentProviderProps> = ({
     //?                                         EFFECTS                                         ?//
     //|-----------------------------------------------------------------------------------------|//
 
-    useAppEventListener(AppEvent.USER_LOGGED_IN, (user) => {
-        if (user.id && consent) {
+    useAppEventListener(AppEvent.USER_LOGGED_IN, async (newUser) => {
+        if (!newUser.id || !consent) return;
+
+        const userDbConsent = newUser.cookieConsent?.[0];
+
+        // Case 1: User has valid DB consent
+        if (userDbConsent && !userDbConsent.revokedAt) {
+            const browserTime = new Date(consent.createdAt).getTime();
+            const dbTime = new Date(userDbConsent.createdAt).getTime();
+
+            if (dbTime > browserTime) {
+                // DB consent is newer - use it
+                setConsentAndEmit(userDbConsent);
+                await setConsentCookie(userDbConsent);
+            } else {
+                // Browser consent is newer - sync to DB and update cookie with userId
+                const payloadForDb: CookieConsentPayload = {
+                    consent: true,
+                    version: consent.version,
+                    accepted: consent.accepted,
+                    createdAt: consent.createdAt ?? new Date()
+                };
+
+                await createUserCookieConsent(payloadForDb);
+
+                // Update cookie with userId
+                const updatedConsent: CookieConsentFromBrowser = {
+                    consent: consent.consent,
+                    version: consent.version,
+                    accepted: consent.accepted,
+                    createdAt: consent.createdAt,
+                    userId: newUser.id.toString()
+                };
+
+                setConsentAndEmit(updatedConsent);
+                await setConsentCookie(updatedConsent);
+            }
+        } else {
+            // Case 2: No DB consent or revoked - sync browser to DB and update cookie with userId
             const payloadForDb: CookieConsentPayload = {
                 consent: true,
                 version: consent.version,
@@ -273,7 +363,37 @@ export const ConsentProvider: React.FC<ConsentProviderProps> = ({
                 createdAt: consent.createdAt ?? new Date()
             };
 
-            createUserCookieConsent(payloadForDb);
+            console.log('payloadForDb', payloadForDb);
+
+            await createUserCookieConsent(payloadForDb);
+
+            // Update cookie with userId
+            const updatedConsent: CookieConsentFromBrowser = {
+                consent: consent.consent,
+                version: consent.version,
+                accepted: consent.accepted,
+                createdAt: consent.createdAt,
+                userId: newUser.id.toString()
+            };
+
+            setConsentAndEmit(updatedConsent);
+            await setConsentCookie(updatedConsent);
+        }
+    });
+
+    useAppEventListener(AppEvent.USER_LOGGED_OUT, () => {
+        // Keep browser consent but clear user association
+        if (consent) {
+            const anonymousConsent: CookieConsentFromBrowser = {
+                consent: consent.consent,
+                version: consent.version,
+                accepted: consent.accepted,
+                createdAt: consent.createdAt,
+                userId: null
+            };
+
+            setConsentAndEmit(anonymousConsent);
+            setConsentCookie(anonymousConsent);
         }
     });
 

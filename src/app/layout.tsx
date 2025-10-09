@@ -32,7 +32,7 @@ import { ClientShell } from './ClientShell';
 import type { CookieConsent } from '@/common/types/cookie-consent';
 import { getCurrentUser } from './actions';
 import { tServer } from '@/server/utils/locales';
-import { ENV_CONFIG_PUBLIC } from '@/common/constants';
+import { ENV_CONFIG_PUBLIC, CONSENT_VERSION } from '@/common/constants';
 
 const openSans = Open_Sans({
     subsets: ['latin'],
@@ -113,15 +113,28 @@ export default async function RootLayout({
 
     if (rawConsent) {
         try {
-            cookieConsent = JSON.parse(decodeURIComponent(rawConsent));
+            const parsed = JSON.parse(decodeURIComponent(rawConsent));
+            // Validate version - discard if outdated
+            cookieConsent = parsed?.version === CONSENT_VERSION ? parsed : null;
         } catch {
             cookieConsent = null;
         }
     }
 
+    // Validate DB consent version - discard if outdated
+    const validDbConsent =
+        dbConsent?.version === CONSENT_VERSION ? dbConsent : null;
+
+    const validCookieConsent =
+        cookieConsent?.version === CONSENT_VERSION ? cookieConsent : null;
+
     const initialConsent = cookieConsent
-        ? pickMostRecentConsent(cookieConsent, dbConsent)
+        ? pickMostRecentConsent(validCookieConsent, validDbConsent)
         : null;
+
+    console.log('cookieConsent', cookieConsent);
+    console.log('dbConsent', dbConsent);
+    console.log('initialConsent', initialConsent);
 
     //|-----------------------------------------------------------------------------------------|//
     //?                                          THEME                                          ?//
