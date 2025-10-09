@@ -50,6 +50,10 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
                 className="text-blue-600 dark:text-blue-400 hover:underline"
             >
                 {t('auth.form.terms-of-use')}
+            </Link>{' '}
+            {t('auth.form.and')}{' '}
+            <Link href="/privacy" target="_blank" rel="noopener noreferrer">
+                {t('auth.form.privacy-policy')}
             </Link>
         </>
     );

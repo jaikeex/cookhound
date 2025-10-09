@@ -8,3 +8,4 @@ export * from './user';
 export * from './fileToByteArray';
 export * from './generateRandomId';
 export * from './cookies';
+export * from './content';

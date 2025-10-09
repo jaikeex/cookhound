@@ -8,8 +8,8 @@ export type TERMS_CONTENT_TYPE = {
     }[];
 };
 
-export const TERMS_TITLE = 'Všeobecné obchodní podmínky pro Cookhound';
-export const TERMS_TIMESTAMP = 'Účinnost od 7. října 2025';
+export const TERMS_TITLE = 'Všeobecné obchodní podmínky pro cookhound.com';
+export const TERMS_TIMESTAMP = 'Datum účinnosti: 7. října 2025';
 
 export const TERMS_CONTENT = [
     {

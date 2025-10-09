@@ -41,6 +41,24 @@ export const Footer: React.FC<FooterProps> = ({ className }) => {
                     {t('app.footer.terms-of-use')}
                 </Link>
 
+                <Link
+                    href="/privacy"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors underline"
+                >
+                    {t('app.footer.privacy-policy')}
+                </Link>
+
+                <Link
+                    href="/contact"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors underline"
+                >
+                    {t('app.footer.contact')}
+                </Link>
+
                 <span className="text-sm text-gray-600 dark:text-gray-400">
                     {t('app.footer.copyright', { year: currentYear })}
                 </span>
