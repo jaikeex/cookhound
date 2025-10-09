@@ -1,0 +1,54 @@
+services:
+    redis:
+        image: redis:latest
+        ports:
+            - '6379:6379'
+        volumes:
+            - redis-data:/data
+        healthcheck:
+            test: ['CMD', 'redis-cli', 'ping']
+            interval: 10s
+            timeout: 5s
+            retries: 5
+            start_period: 5s
+        command: redis-server --requirepass ${REDIS_PASSWORD}
+
+    typesense:
+        image: typesense/typesense:28.0
+        ports:
+            - '8108:8108'
+        volumes:
+            - typesense-data:/data
+        environment:
+            TYPESENSE_API_KEY: ${TYPESENSE_API_KEY}
+            TYPESENSE_DATA_DIR: /data
+            TYPESENSE_ENABLE_CORS: true
+        healthcheck:
+            test: ['CMD', 'curl', '-f', 'http://localhost:8108/health']
+            interval: 10s
+            timeout: 5s
+            retries: 5
+            start_period: 5s
+
+    database:
+        image: postgres:17
+        volumes:
+            - db-data:/var/lib/postgres
+        environment:
+            POSTGRES_USER: ${DB_USERNAME}
+            POSTGRES_DATABASE: ${DB_NAME}
+            POSTGRES_PASSWORD: ${DB_PASSWORD}
+        ports:
+            - '5432:5432'
+        healthcheck:
+            test: ['CMD', 'postgres', 'ping', '-h', 'localhost']
+            interval: 10s
+            timeout: 5s
+            retries: 5
+            start_period: 5s
+
+volumes:
+    redis-data:
+    typesense-data:
+    db-data:
+    db-data-shadow:
