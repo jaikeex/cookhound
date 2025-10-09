@@ -88,7 +88,6 @@ export const IngredientsListCreate: React.FC<IngredientsListCreateProps> = ({
     const notifyOnChange = useCallback(() => {
         const flat: Ingredient[] = [];
 
-        console.log('NOTIFY');
         // Uncategorized first
         const uncategorized = ingredientsByCategory.get(null) || [];
         flat.push(...uncategorized.map((ing) => ({ ...ing, category: null })));
