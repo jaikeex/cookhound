@@ -82,6 +82,32 @@ export const IngredientsListCreate: React.FC<IngredientsListCreateProps> = ({
     }, [defaultIngredients]);
 
     //|-----------------------------------------------------------------------------------------|//
+    //?                                        INDEXING                                         ?//
+    //|-----------------------------------------------------------------------------------------|//
+
+    const getGlobalIndex = useCallback(
+        (categoryName: string | null, localIndex: number): number => {
+            let globalIndex = 0;
+
+            if (categoryName === null) {
+                return localIndex;
+            }
+
+            globalIndex += (ingredientsByCategory.get(null) || []).length;
+
+            for (const cat of categories) {
+                if (cat === categoryName) {
+                    return globalIndex + localIndex;
+                }
+                globalIndex += (ingredientsByCategory.get(cat) || []).length;
+            }
+
+            return globalIndex;
+        },
+        [categories, ingredientsByCategory]
+    );
+
+    //|-----------------------------------------------------------------------------------------|//
     //?                                         HANDLERS                                        ?//
     //|-----------------------------------------------------------------------------------------|//
 
@@ -207,19 +233,27 @@ export const IngredientsListCreate: React.FC<IngredientsListCreateProps> = ({
              * Use lazy evaluation of window size to prevent re-renders on resize.
              */
             if (typeof window !== 'undefined' && window.innerWidth >= 1140) {
+                // Calculate the global index for the new ingredient
+                const currentIngredients =
+                    ingredientsByCategory.get(categoryName) || [];
+
+                const newLocalIndex = currentIngredients.length;
+
+                const newGlobalIndex = getGlobalIndex(
+                    categoryName,
+                    newLocalIndex
+                );
+
                 // Focus the new ingredient
                 setTimeout(() => {
-                    const currentIngredients =
-                        ingredientsByCategory.get(categoryName) || [];
-
                     const ingredient = document.getElementById(
-                        'ingredient-name-' + currentIngredients.length
+                        'ingredient-name-' + newGlobalIndex
                     );
                     ingredient?.focus();
                 }, 0);
             }
         },
-        [ingredientsByCategory]
+        [ingredientsByCategory, getGlobalIndex]
     );
 
     const handleRemoveIngredient = useCallback(
@@ -323,32 +357,6 @@ export const IngredientsListCreate: React.FC<IngredientsListCreateProps> = ({
     const handleAddUncategorizedIngredient = useCallback(
         () => handleAddIngredient(null),
         [handleAddIngredient]
-    );
-
-    //|-----------------------------------------------------------------------------------------|//
-    //?                                        INDEXING                                         ?//
-    //|-----------------------------------------------------------------------------------------|//
-
-    const getGlobalIndex = useCallback(
-        (categoryName: string | null, localIndex: number): number => {
-            let globalIndex = 0;
-
-            if (categoryName === null) {
-                return localIndex;
-            }
-
-            globalIndex += (ingredientsByCategory.get(null) || []).length;
-
-            for (const cat of categories) {
-                if (cat === categoryName) {
-                    return globalIndex + localIndex;
-                }
-                globalIndex += (ingredientsByCategory.get(cat) || []).length;
-            }
-
-            return globalIndex;
-        },
-        [categories, ingredientsByCategory]
     );
 
     //|-----------------------------------------------------------------------------------------|//
