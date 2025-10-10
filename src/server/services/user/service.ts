@@ -35,6 +35,7 @@ import { areConsentsEqual } from '@/common/utils';
 import { generateProofHash } from '@/server/utils/crypto';
 import { serializeTermsContent } from '@/server/utils/terms';
 import { serializeConsentContent } from '@/server/utils/consent';
+import { hashPassword, verifyPassword } from '@/server/utils/password';
 
 //|=============================================================================================|//
 
@@ -92,8 +93,7 @@ class UserService {
             );
         }
 
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, salt);
+        const hashedPassword = await hashPassword(password);
         const verificationToken = uuid();
 
         const userForCreate: UserForLocalCreate = {
@@ -1011,8 +1011,7 @@ class UserService {
             );
         }
 
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, salt);
+        const hashedPassword = await hashPassword(password);
 
         await db.user.updateOneById(user.id, {
             passwordHash: hashedPassword,
@@ -1093,7 +1092,7 @@ class UserService {
         }
 
         if (user.authType === AuthType.Local) {
-            const matches = await bcrypt.compare(
+            const matches = await verifyPassword(
                 currentPassword,
                 user.passwordHash ?? ''
             );
@@ -1297,7 +1296,7 @@ class UserService {
                 );
             }
 
-            const matches = await bcrypt.compare(
+            const matches = await verifyPassword(
                 password,
                 user.passwordHash ?? ''
             );
