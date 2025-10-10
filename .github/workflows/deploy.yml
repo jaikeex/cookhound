@@ -86,6 +86,7 @@ jobs:
                       OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
                       MAIL_DRIVER=${{ secrets.MAIL_DRIVER }}
                       MAIL_GMAIL_FROM=${{ secrets.MAIL_GMAIL_FROM }}
+                      CONTACT_EMAIL=${{ secrets.CONTACT_EMAIL }}
 
             - name: Deploy on droplet
               uses: appleboy/ssh-action@v1

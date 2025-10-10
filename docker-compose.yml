@@ -47,6 +47,7 @@ services:
             - OPENAI_API_KEY=${OPENAI_API_KEY}
             - MAIL_DRIVER=${MAIL_DRIVER}
             - MAIL_GMAIL_FROM=${MAIL_GMAIL_FROM}
+            - CONTACT_EMAIL=${CONTACT_EMAIL}
         volumes:
             - /var/log/cookhound:/var/log/cookhound
         depends_on:
@@ -100,6 +101,7 @@ services:
             - OPENAI_API_KEY=${OPENAI_API_KEY}
             - MAIL_DRIVER=${MAIL_DRIVER}
             - MAIL_GMAIL_FROM=${MAIL_GMAIL_FROM}
+            - CONTACT_EMAIL=${CONTACT_EMAIL}
         volumes:
             - /var/log/cookhound:/var/log/cookhound
         depends_on:
