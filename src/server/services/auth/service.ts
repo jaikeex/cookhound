@@ -23,11 +23,7 @@ import { RequestContext } from '@/server/utils/reqwest/context';
 import { ApplicationErrorCode } from '@/server/error/codes';
 import { createUserDTO } from '@/server/services/user/utils';
 import { assertAuthenticated } from '@/server/utils/reqwest';
-import {
-    hashPassword,
-    verifyPassword,
-    needsRehash
-} from '@/server/utils/password';
+import { verifyPassword } from '@/server/utils/crypto';
 
 //|=============================================================================================|//
 
@@ -111,20 +107,7 @@ class AuthService {
             );
         }
 
-        // Automatically rehash bcrypt passwords to argon2 on successful login
-        if (needsRehash(user.passwordHash)) {
-            log.info('login - rehashing password from bcrypt to argon2', {
-                userId: user.id
-            });
-
-            const newHash = await hashPassword(password);
-            await db.user.updateOneById(user.id, {
-                passwordHash: newHash,
-                lastLogin: new Date()
-            });
-        } else {
-            await db.user.updateOneById(user.id, { lastLogin: new Date() });
-        }
+        await db.user.updateOneById(user.id, { lastLogin: new Date() });
 
         const token = await sessions.createSession(user.id, {
             ipAddress: RequestContext.getIp(),

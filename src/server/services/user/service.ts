@@ -8,8 +8,8 @@ import type {
     UserForGoogleCreatePayload,
     UserPreferences
 } from '@/common/types';
-import bcrypt from 'bcrypt';
 import { v4 as uuid } from 'uuid';
+import { createHash } from 'crypto';
 import { mailService } from '@/server/services';
 import {
     AuthErrorForbidden,
@@ -35,7 +35,7 @@ import { areConsentsEqual } from '@/common/utils';
 import { generateProofHash } from '@/server/utils/crypto';
 import { serializeTermsContent } from '@/server/utils/terms';
 import { serializeConsentContent } from '@/server/utils/consent';
-import { hashPassword, verifyPassword } from '@/server/utils/password';
+import { hashPassword, verifyPassword } from '@/server/utils/crypto';
 
 //|=============================================================================================|//
 
@@ -1320,10 +1320,9 @@ class UserService {
 
         await db.user.markForDeletion(userId, scheduledFor);
 
-        const proofHash = await bcrypt.hash(
-            `${userId}-${scheduledFor.toISOString()}`,
-            10
-        );
+        const proofHash = createHash('sha256')
+            .update(`${userId}-${scheduledFor.toISOString()}`)
+            .digest('hex');
 
         await db.accountDeletionRequest.createOne({
             user: { connect: { id: userId } },

@@ -2871,15 +2871,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/bcrypt@npm:^6.0.0":
-  version: 6.0.0
-  resolution: "@types/bcrypt@npm:6.0.0"
-  dependencies:
-    "@types/node": "npm:*"
-  checksum: 10c0/48b66408838f5eb59791da5a77260cef59a5291ce0945f2caa3b5a6158c44b321b684b4aa7dce771852c63271c766cadd587374273451b300377a17015c1d51d
-  languageName: node
-  linkType: hard
-
 "@types/cookie@npm:^1.0.0":
   version: 1.0.0
   resolution: "@types/cookie@npm:1.0.0"
@@ -3818,17 +3809,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bcrypt@npm:^6.0.0":
-  version: 6.0.0
-  resolution: "bcrypt@npm:6.0.0"
-  dependencies:
-    node-addon-api: "npm:^8.3.0"
-    node-gyp: "npm:latest"
-    node-gyp-build: "npm:^4.8.4"
-  checksum: 10c0/006e69d4b3f0f021051fa9d998a768721a51dde28e7848e3e775ab608ba3476b25fa9262a7082ececbb0d493b0b6ca83673a6f3810b114fe90ec1bc6ae4b35b2
-  languageName: node
-  linkType: hard
-
 "binary-extensions@npm:^2.0.0":
   version: 2.2.0
   resolution: "binary-extensions@npm:2.2.0"
@@ -4311,7 +4291,6 @@ __metadata:
     "@svgr/webpack": "npm:^8.1.0"
     "@tanstack/react-query": "npm:^5.89.0"
     "@types/argon2": "npm:^0.15.4"
-    "@types/bcrypt": "npm:^6.0.0"
     "@types/cookie": "npm:^1.0.0"
     "@types/jsonwebtoken": "npm:^9"
     "@types/node": "npm:^22.6.1"
@@ -4322,7 +4301,6 @@ __metadata:
     "@typescript-eslint/parser": "npm:^7.7.1"
     argon2: "npm:^0.44.0"
     autoprefixer: "npm:^10.4.21"
-    bcrypt: "npm:^6.0.0"
     bullmq: "npm:^5.58.5"
     class-transformer: "npm:^0.5.1"
     cookie: "npm:^1.0.2"
@@ -7647,15 +7625,6 @@ __metadata:
   version: 3.1.1
   resolution: "node-abort-controller@npm:3.1.1"
   checksum: 10c0/f7ad0e7a8e33809d4f3a0d1d65036a711c39e9d23e0319d80ebe076b9a3b4432b4d6b86a7fab65521de3f6872ffed36fc35d1327487c48eb88c517803403eda3
-  languageName: node
-  linkType: hard
-
-"node-addon-api@npm:^8.3.0":
-  version: 8.3.1
-  resolution: "node-addon-api@npm:8.3.1"
-  dependencies:
-    node-gyp: "npm:latest"
-  checksum: 10c0/e28f1c5094130ecc3a0bf882e0385e74cac9c5112d35287dbce369959551ab7ca4d1f1a69af737107c894c14b4063dd5002e2b3c16a27035d025bb06eefee058
   languageName: node
   linkType: hard
 
