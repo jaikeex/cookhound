@@ -18,7 +18,8 @@
         "migrate": "npx prisma migrate dev --name init",
         "generate": "npx prisma generate --sql",
         "setup-typesense": "node scripts/setup-typesense-keys.js",
-        "seed": "npx prisma db seed"
+        "seed": "npx prisma db seed",
+        "redis:flush": "node scripts/flush-redis.js"
     },
     "dependencies": {
         "@babel/runtime": "^7.28.4",
