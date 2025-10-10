@@ -35,7 +35,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
                 priority: 1.0,
                 alternates: {
                     languages: {
-                        en: `${baseUrl}`,
                         cs: `${baseUrl}`
                     }
                 }
@@ -47,7 +46,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
                 priority: 0.8,
                 alternates: {
                     languages: {
-                        en: `${baseUrl}/search`,
                         cs: `${baseUrl}/search`
                     }
                 }
@@ -59,8 +57,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
                 priority: 0.5,
                 alternates: {
                     languages: {
-                        en: `${baseUrl}/terms`,
                         cs: `${baseUrl}/terms`
+                    }
+                }
+            },
+            {
+                url: `${baseUrl}/privacy`,
+                lastModified: new Date(),
+                changeFrequency: 'monthly',
+                priority: 0.5,
+                alternates: {
+                    languages: {
+                        cs: `${baseUrl}/privacy`
                     }
                 }
             }
@@ -75,7 +83,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             priority: 0.9,
             alternates: {
                 languages: {
-                    en: `${baseUrl}/recipe/${recipe.displayId}`,
                     cs: `${baseUrl}/recipe/${recipe.displayId}`
                 }
             }
@@ -93,7 +100,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
                 priority: 0.7,
                 alternates: {
                     languages: {
-                        en: `${baseUrl}/cookbooks/${cookbook.displayId}`,
                         cs: `${baseUrl}/cookbooks/${cookbook.displayId}`
                     }
                 }
@@ -109,7 +115,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             priority: 0.6,
             alternates: {
                 languages: {
-                    en: `${baseUrl}/user/${user.id}`,
                     cs: `${baseUrl}/user/${user.id}`
                 }
             }
