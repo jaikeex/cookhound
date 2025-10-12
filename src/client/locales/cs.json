@@ -107,6 +107,8 @@
     "app.general.delete": "Smazat",
     "app.general.search-no-results": "Vyhledávání nepřineslo žádné výsledky. Zkuste to prosím znovu.",
     "app.general.my-account": "Můj účet",
+    "app.general.banner.bold": "Hledejte",
+    "app.general.banner.normal": "v (zatím) desítce skvělých receptů",
     "app.shopping-list.edited": "Nákupní seznam byl aktualizován",
     "app.shopping-list.delete-recipe-shopping-list": "Opravdu chcete odstranit tento recept ze seznamu?",
     "app.shopping-list.portion-size-tooltip": "Počet procí: {{portionSize}}",

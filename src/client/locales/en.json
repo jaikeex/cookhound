@@ -114,6 +114,8 @@
     "app.general.max": "Maximum",
     "app.general.delete": "Delete",
     "app.general.my-account": "My account",
+    "app.general.banner.bold": "Search",
+    "app.general.banner.normal": "(for now) tens of great recipes",
     "app.profile.dashboard": "Profile",
     "app.profile.recipes": "Recipes",
     "app.profile.cookbooks": "Cookbooks",

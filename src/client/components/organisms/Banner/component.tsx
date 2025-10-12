@@ -1,9 +1,12 @@
+'use client';
+
 import React from 'react';
 import Image from 'next/image';
 import { classNames } from '@/client/utils';
 import { RecipeSearchInput } from '@/client/components';
 import { type ChangeEvent } from 'react';
 import { Typography } from '@/client/components';
+import { useLocale } from '@/client/store/I18nContext';
 
 type BannerProps = Readonly<{
     defaultSearchValue?: string;
@@ -22,6 +25,8 @@ export const Banner: React.FC<BannerProps> = ({
     onSearch,
     searchValue
 }) => {
+    const { t } = useLocale();
+
     return (
         <React.Fragment>
             <div
@@ -42,8 +47,10 @@ export const Banner: React.FC<BannerProps> = ({
                 <div className="relative z-20 flex flex-col items-center justify-center h-full px-4 text-center">
                     <div className="flex flex-col gap-4 mt-12 mb-3 md:mt-16 md:mb-6">
                         <Typography variant="body-sm" className="max-w-md">
-                            <span className="font-bold">Vymysli</span> něco co
-                            se sem bude hodit napsat...
+                            <span className="font-bold">
+                                {t('app.general.banner.bold')}
+                            </span>{' '}
+                            {t('app.general.banner.normal')}
                         </Typography>
                     </div>
 
@@ -56,7 +63,7 @@ export const Banner: React.FC<BannerProps> = ({
                             name="search"
                             onChange={onChange}
                             onSearch={onSearch}
-                            placeholder="Search for a recipe"
+                            placeholder={t('app.recipe.search.placeholder')}
                             value={searchValue}
                         />
                     </div>
