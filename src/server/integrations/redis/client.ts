@@ -74,7 +74,7 @@ class RedisClient {
 
     async set(
         key: string,
-        value: any,
+        value: unknown,
         ttlInSeconds: number = Number(ENV_CONFIG_PRIVATE.REDIS_TTL)
     ): Promise<void> {
         await this.connect();

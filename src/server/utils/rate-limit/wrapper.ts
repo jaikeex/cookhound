@@ -22,13 +22,18 @@ export interface RateLimitOptions extends RateLimitConfig {
 // Middleware-friendly curried signature: withRateLimit(options)(handler)
 export function withRateLimit(
     options: RateLimitOptions
-): <T extends (req: NextRequest, context?: any) => Promise<Response>>(
+): <T extends (req: NextRequest, context?: unknown) => Promise<Response>>(
     handler: T
 ) => T {
-    return <T extends (req: NextRequest, context?: any) => Promise<Response>>(
+    return <
+        T extends (req: NextRequest, context?: unknown) => Promise<Response>
+    >(
         handler: T
     ): T => {
-        return (async (req: NextRequest, context?: any): Promise<Response> => {
+        return (async (
+            req: NextRequest,
+            context?: unknown
+        ): Promise<Response> => {
             logger.info('withRateLimit - guarded request received', {
                 path: req.nextUrl.pathname,
                 method: req.method

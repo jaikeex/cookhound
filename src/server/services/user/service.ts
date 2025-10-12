@@ -750,8 +750,8 @@ class UserService {
         // The Prisma projection returns `preferences` as `{ settings: UserPreferences }`.
         // Flatten it, so we only merge plain key-value pairs.
         const currentSettings: UserPreferences =
-            user.preferences && 'settings' in (user.preferences as any)
-                ? ((user.preferences as any).settings as UserPreferences)
+            user.preferences && 'settings' in user.preferences
+                ? (user.preferences.settings as UserPreferences)
                 : (user.preferences as UserPreferences);
 
         const preferencesForUpdate = {

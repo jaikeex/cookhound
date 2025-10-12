@@ -434,7 +434,7 @@ export class QueueManager {
             defaultJobOptions: {
                 removeOnComplete: true,
                 removeOnFail: 100,
-                ...(options as any).defaultJobOptions, // may come from queueOptions
+                ...options.defaultJobOptions, // may come from queueOptions
                 ...defaultJobOptions
             }
         };
@@ -490,7 +490,7 @@ export class QueueManager {
                 }
 
                 try {
-                    return await jobDef.processor(job as any);
+                    return await jobDef.processor(job);
                 } catch (error: unknown) {
                     log.errorWithStack(
                         'getOrCreateWorker - job processor threw',

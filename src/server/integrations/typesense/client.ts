@@ -67,7 +67,7 @@ class TypesenseClient {
         this.instanceId = `${process.pid}-${randomUUID}`;
 
         try {
-            this.client = new (Typesense as any).Client({
+            this.client = new Typesense.Client({
                 nodes: [
                     {
                         host: ENV_CONFIG_PUBLIC.TYPESENSE_HOST,

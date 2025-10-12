@@ -215,7 +215,7 @@ export function createMockRequest(
         headers: mockHeaders,
         nextUrl: mockUrl,
         ip: headers['x-real-ip'] || '127.0.0.1'
-    } as any;
+    };
 }
 
 export function createMockSession(

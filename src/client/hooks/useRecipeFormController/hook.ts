@@ -57,25 +57,29 @@ export const useRecipeFormController = ({
     const { mutateAsync: uploadImageMutation, isPending: isUploadingImage } =
         chqc.file.useUploadRecipeImage();
 
-    const { mutate: submitRecipe, isPending } = isEdit
-        ? chqc.recipe.useUpdateRecipe({
-              onSuccess: (recipe) => handleSubmitSuccess(recipe as RecipeDTO),
-              onError: (error) => {
-                  setFormErrors({
-                      server:
-                          (error?.message as I18nMessage) || 'app.error.default'
-                  });
-              }
-          })
-        : chqc.recipe.useCreateRecipe({
-              onSuccess: (recipe) => handleSubmitSuccess(recipe as RecipeDTO),
-              onError: (error) => {
-                  setFormErrors({
-                      server:
-                          (error?.message as I18nMessage) || 'app.error.default'
-                  });
-              }
-          });
+    const { mutate: createRecipe, isPending: isCreating } =
+        chqc.recipe.useCreateRecipe({
+            onSuccess: (recipe) => handleSubmitSuccess(recipe as RecipeDTO),
+            onError: (error) => {
+                setFormErrors({
+                    server:
+                        (error?.message as I18nMessage) || 'app.error.default'
+                });
+            }
+        });
+
+    const { mutate: updateRecipe, isPending: isUpdating } =
+        chqc.recipe.useUpdateRecipe({
+            onSuccess: (recipe) => handleSubmitSuccess(recipe as RecipeDTO),
+            onError: (error) => {
+                setFormErrors({
+                    server:
+                        (error?.message as I18nMessage) || 'app.error.default'
+                });
+            }
+        });
+
+    const isPending = isCreating || isUpdating;
 
     const hasUnsavedChanges = changedFields.length > 0 && !isPending;
     const { allowNavigation, safePush } = useUnsavedChangesWarning({
@@ -180,15 +184,22 @@ export const useRecipeFormController = ({
             };
 
             if (isEdit && initialRecipe) {
-                (submitRecipe as any)({
+                updateRecipe({
                     id: `${initialRecipe.id}`,
                     recipe: payload
                 });
             } else {
-                (submitRecipe as any)(payload);
+                createRecipe(payload);
             }
         },
-        [initialRecipe, isEdit, locale, submitRecipe, uploadRecipeImage]
+        [
+            initialRecipe,
+            isEdit,
+            locale,
+            createRecipe,
+            updateRecipe,
+            uploadRecipeImage
+        ]
     );
 
     //~-----------------------------------------------------------------------------------------~//

@@ -27,6 +27,7 @@ import { JOB_NAMES } from '@/server/queues/jobs/names';
 import { ApplicationErrorCode } from '@/server/error/codes';
 import { openaiApiService } from '@/server/services/openai-api/service';
 import type { RecipeFlagDTO } from '@/common/types/flags/recipe-flag';
+import { getFrontPageRecipes } from '@prisma/client/sql';
 
 //|=============================================================================================|//
 
@@ -500,7 +501,7 @@ class RecipeService {
         // a full batch is obtained or until the last threshold has been used.
         const MIN_TIMES_RATED_THRESHOLDS = [10, 5, 2, 1, 0];
 
-        let results: any[] = [];
+        let results: getFrontPageRecipes.Result[] = [];
 
         for (const threshold of MIN_TIMES_RATED_THRESHOLDS) {
             results = await db.recipe.getManyForFrontPage(

@@ -60,9 +60,9 @@ const logAndThrowExtension = Prisma.defineExtension({
                         error &&
                         typeof error === 'object' &&
                         'code' in error &&
-                        typeof (error as any)?.code === 'string'
+                        typeof error?.code === 'string'
                     ) {
-                        switch ((error as any).code) {
+                        switch (error.code) {
                             case 'P2002': // Unique constraint failed
                             case 'P2003': // FK constraint failed
                                 infraCode =

@@ -6,7 +6,7 @@ type CreateRecipeStore = Readonly<{
     recipeObject: RecipeDTO | null;
     suggestionsUsed: number;
     setRecipeObject: (recipeObject: RecipeDTO) => void;
-    updateRecipeObject: (name: string, value: any) => void;
+    updateRecipeObject: (name: string, value: unknown) => void;
     incrementSuggestions: () => void;
     getRemainingsuggestions: () => number;
     canSuggest: () => boolean;
@@ -24,7 +24,7 @@ const initializeStore = () =>
 
         setRecipeObject: (recipeObject: RecipeDTO) => set({ recipeObject }),
 
-        updateRecipeObject: (name: string, value: any) =>
+        updateRecipeObject: (name: string, value: unknown) =>
             set((state) => {
                 if (!state.recipeObject) return { recipeObject: null };
                 return {

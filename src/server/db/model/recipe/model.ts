@@ -390,8 +390,7 @@ class RecipeModel {
                     let ingredient = await tx.ingredient.findFirst({
                         where: {
                             name: ingredientData.name,
-                            language:
-                                (data.recipe as any).language || DEFAULT_LOCALE
+                            language: data.recipe.language || DEFAULT_LOCALE
                         }
                     });
 
@@ -399,9 +398,7 @@ class RecipeModel {
                         ingredient = await tx.ingredient.create({
                             data: {
                                 name: ingredientData.name,
-                                language:
-                                    (data.recipe as any).language ||
-                                    DEFAULT_LOCALE
+                                language: data.recipe.language || DEFAULT_LOCALE
                             }
                         });
                     }

@@ -52,14 +52,11 @@ export function LogServiceMethod(
                 ? Object.fromEntries(names.map((n, i) => [n, args[i]]))
                 : { args };
 
-            (log as any)[attemptLevel](
-                `${String(propertyKey)} - attempt`,
-                payload
-            );
+            log[attemptLevel](`${String(propertyKey)} - attempt`, payload);
 
             const result = await original.apply(this, args);
 
-            (log as any)[successLevel](`${String(propertyKey)} - success`);
+            log[successLevel](`${String(propertyKey)} - success`);
 
             return result;
         };

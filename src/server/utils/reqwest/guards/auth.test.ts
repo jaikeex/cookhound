@@ -89,7 +89,7 @@ describe('Authorization Guards', () => {
         it('should accept custom error parameter', () => {
             mockRequestContext.getUserId.mockReturnValue(null);
             const customError = new AuthErrorUnauthorized(
-                'auth.error.user-not-found' as any
+                'auth.error.user-not-found'
             );
 
             expect(() => assertAuthenticated(customError)).toThrow();
@@ -130,7 +130,7 @@ describe('Authorization Guards', () => {
         it('should accept custom error parameter', () => {
             mockRequestContext.getUserRole.mockReturnValue(UserRole.User);
             const customError = new AuthErrorUnauthorized(
-                'auth.error.user-not-found' as any
+                'auth.error.user-not-found'
             );
 
             expect(() => assertAnonymous(customError)).toThrow();
@@ -173,7 +173,7 @@ describe('Authorization Guards', () => {
         it('should accept custom error parameter', () => {
             mockRequestContext.getUserId.mockReturnValue(1);
             const customError = new AuthErrorUnauthorized(
-                'auth.error.user-not-found' as any
+                'auth.error.user-not-found'
             );
 
             expect(() => assertSelf(2, customError)).toThrow();
@@ -231,7 +231,7 @@ describe('Authorization Guards', () => {
             mockRequestContext.getUserId.mockReturnValue(1);
             mockRequestContext.getUserRole.mockReturnValue(UserRole.User);
             const customError = new AuthErrorUnauthorized(
-                'auth.error.user-not-found' as any
+                'auth.error.user-not-found'
             );
 
             expect(() => assertSelfOrAdmin(2, customError)).toThrow();

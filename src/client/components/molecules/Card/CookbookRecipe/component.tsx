@@ -46,7 +46,7 @@ export const CookbookRecipeCard: React.FC<CookbookRecipeCardProps> = ({
                 });
 
                 alert({
-                    message: t('app.success.remove-recipe' as any),
+                    message: t('app.success.remove-recipe'),
                     variant: 'success'
                 });
 

@@ -24,7 +24,7 @@ export type RecipeFormShellProps = Readonly<{
     isPending: boolean;
     isUploadingImage: boolean;
     isPreviewOpen: boolean;
-    handleFormChange: (name: string, value: any) => void;
+    handleFormChange: (name: string, value: unknown) => void;
     formErrors: RecipeFormErrors;
     formRef: React.RefObject<HTMLFormElement | null>;
     handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;

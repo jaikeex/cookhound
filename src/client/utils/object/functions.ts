@@ -3,8 +3,8 @@ export function deepClone<T>(value: T): T {
     // circular references, Dates, RegExps, Maps, Sets, ArrayBuffers, etc.
     // Most modern browsers (Chrome 98+, Firefox 94+, Safari 15.4+) and Node.js 17+ support it.
     // See https://developer.mozilla.org/en-US/docs/Web/API/structuredClone
-    if (typeof (globalThis as any).structuredClone === 'function') {
-        return (globalThis as any).structuredClone(value);
+    if (typeof globalThis.structuredClone === 'function') {
+        return globalThis.structuredClone(value);
     }
 
     // ---------------------------------------------------------------------------
@@ -77,7 +77,7 @@ export function deepClone<T>(value: T): T {
         // ArrayBuffer & TypedArrays
         if (ArrayBuffer.isView(input)) {
             // Typed arrays (e.g., Uint8Array)
-            return new (input.constructor as any)(input as any);
+            return new (input.constructor as any)(input);
         }
         if (input instanceof ArrayBuffer) {
             return input.slice(0);
@@ -90,7 +90,7 @@ export function deepClone<T>(value: T): T {
 
         // Copy own enumerable string & symbol keys
         for (const key of Reflect.ownKeys(input)) {
-            obj[key] = cloneInternal((input as any)[key]);
+            obj[key] = cloneInternal(input[key]);
         }
 
         return obj;
@@ -268,7 +268,7 @@ export function deepEquals(a: AnyObject, b: AnyObject): boolean {
 
         // Deep compare property values
         for (const k of keysX) {
-            if (!equalsInternal((x as any)[k], (y as any)[k])) {
+            if (!equalsInternal(x[k], y[k])) {
                 return false;
             }
         }

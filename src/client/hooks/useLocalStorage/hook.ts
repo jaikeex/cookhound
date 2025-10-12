@@ -64,7 +64,7 @@ export const useLocalStorage = <T>(
      * should call this function when it does.
      */
     const handleError = useCallback(
-        (err: any) => {
+        (err: unknown) => {
             const error = err instanceof Error ? err : new Error(String(err));
 
             /**

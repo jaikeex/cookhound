@@ -59,7 +59,7 @@ export const Trash: React.FC<TrashProps> = ({
                 {ingredients.map((ingredient) => (
                     <DraggableIngredientRow
                         key={ingredient.id}
-                        ingredient={ingredient as unknown as any}
+                        ingredient={ingredient}
                         dragIndex={ingredient.id}
                         onDragEnd={onDragEnd(ingredient, ingredient.recipeId)}
                     />

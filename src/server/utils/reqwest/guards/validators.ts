@@ -140,7 +140,7 @@ export function validateParams<T>(
 /**
  * Validates request payload against a zod schema.
  */
-export function validatePayload<T>(schema: z.ZodType<T>, payload: any): T {
+export function validatePayload<T>(schema: z.ZodType<T>, payload: unknown): T {
     const validationResult = schema.safeParse(payload);
 
     if (!validationResult.success) {

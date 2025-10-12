@@ -770,10 +770,8 @@ describe('UserService', () => {
         });
 
         it('should return proper DTO structure', async () => {
-            mockDbUser.getOneById.mockResolvedValue(validUser as any);
-            mockDbUser.createUserCookieConsent.mockResolvedValue(
-                mockConsent as any
-            );
+            mockDbUser.getOneById.mockResolvedValue(validUser);
+            mockDbUser.createUserCookieConsent.mockResolvedValue(mockConsent);
 
             const result = await userService.createUserCookieConsent(
                 validUser.id,

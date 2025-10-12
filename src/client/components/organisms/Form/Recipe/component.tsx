@@ -25,7 +25,7 @@ type RecipeFormProps = Readonly<{
     defaultValues?: RecipeDTO | null;
     errors?: RecipeFormErrors;
     mode: RecipeFormMode;
-    onChange?: (name: string, value: any) => void;
+    onChange?: (name: string, value: unknown) => void;
     pending?: boolean;
 }>;
 
