@@ -6,6 +6,20 @@ import { CS_TAG_CATEGORIES } from '../src/common/constants/tags/cs';
 const prisma = new PrismaClient();
 
 async function main() {
+    // Create system user for anonymized content
+    await prisma.$executeRaw`
+        INSERT INTO users (id, username, email, auth_type, role, status, email_verified, created_at, updated_at)
+        VALUES (-1, 'anonymous', 'anonymous@cookhound.com', 'local', 'user', 'active', true, NOW(), NOW())
+        ON CONFLICT (id) DO NOTHING;
+    `;
+
+    // Reset the sequence to ensure new users start from 10, not -1
+    await prisma.$executeRaw`
+        SELECT setval(pg_get_serial_sequence('users', 'id'), GREATEST(10, (SELECT MAX(id) FROM users WHERE id > 0)), true);
+    `;
+
+    console.log('✅ System user created (id: -1)');
+
     // Build quick lookup for translations based on index order across category arrays
     const getTranslation = (
         category: string,
