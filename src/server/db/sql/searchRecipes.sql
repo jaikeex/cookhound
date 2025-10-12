@@ -26,6 +26,6 @@ WHERE
         OR instr.text ILIKE '%' || $2 || '%'
     )
 ORDER BY
-    r.rating DESC,
+    r.rating DESC NULLS LAST,
     r.created_at DESC
 LIMIT $3 OFFSET $4; 

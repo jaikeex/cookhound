@@ -17,6 +17,6 @@ WHERE
     r.times_rated >= $1 AND r.language = $2
     AND rf.recipe_id IS NULL
 ORDER BY
-    r.rating DESC,
+    r.rating DESC NULLS LAST,
     r.created_at DESC
 LIMIT  $3 OFFSET $4; 
