@@ -5,5 +5,8 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 export default defineConfig({
-    plugins: [tsconfigPaths()]
+    plugins: [tsconfigPaths()],
+    test: {
+        exclude: ['**/node_modules/**', '**/dist/**', '**/e2e/**']
+    }
 });

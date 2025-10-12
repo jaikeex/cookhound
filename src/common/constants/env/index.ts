@@ -73,3 +73,7 @@ export const ENV_CONFIG_PRIVATE = createConfig(
     'ENV_CONFIG_PRIVATE',
     process.env.NEXT_PUBLIC_ENV !== 'test' && typeof window === 'undefined'
 );
+
+export const isE2ETestMode = (): boolean => {
+    return process.env.E2E_TEST_MODE === 'true';
+};

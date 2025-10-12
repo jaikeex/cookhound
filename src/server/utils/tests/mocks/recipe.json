@@ -1,0 +1,169 @@
+{
+    "id": 57,
+    "displayId": "fd43dc6f-95a3-496b-8be5-f82e84815ad3",
+    "title": "Svíčková na smetaně",
+    "authorId": 1,
+    "language": "cs",
+    "time": 150,
+    "portionSize": 4,
+    "notes": "Tento postup se od jiných receptů na svíčkovou liší tím, že se výpek ochutí již na začátku.",
+    "imageUrl": "https://storage.googleapis.com/cookhound-recipe-images/recipe-image-8620917f-36c6-4196-9e36-ca99cb114a3f",
+    "rating": 4.5,
+    "tags": [
+        {
+            "id": 18,
+            "name": "arabská",
+            "categoryId": 1
+        },
+        {
+            "id": 19,
+            "name": "česká",
+            "categoryId": 1
+        },
+        {
+            "id": 4,
+            "name": "čínská",
+            "categoryId": 1
+        },
+        {
+            "id": 52,
+            "name": "houby",
+            "categoryId": 4
+        },
+        {
+            "id": 5,
+            "name": "mexická",
+            "categoryId": 1
+        },
+        {
+            "id": 69,
+            "name": "omáčka",
+            "categoryId": 5
+        },
+        {
+            "id": 58,
+            "name": "rýže",
+            "categoryId": 4
+        },
+        {
+            "id": 55,
+            "name": "semínka",
+            "categoryId": 4
+        },
+        {
+            "id": 81,
+            "name": "smažení",
+            "categoryId": 5
+        },
+        {
+            "id": 56,
+            "name": "těstoviny",
+            "categoryId": 4
+        }
+    ],
+    "timesRated": 2,
+    "timesViewed": 8,
+    "ingredients": [
+        {
+            "id": 1,
+            "name": "hovězí maso",
+            "category": null,
+            "quantity": "800 g",
+            "categoryOrder": null
+        },
+        {
+            "id": 2,
+            "name": "kořenová zelenina",
+            "category": null,
+            "quantity": "300 g",
+            "categoryOrder": null
+        },
+        {
+            "id": 3,
+            "name": "cibule",
+            "category": null,
+            "quantity": "1 ks",
+            "categoryOrder": null
+        },
+        {
+            "id": 4,
+            "name": "hořčice",
+            "category": null,
+            "quantity": "50 g",
+            "categoryOrder": null
+        },
+        {
+            "id": 5,
+            "name": "cukr",
+            "category": null,
+            "quantity": "2 lžíce",
+            "categoryOrder": null
+        },
+        {
+            "id": 6,
+            "name": "ocet",
+            "category": null,
+            "quantity": "1 lžíce",
+            "categoryOrder": null
+        },
+        {
+            "id": 7,
+            "name": "máslo",
+            "category": null,
+            "quantity": "20 g",
+            "categoryOrder": null
+        },
+        {
+            "id": 8,
+            "name": "slanina",
+            "category": null,
+            "quantity": "100 g",
+            "categoryOrder": null
+        },
+        {
+            "id": 9,
+            "name": "mouka",
+            "category": null,
+            "quantity": "1 lžíce",
+            "categoryOrder": null
+        },
+        {
+            "id": 10,
+            "name": "smetana ke šlehání",
+            "category": null,
+            "quantity": "250 ml",
+            "categoryOrder": null
+        },
+        {
+            "id": 11,
+            "name": "bobkový list",
+            "category": "Na dochucení",
+            "quantity": "3 ks",
+            "categoryOrder": 1
+        },
+        {
+            "id": 12,
+            "name": "nové koření",
+            "category": "Na dochucení",
+            "quantity": "5 ks",
+            "categoryOrder": 1
+        },
+        {
+            "id": 13,
+            "name": "celý pepř",
+            "category": "Na dochucení",
+            "quantity": "5 ks",
+            "categoryOrder": 1
+        }
+    ],
+    "instructions": [
+        "Maso prošpikujeme hranolky slaniny (jde to skvěle, pokud ji dáme na půl hodiny do mrazničky), osolíme a opečeme na oleji, nebo na oleji s máslem (máslo se nebude připalovat).",
+        "Poté maso vyjmeme a na výpeku opečeme nahrubo nastrouhanou zeleninu a cibuli. Jakmile mrkev pustí barvu, přidáme cukr a necháme zkaramelizovat.",
+        "Přidáme hořčici, koření, přilijeme ocet, vložíme maso a zalijeme vroucím vývarem. Vložíme hrnec či pekáč i s poklicí do trouby a pečeme do změknutí masa (přibližně 1,5-2 hodiny ve středně vyhřáté troubě). Poté maso i koření vyjmeme, maso nakrájíme a omáčku rozmixujeme.",
+        "Je-li třeba, zahustíme omáčku hladkou moukou, rozkvedlanou v mléce a provaříme (mouku je třeba provařit minimálně po dobu 20 minut), podle potřeby dosolíme.",
+        "Omáčku zjemníme smetanou, dochutíme citronem a plátkem másla, již nevaříme. Podáváme s houskovým knedlíkem, na talíři dozdobíme kouskem citronu a brusinkami."
+    ],
+    "flags": null,
+    "createdAt": "2025-10-09T18:26:57.262Z",
+    "updatedAt": "2025-10-09T22:57:58.974Z"
+}
