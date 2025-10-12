@@ -14,6 +14,8 @@
         "dev-worker": "tsx src/server/queues/worker.ts",
         "prepare": "husky",
         "test": "vitest run",
+        "test:e2e": "playwright test",
+        "test:e2e:ui": "playwright test --ui",
         "lint": "prettier --write . && eslint . --fix",
         "migrate": "npx prisma migrate dev --name init",
         "generate": "npx prisma generate --sql",
@@ -48,6 +50,7 @@
         "zustand": "^5.0.8"
     },
     "devDependencies": {
+        "@playwright/test": "^1.56.0",
         "@svgr/webpack": "^8.1.0",
         "@types/argon2": "^0.15.4",
         "@types/cookie": "^1.0.0",

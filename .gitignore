@@ -47,5 +47,14 @@ next-env.d.ts
 ssh
 
 docs/**.md
+README-local.md
 
 .cursor/plans/
+
+# Playwright
+node_modules/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
