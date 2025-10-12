@@ -2,11 +2,8 @@ import { Logger } from '@/server/logger';
 import type { LogLevel } from '@/server/logger/types';
 
 export interface LogOptions {
-    /** Log level for the "attempt" entry. Default: 'trace' */
     attempt?: LogLevel;
-    /** Log level for the "success" entry. Default: 'trace' */
     success?: LogLevel;
-    /** Optional names for method parameters in log output */
     names?: string[];
 }
 

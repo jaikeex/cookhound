@@ -10,7 +10,7 @@ const log = Logger.getInstance('api');
  */
 // This is intended as to not break any current usage, also might have a use in the future.
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export async function logRequest(req: Request) {
+export async function logRequest() {
     try {
         const requestPath = RequestContext.getRequestPath();
         const requestMethod = RequestContext.getRequestMethod();
