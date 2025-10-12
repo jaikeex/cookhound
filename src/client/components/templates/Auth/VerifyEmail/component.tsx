@@ -26,7 +26,10 @@ export const VerifyEmailTemplate: React.FC<VerifyEmailTemplateProps> = ({
     }, [resendVerificationEmail]);
 
     return (
-        <div className="w-full max-w-md mx-auto text-center space-y-8 flex items-center flex-col">
+        <div
+            className="w-full max-w-md mx-auto text-center space-y-8 flex items-center flex-col"
+            data-testid="verify-email-message"
+        >
             <Typography>
                 {newParam
                     ? t('auth.register.success.title')
@@ -42,6 +45,7 @@ export const VerifyEmailTemplate: React.FC<VerifyEmailTemplateProps> = ({
             <ButtonWithCooldown
                 cooldown={60000}
                 onClick={handleResendVerificationEmail}
+                data-testid="verify-email-resend"
             >
                 {t('app.general.resend-email')}
             </ButtonWithCooldown>

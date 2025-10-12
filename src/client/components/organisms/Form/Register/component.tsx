@@ -65,6 +65,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
                 id="username"
                 label={t('auth.form.username')}
                 name="username"
+                data-testid="register-username"
             />
 
             <TextInput
@@ -72,6 +73,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
                 id="email"
                 label={t('auth.form.email')}
                 name="email"
+                data-testid="register-email"
             />
 
             <PasswordInput
@@ -79,6 +81,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
                 id="password"
                 label={t('auth.form.password')}
                 name="password"
+                data-testid="register-password"
             />
 
             <PasswordInput
@@ -86,6 +89,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
                 id="repeat-password"
                 label={t('auth.form.repeat-password')}
                 name="repeat-password"
+                data-testid="register-repeat-password"
             />
 
             <FormCheckbox
@@ -94,6 +98,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
                 id="terms-accepted"
                 name="terms-accepted"
                 label={termsLabel}
+                data-testid="register-terms"
             />
 
             <ErrorList className="self-start" errors={errorsToDisplay} />
@@ -103,6 +108,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
                 disabled={pending}
                 label={t('auth.form.register')}
                 pending={pending}
+                data-testid="register-submit"
             />
 
             {errors?.server ? (

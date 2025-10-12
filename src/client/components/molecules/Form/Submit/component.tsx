@@ -12,10 +12,12 @@ export const Submit: React.FC<SubmitProps> = ({
     className,
     disabled,
     label,
-    pending
+    pending,
+    ...props
 }) => {
     return (
         <ButtonBase
+            {...props}
             color="primary"
             className={className}
             disabled={disabled || pending}

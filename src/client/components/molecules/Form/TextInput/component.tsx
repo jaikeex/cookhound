@@ -19,7 +19,8 @@ export const TextInput: React.FC<TextInputProps> = ({
     name,
     onChange,
     onKeyDown,
-    placeholder
+    placeholder,
+    ...props
 }) => {
     return (
         <div className={classNames('relative w-full', className)}>
@@ -27,6 +28,7 @@ export const TextInput: React.FC<TextInputProps> = ({
                 <InputLabel htmlFor={id} text={label} disabled={disabled} />
             ) : null}
             <BaseInput
+                {...props}
                 type={'text'}
                 defaultValue={defaultValue}
                 placeholder={placeholder}

@@ -13,12 +13,14 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
     id,
     label,
     name,
-    onChange
+    onChange,
+    ...props
 }) => {
     return (
         <div className={classNames('w-full relative', className)}>
             <InputLabel htmlFor={id} text={label} disabled={disabled} />
             <BaseInput
+                {...props}
                 id={id}
                 type="password"
                 name={name}

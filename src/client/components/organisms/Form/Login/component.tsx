@@ -41,6 +41,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ errors, pending }) => {
                 id="email"
                 label={t('auth.form.email')}
                 name="email"
+                data-testid="login-email"
             />
 
             <PasswordInput
@@ -48,6 +49,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ errors, pending }) => {
                 id="password"
                 label={t('auth.form.password')}
                 name="password"
+                data-testid="login-password"
             />
 
             <FormCheckbox
@@ -55,6 +57,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ errors, pending }) => {
                 id="keep-logged-in"
                 label={t('auth.form.keep-logged-in')}
                 name="keep-logged-in"
+                data-testid="login-keep-logged-in"
             />
 
             <ErrorList className="self-start" errors={errorsToDisplay} />
@@ -63,6 +66,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ errors, pending }) => {
                 className="min-w-40 !mt-6 mx-auto"
                 label={t('auth.form.login')}
                 pending={pending}
+                data-testid="login-submit"
             />
 
             {errors?.server ? (
