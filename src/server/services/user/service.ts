@@ -117,7 +117,7 @@ class UserService {
 
         const userResponse: UserDTO = createUserDTO(user);
 
-        return userResponse;
+        return { ...userResponse, email: user.email };
     }
 
     //|-----------------------------------------------------------------------------------------|//
