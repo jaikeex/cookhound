@@ -8,7 +8,7 @@
     ],
     "scripts": {
         "dev": "next dev --turbopack",
-        "build": "next build && npm run copy-static && npm run setup-typesense",
+        "build": "next build && npm run copy-static",
         "copy-static": "node scripts/copy-standalone.js",
         "start": "node .next/standalone/server.js",
         "dev-worker": "tsx src/server/queues/worker.ts",
