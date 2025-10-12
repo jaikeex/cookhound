@@ -1,6 +1,36 @@
-# Cookhound Client
+# Cookhound
 
-This is the frontend client for the Cookhound application.
+## For interwievers
+
+Disclaimer: This project is for learning new things first and for fun second. There are choices that would perhaps not make much sense in a real business project.
+These include:
+
+- Code written for learning. Things like (but not limited to) the cookie consent, rate limiting and session management. Number of 3rd party libraries could solve these issues quickly, and most certainly better than I did, but it was a good challenge and learning opportunity. Also, the less dependencies the better in my opinion.
+
+- Structural choices that I personally like. These include the rigid `component/index` file pattern, service and model separation (also classes everywhere) and comment section banners. While not standard (or even preferred) by most teams I think, these just click for me in this project.
+
+- Redis. Project of this size objectively does not need redis for caching (or any caching for that matter), but I wanted to know if cache invalidation really is the hardest thing in programming (I am starting to think it is...) and when i had it set up I started looking for other ways to make use of it, so now it handles queues and sessions as well!
+
+- Deployment. Hosting this on vercel or similar would save me a couple days of time (and also money at this stage), but having everything under control just feels so much better.
+
+I am always open to feedback. Even though you came here for different reasons, If you would like to share any thoughts on this project, I would be very grateful!
+
+I was (of course) using llms for various tasks when writing this project, mainly the anthropic models (sonnet 4 and then 4.5 when it came out) as well as o3 from openai.
+
+## Overview
+
+Cookhound is a full-stack web application built on a modern stack.
+
+- **Frontend** – Next.js 15 app router with React 19, TailwindCSS for styling and atomic design for component organization.
+- **Backend** – Next.js api routes with dedicated service and model layers.
+- **Database** – PostgreSQL with Prisma.
+- **Caching & Jobs** – Redis handles rate-limiting, caching, sessions and BullMQ job queues.
+- **Search** – Typesense provides full-text search over recipes.
+- **Testing** – Vitest for unit testing and Playwright for end-to-end tests.
+- **Logging** - Wisnton with daily rotating files
+- **DevOps** – Docker deployment to a DigitalOcean droplet.
+
+Guiding principles: strict type-safety, clear separation of concerns, minimal runtime dependencies and, above all, realiability.
 
 ## Getting Started
 
@@ -21,7 +51,7 @@ Default package manager is yarn v 4.1.0. On most systems, you can follow these s
 
 If this does not work, google it.
 
-## Important commands
+## Important commands I might want to forget
 
 ### Connect to the droplet via ssh
 
