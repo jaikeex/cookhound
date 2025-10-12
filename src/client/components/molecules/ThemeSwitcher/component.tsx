@@ -59,7 +59,7 @@ export const ThemeSwitcherIcon: React.FC<ThemeSwitcherIconProps> = (props) => {
                     <IconButton
                         icon="moon"
                         {...iconProps}
-                        ariaLabel={t('app.general.dark-mode')}
+                        aria-label={t('app.general.dark-mode')}
                     />
                 );
             case 'dark':
@@ -67,7 +67,7 @@ export const ThemeSwitcherIcon: React.FC<ThemeSwitcherIconProps> = (props) => {
                     <IconButton
                         icon="sun"
                         {...iconProps}
-                        ariaLabel={t('app.general.light-mode')}
+                        aria-label={t('app.general.light-mode')}
                     />
                 );
             default:
@@ -75,7 +75,7 @@ export const ThemeSwitcherIcon: React.FC<ThemeSwitcherIconProps> = (props) => {
                     <IconButton
                         icon="sun"
                         {...iconProps}
-                        ariaLabel={t('app.general.light-mode')}
+                        aria-label={t('app.general.light-mode')}
                     />
                 );
         }

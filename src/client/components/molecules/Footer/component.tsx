@@ -27,7 +27,7 @@ export const Footer: React.FC<FooterProps> = ({ className }) => {
             <div className="flex items-center justify-center flex-wrap gap-x-4 sm:gap-x-6 gap-y-2 sm:gap-y-3 max-w-7xl mx-auto">
                 <button
                     onClick={handleCookieSettings}
-                    className="text-sm text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors underline"
+                    className="text-sm text-gray-800 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors underline"
                 >
                     {t('app.footer.cookie-settings')}
                 </button>
@@ -36,7 +36,7 @@ export const Footer: React.FC<FooterProps> = ({ className }) => {
                     href="/terms"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-sm text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors underline"
+                    className="text-sm text-gray-800 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors underline"
                 >
                     {t('app.footer.terms-of-use')}
                 </Link>
@@ -45,7 +45,7 @@ export const Footer: React.FC<FooterProps> = ({ className }) => {
                     href="/privacy"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-sm text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors underline"
+                    className="text-sm text-gray-800 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors underline"
                 >
                     {t('app.footer.privacy-policy')}
                 </Link>
@@ -54,12 +54,12 @@ export const Footer: React.FC<FooterProps> = ({ className }) => {
                     href="/contact"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-sm text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors underline"
+                    className="text-sm text-gray-800 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors underline"
                 >
                     {t('app.footer.contact')}
                 </Link>
 
-                <span className="text-sm text-gray-600 dark:text-gray-400">
+                <span className="text-sm text-gray-800 dark:text-gray-400">
                     {t('app.footer.copyright', { year: currentYear })}
                 </span>
             </div>

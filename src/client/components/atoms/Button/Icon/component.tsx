@@ -4,7 +4,6 @@ import type { IconName } from '@/client/types';
 import { classNames } from '@/client/utils';
 
 export type IconButtonProps = Readonly<{
-    ariaLabel?: string;
     className?: string;
     disabled?: boolean;
     icon: IconName;
@@ -22,7 +21,6 @@ export const IconButton: React.FC<IconButtonProps> = React.forwardRef<
 >(
     (
         {
-            ariaLabel,
             className,
             disabled,
             icon,
@@ -31,12 +29,14 @@ export const IconButton: React.FC<IconButtonProps> = React.forwardRef<
             onClick = () => {},
             onPointerDown,
             size,
-            tabIndex
+            tabIndex,
+            ...props
         },
         ref
     ) => {
         return (
             <button
+                {...props}
                 className={classNames(
                     'icon-button',
                     disabled &&
@@ -48,7 +48,6 @@ export const IconButton: React.FC<IconButtonProps> = React.forwardRef<
                 onClick={onClick}
                 onPointerDown={onPointerDown}
                 disabled={disabled || loading}
-                aria-label={ariaLabel}
                 ref={ref}
             >
                 {loading ? (
