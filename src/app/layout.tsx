@@ -1,37 +1,31 @@
 import React from 'react';
-import type { Metadata, Viewport } from 'next';
-import { Kalam, Open_Sans } from 'next/font/google';
 import '@/client/globals.css';
-import {
-    LocaleProvider,
-    AuthProvider,
-    SnackbarProvider,
-    ModalProvider,
-    QueryProvider
-} from '@/client/store';
-import { ThemeProvider } from 'next-themes';
+import type { Metadata, Viewport } from 'next';
+import { cookies, headers } from 'next/headers';
+import { Kalam, Open_Sans } from 'next/font/google';
+import { QueryClient, dehydrate } from '@tanstack/react-query';
+
+import { QueryProvider } from '@/client/store';
+import { AppProviders } from './providers';
+import { ClientShell } from './shell';
 import {
     BottomNavigation,
     TopNavigation,
     ScrollToTop,
     Head,
-    Footer
+    Footer,
+    ConsentBanner
 } from '@/client/components';
+
+import type { UserDTO } from '@/common/types';
+import { CONTENT_WRAPPER_ID, MAIN_PAGE_ID } from '@/client/constants';
 import { locales } from '@/client/locales';
 import { classNames } from '@/client/utils';
-import { pickMostRecentConsent } from '@/common/utils';
-import { cookies, headers } from 'next/headers';
-import type { UserDTO } from '@/common/types';
-import { getUserLocale } from '@/common/utils';
-import { CONTENT_WRAPPER_ID, MAIN_PAGE_ID } from '@/client/constants';
-import { QueryClient, dehydrate } from '@tanstack/react-query';
-import { QUERY_KEYS } from '@/client/request/queryClient';
-import { ConsentProvider } from '@/client/store';
-import { ConsentBanner } from '@/client/components';
-import { ClientShell } from './ClientShell';
-import type { CookieConsent } from '@/common/types/cookie-consent';
-import { getCurrentUser } from './actions';
 import { tServer } from '@/server/utils/locales';
+import { getCurrentUser } from './actions';
+import { pickMostRecentConsent, getUserLocale } from '@/common/utils';
+import { QUERY_KEYS } from '@/client/request/queryClient';
+import type { CookieConsent } from '@/common/types/cookie-consent';
 import { ENV_CONFIG_PUBLIC, CONSENT_VERSION } from '@/common/constants';
 
 const openSans = Open_Sans({
@@ -146,7 +140,9 @@ export default async function RootLayout({
     const themeFromPreferences = user?.preferences?.theme ?? null;
 
     const initialTheme = canUsePreferences
-        ? (themeFromCookie ?? themeFromPreferences ?? 'dark')
+        ? ((themeFromCookie ?? themeFromPreferences ?? 'dark') as
+              | 'light'
+              | 'dark')
         : 'dark';
 
     //|-----------------------------------------------------------------------------------------|//
@@ -160,48 +156,35 @@ export default async function RootLayout({
             <Head />
             <body className={`${kalam.variable} ${openSans.variable}`}>
                 <QueryProvider dehydratedState={dehydratedState}>
-                    <ThemeProvider
-                        attribute="class"
-                        defaultTheme={initialTheme}
-                        enableSystem={false}
-                        disableTransitionOnChange
+                    <AppProviders
+                        initialTheme={initialTheme}
+                        initialConsent={initialConsent}
+                        messages={messages}
+                        locale={locale}
                     >
-                        <AuthProvider>
-                            <ConsentProvider initialConsent={initialConsent}>
-                                <LocaleProvider
-                                    defaultMessages={messages}
-                                    defaultLocale={locale}
-                                >
-                                    <SnackbarProvider>
-                                        <ModalProvider>
-                                            <ClientShell />
-                                            <ConsentBanner />
-                                            <ScrollToTop />
-                                            <div
-                                                id={MAIN_PAGE_ID}
-                                                className="flex flex-col typography-base min-h-screen"
-                                            >
-                                                <div className="fixed top-0 left-0 w-screen h-screen page-background z-[-10]" />
-                                                {/* DO NOT CHANGE THE ORDER OF THESE COMPONENTS */}
-                                                <TopNavigation />
-                                                <BottomNavigation />
-                                                <div
-                                                    id={CONTENT_WRAPPER_ID}
-                                                    className={classNames(
-                                                        'flex-1 px-2 pt-16 md:px-4 md:pt-24',
-                                                        'relative'
-                                                    )}
-                                                >
-                                                    {children}
-                                                </div>
-                                                <Footer />
-                                            </div>
-                                        </ModalProvider>
-                                    </SnackbarProvider>
-                                </LocaleProvider>
-                            </ConsentProvider>
-                        </AuthProvider>
-                    </ThemeProvider>
+                        <ClientShell />
+                        <ConsentBanner />
+                        <ScrollToTop />
+                        <div
+                            id={MAIN_PAGE_ID}
+                            className="flex flex-col typography-base min-h-screen"
+                        >
+                            <div className="fixed top-0 left-0 w-screen h-screen page-background z-[-10]" />
+                            {/* DO NOT CHANGE THE ORDER OF THESE COMPONENTS (stacking order and z-index issues) */}
+                            <TopNavigation />
+                            <BottomNavigation />
+                            <div
+                                id={CONTENT_WRAPPER_ID}
+                                className={classNames(
+                                    'flex-1 px-2 pt-16 md:px-4 md:pt-24',
+                                    'relative'
+                                )}
+                            >
+                                {children}
+                            </div>
+                            <Footer />
+                        </div>
+                    </AppProviders>
                 </QueryProvider>
             </body>
         </html>
