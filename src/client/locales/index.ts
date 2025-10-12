@@ -8,7 +8,10 @@ export type Locales = Record<Locale, Messages>;
 
 export type I18nMessage = keyof typeof en;
 
+export const enMessages = en;
+export const csMessages = cs;
+
 export const locales: Locales = {
-    en,
-    cs
+    en: enMessages,
+    cs: csMessages
 };
