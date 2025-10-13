@@ -12,7 +12,7 @@
     }
 
     .page-wrapper {
-        @apply px-2 pb-8 mx-auto max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg 3xl:max-w-screen-xl;
+        @apply px-2 mx-auto max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg 3xl:max-w-screen-xl;
     }
 
     .base-button {
