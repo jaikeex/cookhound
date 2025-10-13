@@ -51,4 +51,3 @@ volumes:
     redis-data:
     typesense-data:
     db-data:
-    db-data-shadow:

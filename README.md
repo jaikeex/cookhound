@@ -49,9 +49,27 @@ Default package manager is yarn v 4.1.0. On most systems, you can follow these s
 - `yarn set version 4.1.0`
 - `yarn -v` should show 4.1.0
 
-If this does not work, google it.
+If this does not work, google it or switch to other manager.
 
-## Important commands I might want to forget
+#### Self-hosted services
+
+Postgres, redis and typesense are all running locally via docker when developing. You need the db up and running in order to build
+this project (well, technically you need it to generate the prisma types, but the build will fail without the the types
+generated), and both redis and db to actually run it. Typesense is optional as all queries will fallback to using db if
+typesense is not accessible.
+You can start everything at once by running the compose config in `docker-compose-local`
+
+#### Running the project
+
+- `yarn install`
+- `docker-compose up -d` using the local compose config
+- `yarn migrate` when starting from a fresh db
+- `yarn generate` to generate necessary prisma types
+- `yarn seed` to seed the db
+- `yarn setup-typesense` copy the returned api key into .env
+- `yarn dev`
+
+## Important commands I might forget
 
 ### Connect to the droplet via ssh
 
