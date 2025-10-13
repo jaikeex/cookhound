@@ -19,11 +19,26 @@ export default function robots(): MetadataRoute.Robots {
                 ]
             },
             {
-                userAgent: 'GPTBot', // OpenAI crawler
-                disallow: ['/']
-            },
-            {
-                userAgent: 'CCBot', // Common Crawl
+                userAgent: [
+                    'GPTBot',
+                    'CCBot',
+                    'PerplexityBot',
+                    'pbot',
+                    'ClaudeBot',
+                    'Claude-Web',
+                    'Google-Extended',
+                    'Amazonbot',
+                    'Bytespider',
+                    'YouBot',
+                    'youcrawl',
+                    'Applebot-Extended',
+                    'AhrefsBot-LLM',
+                    'StabilityAI',
+                    'cohere-ai',
+                    'SerpAPI',
+                    'Diffbot',
+                    'MiqroBot'
+                ],
                 disallow: ['/']
             }
         ],
