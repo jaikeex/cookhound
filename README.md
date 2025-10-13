@@ -5,7 +5,7 @@
 Disclaimer: This project is for learning new things first and for fun second. There are choices that would perhaps not make much sense in a real business project.
 These include:
 
-- Code written for learning. Things like (but not limited to) the cookie consent, rate limiting and session management. Number of 3rd party libraries could solve these issues quickly, and most certainly better than I did, but it was a good challenge and learning opportunity. Also, the less dependencies the better in my opinion.
+- Code written for learning. Things like (but not limited to) the cookie consent, rate limiting and session management. Number of 3rd party libraries could solve these issues quickly, and most certainly better than I did, but it was a good challenge and learning opportunity. Also, the less dependencies the better in my opinion. Also the weird commit prefix thing.
 
 - Structural choices that I personally like. These include the rigid `component/index` file pattern, service and model separation (also classes everywhere) and comment section banners. While not standard (or even preferred) by most teams I think, these just click for me in this project.
 
@@ -31,6 +31,28 @@ Cookhound is a full-stack web application built on a modern stack.
 - **DevOps** – Docker deployment to a DigitalOcean droplet.
 
 Guiding principles: strict type-safety, clear separation of concerns, minimal runtime dependencies and, above all, realiability.
+
+### LOC count (as of 1.0.3)
+
+Total : 898 files, 41137 codes, 6434 comments, 7902 blanks, all 55473 lines
+
+| language           | files |   code | comment | blank |  total |
+| :----------------- | ----: | -----: | ------: | ----: | -----: |
+| TypeScript         |   606 | 21,718 |   5,251 | 4,941 | 31,910 |
+| TypeScript JSX     |   200 | 14,974 |     835 | 2,394 | 18,203 |
+| JSON               |    12 |  1,354 |       0 |    12 |  1,366 |
+| MS SQL             |    22 |    840 |     244 |   155 |  1,239 |
+| JavaScript         |    11 |    534 |      29 |    90 |    653 |
+| Markdown           |     3 |    521 |       0 |   162 |    683 |
+| Prisma             |     1 |    329 |      44 |    66 |    439 |
+| YAML               |     4 |    276 |       0 |    23 |    299 |
+| XML                |    32 |    254 |       0 |    14 |    268 |
+| JSON with Comments |     2 |    139 |       5 |     7 |    151 |
+| CSS                |     1 |    118 |       6 |    25 |    149 |
+| Docker             |     1 |     71 |      15 |     8 |     94 |
+| Shell Script       |     1 |      6 |       3 |     3 |     12 |
+| Ignore             |     1 |      2 |       0 |     1 |      3 |
+| TOML               |     1 |      1 |       2 |     1 |      4 |
 
 ## Getting Started
 
