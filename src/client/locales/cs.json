@@ -281,7 +281,7 @@
     "app.cookies.banner.manage-preferences": "Podrobné nastavení",
     "app.cookies.error.failed-to-save": "Bohužel se nám nepodařilo uložit vaše nastavení cookies. Zkuste to prosím znovu.",
     "app.footer.cookie-settings": "Nastavení Cookies",
-    "app.footer.copyright": "© {{year}} Cookhound.",
+    "app.footer.copyright": "© {{year}} Cookhound - v{{version}}.",
     "app.footer.terms-of-use": "Obchodní podmínky",
     "app.footer.privacy-policy": "Soukromí",
     "app.footer.contact": "Kontaktujte nás",

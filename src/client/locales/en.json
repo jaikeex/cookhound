@@ -281,7 +281,7 @@
     "app.cookies.banner.manage-preferences": "Manage Preferences",
     "app.cookies.error.failed-to-save": "We could not save your cookie-consent. Please try again.",
     "app.footer.cookie-settings": "Cookie Settings",
-    "app.footer.copyright": "© {{year}} Cookhound.",
+    "app.footer.copyright": "© {{year}} Cookhound - v{{version}}.",
     "app.footer.terms-of-use": "Terms of Use",
     "app.footer.privacy-policy": "Privacy Policy",
     "app.footer.contact": "Contact Us",

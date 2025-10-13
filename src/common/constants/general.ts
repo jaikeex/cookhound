@@ -1,5 +1,11 @@
 import { ENV_CONFIG_PUBLIC } from '@/common/constants/env';
 
+//?=============================================================================================?//
+
+export const VERSION = '1.0.2';
+
+//?=============================================================================================?//
+
 export const DEFAULT_LOCALE = 'cs';
 export const SUPPORTED_LOCALES = ['en', 'cs'] as const;
 

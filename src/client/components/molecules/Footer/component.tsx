@@ -5,6 +5,7 @@ import React, { useCallback } from 'react';
 import { useModal, useLocale } from '@/client/store';
 import { ConsentSettingsModal } from '@/client/components';
 import Link from 'next/link';
+import { VERSION } from '@/common/constants';
 
 type FooterProps = Readonly<{
     className?: string;
@@ -60,7 +61,10 @@ export const Footer: React.FC<FooterProps> = ({ className }) => {
                 </Link>
 
                 <span className="text-sm text-gray-800 dark:text-gray-400">
-                    {t('app.footer.copyright', { year: currentYear })}
+                    {t('app.footer.copyright', {
+                        year: currentYear,
+                        version: VERSION
+                    })}
                 </span>
             </div>
         </footer>
