@@ -1,15 +1,8 @@
 'use client';
 
-import React, {
-    createContext,
-    useCallback,
-    useContext,
-    useEffect,
-    useMemo
-} from 'react';
+import React, { createContext, useCallback, useContext, useMemo } from 'react';
 import type { UserDTO } from '@/common/types';
 import { useQueryClient } from '@tanstack/react-query';
-import { ENV_CONFIG_PUBLIC } from '@/common/constants';
 import { chqc, QUERY_KEYS } from '@/client/request/queryClient';
 
 type AuthContextType = {
@@ -57,10 +50,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }),
         [authResolved, setUser, user]
     );
-
-    useEffect(() => {
-        ENV_CONFIG_PUBLIC.ENV === 'development' && console.log(user);
-    }, [user]);
 
     return (
         <AuthContext.Provider value={contextValue}>

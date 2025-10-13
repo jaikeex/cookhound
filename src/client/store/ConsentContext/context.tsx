@@ -267,10 +267,9 @@ export const ConsentProvider: React.FC<ConsentProviderProps> = ({
                         return;
                     }
                 } catch (error) {
-                    console.warn(
-                        'verifyConsent - failed to verify against DB',
-                        { error }
-                    );
+                    /**
+                     * Do nothing here
+                     */
                 }
             }
 
