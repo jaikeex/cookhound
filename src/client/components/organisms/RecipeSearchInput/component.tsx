@@ -38,9 +38,6 @@ export const RecipeSearchInput: React.FC<RecipeSearchInputProps> = ({
     const [inputValue, setInputValue] = useState(value ?? defaultValue ?? '');
     const [isInputFocused, setIsInputFocused] = useState(false);
 
-    // Guard against stale requests (explained below)
-    const blurTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
-
     const containerRef = useOutsideClick<HTMLDivElement>(() => {
         setIsInputFocused(false);
     });
@@ -134,30 +131,12 @@ export const RecipeSearchInput: React.FC<RecipeSearchInputProps> = ({
         setIsInputFocused(true);
     }, []);
 
-    const handleInputBlur = useCallback(() => {
-        // Delay to allow clicking on suggestions
-        blurTimeoutRef.current = setTimeout(() => {
-            setIsInputFocused(false);
-        }, 200);
-    }, []);
-
     const handleSearch = useCallback(() => {
         onSearch?.();
         setIsInputFocused(false);
     }, [onSearch]);
 
-    // Clear pending timeout on unmount to avoid memory leaks
-    // This is probably completely useless, but i just learned about how effect
-    // callback work in-depth, and wanted to use it immediately.
-    useEffect(() => {
-        return () => {
-            if (blurTimeoutRef.current) {
-                clearTimeout(blurTimeoutRef.current);
-            }
-        };
-    }, []);
-
-    const handleSuggestionClick = useCallback(() => {
+    const handleInputBlur = useCallback(() => {
         setIsInputFocused(false);
     }, []);
 
@@ -213,6 +192,7 @@ export const RecipeSearchInput: React.FC<RecipeSearchInputProps> = ({
         if (isShowingSearchResults) {
             return t('app.recipe.search-suggestions.empty');
         }
+
         return t('app.recipe.search-suggestions.empty-last-viewed');
     }, [isShowingSearchResults, t]);
 
@@ -225,7 +205,6 @@ export const RecipeSearchInput: React.FC<RecipeSearchInputProps> = ({
             {...rest}
             defaultValue={defaultValue}
             isLoading={isLoading}
-            onBlur={handleInputBlur}
             onChange={handleInputChange}
             onFocus={handleInputFocus}
             onSearch={handleSearch}
@@ -237,9 +216,9 @@ export const RecipeSearchInput: React.FC<RecipeSearchInputProps> = ({
                 <SearchSuggestionBox
                     emptyMessage={emptyMessage}
                     error={error}
+                    onClose={handleInputBlur}
                     isEmpty={isEmpty}
                     isLoading={isLoading}
-                    onSuggestionClick={handleSuggestionClick}
                     suggestions={suggestions}
                     title={titleElement}
                 />
