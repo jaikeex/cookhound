@@ -37,7 +37,7 @@ export function LogServiceMethod(
             : [];
 
     return (
-        _target: object,
+        target: object,
         propertyKey: string | symbol,
         descriptor: TypedPropertyDescriptor<any>
     ): void | TypedPropertyDescriptor<any> => {
@@ -45,8 +45,10 @@ export function LogServiceMethod(
 
         if (typeof original !== 'function') return descriptor;
 
+        const className = target.constructor.name;
+
         descriptor.value = async function (...args: unknown[]) {
-            const log = Logger.getInstance('user-service');
+            const log = Logger.getInstance(className);
 
             const payload = names.length
                 ? Object.fromEntries(names.map((n, i) => [n, args[i]]))

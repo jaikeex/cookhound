@@ -159,28 +159,27 @@ export class Logger {
      * resources.
      */
     public static getInstance(context: string): Logger {
-        let instance;
+        let instance = this.instances.get(context);
 
-        if (this.instances.has(context)) {
-            instance = this.instances.get(context);
-        } else {
+        if (!instance) {
             try {
                 instance = new Logger(context);
                 this.instances.set(context, instance);
             } catch (error: unknown) {
-                /**
-                 * Do nothing here. Failure to log an entry should never result in the app crashing
-                 * or in any feedback to the user.
-                 */
+                // No logger instance, so fallback to console
+                console.error(
+                    `[Logger] Failed to create logger for context "${context}":`,
+                    error
+                );
+
+                throw new Error(
+                    `Failed to create logger for context "${context}": ${
+                        error instanceof Error ? error.message : String(error)
+                    }`
+                );
             }
         }
 
-        if (!instance) {
-            /**
-             * It is ok to throw here, since all instances should be crated at app startup.
-             */
-            throw new Error('Logger context is missing');
-        }
         return instance;
     }
 
@@ -250,6 +249,29 @@ export class Logger {
     }
 
     //|-----------------------------------------------------------------------------------------|//
+    //?                                       TRACE SAMPLING                                    ?//
+    //|-----------------------------------------------------------------------------------------|//
+
+    private shouldSampleTrace(): boolean {
+        if (ENV_CONFIG_PUBLIC.ENV !== 'production') {
+            return true; // No sampling in dev
+        }
+
+        const requestId = RequestContext.getRequestId();
+
+        if (!requestId) {
+            return Math.random() < 0.1;
+        }
+
+        const hash = requestId.split('').reduce((acc, char) => {
+            return acc + char.charCodeAt(0);
+        }, 0);
+
+        // Log ~10% of requests
+        return hash % 10 === 0;
+    }
+
+    //|-----------------------------------------------------------------------------------------|//
     //?                                     PRIVATE METHODS                                     ?//
     //|-----------------------------------------------------------------------------------------|//
 
@@ -269,6 +291,10 @@ export class Logger {
         additional: unknown[]
     ): void {
         try {
+            if (level === 'trace' && !this.shouldSampleTrace()) {
+                return;
+            }
+
             // Winston requires the primary log message to be a string.
             let finalMessage = '';
 

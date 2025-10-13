@@ -13,6 +13,20 @@ const LEVEL_TO_SEVERITY: Record<LogLevel, string> = {
     error: 'ERROR'
 };
 
+type LogEntry = {
+    severity: string;
+    timestamp: string;
+    labels: { context: string };
+    textPayload: string;
+};
+
+type WinstonLogInfo = {
+    level: string;
+    message: string;
+    context?: string;
+    timestamp?: string;
+};
+
 interface GoogleCloudLoggingTransportOptions {
     allowedLevels?: LogLevel[];
 }
@@ -22,8 +36,11 @@ export class GoogleCloudLoggingTransport extends Transport {
     private readonly flushIntervalMs: number;
     private readonly allowedLevels: LogLevel[] | undefined;
 
-    private readonly queue: any[] = [];
-    private flushTimer: NodeJS.Timeout;
+    private readonly queue: LogEntry[] = [];
+    private readonly failedQueue: LogEntry[] = [];
+    private flushTimer: NodeJS.Timeout | null = null;
+    private retryAttempts = 0;
+    private readonly maxRetries = 3;
 
     //|-----------------------------------------------------------------------------------------|//
     //?                                            SETUP                                        ?//
@@ -55,7 +72,7 @@ export class GoogleCloudLoggingTransport extends Transport {
     //|-----------------------------------------------------------------------------------------|//
 
     // This needs to be implemented or winston will scream in space.
-    public log(info: any, next: () => void): void {
+    public log(info: WinstonLogInfo, next: () => void): void {
         const level: string = info.level;
 
         // If a level filter is configured and this level is not included, do nothing.
@@ -81,7 +98,7 @@ export class GoogleCloudLoggingTransport extends Transport {
     //?                                         QUEUE                                           ?//
     //|-----------------------------------------------------------------------------------------|//
 
-    private enqueue(info: any): void {
+    private enqueue(info: WinstonLogInfo): void {
         const { message, level, context = 'application' } = info;
 
         const severity = LEVEL_TO_SEVERITY[level as LogLevel] ?? 'DEFAULT';
@@ -115,21 +132,64 @@ export class GoogleCloudLoggingTransport extends Transport {
     }
 
     private _googleApiService?: {
-        writeLogsToGoogleCloud: (entries: any[]) => Promise<unknown>;
+        writeLogsToGoogleCloud: (entries: LogEntry[]) => Promise<unknown>;
     };
 
     private async flush(): Promise<void> {
-        if (this.queue.length === 0) return;
+        if (this.failedQueue.length > 0) {
+            await this.attemptFlush(this.failedQueue, true);
+        }
+
+        if (this.queue.length > 0) {
+            await this.attemptFlush(this.queue, false);
+        }
+    }
+
+    private async attemptFlush(
+        queue: LogEntry[],
+        isRetry: boolean
+    ): Promise<void> {
+        const batchSize = Math.min(queue.length, this.maxBatchSize);
+        const entries = queue.splice(0, batchSize);
 
         try {
-            const entries = this.queue.splice(0, this.queue.length);
-
-            // Lazily import the Google API service the first time we need it.
             const googleApiService = await this.getGoogleApiService();
-
             await googleApiService.writeLogsToGoogleCloud(entries);
+
+            if (isRetry) {
+                this.retryAttempts = 0;
+            }
         } catch (error: unknown) {
-            // Failure to write to Cloud Logging should not crash the app.
+            const errorMsg =
+                error instanceof Error ? error.message : String(error);
+
+            if (isRetry) {
+                this.retryAttempts++;
+
+                if (this.retryAttempts >= this.maxRetries) {
+                    // Give up after max retries - emit error and drop logs
+                    this.emit(
+                        'error',
+                        new Error(
+                            `[GoogleCloudTransport] Dropped ${entries.length} logs after ${this.maxRetries} retries: ${errorMsg}`
+                        )
+                    );
+
+                    this.retryAttempts = 0;
+
+                    // Don't re-queue failed logs
+                    return;
+                }
+            }
+
+            this.failedQueue.push(...entries);
+
+            this.emit(
+                'error',
+                new Error(
+                    `[GoogleCloudTransport] Failed to flush ${entries.length} logs (attempt ${isRetry ? this.retryAttempts : 1}): ${errorMsg}`
+                )
+            );
         }
     }
 
@@ -138,7 +198,11 @@ export class GoogleCloudLoggingTransport extends Transport {
     //|-----------------------------------------------------------------------------------------|//
 
     public close(): void {
-        clearInterval(this.flushTimer);
-        void this.flush();
+        if (this.flushTimer) {
+            clearInterval(this.flushTimer);
+            this.flushTimer = null;
+        }
+
+        void this.flush(); // Final flush before closing
     }
 }
