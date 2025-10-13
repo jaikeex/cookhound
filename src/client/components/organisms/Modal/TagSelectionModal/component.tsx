@@ -2,7 +2,7 @@
 
 import React, { useCallback, useState } from 'react';
 import type { RecipeTagDTO, TagListDTO } from '@/common/types';
-import type { ModalProps } from '@/client/components/molecules/Modal/types';
+import type { ModalProps } from '@/client/components/organisms/Modal/types';
 import {
     ButtonBase,
     Loader,

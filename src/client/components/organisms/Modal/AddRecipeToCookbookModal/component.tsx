@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useCallback, useState } from 'react';
-import type { ModalProps } from '@/client/components/molecules/Modal/types';
+import type { ModalProps } from '@/client/components/organisms/Modal/types';
 import {
     ButtonBase,
     Select,
@@ -15,7 +15,7 @@ import dynamic from 'next/dynamic';
 
 const CreateCookbookModal = dynamic(
     () =>
-        import('@/client/components/molecules/Modal/CreateCookbookModal').then(
+        import('@/client/components/organisms/Modal/CreateCookbookModal').then(
             (mod) => mod.CreateCookbookModal
         ),
     { ssr: false }

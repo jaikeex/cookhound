@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useCallback, useState } from 'react';
-import type { ModalProps } from '@/client/components/molecules/Modal/types';
+import type { ModalProps } from '@/client/components/organisms/Modal/types';
 import { ButtonBase, Typography, PasswordInput } from '@/client/components';
 import { useLocale, useSnackbar, useAuth } from '@/client/store';
 import { AuthType } from '@/common/types';

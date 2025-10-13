@@ -12,7 +12,7 @@ import { SortableItem, SortableKnob } from 'react-easy-sort';
 const DeleteFromCookbookConfirmationModal = dynamic(
     () =>
         import(
-            '@/client/components/molecules/Modal/DeleteFromCookbookConfirmationModal'
+            '@/client/components/organisms/Modal/DeleteFromCookbookConfirmationModal'
         ).then((mod) => mod.DeleteFromCookbookConfirmationModal),
     { ssr: false }
 );

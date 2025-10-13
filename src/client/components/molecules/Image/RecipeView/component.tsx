@@ -15,7 +15,7 @@ import { useScreenSize } from '@/client/hooks';
 const AddRecipeToCookbookModal = dynamic(
     () =>
         import(
-            '@/client/components/molecules/Modal/AddRecipeToCookbookModal'
+            '@/client/components/organisms/Modal/AddRecipeToCookbookModal'
         ).then((mod) => mod.AddRecipeToCookbookModal),
     { ssr: false }
 );

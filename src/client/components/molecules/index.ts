@@ -12,7 +12,6 @@ export * from './InstructionRow';
 export * from './Instructions';
 export * from './Menu';
 export * from './List';
-export * from './Modal';
 export * from './Popup';
 export * from './Profile';
 export * from './Rating';

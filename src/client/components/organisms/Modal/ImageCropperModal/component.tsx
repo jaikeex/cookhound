@@ -2,7 +2,7 @@
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { ButtonBase, Typography } from '@/client/components';
-import type { ModalProps } from '@/client/components/molecules/Modal/types';
+import type { ModalProps } from '@/client/components/organisms/Modal/types';
 import { useLocale, useSnackbar } from '@/client/store';
 import ReactCrop, { type Crop, type PixelCrop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';

@@ -18,7 +18,7 @@ import { useModal } from '@/client/store/ModalContext';
 
 const CreateCookbookModal = dynamic(
     () =>
-        import('@/client/components/molecules/Modal/CreateCookbookModal').then(
+        import('@/client/components/organisms/Modal/CreateCookbookModal').then(
             (mod) => mod.CreateCookbookModal
         ),
     { ssr: false }
