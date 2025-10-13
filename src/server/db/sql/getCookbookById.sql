@@ -1,3 +1,8 @@
+-- Fetch a cookbook by its internal ID with all associated recipes
+-- Parameters:
+--   $1 :: int    – id (internal cookbook identifier)
+--
+-- Returns cookbook details with an ordered JSON array of recipes.
 SELECT
     c.id,
     c.display_id      AS "displayId",

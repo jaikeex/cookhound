@@ -1,9 +1,5 @@
-# -------------------------------------------------------------------
-# Cookhound – production image (Next.js web + worker)
-# -------------------------------------------------------------------
 # syntax=docker/dockerfile:1.5
 
-# -------- Base image with Node.js ------------------------------------------------
 FROM node:20-bookworm AS base
 WORKDIR /app
 ENV NODE_ENV=production

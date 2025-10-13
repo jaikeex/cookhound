@@ -1,3 +1,8 @@
+-- Fetch a single recipe by its internal ID with full details
+-- Parameters:
+--   $1 :: int    – id (internal recipe identifier)
+--
+-- Returns complete recipe data including ingredients, instructions, flags, and tags as JSON arrays.
 SELECT
     r.id,
     r.display_id AS "displayId",

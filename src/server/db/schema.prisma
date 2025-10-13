@@ -75,7 +75,7 @@ model CookieConsent {
   /// Relations
   user User @relation(fields: [userId], references: [id])
 
-  /// Indexesl
+  /// Indexes
   @@index([id, userId])
   @@map("cookie_consents")
 }

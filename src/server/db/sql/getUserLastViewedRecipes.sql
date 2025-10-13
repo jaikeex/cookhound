@@ -1,3 +1,9 @@
+-- Fetch the most recently viewed recipes for a user
+-- Parameters:
+--   $1 :: int    – userId (user ID)
+--   $2 :: int    – limit (maximum number of recipes to return)
+--
+-- Returns recipes ordered by most recent visit time.
 SELECT
     r.id,
     r.display_id AS "displayId",

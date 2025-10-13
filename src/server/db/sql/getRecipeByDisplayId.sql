@@ -1,3 +1,8 @@
+-- Fetch a single recipe by its display ID with full details
+-- Parameters:
+--   $1 :: text   – displayId (unique display identifier for the recipe)
+--
+-- Returns complete recipe data including ingredients, instructions, flags, and tags as JSON arrays.
 SELECT
     r.id,
     r.display_id AS "displayId",

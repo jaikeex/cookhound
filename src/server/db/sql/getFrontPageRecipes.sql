@@ -1,3 +1,11 @@
+-- Fetch recipes for the front page, sorted by rating and creation date
+-- Parameters:
+--   $1 :: int    – minTimesRated (minimum number of ratings required)
+--   $2 :: text   – language (recipe language filter)
+--   $3 :: int    – limit (maximum number of recipes to return)
+--   $4 :: int    – offset (number of recipes to skip)
+--
+-- Excludes recipes with active flags and returns basic recipe information.
 SELECT
     r.id,
     r.display_id AS "displayId",

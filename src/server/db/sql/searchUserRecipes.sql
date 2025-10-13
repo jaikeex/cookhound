@@ -1,3 +1,12 @@
+-- Search recipes owned by a specific user across multiple fields
+-- Parameters:
+--   $1 :: int    – authorId (user ID of the recipe author)
+--   $2 :: text   – language (recipe language filter)
+--   $3 :: text   – searchTerm (search query for title, notes, ingredients, and instructions)
+--   $4 :: int    – limit (maximum number of recipes to return)
+--   $5 :: int    – offset (number of recipes to skip)
+--
+-- Performs case-insensitive search and includes active flags if present.
 SELECT
     DISTINCT r.id,
     r.display_id AS "displayId",

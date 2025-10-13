@@ -1,3 +1,11 @@
+-- Fetch all recipes owned by a specific user
+-- Parameters:
+--   $1 :: int    – authorId (user ID of the recipe author)
+--   $2 :: text   – language (recipe language filter)
+--   $3 :: int    – limit (maximum number of recipes to return)
+--   $4 :: int    – offset (number of recipes to skip)
+--
+-- Returns recipes sorted by creation date, including active flags if present.
 SELECT
     r.id,
     r.display_id AS "displayId",

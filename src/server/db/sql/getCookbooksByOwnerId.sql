@@ -1,3 +1,8 @@
+-- Fetch all cookbooks owned by a specific user
+-- Parameters:
+--   $1 :: int    – ownerId (user ID of the cookbook owner)
+--
+-- Returns cookbooks ordered by owner_order, then by title, with recipe details as JSON arrays.
 SELECT
     c.id,
     c.display_id      AS "displayId",

@@ -1,3 +1,8 @@
+-- Fetch a cookbook by its display ID with all associated recipes
+-- Parameters:
+--   $1 :: text   – displayId (unique display identifier for the cookbook)
+--
+-- Returns cookbook details with an ordered JSON array of recipes.
 SELECT
     c.id,
     c.display_id      AS "displayId",

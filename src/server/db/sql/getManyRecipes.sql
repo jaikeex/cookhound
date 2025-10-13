@@ -1,3 +1,11 @@
+-- Fetch multiple recipes with full details including ingredients, instructions, flags, and tags
+-- Parameters:
+--   $1 :: text   – language (recipe language filter)
+--   $2 :: int    – limit (maximum number of recipes to return)
+--   $3 :: int    – offset (number of recipes to skip)
+--
+-- Returns complete recipe data with nested JSON aggregations for related entities.
+-- Excludes recipes with active flags.
 SELECT
     r.id,
     r.display_id AS "displayId",
