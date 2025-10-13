@@ -4,7 +4,6 @@ import React, { Suspense, useCallback, useState } from 'react';
 import {
     Avatar,
     ButtonBase,
-    IconButton,
     IconLink,
     Logo,
     Popup,
@@ -64,28 +63,16 @@ export const TopNavigation: React.FC<TopNavigationProps> = () => {
             {/*|---------------------------------------------------------------------------------|*/}
             {/*?                                MOBILE RIGHT SIDE                                ?*/}
             {/*|---------------------------------------------------------------------------------|*/}
-            <Link
-                href={'/search'}
-                className="flex items-center md:hidden"
-                tabIndex={-1}
-            >
-                <IconButton
-                    aria-label={t('app.general.search')}
-                    className="flex items-center justify-center w-10 h-12"
-                    icon="search"
-                    size={28}
-                />
 
-                <button
-                    onClick={handleOpenSidebar}
-                    className={classNames(
-                        'flex items-center justify-center w-10 h-12',
-                        'block md:hidden'
-                    )}
-                >
-                    <Avatar size="md" src={avatarSrc || 'anonymous'} />
-                </button>
-            </Link>
+            <button
+                onClick={handleOpenSidebar}
+                className={classNames(
+                    'flex items-center justify-center w-10 h-12',
+                    'block md:hidden'
+                )}
+            >
+                <Avatar size="md" src={avatarSrc || 'anonymous'} />
+            </button>
 
             {/*|---------------------------------------------------------------------------------|*/}
             {/*?                                DESKTOP RIGHT SIDE                               ?*/}
