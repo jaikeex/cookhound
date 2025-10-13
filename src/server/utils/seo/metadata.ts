@@ -85,7 +85,6 @@ export async function getLocalizedMetadata(
         },
         twitter: {
             card: config.twitterCard || 'summary_large_image',
-            site: '@CookhoundApp',
             title: ogTitle,
             description: ogDescription
         },

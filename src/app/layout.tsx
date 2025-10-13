@@ -208,10 +208,6 @@ export async function generateMetadata(): Promise<Metadata> {
         openGraph: {
             siteName: 'Cookhound'
         },
-        twitter: {
-            card: 'summary_large_image',
-            site: '@CookhoundApp'
-        },
         other: {
             'theme-color': '#1f2937'
         }

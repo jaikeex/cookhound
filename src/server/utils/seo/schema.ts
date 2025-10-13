@@ -156,8 +156,7 @@ export function generateOrganizationSchema(baseUrl: string) {
         '@type': 'Organization',
         name: 'Cookhound',
         url: baseUrl,
-        logo: `${baseUrl}/img/logo-light.png`,
-        sameAs: ['https://twitter.com/CookhoundApp']
+        logo: `${baseUrl}/img/logo-light.png`
     };
 }
 
