@@ -2,7 +2,7 @@
 //?                                       THIS IS IT                                        ?//
 ///
 //# All job files that are intended to be registered and actually executed must be exported
-//# from this file. The job class files SHOULD not contain any export, but simply a call to
+//# from this file. The job class files should NOT contain any export, but simply a call to
 //# the queue manager's registerJob method. Importing this file executes that call, and the
 //# queue is created in the system.
 //#
@@ -42,20 +42,20 @@ export * from './emails/SendAccountDeletedJob';
 export * from './emails/SendContactFormJob';
 
 //|-----------------------------------------------------------------------------------------|//
-//?                                        SEARCH                                          ?//
+//?                                         SEARCH                                          ?//
 //|-----------------------------------------------------------------------------------------|//
 
 export * from './search/ReindexRecipesJob';
 
 //|-----------------------------------------------------------------------------------------|//
-//?                                       RECIPES                                          ?//
+//?                                        RECIPES                                          ?//
 //|-----------------------------------------------------------------------------------------|//
 
 export * from './recipes/RegisterRecipeVisitJob';
 export * from './recipes/EvaluateRecipeJob';
 
 //|-----------------------------------------------------------------------------------------|//
-//?                                       ACCOUNTS                                         ?//
+//?                                        ACCOUNTS                                         ?//
 //|-----------------------------------------------------------------------------------------|//
 
 export * from './accounts/ProcessAccountDeletionsJob';

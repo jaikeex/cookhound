@@ -13,7 +13,7 @@ export abstract class BaseJob<TData = any, TResult = any> {
     //$                                         OPTIONS                                         $//
     ///
     //# These only take effect if the job that defines them is first in order to be registered
-    //# inside its queue. This only matters for jobs that sharea the queue with another jobs, as
+    //# inside its queue. This only matters for jobs that share the queue with another jobs, as
     //# setting these values there might be useless if another job has priority.
     ///
     //~—————————————————————————————————————————————————————————————————————————————————————————~//

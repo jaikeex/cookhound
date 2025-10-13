@@ -258,7 +258,7 @@ export class Logger {
     ///
     //# The serialize and safeStringify methods are required now to create readable logs.
     //# The long-term plan here is to log in json format and then parse the logs someplace else
-    //# (Preferably in cookhound administration), but that is a long way of, so this is
+    //# (Preferably in cookhound administration), but that is a long way off, so this is
     //# the solution for now.
     ///
     //?—————————————————————————————————————————————————————————————————————————————————————————?//
