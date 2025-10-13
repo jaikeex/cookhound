@@ -23,14 +23,18 @@ export const ProfileHeadDesktop: React.FC<ProfileHeadPropsDesktop> = ({
     );
 
     return (
-        <div className="flex items-center gap-10 h-36 w-full">
+        <div className="grid grid-cols-4 gap-12 h-36 w-full">
             {isCurrentUser ? (
-                <AvatarInput className="h-36 w-36 max-w-36 max-h-36" />
+                <AvatarInput className="h-36 w-36 max-w-36 max-h-36 col-span-1" />
             ) : (
-                <Avatar size="xxxl" src={user.avatarUrl ?? 'default'} />
+                <Avatar
+                    size="xxxl"
+                    src={user.avatarUrl ?? 'default'}
+                    className="col-span-1"
+                />
             )}
 
-            <div className="flex flex-col gap-2 h-32 text-right">
+            <div className="flex flex-col gap-2 h-32 col-span-3">
                 <Typography variant="heading-md">{user.username}</Typography>
 
                 {isCurrentUser ? (
