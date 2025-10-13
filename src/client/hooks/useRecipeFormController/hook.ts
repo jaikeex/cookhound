@@ -49,8 +49,12 @@ export const useRecipeFormController = ({
     const [changedFields, setChangedFields] = useState<string[]>([]);
     const [formErrors, setFormErrors] = useState<RecipeFormErrors>({});
 
-    const { recipeObject, setRecipeObject, updateRecipeObject } =
-        useCreateRecipeStore();
+    const {
+        recipeObject,
+        setRecipeObject,
+        updateRecipeObject,
+        resetSuggestions
+    } = useCreateRecipeStore();
 
     const formRef = useRef<HTMLFormElement>(null);
 
@@ -142,10 +146,19 @@ export const useRecipeFormController = ({
                 variant: 'success'
             });
 
+            resetSuggestions();
             allowNavigation();
             safePush(`/recipe/${recipe.displayId}`);
         },
-        [alert, allowNavigation, isEdit, queryClient, safePush, t]
+        [
+            alert,
+            allowNavigation,
+            isEdit,
+            queryClient,
+            safePush,
+            t,
+            resetSuggestions
+        ]
     );
 
     const handleSubmit = useCallback(
