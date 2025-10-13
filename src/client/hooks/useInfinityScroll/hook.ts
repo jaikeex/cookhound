@@ -37,6 +37,11 @@ export const useInfinityScroll = <T extends HTMLElement = HTMLDivElement>({
         const observer = new IntersectionObserver(
             (entries) => {
                 const [entry] = entries;
+
+                if (!entry) {
+                    return;
+                }
+
                 if (entry.isIntersecting && !isLoading) {
                     loadMoreRef.current();
                 }

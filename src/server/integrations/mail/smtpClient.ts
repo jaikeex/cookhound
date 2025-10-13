@@ -131,9 +131,14 @@ export class MailClient {
             const onData = (data: string) => {
                 response += data;
                 const lines = response.split('\r\n');
+
+                if (!lines) {
+                    return;
+                }
+
                 if (
                     lines.length > 1 &&
-                    /^\d{3} /.test(lines[lines.length - 2])
+                    /^\d{3} /.test(lines[lines.length - 2] ?? '')
                 ) {
                     this.socket.removeListener('data', onData);
                     this.socket.removeListener('error', onError);

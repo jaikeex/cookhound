@@ -44,7 +44,7 @@ export async function readMultipartFile(
      * Ensures that the boundary parameter is present, undici will throw an opaque error otherwise.
      */
     const boundaryMatch = /boundary=(.*)$/i.exec(contentType);
-    if (!boundaryMatch || boundaryMatch[1].trim() === '') {
+    if (!boundaryMatch || boundaryMatch[1]?.trim() === '') {
         throw new ValidationError(
             'app.error.bad-request',
             ApplicationErrorCode.INVALID_FORMAT

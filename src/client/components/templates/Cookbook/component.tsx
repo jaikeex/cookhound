@@ -69,6 +69,10 @@ export const CookbookTemplate: React.FC<CookbookTemplateProps> = ({
             const newState = [...prevState];
             const [moved] = newState.splice(oldIndex, 1);
 
+            if (!moved) {
+                return prevState;
+            }
+
             newState.splice(newIndex, 0, moved);
 
             return newState;
@@ -96,7 +100,7 @@ export const CookbookTemplate: React.FC<CookbookTemplateProps> = ({
 
         if (
             debouncedOrder.length !== cookbook.recipes.length ||
-            !debouncedOrder.every((id, idx) => id === cookbook.recipes[idx].id)
+            !debouncedOrder.every((id, idx) => id === cookbook.recipes[idx]?.id)
         ) {
             reorderRecipes({
                 cookbookId: cookbook.id,

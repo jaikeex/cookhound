@@ -36,6 +36,11 @@ export const parseContentLinks = (
         }
 
         const target = match[1];
+
+        if (!target || typeof target !== 'string') {
+            continue;
+        }
+
         const linkText = match[2];
         const key = `link-${keyCounter++}`;
 

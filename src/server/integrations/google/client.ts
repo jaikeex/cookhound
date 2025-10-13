@@ -214,6 +214,12 @@ class GoogleApiClient {
                 const emailMatch = /<(.+?)>/.exec(from);
                 const userId = emailMatch ? emailMatch[1] : from;
 
+                if (!userId) {
+                    throw new InfrastructureError(
+                        InfrastructureErrorCode.GOOGLE_API_REQUEST_FAILED
+                    );
+                }
+
                 const url = `https://gmail.googleapis.com/gmail/v1/users/${encodeURIComponent(
                     userId
                 )}/messages/send`;

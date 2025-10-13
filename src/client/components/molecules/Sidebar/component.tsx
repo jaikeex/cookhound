@@ -81,6 +81,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
         (e: React.TouchEvent<HTMLDivElement>) => {
             const t = e.touches[0];
 
+            if (!t) {
+                return;
+            }
+
             // Capture scroll metrics to later decide if the swipe should close the sidebar.
             const scrollable = contentRef.current;
             touchStart.current = {
@@ -98,6 +102,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
         (e: React.TouchEvent<HTMLDivElement>) => {
             if (!touchStart.current) return;
             const t = e.touches[0];
+
+            if (!t) {
+                return;
+            }
+
             const dx = t.clientX - touchStart.current.x;
             const dy = t.clientY - touchStart.current.y;
 

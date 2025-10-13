@@ -86,7 +86,7 @@ function getAppRouterClientIdentifier(req: NextRequest): string {
 
     let ip = '';
     if (forwarded) {
-        ip = forwarded.split(',')[0].trim();
+        ip = forwarded.split(',')[0]?.trim() ?? '';
     } else if (realIp) {
         ip = realIp;
     } else if (cfConnectingIp) {

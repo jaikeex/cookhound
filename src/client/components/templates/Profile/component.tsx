@@ -45,10 +45,10 @@ export const ProfileTemplate: React.FC<ProfileProps> = ({
             content: (
                 <Recipes
                     cols={{
-                        sm: GRID_COLS[2],
-                        md: GRID_COLS[2],
-                        lg: GRID_COLS[3],
-                        xl: GRID_COLS[3]
+                        sm: GRID_COLS[2] ?? 'grid-cols-2',
+                        md: GRID_COLS[2] ?? 'grid-cols-2',
+                        lg: GRID_COLS[3] ?? 'grid-cols-3',
+                        xl: GRID_COLS[3] ?? 'grid-cols-3'
                     }}
                     isCurrentUser={isCurrentUser}
                     userId={userResolved.id}

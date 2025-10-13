@@ -418,10 +418,7 @@ class UserService {
                 ? user.cookieConsent[0]
                 : null;
 
-        if (
-            latestConsent !== null &&
-            areConsentsEqual(latestConsent, payload)
-        ) {
+        if (latestConsent && areConsentsEqual(latestConsent, payload)) {
             log.trace(
                 'createUserCookieConsent - duplicate consent, skipping DB write',
                 {

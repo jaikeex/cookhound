@@ -379,12 +379,24 @@ class RecipeModel {
                 const categoryOrders = this.calculateCategoryOrders(
                     data.ingredients
                 );
+
                 const ingredientOrders = this.calculateIngredientOrders(
                     data.ingredients
                 );
 
+                if (!ingredientOrders || !Array.isArray(ingredientOrders)) {
+                    return recipe;
+                }
+
                 for (let i = 0; i < data.ingredients.length; i++) {
                     const ingredientData = data.ingredients[i];
+
+                    const categoryOrder = categoryOrders[i];
+                    const ingredientOrder = ingredientOrders[i];
+
+                    if (!ingredientData || ingredientOrder === undefined) {
+                        continue;
+                    }
 
                     // Only create ingredient if it doesn't already exist
                     let ingredient = await tx.ingredient.findFirst({
@@ -410,8 +422,8 @@ class RecipeModel {
                             ingredientId: ingredient.id,
                             quantity: ingredientData.quantity,
                             category: ingredientData.category || null,
-                            categoryOrder: categoryOrders[i],
-                            ingredientOrder: ingredientOrders[i]
+                            categoryOrder,
+                            ingredientOrder
                         }
                     });
                 }
@@ -532,6 +544,13 @@ class RecipeModel {
                 for (let i = 0; i < ingredients.length; i++) {
                     const ingredientData = ingredients[i];
 
+                    const categoryOrder = categoryOrders[i];
+                    const ingredientOrder = ingredientOrders[i];
+
+                    if (!ingredientData || ingredientOrder === undefined) {
+                        continue;
+                    }
+
                     let ingredient = await tx.ingredient.findFirst({
                         where: {
                             name: ingredientData.name,
@@ -554,8 +573,8 @@ class RecipeModel {
                             ingredientId: ingredient.id,
                             quantity: ingredientData.quantity,
                             category: ingredientData.category || null,
-                            categoryOrder: categoryOrders[i],
-                            ingredientOrder: ingredientOrders[i]
+                            categoryOrder,
+                            ingredientOrder
                         }
                     });
                 }

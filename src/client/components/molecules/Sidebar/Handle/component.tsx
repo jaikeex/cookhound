@@ -49,6 +49,11 @@ export const SidebarHandle: React.FC<SidebarHandleProps> = ({
     const handleTouchStart = useCallback(
         (e: React.TouchEvent<HTMLButtonElement>) => {
             const touch = e.touches[0];
+
+            if (!touch) {
+                return;
+            }
+
             touchStartY.current = touch.clientY;
             touchStartX.current = touch.clientX;
         },
@@ -58,6 +63,10 @@ export const SidebarHandle: React.FC<SidebarHandleProps> = ({
     const handleTouchMove = useCallback(
         (e: React.TouchEvent<HTMLButtonElement>) => {
             const touch = e.touches[0];
+
+            if (!touch) {
+                return;
+            }
 
             switch (position) {
                 case 'bottom': {

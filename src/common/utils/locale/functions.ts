@@ -18,10 +18,17 @@ export function extractPreferredLanguage(headerValue: string | null): string {
     // Map each language to an object with code and quality
     const parsedLanguages = languages.map((lang) => {
         const parts = lang.split(';');
-        const code = parts[0].trim().split('-')[0].toLowerCase();
+
+        if (!parts[0] || typeof parts[0] !== 'string') {
+            return { code: DEFAULT_LOCALE, quality: 1.0 };
+        }
+
+        const code = (
+            parts[0].trim().split('-')[0] ?? parts[0].trim()
+        ).toLowerCase();
         const qualityPart = parts[1];
         const quality = qualityPart
-            ? parseFloat(qualityPart.split('=')[1])
+            ? parseFloat(qualityPart.split('=')[1] ?? '1.0')
             : 1.0; // Default quality is 1.0
         return { code, quality };
     });
@@ -31,7 +38,7 @@ export function extractPreferredLanguage(headerValue: string | null): string {
 
     // Return the language code with the highest quality
     return parsedLanguages.length > 0
-        ? parsedLanguages[0].code
+        ? (parsedLanguages[0]?.code ?? DEFAULT_LOCALE)
         : DEFAULT_LOCALE;
 }
 

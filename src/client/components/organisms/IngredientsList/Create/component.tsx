@@ -316,6 +316,10 @@ export const IngredientsListCreate: React.FC<IngredientsListCreateProps> = ({
                 const keyToValue = new Map<number, Ingredient>();
 
                 oldKeys.forEach((key, idx) => {
+                    if (!ingredients[idx]) {
+                        return;
+                    }
+
                     keyToValue.set(key, ingredients[idx]);
                 });
 

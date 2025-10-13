@@ -83,6 +83,11 @@ export function intersectArrays<T, K = unknown>(
     // ------------------------------------------------------------
     {
         const first = arraysBySize[0];
+
+        if (!first) {
+            return [];
+        }
+
         for (const item of first) {
             const key = keySelector(item);
             // We only set the bucket if it does not exist yet – duplicate keys inside the first
@@ -108,6 +113,10 @@ export function intersectArrays<T, K = unknown>(
         // `seenInThisArray` prevents multiple occurrences of the same key within the
         // current array from counting multiple times.
         const seenInThisArray = new Set<K>();
+
+        if (!arr) {
+            continue;
+        }
 
         for (const item of arr) {
             const key = keySelector(item);
@@ -139,6 +148,10 @@ export function intersectArrays<T, K = unknown>(
     const result: T[] = [];
     const firstArray = arraysBySize[0];
     const emitted = new Set<K>();
+
+    if (!firstArray) {
+        return [];
+    }
 
     for (const item of firstArray) {
         const key = keySelector(item);

@@ -238,7 +238,7 @@ export const ImageInput: React.FC<ImageInputProps> = ({
 
     const handleManualUpload = useCallback(
         (e: React.ChangeEvent<HTMLInputElement>) => {
-            if (e.target.files) {
+            if (e.target.files && e.target.files[0]) {
                 openCropperModal(e.target.files[0]);
             }
         },

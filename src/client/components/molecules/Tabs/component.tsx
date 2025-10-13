@@ -77,7 +77,13 @@ export const Tabs: React.FC<TabsProps> = ({
 
     const updateUrlParam = useCallback(
         (index: number) => {
-            if (!enableNavigation) return;
+            if (!enableNavigation) {
+                return;
+            }
+
+            if (!tabs[index]) {
+                return;
+            }
 
             const currentUrl = new URL(window.location.href);
             const tab = tabs[index];

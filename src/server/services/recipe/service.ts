@@ -619,6 +619,13 @@ class RecipeService {
             if (queryTerms.length === 1) {
                 // single query fetch.
 
+                if (!queryTerms[0]) {
+                    throw new ValidationError(
+                        undefined,
+                        ApplicationErrorCode.VALIDATION_FAILED
+                    );
+                }
+
                 results = await recipeSearchIndex.searchSingleQuery(
                     queryTerms[0],
                     language,
@@ -683,6 +690,13 @@ class RecipeService {
             }
         } catch (error: unknown) {
             log.warn('searchRecipes - falling back to DB search', { error });
+
+            if (!queryTerms[0]) {
+                throw new ValidationError(
+                    undefined,
+                    ApplicationErrorCode.VALIDATION_FAILED
+                );
+            }
 
             /**
              * Fallback to db search if typesense fails. Do not bother with multi-searching here,

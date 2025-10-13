@@ -1,3 +1,5 @@
+import { Logger } from '@/server/logger';
+
 const CONSENT_CONTENT: Record<string, readonly string[]> = {
     en: [
         'We value your privacy. Choose which cookies you want to allow. Essential cookies are always enabled as they are necessary for the website to function properly.',
@@ -15,6 +17,8 @@ const CONSENT_CONTENT: Record<string, readonly string[]> = {
     ]
 } as const;
 
+const log = Logger.getInstance('serializeConsentContent');
+
 /**
  * Serializes the cookie consent content into a consistent, deterministic string
  * that can be used for hash generation.
@@ -26,6 +30,11 @@ export function serializeConsentContent(): string {
     const parts: string[] = [];
 
     for (const locale of locales) {
+        if (!CONSENT_CONTENT[locale]) {
+            log.warn('serializeConsentContent - locale not found', { locale });
+            continue;
+        }
+
         parts.push(...CONSENT_CONTENT[locale]);
     }
 
