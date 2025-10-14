@@ -26,7 +26,8 @@ export const QueryProvider: React.FC<
                 defaultOptions: {
                     queries: {
                         staleTime: 60_000,
-                        refetchOnWindowFocus: false
+                        refetchOnWindowFocus: false,
+                        refetchOnMount: true
                     }
                 }
             })

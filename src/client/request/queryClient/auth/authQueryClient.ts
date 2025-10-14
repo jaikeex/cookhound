@@ -18,6 +18,7 @@ class AuthQueryClient {
      * Key: AUTH_QUERY_KEYS.currentUser
      * Stale time: 5 minutes
      * Retry: 1
+     * refetchOnMount: true
      */
     useCurrentUser = (options?: Partial<CurrentUserOptions>) =>
         useAppQuery(
@@ -26,6 +27,7 @@ class AuthQueryClient {
             {
                 staleTime: 5 * 60 * 1000, // 5 minutes
                 retry: 1,
+                refetchOnMount: true,
                 ...options
             }
         );

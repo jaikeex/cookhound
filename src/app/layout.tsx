@@ -74,23 +74,22 @@ export default async function RootLayout({
     //?                                      AUTHENTICATION                                     ?//
     //|-----------------------------------------------------------------------------------------|//
 
-    let user: UserDTO | null = null;
-
-    try {
-        if (typeof window !== 'undefined') {
-            throw new Error('Cannot get user like this in a browser');
+    await qc.prefetchQuery({
+        queryKey: QUERY_KEYS.auth.currentUser,
+        staleTime: 5 * 60 * 1000,
+        queryFn: async () => {
+            try {
+                if (typeof window !== 'undefined') {
+                    return null;
+                }
+                return await getCurrentUser();
+            } catch (error: unknown) {
+                return null;
+            }
         }
+    });
 
-        user = await getCurrentUser();
-    } catch (error: unknown) {
-        user = null;
-    }
-
-    /**
-     * There is no need to fetch through react-query here. the api client would be called anyway and no
-     * functionality from rq is needed, it would only make the code more cluttered.
-     */
-    qc.setQueryData(QUERY_KEYS.auth.currentUser, user);
+    const user = qc.getQueryData<UserDTO | null>(QUERY_KEYS.auth.currentUser);
 
     //|-----------------------------------------------------------------------------------------|//
     //?                                      COOKIE CONSENT                                     ?//
