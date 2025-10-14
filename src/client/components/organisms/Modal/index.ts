@@ -7,3 +7,4 @@ export * from './CreateCookbookModal';
 export * from './AddRecipeToCookbookModal';
 export * from './DeleteFromCookbookConfirmationModal';
 export * from './DeleteAccountModal';
+export * from './ShareModal';

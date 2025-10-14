@@ -4,7 +4,7 @@ export * from './object';
 export * from './string';
 export * from './classnames';
 export * from './user';
-
+export * from './social-sharing';
 export * from './fileToByteArray';
 export * from './generateRandomId';
 export * from './cookies';
