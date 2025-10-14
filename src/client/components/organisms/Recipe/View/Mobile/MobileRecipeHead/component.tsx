@@ -30,14 +30,10 @@ export const MobileRecipeHead: React.FC<MobileRecipeHeadProps> = ({
     return (
         <React.Fragment>
             <RecipeViewImage
-                src={recipe.imageUrl}
-                alt={recipe.title}
-                recipeId={recipe.id}
+                recipe={recipe}
                 wrapperClassName={'mx-auto max-w-[480px]'}
                 className={'min-w-auto max-w-auto'}
                 priority={true}
-                authorId={recipe.authorId}
-                createdAt={recipe.createdAt}
                 isPreview={isPreview}
             />
 
@@ -65,21 +61,23 @@ export const MobileRecipeHead: React.FC<MobileRecipeHeadProps> = ({
                     typographyVariant={'body'}
                 />
 
-                <Tooltip
-                    position={'top'}
-                    text={t('app.general.anonymous')}
-                    disabled={isPreview || !!user}
-                >
-                    <Rating
-                        onClick={onRateRecipe}
-                        disabled={isPreview || !user}
-                        rating={recipe.rating}
-                        fill={'gold'}
-                        iconSize={22}
-                        cooldown={60000}
-                        cooldownKey={recipe.displayId}
-                    />
-                </Tooltip>
+                <div className="flex items-center gap-3">
+                    <Tooltip
+                        position={'top'}
+                        text={t('app.general.anonymous')}
+                        disabled={isPreview || !!user}
+                    >
+                        <Rating
+                            onClick={onRateRecipe}
+                            disabled={isPreview || !user}
+                            rating={recipe.rating}
+                            fill={'gold'}
+                            iconSize={22}
+                            cooldown={60000}
+                            cooldownKey={recipe.displayId}
+                        />
+                    </Tooltip>
+                </div>
             </div>
         </React.Fragment>
     );

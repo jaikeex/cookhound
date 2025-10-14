@@ -137,6 +137,8 @@ export async function getLocalizedMetadata(
     //?                                          IMAGES                                         ?//
     //|-----------------------------------------------------------------------------------------|//
 
+    const fallbackImage = `${baseUrl}/img/logo-light.png`;
+
     if (config.images && config.images.length > 0) {
         metadata.openGraph = {
             ...metadata.openGraph,
@@ -166,6 +168,22 @@ export async function getLocalizedMetadata(
         metadata.twitter = {
             ...metadata.twitter,
             images: [config.imageUrl]
+        };
+    } else {
+        metadata.openGraph = {
+            ...metadata.openGraph,
+            images: [
+                {
+                    url: fallbackImage,
+                    width: 1200,
+                    height: 630,
+                    alt: 'Cookhound'
+                }
+            ]
+        };
+        metadata.twitter = {
+            ...metadata.twitter,
+            images: [fallbackImage]
         };
     }
 

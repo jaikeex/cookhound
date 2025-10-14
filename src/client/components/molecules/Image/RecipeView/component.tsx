@@ -145,9 +145,10 @@ export const RecipeViewImage: React.FC<RecipeViewImageProps> = ({
     }, [
         isPreview,
         handleOpenCookbookModal,
-        recipe,
-        isMobile,
-        handleOpenShareModal
+        t,
+        handleOpenShareModal,
+        recipe.authorId,
+        isMobile
     ]);
 
     //|-----------------------------------------------------------------------------------------|//

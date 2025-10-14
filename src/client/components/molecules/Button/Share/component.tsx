@@ -42,7 +42,7 @@ export const ShareButton: React.FC<ShareButtonProps> = ({
             onClick={onClick}
             disabled={disabled}
             className={classNames(
-                'flex flex-col items-center justify-center gap-2 p-4',
+                'flex flex-col items-center justify-center gap-2 p-4 min-w-40',
                 'rounded-lg border-2 transition-all duration-200',
                 disabled
                     ? 'opacity-50 cursor-not-allowed border-gray-300 dark:border-gray-600'

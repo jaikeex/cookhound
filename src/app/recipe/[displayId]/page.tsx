@@ -60,6 +60,7 @@ export async function generateMetadata({
             descriptionKey: 'meta.recipe.description',
             ogTitleKey: 'meta.recipe.title',
             ogDescriptionKey: 'meta.recipe.description',
+            twitterCard: 'summary_large_image',
             images: recipe.imageUrl ? [recipe.imageUrl] : [],
             params: { recipeTitle: recipe.title },
             canonical,

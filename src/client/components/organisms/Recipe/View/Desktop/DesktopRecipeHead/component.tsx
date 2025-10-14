@@ -47,22 +47,24 @@ export const DesktopRecipeHead: React.FC<DesktopRecipeHeadProps> = ({
                             />
                         )}
 
-                        <Tooltip
-                            className={'w-fit'}
-                            disabled={isPreview || !!user}
-                            position={'bottom'}
-                            text={t('app.general.anonymous')}
-                        >
-                            <Rating
-                                cooldown={60000}
-                                cooldownKey={recipe.displayId}
-                                disabled={isPreview || !user}
-                                fill={'gold'}
-                                iconSize={22}
-                                onClick={onRateRecipe}
-                                rating={recipe.rating}
-                            />
-                        </Tooltip>
+                        <div className="flex items-center gap-3">
+                            <Tooltip
+                                className={'w-fit'}
+                                disabled={isPreview || !!user}
+                                position={'bottom'}
+                                text={t('app.general.anonymous')}
+                            >
+                                <Rating
+                                    cooldown={60000}
+                                    cooldownKey={recipe.displayId}
+                                    disabled={isPreview || !user}
+                                    fill={'gold'}
+                                    iconSize={22}
+                                    onClick={onRateRecipe}
+                                    rating={recipe.rating}
+                                />
+                            </Tooltip>
+                        </div>
                     </div>
 
                     <TagList
@@ -82,13 +84,9 @@ export const DesktopRecipeHead: React.FC<DesktopRecipeHeadProps> = ({
             </div>
 
             <RecipeViewImage
-                alt={recipe.title}
                 className="max-h-[180px] max-w-80"
-                src={recipe.imageUrl}
-                recipeId={recipe.id}
+                recipe={recipe}
                 priority={true}
-                authorId={recipe.authorId}
-                createdAt={recipe.createdAt}
                 isPreview={isPreview}
             />
         </div>
