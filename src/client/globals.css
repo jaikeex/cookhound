@@ -21,7 +21,7 @@
     }
 
     .icon-button {
-        @apply min-h-7 min-w-7 flex items-center justify-center rounded hover:bg-stone-200
+        @apply min-h-7 min-w-7 aspect-square flex items-center justify-center rounded hover:bg-stone-200
         dark:hover:bg-stone-700 transition-colors;
     }
 
