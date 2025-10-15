@@ -399,8 +399,10 @@ describe('AuthService', () => {
             expect(mockFetch).toHaveBeenCalledTimes(2);
 
             const tokenCall = mockFetch.mock.calls[0];
-            expect(tokenCall[0]).toContain('oauth2.googleapis.com/token');
-            expect(tokenCall[1]).toMatchObject({
+            expect(tokenCall).toBeDefined();
+
+            expect(tokenCall?.[0]).toContain('oauth2.googleapis.com/token');
+            expect(tokenCall?.[1]).toMatchObject({
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded'
@@ -408,10 +410,10 @@ describe('AuthService', () => {
             });
 
             const userInfoCall = mockFetch.mock.calls[1];
-            expect(userInfoCall[0]).toContain(
+            expect(userInfoCall?.[0]).toContain(
                 'www.googleapis.com/oauth2/v3/userinfo'
             );
-            expect(userInfoCall[1]).toMatchObject({
+            expect(userInfoCall?.[1]).toMatchObject({
                 headers: {
                     Authorization: `Bearer ${mockGoogleAccessTokenResponse.access_token}`
                 }
