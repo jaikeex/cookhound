@@ -72,7 +72,8 @@ vi.mock('@/server/utils/reqwest', () => ({
 
 vi.mock('@/server/utils/crypto', () => ({
     safeVerifyPassword: vi.fn(),
-    hashPassword: vi.fn()
+    hashPassword: vi.fn(),
+    needsRehash: vi.fn()
 }));
 
 //|=============================================================================================|//
@@ -84,7 +85,11 @@ import { sessions, deleteSessionCookie } from '@/server/utils/session';
 import { RequestContext } from '@/server/utils/reqwest/context';
 import { userService } from '@/server/services/user/service';
 import { assertAuthenticated } from '@/server/utils/reqwest';
-import { safeVerifyPassword, hashPassword } from '@/server/utils/crypto';
+import {
+    safeVerifyPassword,
+    hashPassword,
+    needsRehash
+} from '@/server/utils/crypto';
 
 const mockDbUser = vi.mocked(db.user);
 const mockSessions = vi.mocked(sessions);
@@ -95,6 +100,7 @@ const mockAssertAuthenticated = vi.mocked(assertAuthenticated);
 const mocksafeVerifyPassword = vi.mocked(safeVerifyPassword);
 const mockSafeVerifyPassword = vi.mocked(safeVerifyPassword);
 const mockHashPassword = vi.mocked(hashPassword);
+const mockNeedsRehash = vi.mocked(needsRehash);
 
 // Mock global fetch
 const mockFetch = vi.fn();
@@ -116,7 +122,8 @@ describe('AuthService', () => {
         setupPasswordMocks(
             mocksafeVerifyPassword,
             mockSafeVerifyPassword,
-            mockHashPassword
+            mockHashPassword,
+            mockNeedsRehash
         );
         setupRequestContextMocks(mockRequestContext, {
             userId: validUser.id
@@ -245,6 +252,31 @@ describe('AuthService', () => {
 
             expect(mockDbUser.updateOneById).not.toHaveBeenCalled();
             expect(mockSessions.createSession).not.toHaveBeenCalled();
+        });
+
+        it('should rehash password when hash uses old parameters', async () => {
+            const oldHashUser = { ...validUser };
+            mockDbUser.getOneByEmail.mockResolvedValue(oldHashUser);
+            mocksafeVerifyPassword.mockResolvedValue(true);
+            mockNeedsRehash.mockReturnValue(true);
+            mockHashPassword.mockResolvedValue('new-hashed-password');
+
+            await authService.login({
+                email: validUser.email,
+                password: TEST_PASSWORD,
+                keepLoggedIn: false
+            });
+
+            expect(mockNeedsRehash).toHaveBeenCalledWith(
+                oldHashUser.passwordHash
+            );
+            expect(mockHashPassword).toHaveBeenCalledWith(TEST_PASSWORD);
+            expect(mockDbUser.updateOneById).toHaveBeenCalledWith(
+                validUser.id,
+                expect.objectContaining({
+                    passwordHash: 'new-hashed-password'
+                })
+            );
         });
     });
 

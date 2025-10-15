@@ -94,21 +94,25 @@ export function setupPasswordMocks(
     mockVerifyPassword: any,
     mockSafeVerifyPassword: any,
     mockHashPassword: any,
+    mockNeedsRehash: any,
     options: {
         verifyResult?: boolean;
         hashResult?: string;
         safeVerifyResult?: boolean;
+        needsRehashResult?: boolean;
     } = {}
 ) {
     const {
         verifyResult = true,
         hashResult = '$argon2id$v=19$m=65536,t=3,p=4$mock-hash',
-        safeVerifyResult = true
+        safeVerifyResult = true,
+        needsRehashResult = false
     } = options;
 
     mockVerifyPassword.mockResolvedValue(verifyResult);
     mockSafeVerifyPassword.mockResolvedValue(safeVerifyResult);
     mockHashPassword.mockResolvedValue(hashResult);
+    mockNeedsRehash.mockReturnValue(needsRehashResult);
 }
 
 export function setupUuidMock(mockUuid: any, token = 'mock-uuid-token') {

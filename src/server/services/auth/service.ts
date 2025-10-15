@@ -23,7 +23,11 @@ import { RequestContext } from '@/server/utils/reqwest/context';
 import { ApplicationErrorCode } from '@/server/error/codes';
 import { createUserDTO } from '@/server/services/user/utils';
 import { assertAuthenticated } from '@/server/utils/reqwest';
-import { safeVerifyPassword } from '@/server/utils/crypto';
+import {
+    safeVerifyPassword,
+    needsRehash,
+    hashPassword
+} from '@/server/utils/crypto';
 
 //|=============================================================================================|//
 
@@ -82,6 +86,17 @@ class AuthService {
                 'auth.error.email-not-verified',
                 ApplicationErrorCode.EMAIL_NOT_VERIFIED
             );
+        }
+
+        if (needsRehash(user.passwordHash)) {
+            log.info('login - rehashing password', {
+                userId: user.id
+            });
+
+            const newHash = await hashPassword(password);
+            await db.user.updateOneById(user.id, {
+                passwordHash: newHash
+            });
         }
 
         await db.user.updateOneById(user.id, { lastLogin: new Date() });
