@@ -21,6 +21,7 @@ import { RequestContext } from '@/server/utils/reqwest/context';
 import { randomUUID } from 'crypto';
 import { recipeSearchIndex } from '@/server/search-index';
 import { intersectArrays } from '@/common/utils';
+import { revalidateRouteCache } from '@/server/utils/revalidateRouteCache';
 import { SEARCH_QUERY_SEPARATOR } from '@/common/constants';
 import { queueManager } from '@/server/queues/QueueManager';
 import { JOB_NAMES } from '@/server/queues/jobs/names';
@@ -286,6 +287,15 @@ class RecipeService {
         // The recipe was successfully updated, and needs to be evaluated again.
         openaiApiService.evaluateRecipeContent(recipeDTO);
 
+        try {
+            await revalidateRouteCache(`/recipe/${recipeDTO.displayId}`);
+        } catch (error: unknown) {
+            log.warn('updateRecipe - failed to revalidate recipe route', {
+                error,
+                recipeId
+            });
+        }
+
         return recipeDTO;
     }
 
@@ -324,6 +334,15 @@ class RecipeService {
         }
 
         await db.recipe.deleteOneById(recipeId);
+
+        try {
+            await revalidateRouteCache(`/recipe/${recipe.displayId}`);
+        } catch (error: unknown) {
+            log.warn('deleteRecipe - failed to revalidate recipe route', {
+                error,
+                recipeId
+            });
+        }
 
         try {
             await recipeSearchIndex.deleteOne(recipeId);
@@ -431,7 +450,9 @@ class RecipeService {
             timesRated: allRatings.length
         });
 
-        // Update in search index, no need to await this.
+        // no need to await this here
+        revalidateRouteCache(`/recipe/${recipe.displayId}`);
+
         try {
             const updatedRecipe = await this.getRecipeById(recipeId);
             await recipeSearchIndex.upsert(updatedRecipe);

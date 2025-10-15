@@ -9,10 +9,11 @@ import { Logger } from '@/server/logger';
 import recipeModel from '@/server/db/model/recipe/model';
 import { InfrastructureError } from '@/server/error/server';
 import { InfrastructureErrorCode } from '@/server/error/codes';
-import { ENV_CONFIG_PUBLIC, RecipeFlagReason } from '@/common/constants';
+import { RecipeFlagReason } from '@/common/constants';
 import { zodTextFormat } from '@/server/utils/openai';
 import { z } from 'zod';
 import { recipeSearchIndex } from '@/server/search-index/recipeIndex';
+import { revalidateRouteCache } from '@/server/utils/revalidateRouteCache';
 
 const log = Logger.getInstance('recipe-evaluation-worker');
 
@@ -76,17 +77,7 @@ class EvaluateRecipeJob extends BaseJob<EvaluateRecipeJobData> {
 
             recipeSearchIndex.deleteOne(recipeId);
 
-            const response = await fetch(
-                `${ENV_CONFIG_PUBLIC.API_URL}/revalidate?path=/recipes/display/${recipeDisplayId}`
-            );
-
-            if (!response.ok) {
-                log.warn('handle - failed to revalidate recipe route', {
-                    recipeId,
-                    userId,
-                    response
-                });
-            }
+            await revalidateRouteCache(`/recipe/${recipeDisplayId}`);
 
             log.notice('handle - recipe rejected and flagged', {
                 recipeId,

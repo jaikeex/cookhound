@@ -8,7 +8,6 @@ import {
     useSnackbar
 } from '@/client/store';
 import { useShoppingList } from '@/client/hooks';
-import { revalidateRouteCache } from '@/common/utils';
 import type { RecipeDTO } from '@/common/types/recipe';
 import { useRouter } from 'next/navigation';
 import { useCallback } from 'react';
@@ -26,17 +25,17 @@ export const useDisplayRecipe = (recipe: RecipeDTO) => {
 
     const { mutate: rateRecipe } = chqc.recipe.useRateRecipe({
         onSuccess: async () => {
-            // Invalidate is not sufficient here.
-            queryClient.refetchQueries({
-                queryKey: QUERY_KEYS.recipe.byDisplayId(recipe.displayId)
-            });
-
             alert({
                 message: t('app.recipe.rated'),
                 variant: 'success'
             });
 
-            handleMutateRecipeSuccess();
+            // Invalidate is not sufficient here.
+            await queryClient.refetchQueries({
+                queryKey: QUERY_KEYS.recipe.byDisplayId(recipe.displayId)
+            });
+
+            router.refresh();
         },
         onError: () => {
             alert({
@@ -45,11 +44,6 @@ export const useDisplayRecipe = (recipe: RecipeDTO) => {
             });
         }
     });
-
-    const handleMutateRecipeSuccess = useCallback(async () => {
-        await revalidateRouteCache(`/recipe/${recipe.displayId}`);
-        router.refresh();
-    }, [recipe.displayId, router]);
 
     const handleRateRecipe = useCallback(
         async (rating: number) => {
