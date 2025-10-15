@@ -51,6 +51,6 @@ export const POST = makeHandler(
     withAuth,
     withRateLimit({
         maxRequests: 20,
-        windowSizeInSeconds: 600
+        windowSizeInSeconds: 600 // 10 minutes
     })
 );

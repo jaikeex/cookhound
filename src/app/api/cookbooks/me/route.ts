@@ -9,6 +9,7 @@ import {
 } from '@/server/utils/reqwest';
 import { cookbookService } from '@/server/services/cookbook/service';
 import { z } from 'zod';
+import { withRateLimit } from '@/server/utils/rate-limit/wrapper';
 
 //|=============================================================================================|//
 //?                                     VALIDATION SCHEMAS                                      ?//
@@ -39,4 +40,11 @@ async function putHandler(request: NextRequest) {
     return ok({ message: 'Cookbooks reordered' });
 }
 
-export const PUT = makeHandler(putHandler, withAuth);
+export const PUT = makeHandler(
+    putHandler,
+    withAuth,
+    withRateLimit({
+        maxRequests: 10,
+        windowSizeInSeconds: 15
+    })
+);

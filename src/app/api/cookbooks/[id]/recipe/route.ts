@@ -10,6 +10,7 @@ import type { NextRequest } from 'next/server';
 import { withAuth } from '@/server/utils/reqwest';
 import { z } from 'zod';
 import { cookbookService } from '@/server/services/cookbook/service';
+import { withRateLimit } from '@/server/utils/rate-limit/wrapper';
 
 //|=============================================================================================|//
 //?                                     VALIDATION SCHEMAS                                      ?//
@@ -111,6 +112,22 @@ async function putHandler(request: NextRequest) {
     return noContent();
 }
 
-export const POST = makeHandler(postHandler, withAuth);
+export const POST = makeHandler(
+    postHandler,
+    withAuth,
+    withRateLimit({
+        maxRequests: 10,
+        windowSizeInSeconds: 60
+    })
+);
+
 export const DELETE = makeHandler(deleteHandler, withAuth);
-export const PUT = makeHandler(putHandler, withAuth);
+
+export const PUT = makeHandler(
+    putHandler,
+    withAuth,
+    withRateLimit({
+        maxRequests: 10,
+        windowSizeInSeconds: 60
+    })
+);

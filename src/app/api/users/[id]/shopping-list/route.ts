@@ -11,6 +11,7 @@ import {
 import { userService } from '@/server/services/user/service';
 import { withAuth } from '@/server/utils/reqwest';
 import { z } from 'zod';
+import { withRateLimit } from '@/server/utils/rate-limit';
 
 //|=============================================================================================|//
 //?                                     VALIDATION SCHEMAS                                      ?//
@@ -142,6 +143,21 @@ async function deleteHandler(request: NextRequest) {
 }
 
 export const GET = makeHandler(getHandler, withAuth);
-export const POST = makeHandler(postHandler, withAuth);
-export const PUT = makeHandler(putHandler, withAuth);
+
+export const POST = makeHandler(
+    postHandler,
+    withAuth,
+    withRateLimit({
+        maxRequests: 10,
+        windowSizeInSeconds: 60
+    })
+);
+export const PUT = makeHandler(
+    putHandler,
+    withAuth,
+    withRateLimit({
+        maxRequests: 10,
+        windowSizeInSeconds: 60
+    })
+);
 export const DELETE = makeHandler(deleteHandler, withAuth);

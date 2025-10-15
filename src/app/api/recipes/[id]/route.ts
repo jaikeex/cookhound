@@ -11,6 +11,7 @@ import {
 import { validatePayload } from '@/server/utils/reqwest';
 import { ApplicationErrorCode } from '@/server/error/codes';
 import { z } from 'zod';
+import { withRateLimit } from '@/server/utils/rate-limit/wrapper';
 
 //|=============================================================================================|//
 //?                                     VALIDATION SCHEMAS                                      ?//
@@ -138,5 +139,13 @@ async function deleteHandler(request: NextRequest) {
 }
 
 export const GET = makeHandler(getHandler);
-export const PUT = makeHandler(putHandler, withAuth);
+export const PUT = makeHandler(
+    putHandler,
+    withAuth,
+    withRateLimit({
+        maxRequests: 5,
+        windowSizeInSeconds: 60
+    })
+);
+
 export const DELETE = makeHandler(deleteHandler, withAuth);

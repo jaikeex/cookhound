@@ -52,4 +52,5 @@ async function putHandler(request: NextRequest) {
     return noContent();
 }
 
+// not rate limited by design
 export const PUT = makeHandler(putHandler, withAuth);

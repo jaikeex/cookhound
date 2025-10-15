@@ -10,6 +10,7 @@ import {
 import type { NextRequest } from 'next/server';
 import { z } from 'zod';
 import { ApplicationErrorCode } from '@/server/error/codes';
+import { withRateLimit } from '@/server/utils/rate-limit';
 
 //|=============================================================================================|//
 //?                                     VALIDATION SCHEMAS                                      ?//
@@ -87,5 +88,18 @@ async function putHandler(request: NextRequest) {
     return noContent();
 }
 
-export const POST = makeHandler(postHandler);
-export const PUT = makeHandler(putHandler);
+export const POST = makeHandler(
+    postHandler,
+    withRateLimit({
+        maxRequests: 10,
+        windowSizeInSeconds: 60
+    })
+);
+
+export const PUT = makeHandler(
+    putHandler,
+    withRateLimit({
+        maxRequests: 10,
+        windowSizeInSeconds: 60
+    })
+);

@@ -15,6 +15,7 @@ import type { TermsAcceptanceForCreate } from '@/common/types';
 import { RequestContext } from '@/server/utils/reqwest/context';
 import { generateProofHash } from '@/server/utils/crypto';
 import { serializeTermsContent } from '@/server/utils/terms';
+import { withRateLimit } from '@/server/utils/rate-limit';
 
 //|=============================================================================================|//
 //?                                     VALIDATION SCHEMAS                                      ?//
@@ -22,7 +23,16 @@ import { serializeTermsContent } from '@/server/utils/terms';
 
 const UserForCreateSchema = z.strictObject({
     email: z.email().trim(),
-    password: z.string().trim().min(6).max(40),
+    password: z
+        .string()
+        .trim()
+        .regex(
+            /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).*$/,
+            'auth.error.password-missing-character'
+        )
+        .min(6, 'auth.error.password-min-length')
+        .min(1, 'auth.error.password-required')
+        .max(40, 'auth.error.password-max-length'),
     username: z.string().trim().min(3).max(40),
     termsAccepted: z.boolean()
 });
@@ -94,4 +104,10 @@ async function postHandler(request: NextRequest) {
     return created(user);
 }
 
-export const POST = makeHandler(postHandler);
+export const POST = makeHandler(
+    postHandler,
+    withRateLimit({
+        maxRequests: 10,
+        windowSizeInSeconds: 60 * 60 // 1 hour
+    })
+);

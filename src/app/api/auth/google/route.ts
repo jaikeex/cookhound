@@ -6,6 +6,7 @@ import { z } from 'zod';
 import { ApplicationErrorCode } from '@/server/error/codes';
 import { createSessionCookie } from '@/server/utils/session/cookie';
 import { assertAnonymous, ok } from '@/server/utils/reqwest';
+import { withRateLimit } from '@/server/utils/rate-limit';
 
 //|=============================================================================================|//
 //?                                     VALIDATION SCHEMAS                                      ?//
@@ -62,4 +63,10 @@ async function postHandler(request: NextRequest) {
     );
 }
 
-export const POST = makeHandler(postHandler);
+export const POST = makeHandler(
+    postHandler,
+    withRateLimit({
+        maxRequests: 10,
+        windowSizeInSeconds: 60
+    })
+);

@@ -1,6 +1,7 @@
 import { NotFoundError, ValidationError } from '@/server/error';
 import { ApplicationErrorCode } from '@/server/error/codes';
 import { userService } from '@/server/services';
+import { withRateLimit } from '@/server/utils/rate-limit/wrapper';
 import {
     assertSelfOrAdmin,
     makeHandler,
@@ -108,4 +109,11 @@ async function putHandler(request: NextRequest) {
 }
 
 export const GET = makeHandler(getHandler);
-export const PUT = makeHandler(putHandler, withAuth);
+export const PUT = makeHandler(
+    putHandler,
+    withAuth,
+    withRateLimit({
+        maxRequests: 10,
+        windowSizeInSeconds: 60
+    })
+);

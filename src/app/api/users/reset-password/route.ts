@@ -7,6 +7,7 @@ import {
 } from '@/server/utils/reqwest';
 import { userService } from '@/server/services/user/service';
 import { z } from 'zod';
+import { withRateLimit } from '@/server/utils/rate-limit';
 
 //|=============================================================================================|//
 //?                                     VALIDATION SCHEMAS                                      ?//
@@ -63,5 +64,18 @@ async function putHandler(request: NextRequest) {
     return noContent();
 }
 
-export const POST = makeHandler(postHandler);
-export const PUT = makeHandler(putHandler);
+export const POST = makeHandler(
+    postHandler,
+    withRateLimit({
+        maxRequests: 5,
+        windowSizeInSeconds: 60 * 60 // 1 hour
+    })
+);
+
+export const PUT = makeHandler(
+    putHandler,
+    withRateLimit({
+        maxRequests: 5,
+        windowSizeInSeconds: 60 * 60 // 1 hour
+    })
+);

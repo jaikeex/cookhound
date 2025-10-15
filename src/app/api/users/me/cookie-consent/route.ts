@@ -86,4 +86,5 @@ async function postHandler(request: NextRequest) {
     return ok(cookieConsent);
 }
 
+// not rate limited by design
 export const POST = makeHandler(postHandler, withAuth);

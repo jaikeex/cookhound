@@ -73,11 +73,4 @@ export const POST = makeHandler(
     })
 );
 
-export const DELETE = makeHandler(
-    deleteHandler,
-    withAuth,
-    withRateLimit({
-        maxRequests: 5,
-        windowSizeInSeconds: 60 * 60 // 1 hour
-    })
-);
+export const DELETE = makeHandler(deleteHandler, withAuth);
