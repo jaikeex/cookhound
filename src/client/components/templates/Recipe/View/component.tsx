@@ -5,7 +5,7 @@ import { DesktopRecipeViewTemplate } from './Desktop';
 import { MobileRecipeViewTemplate } from './Mobile';
 import type { RecipeDTO } from '@/common/types';
 import type { RecipeForDisplayDTO } from '@/common/types';
-import { useIngredientSelectStore, useAuth } from '@/client/store';
+import { useIngredientSelectStore, useAuth, useConsent } from '@/client/store';
 import { useRunOnce } from '@/client/hooks';
 import { useLocalStorage } from '@/client/hooks/useLocalStorage';
 import { LOCAL_STORAGE_LAST_VIEWED_RECIPES_KEY } from '@/common/constants';
@@ -22,6 +22,7 @@ export const RecipeViewTemplate: React.FC<RecipeViewProps> = ({ recipe }) => {
     const queryClient = useQueryClient();
     const { resetSelectedIngredients } = useIngredientSelectStore();
     const { user } = useAuth();
+    const { canUsePreferences } = useConsent();
 
     const isFlagged = recipeResolved.flags?.some((flag) => flag.active);
 
@@ -53,7 +54,7 @@ export const RecipeViewTemplate: React.FC<RecipeViewProps> = ({ recipe }) => {
             });
 
             // For anonymous users, also store the recipe locally so it can be suggested later.
-            if (!user?.id) {
+            if (!user?.id && canUsePreferences) {
                 const lightweight: RecipeForDisplayDTO = {
                     id: recipeResolved.id,
                     displayId: recipeResolved.displayId,
