@@ -31,7 +31,6 @@ interface LanguagePack {
     translations: Record<TimeUnits, Partial<Record<PluralCategory, string>>>;
 }
 
-// English Language Pack
 const en: LanguagePack = {
     pluralization: (n) => (n === 1 ? 'one' : 'other'),
     formatter: (value, unit) => `${value} ${unit}`,
@@ -45,7 +44,6 @@ const en: LanguagePack = {
     }
 };
 
-// Czech Language Pack
 const cs: LanguagePack = {
     pluralization: (n) => {
         if (n === 1) return 'one';

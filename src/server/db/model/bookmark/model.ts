@@ -49,8 +49,8 @@ class BookmarkModel {
         log.trace('Adding bookmark', { userId, cookbookId, position });
 
         await prisma.$transaction(async (tx) => {
-            // Determine target position
             let targetPos: number;
+
             if (typeof position === 'number' && position > 0) {
                 targetPos = position;
                 await tx.cookbookBookmark.updateMany({

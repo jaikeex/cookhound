@@ -199,7 +199,6 @@ export class MailClient {
         let email = `From: ${from}\r\n`;
         email += `To: ${to}\r\n`;
 
-        // Detect non-ASCII characters using Unicode property escapes to avoid control-char regex lint error
         const needsEncoding = /[^\p{ASCII}]/u.test(options.subject);
         const subjectHeader = needsEncoding
             ? encodeHeaderUtf8(options.subject)

@@ -88,7 +88,6 @@ export const useSettingPersistence = <T>(
         return parsed;
     }, [canPersist, storageKey, deserialize, allowedValues]);
 
-    // Hydrate external state once
     useEffect(() => {
         if (restored === undefined || !onRestore) return;
 
@@ -96,7 +95,6 @@ export const useSettingPersistence = <T>(
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [restored]);
 
-    // Persist whenever the value or consent changes
     useEffect(() => {
         if (currentValue === undefined) return;
 

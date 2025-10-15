@@ -177,7 +177,7 @@ export class GoogleCloudLoggingTransport extends Transport {
 
                     this.retryAttempts = 0;
 
-                    // Don't re-queue failed logs
+                    // Never re-queue failed logs
                     return;
                 }
             }

@@ -50,13 +50,11 @@ export default async function Page({ params }: CookbookPageParams) {
         notFound();
     }
 
-    // Generate structured data for public cookbooks only
     const cookbookSchema =
         isPublic && cookbook
             ? generateCookbookSchema(cookbook, ENV_CONFIG_PUBLIC.ORIGIN)
             : null;
 
-    // Generate breadcrumb schema: Home > User Profile > Cookbook
     const breadcrumbSchema =
         isPublic && cookbook
             ? generateBreadcrumbSchema([

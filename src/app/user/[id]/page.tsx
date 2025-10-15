@@ -45,7 +45,8 @@ export default async function UserProfilePage({
 
     const sessionId = cookieStore.get(SESSION_COOKIE_NAME)?.value;
 
-    // Check whether the caller is the profile owner
+    // Check whether the caller is the profile owner, this is important for the default tab
+    // displayed and to hide sensitive info from impostors.
     let isCurrentUser = false;
 
     if (sessionId) {
@@ -53,7 +54,6 @@ export default async function UserProfilePage({
         isCurrentUser = isLoggedIn && session?.userId === id;
     }
 
-    // Get the correct tab to display
     const incomingTab = searchParamsResolved.tab ?? null;
 
     let resolvedTab: ProfileTab;

@@ -39,8 +39,8 @@ export const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
                 });
                 onClose?.();
                 close?.();
-                // Refresh the page to show the pending deletion banner
-                window.location.reload();
+
+                window.location.reload(); // to show the banner
             },
             onError: () => {
                 alert({

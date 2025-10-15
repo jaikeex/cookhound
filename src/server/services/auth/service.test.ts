@@ -107,13 +107,11 @@ describe('AuthService', () => {
     beforeEach(() => {
         vi.clearAllMocks();
 
-        // Default mock implementations
         mockSessions.createSession.mockResolvedValue('mock-session-token');
         mockDbUser.updateOneById.mockResolvedValue(validUser);
         mockDbUser.registerUserVisit.mockResolvedValue(undefined);
         mockAssertAuthenticated.mockReturnValue(validUser.id);
 
-        // Setup helpers for common mocks
         setupPasswordMocks(mockVerifyPassword, mockHashPassword);
         setupRequestContextMocks(mockRequestContext, {
             userId: validUser.id

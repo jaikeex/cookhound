@@ -11,7 +11,6 @@ import recipeModel from '@/server/db/model/recipe/model';
 
 const log = Logger.getInstance('recipe-reindex-job');
 
-// How many recipes to load from DB in one go.
 const BATCH_SIZE = 250;
 
 /**

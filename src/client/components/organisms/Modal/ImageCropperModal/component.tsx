@@ -39,7 +39,6 @@ export const ImageCropperModal: React.FC<ImageCropperModalProps> = ({
         []
     );
 
-    // Create object URL for the file
     useEffect(() => {
         const url = URL.createObjectURL(file);
         setImageUrl(url);

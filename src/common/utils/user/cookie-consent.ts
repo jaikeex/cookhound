@@ -28,7 +28,6 @@ export function pickMostRecentConsent(
     const cookieTs = validCookie.createdAt.getTime();
     const dbTs = validDb.createdAt.getTime();
 
-    // Always return a shallow copy to prevent accidental external mutation
     return dbTs > cookieTs ? { ...fromDb } : { ...fromCookie };
 }
 
@@ -39,12 +38,10 @@ export function areConsentsEqual(
     if (!a && !b) return true;
     if (!a || !b) return false;
 
-    // version and consent check
     if (a.version !== b.version || a.consent !== b.consent) {
         return false;
     }
 
-    // createdAt check
     const aTime =
         a.createdAt instanceof Date
             ? a.createdAt.getTime()
@@ -57,7 +54,6 @@ export function areConsentsEqual(
         return false;
     }
 
-    // categories check
     if (a.accepted.length !== b.accepted.length) {
         return false;
     }

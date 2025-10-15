@@ -23,8 +23,8 @@ export const PendingDeletionBanner: React.FC<PendingDeletionBannerProps> = ({
                     variant: 'success',
                     message: t('app.profile.pendingDeletion.cancel.success')
                 });
-                // Refresh the page to remove the banner
-                window.location.reload();
+
+                window.location.reload(); // to remove the banner
             },
             onError: () => {
                 alert({

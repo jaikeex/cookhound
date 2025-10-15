@@ -486,7 +486,7 @@ class RecipeModel {
         log.trace('Updating recipe by id', { id });
 
         // Extract relation data so we can treat them separately.
-        // Everything left in `recipeData` can be passed directly to Prisma.
+        // Everything left in recipeData can be passed directly to Prisma.
         const { instructions, ingredients, tags, ...recipeData } =
             data as typeof data & Record<string, unknown>;
 

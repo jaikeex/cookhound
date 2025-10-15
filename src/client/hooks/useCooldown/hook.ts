@@ -71,7 +71,6 @@ export const useCooldown = (
                 return;
             }
 
-            // Set everything needed to manage the cd.
             const endTime = Date.now() + cooldown;
             setEndTime(endTime);
             setIsOnCooldown(true);

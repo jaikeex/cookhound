@@ -125,7 +125,6 @@ export const RegisterTemplate: React.FC<RegisterTemplateProps> = () => {
         [alert, cleanUpAndRedirectAfterSubmit, setUser, t]
     );
 
-    // Custom hook to handle Google sign-in.
     const {
         signInUserWithGoogleOauth,
         error: googleSignInError,
@@ -176,7 +175,6 @@ export const RegisterTemplate: React.FC<RegisterTemplateProps> = () => {
         [createUser]
     );
 
-    // Update the form errors whenever the signin process fails.
     useEffect(() => {
         if (createUserError) {
             setFormErrors({ server: createUserError.message as I18nMessage });

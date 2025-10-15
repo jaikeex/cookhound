@@ -132,6 +132,7 @@ export const useUnsavedChangesWarning = ({
         if (conditionsToMatch.some((condition) => condition)) {
             // Actually just ask if it is ok to loose everything
             const shouldNavigate = window.confirm(message);
+
             if (!shouldNavigate) {
                 // If not, BURN IT DOWN!
                 e.preventDefault();

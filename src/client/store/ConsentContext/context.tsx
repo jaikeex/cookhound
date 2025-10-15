@@ -140,7 +140,6 @@ export const ConsentProvider: React.FC<ConsentProviderProps> = ({
         [consent]
     );
 
-    // Holds latest consent for use inside stable callbacks
     const consentRef = useRef<CookieConsent | null>(consent);
 
     /**

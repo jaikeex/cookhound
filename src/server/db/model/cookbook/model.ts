@@ -99,7 +99,6 @@ class CookbookModel {
         await this.invalidateUserCookbookCache(data.ownerId);
 
         return await prisma.$transaction(async (tx) => {
-            // Determine next position in owner's list (append)
             const { _max } = (await tx.cookbook.aggregate({
                 where: { ownerId: data.ownerId },
                 _max: { ownerOrder: true }

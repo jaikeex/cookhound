@@ -42,12 +42,10 @@ export const useRecipeDiscovery = (
 ) => {
     const { locale } = useLocale();
 
-    // Normalised list of search terms.
     const [queries, setQueries] = useState<string[]>(
         normaliseToArray(initialQuery)
     );
 
-    // Merge all queries into a single string.
     const queryString = useMemo(
         () => queries.join(SEARCH_QUERY_SEPARATOR),
         [queries]

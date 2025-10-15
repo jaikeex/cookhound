@@ -183,10 +183,8 @@ class ShoppingListModel {
             //?                                  EXECUTE AND RETURN                                 ?//
             //|-------------------------------------------------------------------------------------|//
 
-            // Execute all upserts
             const upsertedItems = await Promise.all(upsertPromises);
 
-            // Map to the expected return format
             const result: ShoppingListIngredientDTO[] = upsertedItems.map(
                 (item) => ({
                     recipeId: item.recipeId,

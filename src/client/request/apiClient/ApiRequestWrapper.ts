@@ -247,7 +247,7 @@ class ApiRequestWrapper {
                 window.location.href = '/error/too-many-requests';
             }
 
-            // Handle 404 Not Found on server side (server components)
+            // Handle 404 Not Found on server side
             if (response.status === 404 && typeof window === 'undefined') {
                 notFound();
             }

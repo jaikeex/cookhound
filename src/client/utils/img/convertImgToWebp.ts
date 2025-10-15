@@ -48,14 +48,11 @@ export const convertImgToWebP = async (
                 canvas.width = newWidth;
                 canvas.height = newHeight;
 
-                // Use high-quality image rendering
                 ctx.imageSmoothingEnabled = true;
                 ctx.imageSmoothingQuality = 'high';
 
-                // Draw the resized image
                 ctx.drawImage(image, 0, 0, newWidth, newHeight);
 
-                // Convert to WebP with initial quality
                 convertWithQualityOptimization(
                     canvas,
                     file.name.replace(/\.\w+$/, '.webp'),
@@ -105,7 +102,6 @@ const calculateOptimalDimensions = (
             newWidth = newHeight * aspectRatio;
         }
 
-        // Ensure both dimensions are within limits
         if (newWidth > maxWidth) {
             newWidth = maxWidth;
             newHeight = newWidth / aspectRatio;
@@ -134,7 +130,7 @@ const convertWithQualityOptimization = (
     reject: (error: Error) => void
 ) => {
     let currentQuality = initialQuality;
-    const minQuality = 0.3; // Don't go below 30% quality
+    const minQuality = 0.3;
     const qualityStep = 0.1;
 
     const attemptConversion = () => {

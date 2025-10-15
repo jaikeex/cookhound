@@ -140,7 +140,6 @@ export async function invalidateModelCache(
         });
     }
 
-    // Invalidate all unique patterns
     await Promise.all(
         Array.from(patterns).map((pattern) => invalidateCacheByPattern(pattern))
     );

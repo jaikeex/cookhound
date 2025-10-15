@@ -182,7 +182,6 @@ class GoogleApiClient {
         };
     }
 
-    // Gmail service
     public getGmailService() {
         return {
             sendMail: async (params: {

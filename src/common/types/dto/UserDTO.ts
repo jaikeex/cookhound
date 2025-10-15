@@ -51,7 +51,6 @@ export class UserDTO {
     @Expose({ groups: ['self', 'admin'] })
     authType: AuthType = AuthType.Local;
 
-    // Semi-private profile fields
     @Expose({ groups: ['self', 'admin'] })
     createdAt: string = '';
 

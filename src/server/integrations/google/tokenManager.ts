@@ -51,6 +51,7 @@ export class TokenManager {
 
         const newAccessToken = await this.fetchNewAccessToken(subject);
         this.accessToken = newAccessToken.access_token;
+
         //-300 seconds to account for clock drift and latency
         this.tokenExpiry = new Date(
             new Date().getTime() + (newAccessToken.expires_in - 300) * 1000

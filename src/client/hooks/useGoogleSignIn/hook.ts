@@ -37,7 +37,6 @@ export const useGoogleSignIn: UseGoogleSignInType = ({ onSuccess }) => {
         const screenLeft = window.screenLeft ?? window.screenX ?? 0;
         const screenTop = window.screenTop ?? window.screenY ?? 0;
 
-        // Fallbacks handle browser differences (outerWidth/outerHeight vs. screen)
         const width = window.outerWidth ?? window.screen.width;
         const height = window.outerHeight ?? window.screen.height;
 

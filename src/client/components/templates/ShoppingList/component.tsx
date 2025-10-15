@@ -97,7 +97,6 @@ export const ShoppingListTemplate: React.FC<ShoppingListTemplateProps> = ({
 
         await shoppingListStore.updateShoppingList(payloads);
 
-        // Clear temp state and exit editing
         shoppingListStore.setEditingShoppingList(null);
         setBinIngredients([]);
         setIsEditing(false);

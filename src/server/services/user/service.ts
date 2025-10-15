@@ -538,7 +538,6 @@ class UserService {
             );
         }
 
-        // Create the record
         try {
             await db.user.createUserTermsAcceptance(userId, payload);
         } catch (error) {
@@ -744,8 +743,6 @@ class UserService {
             );
         }
 
-        // The Prisma projection returns `preferences` as `{ settings: UserPreferences }`.
-        // Flatten it, so we only merge plain key-value pairs.
         const currentSettings: UserPreferences =
             user.preferences && 'settings' in user.preferences
                 ? (user.preferences.settings as UserPreferences)
@@ -1411,10 +1408,8 @@ class UserService {
         //?                                  CANCEL DELETION                                    ?//
         //|-------------------------------------------------------------------------------------|//
 
-        // Restore user to active status
         await db.user.cancelDeletion(userId);
 
-        // Update audit record
         const auditRecord =
             await db.accountDeletionRequest.getLatestByUserId(userId);
         if (auditRecord) {
@@ -1464,7 +1459,6 @@ class UserService {
                     userId: user.id
                 });
 
-                // Execute complete hard deletion through the model layer
                 await db.user.executeHardDeletion(user.id);
 
                 processed++;

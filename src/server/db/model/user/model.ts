@@ -773,57 +773,46 @@ class UserModel {
                 data: { ownerId: -1 }
             });
 
-            // Delete shopping list
             await tx.shoppingListIngredient.deleteMany({
                 where: { userId }
             });
 
-            // Delete ratings
             await tx.rating.deleteMany({
                 where: { userId }
             });
 
-            // Delete flags
             await tx.recipeFlag.deleteMany({
                 where: { userId }
             });
 
-            // Delete visited recipes
             await tx.userVisitedRecipe.deleteMany({
                 where: { userId }
             });
 
-            // Delete user preferences
             await tx.userPreference.deleteMany({
                 where: { userId }
             });
 
-            // Delete cookie consents
             await tx.cookieConsent.deleteMany({
                 where: { userId }
             });
 
-            // Delete terms acceptances
             await tx.termsAcceptance.deleteMany({
                 where: { userId }
             });
 
-            // Delete email change requests
             await tx.emailChangeRequest.deleteMany({
                 where: { userId }
             });
 
-            // Delete cookbook bookmarks
             await tx.cookbookBookmark.deleteMany({
                 where: { userId }
             });
 
-            // Delete account deletion requests (audit records will be removed by cascade)
             await tx.accountDeletionRequest.deleteMany({
                 where: { userId }
             });
 
-            // Hard delete user
             await tx.user.delete({
                 where: { id: userId }
             });

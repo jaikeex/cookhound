@@ -57,24 +57,20 @@ export const Tooltip: React.FC<TooltipProps> = ({
     const [targetRect, setTargetRect] = useState<DOMRect | null>(null);
     const [isTouchDevice, setIsTouchDevice] = useState(false);
 
-    // Use controlled visibility if provided, otherwise use internal state
     const shouldShow = visible !== undefined ? visible : isVisible;
 
-    // Detect if touch device
     useEffect(() => {
         setIsTouchDevice(
             'ontouchstart' in window || navigator.maxTouchPoints > 0
         );
     }, []);
 
-    // Handle click outside for touch devices
     const outsideClickRef = useOutsideClick<HTMLDivElement>(() => {
         if (isTouchDevice && visible === undefined) {
             setIsVisible(false);
         }
     });
 
-    // Track target element position when using targetRef
     useEffect(() => {
         if (targetRef?.current && visible !== undefined) {
             const updatePosition = () => {
@@ -121,7 +117,6 @@ export const Tooltip: React.FC<TooltipProps> = ({
         [isTouchDevice]
     );
 
-    // When using targetRef with controlled visibility, render tooltip with absolute positioning
     if (targetRef && visible !== undefined) {
         if (!shouldShow || !targetRect) return null;
 
@@ -223,7 +218,6 @@ export const Tooltip: React.FC<TooltipProps> = ({
         );
     }
 
-    // Default behavior with children (backward compatibility)
     return (
         <div
             ref={outsideClickRef}

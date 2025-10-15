@@ -26,7 +26,6 @@ export function withRequestContext<
 
         const execute = async (): Promise<Awaited<ReturnType<T>>> => {
             try {
-                // Standard request logging
                 await logRequest();
 
                 // Execute the actual business handler
@@ -34,7 +33,6 @@ export function withRequestContext<
                     handler as unknown as (...a: Parameters<T>) => ReturnType<T>
                 )(...args);
 
-                // Successful response logging
                 if (res instanceof NextResponse) {
                     await logResponse(res);
                 }

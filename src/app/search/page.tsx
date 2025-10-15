@@ -39,7 +39,6 @@ export default async function SearchPage({
           })
         : Promise.resolve([]);
 
-    // Generate breadcrumb schema: Home > Search Results
     const breadcrumbItems = [
         {
             name: tServer(locale, 'app.general.home'),
@@ -96,7 +95,6 @@ export async function generateMetadata({
         noindex: true
     });
 
-    // For specific queries, we override the title and description and keep noindex
     return {
         ...metadata,
         title: `${capitalised} | ${metadata.title}`,

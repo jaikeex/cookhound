@@ -30,7 +30,7 @@ export async function readMultipartFile(
     opts: ReadMultipartFileOptions = {}
 ): Promise<MultipartFile> {
     const fieldName = opts.fieldName ?? 'file';
-    const maxSize = opts.maxSize ?? 5 * 1024 * 1024; // 5 MiB
+    const maxSize = opts.maxSize ?? 5 * 1024 * 1024; // 5 MB
 
     const contentType = req.headers.get('content-type') ?? '';
     if (!contentType.startsWith('multipart/form-data')) {

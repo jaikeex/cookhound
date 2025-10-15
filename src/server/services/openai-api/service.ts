@@ -99,7 +99,6 @@ class OpenAIApiService {
         const parsed = response.output_parsed;
         const suggestedSlugs: string[] = parsed?.tags ?? [];
 
-        // Map from slug to category for quick lookup
         const slugToCategory: Record<
             string,
             keyof typeof RECIPE_CATEGORY_TAGS

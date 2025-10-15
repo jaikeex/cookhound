@@ -18,7 +18,6 @@ export const RecipeStructuredData: React.FC<
     const recipe = await recipePromise;
     const recipeSchema = generateRecipeSchema(recipe, ENV_CONFIG_PUBLIC.ORIGIN);
 
-    // Generate breadcrumb schema: Home > Recipe
     const breadcrumbSchema = generateBreadcrumbSchema([
         {
             name: tServer(recipe.language, 'app.general.home'),

@@ -62,14 +62,13 @@ export const useKeyboardOpen = (threshold: number = 150): boolean => {
 
         if (viewport) {
             viewport.addEventListener('resize', handleResize);
-            viewport.addEventListener('scroll', handleResize); // iOS fires scroll on keyboard.
+            viewport.addEventListener('scroll', handleResize); // iOS apparently fires scroll on keyboard.
             return () => {
                 viewport.removeEventListener('resize', handleResize);
                 viewport.removeEventListener('scroll', handleResize);
             };
         }
 
-        // Fallback for browsers without the API.
         window.addEventListener('resize', handleResize);
         return () => {
             window.removeEventListener('resize', handleResize);

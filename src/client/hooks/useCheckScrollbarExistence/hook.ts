@@ -57,7 +57,6 @@ export function useCheckScrollExistence(ref?: React.RefObject<HTMLElement>) {
         : 0;
 
     useLayoutEffect(() => {
-        // Measure scrollbar width on mount
         const measuredScrollbarWidth = getScrollbarWidth();
         setScrollbarWidth(measuredScrollbarWidth);
 

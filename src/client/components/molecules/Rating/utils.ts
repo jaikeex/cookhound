@@ -19,7 +19,6 @@ export const generateStars = (rating: number): Array<StarState> => {
     const isHalf = ratingMathed % 1 !== 0;
 
     if (isHalf) {
-        // If the rating is halved, the for loops will start at index 1, so that there is space for the half star
         for (let i = 1; i < ratingMathed; i++) {
             stars.push(StarState.FULL);
         }
@@ -30,7 +29,6 @@ export const generateStars = (rating: number): Array<StarState> => {
             stars.push(StarState.EMPTY);
         }
     } else {
-        // If the rating is not halved, the for loops start at 0 as usual
         for (let i = 0; i < ratingMathed; i++) {
             stars.push(StarState.FULL);
         }

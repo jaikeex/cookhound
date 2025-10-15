@@ -73,7 +73,7 @@ if (ENV_CONFIG_PUBLIC.ENV === 'production') {
 //$                                           CONSOLE                                           $//
 //~=============================================================================================~//
 
-// In development, also output to console so debugging does not take years.
+// In development, also output to console for obvious reasons.
 if (ENV_CONFIG_PUBLIC.ENV !== 'production') {
     baseLogger.add(
         new transports.Console({
@@ -85,7 +85,6 @@ if (ENV_CONFIG_PUBLIC.ENV !== 'production') {
         })
     );
 
-    // Add colorization to the console transport.
     addColors(LOG_LEVELS.colors);
 }
 
@@ -384,7 +383,6 @@ export class Logger {
             return JSON.stringify(value);
         } catch {
             try {
-                // Fall back to toString implementations.
                 return String(value);
             } catch {
                 return '[Unserialisable value]';

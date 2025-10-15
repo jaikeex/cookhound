@@ -729,7 +729,6 @@ class RecipeService {
         //?                                        RETURN                                       ?//
         //|-------------------------------------------------------------------------------------|//
 
-        // Apply pagination to final results
         const paginatedResults = results.slice(offset, offset + perPage);
 
         return paginatedResults;

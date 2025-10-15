@@ -18,7 +18,7 @@ class RedisClient {
             password: ENV_CONFIG_PRIVATE.REDIS_PASSWORD || undefined,
             maxRetriesPerRequest: null,
             enableReadyCheck: true,
-            lazyConnect: true // Don't connect immediately
+            lazyConnect: true
         });
 
         this.client.on('error', () => {

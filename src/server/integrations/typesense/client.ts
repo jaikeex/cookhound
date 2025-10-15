@@ -102,7 +102,6 @@ class TypesenseClient {
     //~-----------------------------------------------------------------------------------------~//
 
     static getInstance(): TypesenseClient {
-        // Get or create global storage for the singleton
         if (!global.__cookhound_typesense_client__) {
             global.__cookhound_typesense_client__ = {
                 instance: null,

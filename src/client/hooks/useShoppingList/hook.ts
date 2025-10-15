@@ -65,7 +65,6 @@ export const useShoppingList = () => {
     ///
     //?—————————————————————————————————————————————————————————————————————————————————————————?//
 
-    // Central shopping list state
     const {
         data: shoppingListData,
         isFetching: isQueryLoading,
@@ -237,7 +236,6 @@ export const useShoppingList = () => {
     //$                                         HOOK API                                        $//
     //~-----------------------------------------------------------------------------------------~//
 
-    // Manually seeds the cache (typically from SSR data).
     const initialize = useCallback(
         (list: ShoppingListDTO[]) => {
             if (listQueryKey) {

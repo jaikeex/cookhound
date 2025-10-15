@@ -127,7 +127,6 @@ export class EventBus<EventMap extends object = object> {
 
         const executions: Promise<void>[] = [];
 
-        // Wrap each listener with try/catch to prevent them from crashing each other.
         set.forEach((listener) => {
             const maybePromise = (async () => {
                 try {

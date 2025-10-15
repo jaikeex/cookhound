@@ -88,7 +88,6 @@ export const LoginTemplate: React.FC<LoginTemplateProps> = ({
         [alert, callbackUrl, router, setUser, t]
     );
 
-    // Custom hook to handle Google sign-in.
     const {
         signInUserWithGoogleOauth,
         error,
@@ -131,7 +130,6 @@ export const LoginTemplate: React.FC<LoginTemplateProps> = ({
         [login]
     );
 
-    // Update the form errors whenever the google signin process fails.
     useEffect(() => {
         if (loginError) {
             setFormErrors({ server: loginError.message as I18nMessage });

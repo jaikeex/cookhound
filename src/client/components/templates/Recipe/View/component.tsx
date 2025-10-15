@@ -65,7 +65,7 @@ export const RecipeViewTemplate: React.FC<RecipeViewProps> = ({ recipe }) => {
                     portionSize: recipeResolved.portionSize
                 };
 
-                // Ensure uniqueness (newest first) and limit to 5 entries.
+                // Ensure uniqueness, newest first and limit to 5 entries.
                 setLastViewedRecipes((prev) => {
                     const filtered = prev.filter(
                         (r) => r.id !== lightweight.id

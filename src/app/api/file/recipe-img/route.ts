@@ -22,7 +22,6 @@ async function postHandler(request: NextRequest) {
 
     await googleApiService.uploadRecipeImage(fileName, data);
 
-    // Generate the public URL for the uploaded image
     const bucket = ENV_CONFIG_PRIVATE.GOOGLE_STORAGE_BUCKET_RECIPE_IMAGES;
     const objectUrl = `https://storage.googleapis.com/${bucket}/${fileName}`;
 

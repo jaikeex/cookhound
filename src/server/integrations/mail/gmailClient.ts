@@ -27,7 +27,6 @@ class GmailMailClient {
                 ? options.to.map((t) => `${t.name} <${t.address}>`).join(', ')
                 : `${options.to.name} <${options.to.address}>`;
 
-            // Detect non-ASCII characters using Unicode property escapes to avoid control-char regex lint error
             const needsEncoding = /[^\p{ASCII}]/u.test(options.subject);
             const subjectHeader = needsEncoding
                 ? encodeHeaderUtf8(options.subject)

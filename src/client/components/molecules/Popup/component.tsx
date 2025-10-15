@@ -265,7 +265,6 @@ function calculatePosition(
             break;
     }
 
-    // Adjust for viewport boundaries
     if (left < 0) {
         left = 8;
     } else if (left + popupRect.width > viewport.width) {

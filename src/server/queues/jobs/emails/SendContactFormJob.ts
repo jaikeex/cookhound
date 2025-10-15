@@ -43,7 +43,7 @@ class SendContactFormJob extends BaseJob<ContactFormData> {
             message
         );
 
-        // Send email to support team
+        // Send email to "support team"... Well it is only me at the moment but what can you do?
         await mailClient.send({
             from: { name: 'Cookhound Contact Form', address: FROM_ADDRESS },
             to: {
