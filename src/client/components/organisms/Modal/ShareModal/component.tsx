@@ -29,9 +29,26 @@ export const ShareModal: React.FC<ShareModalProps> = ({
     const { alert } = useSnackbar();
     const [copiedRecently, setCopiedRecently] = useState(false);
 
-    const fullUrl = getShareUrl(url);
+    const getFullUrl = useCallback(() => {
+        try {
+            return getShareUrl(url);
+        } catch (error) {
+            alert({
+                message: t('app.error.default'),
+                variant: 'error'
+            });
+
+            return null;
+        }
+    }, [url, alert, t]);
 
     const handleCopy = useCallback(async () => {
+        const fullUrl = getFullUrl();
+
+        if (!fullUrl) {
+            return;
+        }
+
         const success = await copyToClipboard(fullUrl);
 
         if (success) {
@@ -50,10 +67,16 @@ export const ShareModal: React.FC<ShareModalProps> = ({
                 variant: 'error'
             });
         }
-    }, [alert, fullUrl, t]);
+    }, [alert, getFullUrl, t]);
 
     const handleShare = useCallback(
         (platform: SocialPlatform) => async () => {
+            const fullUrl = getFullUrl();
+
+            if (!fullUrl) {
+                return;
+            }
+
             if (platform === 'copy') {
                 handleCopy();
                 return;
@@ -66,7 +89,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({
                 }, 300);
             }
         },
-        [handleCopy, fullUrl, title, description, close]
+        [handleCopy, getFullUrl, title, description, close]
     );
 
     const handleClose = useCallback(() => {

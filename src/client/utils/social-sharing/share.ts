@@ -104,6 +104,12 @@ export function getShareUrl(path: string): string {
 
     // If already absolute URL, return as is
     if (path.startsWith('http://') || path.startsWith('https://')) {
+        if (!path.includes(ENV_CONFIG_PUBLIC.ORIGIN)) {
+            // This is a wierd case which should never happen, but was nevertheless point out to me
+            // as a real security risk, so here is this check.
+            throw new Error('Wrong path');
+        }
+
         return path;
     }
 
