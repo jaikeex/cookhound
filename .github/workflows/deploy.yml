@@ -63,6 +63,7 @@ jobs:
                       GOOGLE_GMAIL_CREDENTIALS_BASE64=${{ secrets.GOOGLE_GMAIL_CREDENTIALS_BASE64 }}
                       GOOGLE_STORAGE_BUCKET_RECIPE_IMAGES=${{ secrets.GOOGLE_STORAGE_BUCKET_RECIPE_IMAGES }}
                       GOOGLE_STORAGE_BUCKET_AVATAR_IMAGES=${{ secrets.GOOGLE_STORAGE_BUCKET_AVATAR_IMAGES }}
+                      REVALIDATE_PATH_TOKEN=${{ secrets.REVALIDATE_PATH_TOKEN }}
                       DB_NAME=${{ secrets.DB_NAME }}
                       DB_USERNAME=${{ secrets.DB_USERNAME }}
                       DB_PASSWORD=${{ secrets.DB_PASSWORD }}
