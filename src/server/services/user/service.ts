@@ -3,13 +3,14 @@ import type {
     RecipeForDisplayDTO,
     ShoppingListDTO,
     ShoppingListIngredientPayload,
+    TermsAcceptanceForVerifyDTO,
     UserDTO,
     UserForCreatePayload,
     UserForGoogleCreatePayload,
     UserPreferences
 } from '@/common/types';
 import { v4 as uuid } from 'uuid';
-import { createHash } from 'crypto';
+import { createHash, timingSafeEqual } from 'crypto';
 import { mailService } from '@/server/services';
 import {
     AuthErrorForbidden,
@@ -27,15 +28,19 @@ import { ApplicationErrorCode } from '@/server/error/codes';
 import type {
     ConsentCategory,
     CookieConsent,
-    CookieConsentForCreate
+    CookieConsentForCreate,
+    CookieConsentForVerifyDTO
 } from '@/common/types/cookie-consent';
 import type { TermsAcceptanceForCreate } from '@/common/types';
 import { ONE_DAY_IN_MILLISECONDS } from '@/common/constants';
 import { areConsentsEqual } from '@/common/utils';
-import { generateProofHash } from '@/server/utils/crypto';
+import {
+    generateProofHash,
+    hashPassword,
+    verifyPassword
+} from '@/server/utils/crypto';
 import { serializeTermsContent } from '@/server/utils/terms';
 import { serializeConsentContent } from '@/server/utils/consent';
-import { hashPassword, verifyPassword } from '@/server/utils/crypto';
 
 //|=============================================================================================|//
 
@@ -570,16 +575,7 @@ class UserService {
     async verifyTermsAcceptanceHash(
         userId: number,
         acceptanceId: number
-    ): Promise<{
-        valid: boolean;
-        details: {
-            version: string;
-            createdAt: Date;
-            verified: Date;
-            storedHash: string;
-            computedHash?: string;
-        };
-    }> {
+    ): Promise<TermsAcceptanceForVerifyDTO> {
         const termsAcceptance =
             await db.user.getLatestUserTermsAcceptance(userId);
 
@@ -615,7 +611,10 @@ class UserService {
             timestamp: termsAcceptance.createdAt
         });
 
-        const valid = storedHash === computedHash;
+        const valid = timingSafeEqual(
+            Buffer.from(storedHash),
+            Buffer.from(computedHash)
+        );
 
         log.trace('verifyTermsAcceptanceHash - verification complete', {
             userId,
@@ -653,17 +652,7 @@ class UserService {
     async verifyCookieConsentHash(
         userId: number,
         consentId: number
-    ): Promise<{
-        valid: boolean;
-        details: {
-            version: string;
-            createdAt: Date;
-            verified: Date;
-            accepted: string[];
-            storedHash: string;
-            computedHash?: string;
-        };
-    }> {
+    ): Promise<CookieConsentForVerifyDTO> {
         const cookieConsent = await db.user.getLatestUserCookieConsent(userId);
 
         if (!cookieConsent) {
@@ -701,7 +690,10 @@ class UserService {
             accepted: cookieConsent.accepted
         });
 
-        const valid = storedHash === computedHash;
+        const valid = timingSafeEqual(
+            Buffer.from(storedHash),
+            Buffer.from(computedHash)
+        );
 
         log.trace('verifyCookieConsentHash - verification complete', {
             userId,

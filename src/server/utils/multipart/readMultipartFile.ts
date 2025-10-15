@@ -100,9 +100,30 @@ export async function readMultipartFile(
         readonly _maxSize: typeof maxSize;
     };
 
+    if (!isWebP(data)) {
+        throw new UnsupportedMediaTypeError(
+            'app.error.file-type-unsupported',
+            ApplicationErrorCode.FILE_TYPE_UNSUPPORTED
+        );
+    }
+
     return {
         fileName: maybeFile.name,
         contentType: maybeFile.type,
         data
     };
+}
+
+function isWebP(data: Uint8Array): boolean {
+    return (
+        data.length >= 12 &&
+        data[0] === 0x52 &&
+        data[1] === 0x49 &&
+        data[2] === 0x46 &&
+        data[3] === 0x46 &&
+        data[8] === 0x57 &&
+        data[9] === 0x45 &&
+        data[10] === 0x42 &&
+        data[11] === 0x50
+    );
 }

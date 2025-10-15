@@ -44,3 +44,15 @@ export type CookieConsentForCreate = {
     accepted: ConsentCategory[];
     proofHash: string;
 };
+
+export type CookieConsentForVerifyDTO = {
+    valid: boolean;
+    details: {
+        version: string;
+        createdAt: Date;
+        verified: Date;
+        accepted: string[];
+        storedHash: string;
+        computedHash?: string;
+    };
+};

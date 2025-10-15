@@ -22,3 +22,14 @@ export type TermsAcceptanceForCreate = {
     userAgent: string;
     proofHash: string;
 };
+
+export type TermsAcceptanceForVerifyDTO = {
+    valid: boolean;
+    details: {
+        version: string;
+        createdAt: Date;
+        verified: Date;
+        storedHash: string;
+        computedHash?: string;
+    };
+};

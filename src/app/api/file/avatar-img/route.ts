@@ -5,6 +5,7 @@ import type { NextRequest } from 'next/server';
 import { ENV_CONFIG_PRIVATE } from '@/common/constants';
 import { withRateLimit } from '@/server/utils/rate-limit';
 import { withAuth } from '@/server/utils/reqwest';
+import { randomUUID } from 'crypto';
 
 /**
  * Handles POST requests to `/api/file/avatar-img` to upload a avatar image.
@@ -14,11 +15,13 @@ import { withAuth } from '@/server/utils/reqwest';
  * @returns A JSON response with the uploaded file's object URL.
  */
 async function postHandler(request: NextRequest) {
-    const { fileName, data } = await readMultipartFile(request, {
+    const { data } = await readMultipartFile(request, {
         fieldName: 'avatar-image',
         maxSize: 5 * 1024 * 1024,
         allowedContentTypes: ['image/webp']
     });
+
+    const fileName = `avatar-image-${randomUUID()}.webp`;
 
     await googleApiService.uploadAvatarImage(fileName, data);
 
