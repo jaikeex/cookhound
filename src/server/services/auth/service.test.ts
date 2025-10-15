@@ -71,7 +71,7 @@ vi.mock('@/server/utils/reqwest', () => ({
 }));
 
 vi.mock('@/server/utils/crypto', () => ({
-    verifyPassword: vi.fn(),
+    safeVerifyPassword: vi.fn(),
     hashPassword: vi.fn()
 }));
 
@@ -84,7 +84,7 @@ import { sessions, deleteSessionCookie } from '@/server/utils/session';
 import { RequestContext } from '@/server/utils/reqwest/context';
 import { userService } from '@/server/services/user/service';
 import { assertAuthenticated } from '@/server/utils/reqwest';
-import { verifyPassword, hashPassword } from '@/server/utils/crypto';
+import { safeVerifyPassword, hashPassword } from '@/server/utils/crypto';
 
 const mockDbUser = vi.mocked(db.user);
 const mockSessions = vi.mocked(sessions);
@@ -92,7 +92,8 @@ const mockDeleteSessionCookie = vi.mocked(deleteSessionCookie);
 const mockRequestContext = vi.mocked(RequestContext);
 const mockUserService = vi.mocked(userService);
 const mockAssertAuthenticated = vi.mocked(assertAuthenticated);
-const mockVerifyPassword = vi.mocked(verifyPassword);
+const mocksafeVerifyPassword = vi.mocked(safeVerifyPassword);
+const mockSafeVerifyPassword = vi.mocked(safeVerifyPassword);
 const mockHashPassword = vi.mocked(hashPassword);
 
 // Mock global fetch
@@ -112,7 +113,11 @@ describe('AuthService', () => {
         mockDbUser.registerUserVisit.mockResolvedValue(undefined);
         mockAssertAuthenticated.mockReturnValue(validUser.id);
 
-        setupPasswordMocks(mockVerifyPassword, mockHashPassword);
+        setupPasswordMocks(
+            mocksafeVerifyPassword,
+            mockSafeVerifyPassword,
+            mockHashPassword
+        );
         setupRequestContextMocks(mockRequestContext, {
             userId: validUser.id
         });
@@ -129,7 +134,7 @@ describe('AuthService', () => {
     describe('login', () => {
         it('should successfully login with valid credentials', async () => {
             mockDbUser.getOneByEmail.mockResolvedValue(validUser);
-            mockVerifyPassword.mockResolvedValue(true);
+            mocksafeVerifyPassword.mockResolvedValue(true);
 
             const result = await authService.login({
                 email: validUser.email,
@@ -141,7 +146,7 @@ describe('AuthService', () => {
             expect(result).toHaveProperty('user');
             expect(result.user.email).toBe(validUser.email);
 
-            expect(mockVerifyPassword).toHaveBeenCalledWith(
+            expect(mocksafeVerifyPassword).toHaveBeenCalledWith(
                 TEST_PASSWORD,
                 validUser.passwordHash
             );
@@ -149,7 +154,7 @@ describe('AuthService', () => {
 
         it('should create session with correct parameters', async () => {
             mockDbUser.getOneByEmail.mockResolvedValue(validUser);
-            mockVerifyPassword.mockResolvedValue(true);
+            mocksafeVerifyPassword.mockResolvedValue(true);
 
             await authService.login({
                 email: validUser.email,
@@ -169,34 +174,28 @@ describe('AuthService', () => {
             );
         });
 
-        it('should throw ValidationError when email is missing', async () => {
+        it('should throw UnauthorizedError when email is missing', async () => {
             await expectToThrowWithCode(
                 authService.login({
                     email: '',
                     password: TEST_PASSWORD,
                     keepLoggedIn: false
                 }),
-                ValidationError,
-                ApplicationErrorCode.MISSING_FIELD,
-                'auth.error.email-required'
+                AuthErrorUnauthorized,
+                ApplicationErrorCode.INVALID_CREDENTIALS
             );
-
-            expect(mockDbUser.getOneByEmail).not.toHaveBeenCalled();
         });
 
-        it('should throw ValidationError when password is missing', async () => {
+        it('should throw UnauthorizedError when password is missing', async () => {
             await expectToThrowWithCode(
                 authService.login({
                     email: validUser.email,
                     password: '',
                     keepLoggedIn: false
                 }),
-                ValidationError,
-                ApplicationErrorCode.MISSING_FIELD,
-                'auth.error.password-required'
+                AuthErrorUnauthorized,
+                ApplicationErrorCode.INVALID_CREDENTIALS
             );
-
-            expect(mockDbUser.getOneByEmail).not.toHaveBeenCalled();
         });
 
         it('should throw AuthErrorUnauthorized when user not found', async () => {
@@ -227,13 +226,11 @@ describe('AuthService', () => {
                 ApplicationErrorCode.EMAIL_NOT_VERIFIED,
                 'auth.error.email-not-verified'
             );
-
-            expect(mockVerifyPassword).not.toHaveBeenCalled();
         });
 
         it('should throw AuthErrorUnauthorized when password is invalid', async () => {
             mockDbUser.getOneByEmail.mockResolvedValue(validUser);
-            mockVerifyPassword.mockResolvedValue(false);
+            mocksafeVerifyPassword.mockResolvedValue(false);
 
             await expectToThrowWithCode(
                 authService.login({

@@ -92,18 +92,22 @@ export function setupRequestContextMocks(
 
 export function setupPasswordMocks(
     mockVerifyPassword: any,
+    mockSafeVerifyPassword: any,
     mockHashPassword: any,
     options: {
         verifyResult?: boolean;
         hashResult?: string;
+        safeVerifyResult?: boolean;
     } = {}
 ) {
     const {
         verifyResult = true,
-        hashResult = '$argon2id$v=19$m=65536,t=3,p=4$mock-hash'
+        hashResult = '$argon2id$v=19$m=65536,t=3,p=4$mock-hash',
+        safeVerifyResult = true
     } = options;
 
     mockVerifyPassword.mockResolvedValue(verifyResult);
+    mockSafeVerifyPassword.mockResolvedValue(safeVerifyResult);
     mockHashPassword.mockResolvedValue(hashResult);
 }
 

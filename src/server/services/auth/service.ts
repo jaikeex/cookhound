@@ -23,7 +23,7 @@ import { RequestContext } from '@/server/utils/reqwest/context';
 import { ApplicationErrorCode } from '@/server/error/codes';
 import { createUserDTO } from '@/server/services/user/utils';
 import { assertAuthenticated } from '@/server/utils/reqwest';
-import { verifyPassword } from '@/server/utils/crypto';
+import { safeVerifyPassword } from '@/server/utils/crypto';
 
 //|=============================================================================================|//
 
@@ -61,24 +61,14 @@ class AuthService {
     async login(payload: UserForLogin): Promise<AuthResponse> {
         const { email, password } = payload;
 
-        if (!email) {
-            log.info('login - email required', { email });
-            throw new ValidationError(
-                'auth.error.email-required',
-                ApplicationErrorCode.MISSING_FIELD
-            );
-        }
-
-        if (!password) {
-            log.info('login - password required', { password });
-            throw new ValidationError(
-                'auth.error.password-required',
-                ApplicationErrorCode.MISSING_FIELD
-            );
-        }
         const user = await db.user.getOneByEmail(email, AUTH_USER_SELECT);
 
-        if (!user || !user.passwordHash) {
+        const isPasswordValid = await safeVerifyPassword(
+            password,
+            user?.passwordHash
+        );
+
+        if (!user || !user.passwordHash || !isPasswordValid) {
             log.info('login - user not found', { email });
             throw new AuthErrorUnauthorized(
                 'auth.error.invalid-credentials',
@@ -91,19 +81,6 @@ class AuthService {
             throw new AuthErrorForbidden(
                 'auth.error.email-not-verified',
                 ApplicationErrorCode.EMAIL_NOT_VERIFIED
-            );
-        }
-
-        const isPasswordValid = await verifyPassword(
-            password,
-            user.passwordHash
-        );
-
-        if (!isPasswordValid) {
-            log.info('login - invalid password', { email });
-            throw new AuthErrorUnauthorized(
-                'auth.error.invalid-credentials',
-                ApplicationErrorCode.INVALID_CREDENTIALS
             );
         }
 

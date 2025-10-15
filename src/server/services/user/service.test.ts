@@ -77,6 +77,7 @@ vi.mock('@/server/services/mail/service', () => ({
 
 vi.mock('@/server/utils/crypto', () => ({
     verifyPassword: vi.fn(),
+    safeVerifyPassword: vi.fn(),
     hashPassword: vi.fn()
 }));
 
@@ -102,13 +103,18 @@ vi.mock('uuid', () => ({
 
 import db from '@/server/db/model';
 import { mailService } from '@/server/services/mail/service';
-import { verifyPassword, hashPassword } from '@/server/utils/crypto';
+import {
+    verifyPassword,
+    hashPassword,
+    safeVerifyPassword
+} from '@/server/utils/crypto';
 import { RequestContext } from '@/server/utils/reqwest/context';
 import { v4 as uuid } from 'uuid';
 
 const mockDbUser = vi.mocked(db.user);
 const mockMailService = vi.mocked(mailService);
 const mockVerifyPassword = vi.mocked(verifyPassword);
+const mockSafeVerifyPassword = vi.mocked(safeVerifyPassword);
 const mockHashPassword = vi.mocked(hashPassword);
 const mockRequestContext = vi.mocked(RequestContext);
 const mockUuid = vi.mocked(uuid);
@@ -122,7 +128,11 @@ describe('UserService', () => {
         vi.clearAllMocks();
 
         // Setup helpers for common mocks
-        setupPasswordMocks(mockVerifyPassword, mockHashPassword);
+        setupPasswordMocks(
+            mockVerifyPassword,
+            mockSafeVerifyPassword,
+            mockHashPassword
+        );
         setupUuidMock(mockUuid, 'mock-uuid-token');
         setupRequestContextMocks(mockRequestContext, { userId: validUser.id });
     });
