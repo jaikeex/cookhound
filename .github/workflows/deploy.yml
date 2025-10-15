@@ -58,13 +58,11 @@ jobs:
                       GOOGLE_SMTP_PASSWORD=${{ secrets.GOOGLE_SMTP_PASSWORD }}
                       LOG_DIR=${{ secrets.LOG_DIR }}
                       GOOGLE_API_PROJECT_ID=${{ secrets.GOOGLE_API_PROJECT_ID }}
-                      GOOGLE_LOGGING_WRITE_CREDENTIALS=${{ secrets.GOOGLE_LOGGING_WRITE_CREDENTIALS }}
-                      GOOGLE_LOGGING_CLIENT_ID=${{ secrets.GOOGLE_LOGGING_CLIENT_ID }}
-                      GOOGLE_STORAGE_CREDENTIALS=${{ secrets.GOOGLE_STORAGE_CREDENTIALS }}
-                      GOOGLE_STORAGE_CLIENT_ID=${{ secrets.GOOGLE_STORAGE_CLIENT_ID }}
+                      GOOGLE_LOGGING_CREDENTIALS_BASE64=${{ secrets.GOOGLE_LOGGING_CREDENTIALS_BASE64 }}
+                      GOOGLE_STORAGE_CREDENTIALS_BASE64=${{ secrets.GOOGLE_STORAGE_CREDENTIALS_BASE64 }}
+                      GOOGLE_GMAIL_CREDENTIALS_BASE64=${{ secrets.GOOGLE_GMAIL_CREDENTIALS_BASE64 }}
                       GOOGLE_STORAGE_BUCKET_RECIPE_IMAGES=${{ secrets.GOOGLE_STORAGE_BUCKET_RECIPE_IMAGES }}
                       GOOGLE_STORAGE_BUCKET_AVATAR_IMAGES=${{ secrets.GOOGLE_STORAGE_BUCKET_AVATAR_IMAGES }}
-                      COOKIE_CONSENT_HASH_V2025_09_15=${{ secrets.COOKIE_CONSENT_HASH_V2025_09_15 }}
                       DB_NAME=${{ secrets.DB_NAME }}
                       DB_USERNAME=${{ secrets.DB_USERNAME }}
                       DB_PASSWORD=${{ secrets.DB_PASSWORD }}
