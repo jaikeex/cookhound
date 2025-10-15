@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { ENV_CONFIG_PUBLIC } from '@/common/constants';
+import { ENV_CONFIG_PUBLIC, OAUTH_STATE_KEY } from '@/common/constants';
 import { Loader, Typography } from '@/client/components';
 import { useLocale } from '@/client/store';
 
@@ -15,15 +15,31 @@ export default function GoogleCallbackPage() {
             return;
         }
 
-        const data = {
-            authCode: new URLSearchParams(window.location.search).get('code')
-        };
+        const params = new URLSearchParams(window.location.search);
+        const authCode = params.get('code');
+        const state = params.get('state');
 
-        if (!data || !data.authCode) {
+        if (!authCode || !state) {
             return;
         }
 
-        window.opener.postMessage(data, ENV_CONFIG_PUBLIC.ORIGIN);
+        const storedState = sessionStorage.getItem(OAUTH_STATE_KEY);
+
+        if (!storedState || storedState !== state) {
+            window.opener?.postMessage(
+                { error: 'invalid_state' },
+                ENV_CONFIG_PUBLIC.ORIGIN
+            );
+
+            window.close();
+            return;
+        }
+
+        window.opener.postMessage(
+            { authCode, state },
+            ENV_CONFIG_PUBLIC.ORIGIN
+        );
+
         window.close();
     }, []);
 

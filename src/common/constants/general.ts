@@ -17,6 +17,8 @@ export const LOCAL_STORAGE_LAST_VIEWED_RECIPES_KEY = 'lastViewedRecipes';
 
 export const SESSION_COOKIE_NAME = 'session';
 
+export const OAUTH_STATE_KEY = 'oauth_state';
+
 /**
  * Maximum number of tag suggestions allowed per recipe creation session.
  * There is a rate limit on the route, but as it is currently designed, it would redirect the user
