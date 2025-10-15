@@ -22,8 +22,10 @@ export type SearchSuggestionBoxProps = Readonly<{
     onClose?: () => void;
     onSuggestionClick?: () => void;
     title: string | ReactNode;
-    emptyMessage: string;
+    emptyMessage: ReactNode;
 }>;
+
+const FIXED_CONTENT_HEIGHT = 150; // Equivalent to 5 suggestion items
 
 export const SearchSuggestionBox: React.FC<SearchSuggestionBoxProps> = ({
     suggestions,
@@ -36,8 +38,6 @@ export const SearchSuggestionBox: React.FC<SearchSuggestionBoxProps> = ({
     title,
     emptyMessage
 }) => {
-    const FIXED_CONTENT_HEIGHT = 150; // Equivalent to 5 suggestion items
-
     const [focusedIndex, setFocusedIndex] = useState<number>(-1);
     const linkRefs = useRef<(HTMLAnchorElement | null)[]>([]);
     const containerRef = useRef<HTMLDivElement>(null);
@@ -186,7 +186,7 @@ export const SearchSuggestionBox: React.FC<SearchSuggestionBoxProps> = ({
         <div
             ref={containerRef}
             className={classNames(
-                'absolute left-0 right-0 mt-1 rounded-md shadow-lg top-full z-[9000] sheet',
+                'absolute left-0 right-0 mt-1 rounded-md shadow-lg top-full z-[9000] bg-sheet-200 dark:bg-sheet-900',
                 'animate-fade-in overflow-hidden',
                 className
             )}

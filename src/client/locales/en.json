@@ -224,6 +224,8 @@
     "app.recipe.search-suggestions.empty": "Enter a recipe name, ingredient, or instruction",
     "app.recipe.search-suggestions.title-last-viewed": "Last viewed",
     "app.recipe.search-suggestions.empty-last-viewed": "Start browsing recipes and this will show your last viewed",
+    "app.recipe.search-suggestions.login-link": "Login",
+    "app.recipe.search-suggestions.empty-anonymous": "and this will show your last viewed recipes",
     "app.recipe.delete-confirmation": "Are you sure you want to delete the recipe {{recipeTitle}}? This action cannot be undone.",
     "app.recipe.remove-from-cookbook-confirmation": "Are you sure you want to remove this recipe from the cookbook?",
     "app.recipe.age": "Age",

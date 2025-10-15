@@ -6,12 +6,10 @@ import { useOutsideClick } from '@/client/hooks';
 import { useDebounce } from '@/client/hooks/useDebounce';
 import { useAuth, useLocale } from '@/client/store';
 import { SEARCH_QUERY_SEPARATOR } from '@/common/constants';
-import type { RecipeForDisplayDTO } from '@/common/types';
 import type { SearchInputProps } from '@/client/components/molecules/Form/SearchInput/component';
 import { Chip, Typography, SearchInput } from '@/client/components';
-import { useLocalStorage } from '@/client/hooks/useLocalStorage';
-import { LOCAL_STORAGE_LAST_VIEWED_RECIPES_KEY } from '@/common/constants';
 import { chqc } from '@/client/request/queryClient';
+import Link from 'next/link';
 
 export type RecipeSearchInputProps = Readonly<{
     enableSuggestions?: boolean;
@@ -33,7 +31,7 @@ export const RecipeSearchInput: React.FC<RecipeSearchInputProps> = ({
     //~-----------------------------------------------------------------------------------------~//
 
     const { locale, t } = useLocale();
-    const { user } = useAuth();
+    const { user, authResolved } = useAuth();
 
     const [inputValue, setInputValue] = useState(value ?? defaultValue ?? '');
     const [isInputFocused, setIsInputFocused] = useState(false);
@@ -41,10 +39,6 @@ export const RecipeSearchInput: React.FC<RecipeSearchInputProps> = ({
     const containerRef = useOutsideClick<HTMLDivElement>(() => {
         setIsInputFocused(false);
     });
-
-    const { value: localLastViewedRecipes } = useLocalStorage<
-        RecipeForDisplayDTO[]
-    >(LOCAL_STORAGE_LAST_VIEWED_RECIPES_KEY, []);
 
     //~-----------------------------------------------------------------------------------------~//
     //$                                      QUERIES & DATA                                     $//
@@ -88,16 +82,11 @@ export const RecipeSearchInput: React.FC<RecipeSearchInputProps> = ({
                 return lastViewedRecipesQuery.data?.slice(0, 5) ?? [];
             }
 
-            if (localLastViewedRecipes !== undefined) {
-                return localLastViewedRecipes.slice(0, 5);
-            }
-
             return [];
         }
     }, [
         isSearchMode,
         lastViewedRecipesQuery.data,
-        localLastViewedRecipes,
         searchRecipesQuery.data,
         user?.id
     ]);
@@ -193,8 +182,20 @@ export const RecipeSearchInput: React.FC<RecipeSearchInputProps> = ({
             return t('app.recipe.search-suggestions.empty');
         }
 
+        if (!user && authResolved) {
+            return (
+                <React.Fragment>
+                    <Link href="/auth/login">
+                        {t('app.recipe.search-suggestions.login-link')}
+                    </Link>
+                    &nbsp;
+                    {t('app.recipe.search-suggestions.empty-anonymous')}
+                </React.Fragment>
+            );
+        }
+
         return t('app.recipe.search-suggestions.empty-last-viewed');
-    }, [isShowingSearchResults, t]);
+    }, [isShowingSearchResults, t, user, authResolved]);
 
     //~-----------------------------------------------------------------------------------------~//
     //$                                         RENDER                                          $//
