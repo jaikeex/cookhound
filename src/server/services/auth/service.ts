@@ -54,6 +54,7 @@ class AuthService {
      * Authenticates a user with their email and password.
      * It validates credentials, and on success, updates the last login time
      * and returns a session and user data.
+     * Also checks if the password hash needs updating and rehashes it if needed.
      *
      * @param payload - The user's login credentials.
      * @returns A promise that resolves to an object containing the session and user data.
@@ -100,6 +101,8 @@ class AuthService {
         }
 
         await db.user.updateOneById(user.id, { lastLogin: new Date() });
+
+        deleteSessionCookie();
 
         const token = await sessions.createSession(user.id, {
             ipAddress: RequestContext.getIp(),
