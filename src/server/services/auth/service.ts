@@ -57,7 +57,7 @@ class AuthService {
      * @throws {ServerError} Throws an error with status 401 for invalid credentials.
      * @throws {ServerError} Throws an error with status 403 if the user's email is not verified.
      */
-    @LogServiceMethod({ names: ['payload'] })
+    @LogServiceMethod({ excludeArgs: true })
     async login(payload: UserForLogin): Promise<AuthResponse> {
         const { email, password } = payload;
 

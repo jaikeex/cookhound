@@ -5,13 +5,15 @@ export interface LogOptions {
     attempt?: LogLevel;
     success?: LogLevel;
     names?: string[];
+    excludeArgs?: boolean;
 }
 
 /**
  * Overloads:
- *  - @Log()                               -> attempt=trace, success=trace
- *  - @Log('trace', 'notice')              -> positional log levels
- *  - @Log({ names:['userId','recipeId']}) -> options object
+ *  - @LogServiceMethod()                                      -> attempt=trace, success=trace
+ *  - @LogServiceMethod('trace', 'notice')                     -> positional log levels
+ *  - @LogServiceMethod({ names:['userId','recipeId']})        -> options object with named args
+ *  - @LogServiceMethod({ excludeArgs: true })                 -> skip all argument logging
  */
 export function LogServiceMethod(): MethodDecorator;
 export function LogServiceMethod(
@@ -26,6 +28,13 @@ export function LogServiceMethod(
     const attemptLevel: LogLevel =
         typeof arg1 === 'string' ? arg1 : (arg1?.attempt ?? 'trace');
 
+    /**
+     * This is (i thinkg) a clever way to do this. If arg1 is present as a string then the caller
+     * is defining log levels directly as top level arguments. In that case use arg2 if exists.
+     * If however, the arg1 is not a string (or not present at all), then either an object was passed or the
+     * args are empty. Try to read from the config object or default to trace.
+     * The check is similar in nature for other configs above and below.
+     */
     const successLevel: LogLevel =
         typeof arg1 === 'string'
             ? (arg2 ?? 'trace')
@@ -35,6 +44,11 @@ export function LogServiceMethod(
         typeof arg1 === 'object' && !Array.isArray(arg1)
             ? (arg1.names ?? [])
             : [];
+
+    const excludeArgs: boolean =
+        typeof arg1 === 'object' && !Array.isArray(arg1)
+            ? (arg1.excludeArgs ?? false)
+            : false;
 
     return (
         target: object,
@@ -50,9 +64,13 @@ export function LogServiceMethod(
         descriptor.value = async function (...args: unknown[]) {
             const log = Logger.getInstance(className);
 
-            const payload = names.length
-                ? Object.fromEntries(names.map((n, i) => [n, args[i]]))
-                : { args };
+            let payload: Record<string, unknown> = {};
+
+            if (!excludeArgs) {
+                payload = names.length
+                    ? Object.fromEntries(names.map((n, i) => [n, args[i]]))
+                    : { args };
+            }
 
             log[attemptLevel](`${String(propertyKey)} - attempt`, payload);
 

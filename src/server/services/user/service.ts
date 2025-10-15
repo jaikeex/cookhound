@@ -63,7 +63,7 @@ class UserService {
      * @throws {ServerError} Throws an error with status 400 if required fields are missing.
      * @throws {ServerError} Throws an error with status 409 if email or username is already taken.
      */
-    @LogServiceMethod({ success: 'notice', names: ['payload'] })
+    @LogServiceMethod({ success: 'notice', excludeArgs: true })
     async createUser(payload: UserForCreatePayload): Promise<UserDTO> {
         const { email, password, username } = payload;
 
@@ -954,7 +954,7 @@ class UserService {
      * @param password - The new password.
      */
 
-    @LogServiceMethod({ success: 'notice', names: ['token', 'password'] })
+    @LogServiceMethod({ success: 'notice', excludeArgs: true })
     async resetPassword(token: string, password: string): Promise<void> {
         if (!token || !password) {
             log.warn('resetPassword - missing token or password');
