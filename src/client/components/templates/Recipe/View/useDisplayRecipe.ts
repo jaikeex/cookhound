@@ -35,7 +35,9 @@ export const useDisplayRecipe = (recipe: RecipeDTO) => {
                 queryKey: QUERY_KEYS.recipe.byDisplayId(recipe.displayId)
             });
 
-            router.refresh();
+            setTimeout(() => {
+                router.refresh();
+            }, 1000);
         },
         onError: () => {
             alert({
