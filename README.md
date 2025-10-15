@@ -120,3 +120,21 @@ The password must be surrounded by single quotes.
 ```bash
 redis-cli -h localhost -p 6379 -a 'password'
 ```
+
+### edit site nginx config
+
+```bash
+nano etc/nginx/sites-available/cookhound.com
+```
+
+### edit global nginx config
+
+```bash
+nano etc/nginx/nginx.conf
+```
+
+### restart nginx
+
+```bash
+systemctl restart nginx
+```
