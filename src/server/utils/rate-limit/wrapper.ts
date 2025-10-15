@@ -5,6 +5,7 @@ import type { RateLimitConfig, RateLimiter, RateLimitResult } from './types';
 import { InfrastructureError } from '@/server/error';
 import { Logger } from '@/server/logger';
 import { InfrastructureErrorCode } from '@/server/error/codes';
+import { isE2ETestMode } from '@/common/constants';
 
 const logger = Logger.getInstance('rate-limit');
 
@@ -19,7 +20,6 @@ export interface RateLimitOptions extends RateLimitConfig {
     algorithm?: RateLimitAlgorithm;
 }
 
-// Middleware-friendly curried signature: withRateLimit(options)(handler)
 export function withRateLimit(
     options: RateLimitOptions
 ): <T extends (req: NextRequest, context?: unknown) => Promise<Response>>(
@@ -34,6 +34,11 @@ export function withRateLimit(
             req: NextRequest,
             context?: unknown
         ): Promise<Response> => {
+            if (isE2ETestMode()) {
+                //! Skip rate limiting in e2e tests
+                return handler(req, context);
+            }
+
             logger.info('withRateLimit - guarded request received', {
                 path: req.nextUrl.pathname,
                 method: req.method
@@ -78,19 +83,40 @@ function createRateLimiter(options: RateLimitOptions): RateLimiter {
 }
 
 function getAppRouterClientIdentifier(req: NextRequest): string {
+    //?—————————————————————————————————————————————————————————————————————————————————————————?//
+    //?                                      IP SPOOFING                                        ?//
+    ///
+    //# These checks MUST be paired with proper reverse proxy configuration.
+    //# In case of the current deployment, the do droplet has an nginx instance running, and
+    //# it must be configured to reset the headers to its proper actual values read from the
+    //# connection itself, not from the request headers, since those can be set arbitrarily
+    //# by the caller.
+    //#
+    //# The correct nginx config is as follows:
+    //#
+    //#     # Clear incoming client IP headers to prevent spoofing
+    //#     proxy_set_header X-Real-IP "";
+    //#     proxy_set_header X-Forwarded-For "";
+    //#
+    //#     # Set the X-Real-IP header to the real remote address
+    //#     proxy_set_header X-Real-IP $remote_addr;
+    //#
+    //#     # Append the remote address to the X-Forwarded-For header
+    //#     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    ///
+    //?—————————————————————————————————————————————————————————————————————————————————————————?//
+
     const forwarded = req.headers.get('x-forwarded-for');
     const realIp = req.headers.get('x-real-ip');
-    const cfConnectingIp = req.headers.get('cf-connecting-ip'); // Cloudflare
 
     const path = req.nextUrl.pathname;
 
     let ip = '';
+
     if (forwarded) {
         ip = forwarded.split(',')[0]?.trim() ?? '';
     } else if (realIp) {
         ip = realIp;
-    } else if (cfConnectingIp) {
-        ip = cfConnectingIp;
     } else {
         // Fallback to req.ip if available (may not be available in all environments)
         ip = (req as any).ip || 'unknown';
