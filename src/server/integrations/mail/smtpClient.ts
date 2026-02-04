@@ -39,31 +39,15 @@ interface MailOptions {
 //~=============================================================================================~//
 
 /**
- * A service for sending emails using Google's SMTP server without any
- * third-party libraries. It handles the entire SMTP conversation, including
- * the TLS upgrade and authentication.
+ * A service for sending emails using SMTP server without any third-party libraries (a little flex is in order).
+ * It handles the entire SMTP conversation, including the TLS upgrade and authentication.
  */
 export class MailClient {
-    private readonly smtpHost = 'smtp.gmail.com';
+    private readonly smtpHost = ENV_CONFIG_PRIVATE.SMTP_HOST;
     private readonly smtpPort = 587;
-    private readonly user: string;
-    private readonly pass: string;
+    private readonly user = ENV_CONFIG_PRIVATE.SMTP_USERNAME;
+    private readonly pass = ENV_CONFIG_PRIVATE.SMTP_PASSWORD;
     private socket!: net.Socket | tls.TLSSocket;
-
-    constructor() {
-        if (
-            !ENV_CONFIG_PRIVATE.GOOGLE_SMTP_USERNAME ||
-            !ENV_CONFIG_PRIVATE.GOOGLE_SMTP_PASSWORD
-        ) {
-            log.error('SMTP credentials are not configured.');
-            throw new InfrastructureError(
-                InfrastructureErrorCode.SMTP_NOT_CONFIGURED
-            );
-        }
-
-        this.user = ENV_CONFIG_PRIVATE.GOOGLE_SMTP_USERNAME;
-        this.pass = ENV_CONFIG_PRIVATE.GOOGLE_SMTP_PASSWORD;
-    }
 
     //|-----------------------------------------------------------------------------------------|//
     //?                                     PUBLIC SEND API                                     ?//

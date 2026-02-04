@@ -14,7 +14,10 @@ const log = Logger.getInstance('verif-email-worker');
 
 type VerificationEmailJobData = {
     token: string;
-    to: { address: string; name: string };
+    to: {
+        address: string;
+        name: string;
+    };
     locale: Locale;
 };
 
@@ -28,7 +31,11 @@ class SendVerificationEmailJob extends BaseJob<VerificationEmailJobData> {
 
         log.trace('handle - attempting to send verification email', to);
 
-        const verificationLink = `${ENV_CONFIG_PUBLIC.ORIGIN}/auth/callback/verify-email?token=${token}&email=${to.address}`;
+        const encodedToken = encodeURIComponent(token);
+        const encodedEmail = encodeURIComponent(to.address);
+
+        const verificationLink = `${ENV_CONFIG_PUBLIC.ORIGIN}/auth/callback/verify-email?token=${encodedToken}&email=${encodedEmail}`;
+
         const { subject, html } = createTemplate(
             emailVerificationTpl,
             locale,

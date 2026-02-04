@@ -73,6 +73,8 @@ export const VerifyEmailCallbackTemplate: React.FC = () => {
             ? t((error as RequestError).message as I18nMessage)
             : t('auth.error.default');
 
+        const encodedEmail = email ? encodeURIComponent(email) : '';
+
         return (
             <div className="flex flex-col items-center space-y-6">
                 <Typography variant="heading-md" className="text-danger">
@@ -80,7 +82,13 @@ export const VerifyEmailCallbackTemplate: React.FC = () => {
                 </Typography>
                 <Typography>{errorMessage}</Typography>
                 <Typography>
-                    <Link href={`/auth/verify-email?new=false&email=${email}`}>
+                    <Link
+                        href={
+                            email
+                                ? `/auth/verify-email?new=false&email=${encodedEmail}`
+                                : '/auth/verify-email?new=false'
+                        }
+                    >
                         {t('auth.verify-email.try-again')}
                     </Link>
                 </Typography>

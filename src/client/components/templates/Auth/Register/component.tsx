@@ -93,8 +93,12 @@ export const RegisterTemplate: React.FC<RegisterTemplateProps> = () => {
                 variant: 'success'
             });
 
+            const encodedEmail = user?.email
+                ? encodeURIComponent(user.email)
+                : '';
+
             cleanUpAndRedirectAfterSubmit(
-                `/auth/verify-email?email=${user?.email}`
+                `/auth/verify-email?email=${encodedEmail}`
             );
         }
     });
