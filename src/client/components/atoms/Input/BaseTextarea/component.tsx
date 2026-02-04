@@ -34,14 +34,12 @@ export const BaseTextarea: React.FC<BaseTextareaProps> = ({
         const minHeight = lineHeight * minRows;
         const maxHeight = maxRows ? lineHeight * maxRows : Infinity;
 
-        // Set the new height based on content, respecting min/max constraints
         const newHeight = Math.min(
             Math.max(textarea.scrollHeight, minHeight),
             maxHeight
         );
         textarea.style.height = `${newHeight}px`;
 
-        // Enable/disable scrolling based on whether we've hit the max height
         textarea.style.overflowY =
             textarea.scrollHeight > maxHeight ? 'auto' : 'hidden';
     }, [minRows, maxRows]);
@@ -51,7 +49,7 @@ export const BaseTextarea: React.FC<BaseTextareaProps> = ({
     }, [adjustHeight]);
 
     const handleInput = useCallback(
-        (e: React.FormEvent<HTMLTextAreaElement>) => {
+        (e: React.InputEvent<HTMLTextAreaElement>) => {
             adjustHeight();
             if (onInput) {
                 onInput(e);
