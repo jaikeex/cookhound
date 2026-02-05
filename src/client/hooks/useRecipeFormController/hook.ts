@@ -176,7 +176,7 @@ export const useRecipeFormController = ({
                     setFormErrors(validationErrors);
                     return;
                 }
-            } catch (err) {
+            } catch {
                 setFormErrors({ server: 'auth.error.default' });
                 return;
             }

@@ -9,7 +9,6 @@ const log = Logger.getInstance('api');
  * Intended to be used in route handlers to report that a request has been recieved.
  */
 // This is intended as to not break any current usage, also might have a use in the future.
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function logRequest() {
     try {
         const requestPath = RequestContext.getRequestPath();

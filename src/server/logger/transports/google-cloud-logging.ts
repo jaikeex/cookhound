@@ -124,9 +124,8 @@ export class GoogleCloudLoggingTransport extends Transport {
 
         if (this._googleApiService) return this._googleApiService;
 
-        const serviceModule = await import(
-            '@/server/services/google-api/service'
-        );
+        const serviceModule =
+            await import('@/server/services/google-api/service');
         this._googleApiService = serviceModule.googleApiService;
         return this._googleApiService;
     }

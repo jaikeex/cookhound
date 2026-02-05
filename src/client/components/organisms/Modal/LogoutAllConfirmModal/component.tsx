@@ -68,7 +68,6 @@ export const LogoutAllConfirmModal: React.FC<LogoutAllConfirmModalProps> = ({
                 {t('auth.logout-all.title')}
             </Typography>
             <Typography className="mt-2">
-                {/* eslint-disable-next-line react/no-danger */}
                 {t('auth.logout-all.body')}
             </Typography>
 

@@ -15,7 +15,7 @@ export const useUrlChangeListener: UseUrlChangeListenerType = ({
     const paramsTracker = params.toString();
 
     useEffect(() => {
-        onChange && onChange();
+        onChange?.();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [pathname, paramsTracker]);
 };

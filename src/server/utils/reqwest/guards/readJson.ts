@@ -38,7 +38,6 @@ export async function readJson<T = unknown>(
     let received = 0;
     const chunks: Uint8Array[] = [];
 
-    // eslint-disable-next-line no-constant-condition
     while (true) {
         const { value, done } = await reader.read();
 

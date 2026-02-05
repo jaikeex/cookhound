@@ -16,6 +16,9 @@ import {
     type ReorderCookbookRecipesOptions
 } from './types';
 
+// This is fine (not a component, just declarations here).
+/* eslint-disable react-hooks/rules-of-hooks */
+
 class CookbookQueryClient {
     /** Fetch cookbook by numeric id. */
     useCookbookById = (

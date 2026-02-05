@@ -101,7 +101,7 @@ export const Tabs: React.FC<TabsProps> = ({
         (index: number) => () => {
             setCurrentTab(index);
             updateUrlParam(index);
-            onTabChange && onTabChange(index);
+            onTabChange?.(index);
         },
         [onTabChange, updateUrlParam]
     );

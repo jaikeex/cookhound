@@ -19,7 +19,7 @@ export const usePathnameChangeListener: UsePathnameChangeListenerType = ({
     const pathNameToCheck = ignoreParams ? pathname.split('?')[0] : pathname;
 
     useEffect(() => {
-        onChange && onChange();
+        onChange?.();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [pathNameToCheck]);
 };

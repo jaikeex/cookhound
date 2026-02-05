@@ -11,6 +11,9 @@ import type {
 } from './types';
 import { AUTH_QUERY_KEYS } from './types';
 
+// This is fine (not a component, just declarations here).
+/* eslint-disable react-hooks/rules-of-hooks */
+
 class AuthQueryClient {
     /**
      * Returns the currently logged-in user.

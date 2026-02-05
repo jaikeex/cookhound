@@ -106,7 +106,6 @@ class CookbookModel {
 
             const nextPos = Number(_max.ownerOrder ?? 0) + 1;
 
-            // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
             const cookbook = await tx.cookbook.create({
                 data: {
                     ...data,

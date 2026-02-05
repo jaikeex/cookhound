@@ -25,6 +25,9 @@ import type {
 import { RECIPE_QUERY_KEYS } from './types';
 import type { RecipeForCreatePayload } from '@/common/types/recipe';
 
+// This is fine (not a component, just declarations here).
+/* eslint-disable react-hooks/rules-of-hooks */
+
 class RecipeQueryClient {
     /**
      * Fetches a recipe by its display id.

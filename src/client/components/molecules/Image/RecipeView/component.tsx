@@ -16,9 +16,9 @@ import type { RecipeDTO } from '@/common/types';
 
 const AddRecipeToCookbookModal = dynamic(
     () =>
-        import(
-            '@/client/components/organisms/Modal/AddRecipeToCookbookModal'
-        ).then((mod) => mod.AddRecipeToCookbookModal),
+        import('@/client/components/organisms/Modal/AddRecipeToCookbookModal').then(
+            (mod) => mod.AddRecipeToCookbookModal
+        ),
     { ssr: false }
 );
 

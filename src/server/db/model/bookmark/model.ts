@@ -111,7 +111,6 @@ class BookmarkModel {
                 .join(' ');
             const ids = orderedCookbookIds.join(',');
             const raw = `UPDATE "cookbook_bookmarks" SET "bookmark_order" = CASE "cookbook_id" ${cases} END WHERE "user_id" = ${userId} AND "cookbook_id" IN (${ids});`;
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-call
             await tx.$executeRawUnsafe(raw);
         });
 

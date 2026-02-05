@@ -54,7 +54,7 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({
     const handleImageChange = useCallback(
         (file: File) => {
             const imageUrl = URL.createObjectURL(file);
-            onChange && onChange('imageUrl', imageUrl);
+            onChange?.('imageUrl', imageUrl);
         },
         [onChange]
     );
@@ -68,7 +68,7 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({
             }
 
             if (onChange) {
-                onChange && onChange(name, value);
+                onChange?.(name, value);
             }
         },
         [onChange]
@@ -76,14 +76,14 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({
 
     const handleIngredientsChange = useCallback(
         (ingredients: Ingredient[]) => {
-            onChange && onChange('ingredients', ingredients);
+            onChange?.('ingredients', ingredients);
         },
         [onChange]
     );
 
     const handleInstructionsChange = useCallback(
         (instructions: string[]) => {
-            onChange && onChange('instructions', instructions);
+            onChange?.('instructions', instructions);
         },
         [onChange]
     );
@@ -101,7 +101,7 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({
 
     const handleTagSelection = useCallback(
         (tags: RecipeTagDTO[]) => {
-            onChange && onChange('tags', tags);
+            onChange?.('tags', tags);
         },
         [onChange]
     );

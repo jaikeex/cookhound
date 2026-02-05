@@ -25,6 +25,9 @@ import type {
 } from './types';
 import { USER_QUERY_KEYS } from './types';
 
+// This is fine (not a component, just declarations here).
+/* eslint-disable react-hooks/rules-of-hooks */
+
 class UserQueryClient {
     /**
      * Creates a new user.

@@ -38,7 +38,7 @@ export const IngredientRowCreate: React.FC<IngredientRowCreateProps> = ({
         index === 0 && recipeObject?.ingredients.length === 1;
 
     const handleRemove = useCallback(() => {
-        onRemove && onRemove(index);
+        onRemove?.(index);
     }, [index, onRemove]);
 
     const handleNameKeyPress = useCallback(
@@ -59,7 +59,7 @@ export const IngredientRowCreate: React.FC<IngredientRowCreateProps> = ({
         (e: React.KeyboardEvent<HTMLInputElement>) => {
             if (e.key === 'Enter') {
                 e.preventDefault(); // Prevent form submission
-                onAddIngredient && onAddIngredient();
+                onAddIngredient?.();
             }
         },
         [onAddIngredient]
@@ -73,7 +73,7 @@ export const IngredientRowCreate: React.FC<IngredientRowCreateProps> = ({
                 category
             };
             setIngredient(newIngredient);
-            onChange && onChange(newIngredient);
+            onChange?.(newIngredient);
         },
         [ingredient, onChange, category]
     );
@@ -86,13 +86,13 @@ export const IngredientRowCreate: React.FC<IngredientRowCreateProps> = ({
                 category
             };
             setIngredient(newIngredient);
-            onChange && onChange(newIngredient);
+            onChange?.(newIngredient);
         },
         [ingredient, onChange, category]
     );
     useEffect(() => {
         if (ingredient.name || ingredient.quantity) {
-            onChange && onChange(ingredient);
+            onChange?.(ingredient);
         }
         // This is intentional, only run this effect when the index changes
         // eslint-disable-next-line react-hooks/exhaustive-deps

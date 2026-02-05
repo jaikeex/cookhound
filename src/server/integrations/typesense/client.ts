@@ -46,7 +46,6 @@ interface GlobalTypesenseClient {
 
 declare global {
     //~ see explanation above
-    // eslint-disable-next-line no-var
     var __cookhound_typesense_client__: GlobalTypesenseClient | undefined;
 }
 

@@ -18,7 +18,7 @@ export const useParamsChangeListener: UseParamsChangeListenerType = ({
     const tracker = params.get(key);
 
     useEffect(() => {
-        onChange && onChange();
+        onChange?.();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [tracker]);
 };

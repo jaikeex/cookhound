@@ -1,6 +1,6 @@
 // types inspired by the original `classnames` package
 type ClassValue =
-    | ClassArray
+    | Array<ClassValue>
     | ClassDictionary
     | string
     | number
@@ -10,7 +10,6 @@ type ClassValue =
 interface ClassDictionary {
     [id: string]: unknown;
 }
-interface ClassArray extends Array<ClassValue> {}
 
 /**
  * Build a space-separated list of unique class names.

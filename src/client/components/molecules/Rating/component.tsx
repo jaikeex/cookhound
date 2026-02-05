@@ -119,7 +119,10 @@ export const Rating: React.FC<RatingProps> = ({
             onClick(clickedRating);
 
             setTimeout(() => {
-                cooldown && startCooldown();
+                if (cooldown) {
+                    startCooldown();
+                }
+
                 isSubmitting.current = false;
                 setIsPulsing(false);
             }, 1000);

@@ -57,8 +57,6 @@ export function handleServerError(error: unknown): NextResponse<ErrorResponse> {
             response.status = 499;
             response.code = ApplicationErrorCode.DEFAULT;
 
-            log.trace;
-
             // No need to log this anywhere.
             return NextResponse.json(response, { status: response.status });
         }

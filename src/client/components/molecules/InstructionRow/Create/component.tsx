@@ -32,14 +32,14 @@ export const InstructionRowCreate: React.FC<InstructionRowCreateProps> = ({
         index === 0 && recipeObject?.instructions.length === 1;
 
     const handleRemove = useCallback(() => {
-        onRemove && onRemove(index);
+        onRemove?.(index);
     }, [index, onRemove]);
 
     const handleKeyPress = useCallback(
         (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
             if (e.key === 'Enter') {
                 e.preventDefault(); // Prevent form submission
-                onAddInstruction && onAddInstruction();
+                onAddInstruction?.();
             }
         },
         [onAddInstruction]
@@ -48,14 +48,14 @@ export const InstructionRowCreate: React.FC<InstructionRowCreateProps> = ({
     const handleChange = useCallback(
         (e: React.ChangeEvent<HTMLTextAreaElement>) => {
             setInstruction(e.target.value);
-            onChange && onChange(e.target.value);
+            onChange?.(e.target.value);
         },
         [onChange]
     );
 
     useEffect(() => {
         if (instruction) {
-            onChange && onChange(instruction);
+            onChange?.(instruction);
         }
         // This is intentional, only run this effect when the index changes
         // eslint-disable-next-line react-hooks/exhaustive-deps

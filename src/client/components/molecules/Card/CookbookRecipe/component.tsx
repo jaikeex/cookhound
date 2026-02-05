@@ -11,9 +11,9 @@ import { SortableItem, SortableKnob } from 'react-easy-sort';
 
 const DeleteFromCookbookConfirmationModal = dynamic(
     () =>
-        import(
-            '@/client/components/organisms/Modal/DeleteFromCookbookConfirmationModal'
-        ).then((mod) => mod.DeleteFromCookbookConfirmationModal),
+        import('@/client/components/organisms/Modal/DeleteFromCookbookConfirmationModal').then(
+            (mod) => mod.DeleteFromCookbookConfirmationModal
+        ),
     { ssr: false }
 );
 
@@ -90,7 +90,7 @@ export const CookbookRecipeCard: React.FC<CookbookRecipeCardProps> = ({
             openModal(getModalContent(), {
                 hideCloseButton: true
             });
-        } catch (err) {
+        } catch {
             alert({
                 message: t('app.error.default'),
                 variant: 'error'

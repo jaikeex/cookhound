@@ -25,7 +25,6 @@ class ReindexRecipesJob extends BaseJob {
     // A single worker is sufficient – the fetches are sequential anyway.
     static concurrency = 1;
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     async handle(_job: Job): Promise<void> {
         log.info('handle - starting full recipe re-index run');
 
@@ -36,7 +35,6 @@ class ReindexRecipesJob extends BaseJob {
         for (const language of languages) {
             let totalProcessed = 0;
 
-            // eslint-disable-next-line no-constant-condition
             while (true) {
                 const recipes = await recipeModel.getMany(
                     language,

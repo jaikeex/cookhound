@@ -66,7 +66,9 @@ export function useCheckScrollExistence(ref?: React.RefObject<HTMLElement>) {
         }
 
         const updateScrollState = () => {
-            contentWrapper && setIsScrollExist(contentHeight > pageHeight);
+            if (contentWrapper) {
+                setIsScrollExist(contentHeight > pageHeight);
+            }
         };
 
         updateScrollState();
@@ -75,12 +77,13 @@ export function useCheckScrollExistence(ref?: React.RefObject<HTMLElement>) {
             updateScrollState();
         });
 
-        contentWrapper &&
+        if (contentWrapper) {
             observer.observe(contentWrapper, {
                 attributes: true,
                 childList: true,
                 subtree: true
             });
+        }
 
         return () => {
             observer.disconnect();

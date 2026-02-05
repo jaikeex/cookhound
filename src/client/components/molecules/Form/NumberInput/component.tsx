@@ -31,7 +31,7 @@ export const NumberInput: React.FC<NumberInputProps> = ({
                 ).toString();
             }
 
-            onChange && onChange(e);
+            onChange?.(e);
         },
         [allowDecimals, onChange]
     );

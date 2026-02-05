@@ -81,7 +81,7 @@ export const InstructionsListCreate: React.FC<InstructionsListCreateProps> = ({
     );
 
     useEffect(() => {
-        onChange && onChange(instructionValues);
+        onChange?.(instructionValues);
     }, [instructionValues, onChange]);
 
     // Memoize the DraggableList to prevent unnecessary re-renders during screen size changes

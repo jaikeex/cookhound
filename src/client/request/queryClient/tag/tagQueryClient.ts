@@ -11,6 +11,9 @@ import {
 import type { RecipeDTO } from '@/common/types';
 import type { Locale } from '@/common/types';
 
+// This is fine (not a component, just declarations here).
+/* eslint-disable react-hooks/rules-of-hooks */
+
 class TagQueryClient {
     useTags = (language: Locale, options?: Partial<TagListOptions>) =>
         useAppQuery(

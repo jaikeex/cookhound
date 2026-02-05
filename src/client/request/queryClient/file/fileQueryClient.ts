@@ -5,6 +5,9 @@ import type {
     UploadRecipeImageOptions
 } from './types';
 
+// This is fine (not a component, just declarations here).
+/* eslint-disable react-hooks/rules-of-hooks */
+
 class FileQueryClient {
     /**
      * Uploads a recipe image.

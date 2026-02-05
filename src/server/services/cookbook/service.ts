@@ -13,7 +13,6 @@ import { createCookbookDTO, verifyCookbookOwnership } from './utils';
 
 //|=============================================================================================|//
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const log = Logger.getInstance('cookbook-service');
 
 /**

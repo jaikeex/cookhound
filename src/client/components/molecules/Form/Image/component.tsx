@@ -133,7 +133,7 @@ export const ImageInput: React.FC<ImageInputProps> = ({
 
                     // DO NOT FORGET THIS LINE
                     setInputUrl(processedFile);
-                    onUpload && onUpload(processedFile);
+                    onUpload?.(processedFile);
 
                     if (showPreview) {
                         const imageUrl = URL.createObjectURL(processedFile);
