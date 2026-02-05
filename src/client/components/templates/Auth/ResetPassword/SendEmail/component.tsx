@@ -126,7 +126,7 @@ export const SendResetPasswordEmailTemplate: React.FC<
             </form>
 
             {submitted ? (
-                <div className="space-y-4 !mt-8">
+                <div className="space-y-4 mt-8!">
                     <Typography align="center" className="space-x-3">
                         {t('auth.form.reset-password.email-sent')}
                     </Typography>

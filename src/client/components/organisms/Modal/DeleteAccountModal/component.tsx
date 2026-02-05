@@ -88,11 +88,11 @@ export const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
 
     return (
         <div className="flex flex-col w-full h-full max-h-[85dvh] md:max-h-[70dvh] max-w-[90dvw] md:max-w-[50dvw] xl:max-w-[40dvw] px-4 overflow-y-auto">
-            <Typography variant="heading-sm" className="flex-shrink-0">
+            <Typography variant="heading-sm" className="shrink-0">
                 {t('app.profile.deleteAccount.modal.title')}
             </Typography>
 
-            <div className="mt-4 space-y-4 flex-grow overflow-y-auto">
+            <div className="mt-4 space-y-4 grow overflow-y-auto">
                 <div className="bg-danger/10 dark:bg-danger/20 rounded-lg">
                     <Typography className="font-semibold text-danger">
                         {t('app.profile.deleteAccount.modal.warning')}
@@ -154,7 +154,7 @@ export const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
                 />
             </div>
 
-            <div className="flex-shrink-0 flex w-full gap-3 mt-6 pt-4">
+            <div className="shrink-0 flex w-full gap-3 mt-6 pt-4">
                 <ButtonBase
                     onClick={handleCancel}
                     color="subtle"

@@ -132,7 +132,7 @@ export const AddRecipeToCookbookModal: React.FC<
                     {t('app.cookbook.no-cookbooks-description')}
                 </Typography>
 
-                <div className="flex-shrink-0 flex w-full gap-3 mt-4 pt-4">
+                <div className="shrink-0 flex w-full gap-3 mt-4 pt-4">
                     <ButtonBase
                         onClick={handleClose}
                         color="subtle"
@@ -177,7 +177,7 @@ export const AddRecipeToCookbookModal: React.FC<
                 onChange={handleSelectChange}
             />
 
-            <div className="flex-shrink-0 flex w-full gap-3 mt-4 pt-4">
+            <div className="shrink-0 flex w-full gap-3 mt-4 pt-4">
                 <ButtonBase
                     onClick={handleClose}
                     color="subtle"

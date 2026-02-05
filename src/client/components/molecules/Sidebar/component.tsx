@@ -129,7 +129,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     const atBottom =
                         start &&
                         start.scrollTop + start.clientHeight >=
-                            start.scrollHeight - 1; // tolerate rounding
+                            start.scrollHeight - 1;
                     if (dy < -THRESHOLD && atBottom) {
                         touchStart.current = null;
                         toggleSidebar();
@@ -159,7 +159,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <React.Fragment>
                     <div
                         className={classNames(
-                            'fixed inset-0 z-20 w-screen bg-black bg-opacity-75 h-[100dvh]',
+                            'fixed inset-0 z-20 w-screen bg-black/75 h-dvh',
                             backdropClass
                         )}
                     />

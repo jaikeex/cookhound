@@ -22,7 +22,7 @@ export const Loader: React.FC<LoaderProps> = ({ className, size = 'md' }) => {
                 className
             )}
         >
-            <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p [clip:rect(0,0,0,0)]">
+            <span className="absolute! -m-px! h-px! w-px! overflow-hidden! whitespace-nowrap! border-0! p-0! [clip:rect(0,0,0,0)]">
                 Loading...
             </span>
         </span>

@@ -83,7 +83,7 @@ export const Accordion: React.FC<AccordionProps> = ({
                                 disabled
                                     ? 'cursor-not-allowed text-gray-400 dark:text-gray-500'
                                     : 'hover:bg-gray-100 dark:hover:bg-gray-800',
-                                'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500'
+                                'focus:outline-hidden focus-visible:ring-2 focus-visible:ring-primary-500'
                             )}
                         >
                             {typeof title === 'string' ? (

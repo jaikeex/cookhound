@@ -1,0 +1,53 @@
+@utility base-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.25rem;
+    font-weight: 600;
+    transition-property:
+        color, background-color, border-color, text-decoration-color, fill,
+        stroke;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+
+    &:disabled {
+        cursor: not-allowed;
+        opacity: 0.5;
+        background-color: rgb(156 163 175);
+    }
+
+    &:disabled:hover {
+        background-color: rgb(156 163 175);
+    }
+
+    .dark &:disabled {
+        background-color: transparent;
+    }
+
+    .dark &:disabled:hover {
+        background-color: rgb(75 85 99);
+    }
+}
+
+@utility icon-button {
+    min-height: 1.75rem;
+    min-width: 1.75rem;
+    aspect-ratio: 1 / 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.25rem;
+    transition-property:
+        color, background-color, border-color, text-decoration-color, fill,
+        stroke;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+
+    &:hover {
+        background-color: rgb(231 229 228);
+    }
+
+    .dark &:hover {
+        background-color: rgb(68 64 60);
+    }
+}

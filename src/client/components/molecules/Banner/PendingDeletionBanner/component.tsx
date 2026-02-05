@@ -89,7 +89,7 @@ export const PendingDeletionBanner: React.FC<PendingDeletionBannerProps> = ({
                     disabled={isPending}
                     color="warning"
                     size="sm"
-                    className="md:flex-shrink-0"
+                    className="md:shrink-0"
                 >
                     {t('app.profile.pendingDeletion.banner.cancel')}
                 </ButtonBase>

@@ -12,6 +12,7 @@ export const ErrorList: React.FC<ErrorListProps> = ({ errors, className }) => {
         <ul
             className={classNames(
                 'text-red-700 dark:text-red-500 space-y-1',
+                errors.length === 0 ? 'hidden' : '',
                 className
             )}
         >

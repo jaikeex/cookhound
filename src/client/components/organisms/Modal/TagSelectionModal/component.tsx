@@ -154,7 +154,7 @@ export const TagSelectionModal: React.FC<TagSelectionModalProps> = ({
                 className="overflow-y-auto"
             />
 
-            <div className="flex-shrink-0 flex w-full gap-3 mt-4 pt-4">
+            <div className="shrink-0 flex w-full gap-3 mt-4 pt-4">
                 <ButtonBase
                     onClick={handleClose}
                     color="subtle"

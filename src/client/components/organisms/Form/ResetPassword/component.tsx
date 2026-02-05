@@ -47,7 +47,7 @@ export const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({
             />
 
             <Submit
-                className="min-w-40 !mt-10 mx-auto"
+                className="min-w-40 mt-10! mx-auto"
                 disabled={disabled}
                 pending={pending}
                 label={t('app.general.submit')}

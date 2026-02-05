@@ -229,7 +229,7 @@ const ModalWrapper: React.FC<ModalWrapperProps> = ({
 }) => {
     return (
         <motion.div
-            className="fixed inset-0 z-[1000] flex items-center justify-center"
+            className="fixed inset-0 z-1000 flex items-center justify-center"
             initial="hidden"
             animate="visible"
             exit="exit"
@@ -237,7 +237,7 @@ const ModalWrapper: React.FC<ModalWrapperProps> = ({
             {/* Overlay */}
             <motion.div
                 variants={backdropVariants}
-                className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+                className="absolute inset-0 bg-black/50 backdrop-blur-xs"
                 onClick={disableBackdropClick ? undefined : onClose}
             />
 

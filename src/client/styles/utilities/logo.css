@@ -1,0 +1,74 @@
+@utility logo-xs {
+    gap: 0.25rem;
+    transform: translateY(0.25rem);
+
+    & > span {
+        font-size: 1.25rem;
+        line-height: 1.75rem;
+    }
+
+    & > img {
+        width: 2rem;
+        height: 2rem;
+    }
+}
+
+@utility logo-sm {
+    gap: 0.375rem;
+    transform: translateY(0.375rem);
+
+    & > span {
+        font-size: 1.5rem;
+        line-height: 2rem;
+    }
+
+    & > img {
+        width: 3rem;
+        height: 3rem;
+    }
+}
+
+@utility logo-md {
+    gap: 0.5rem;
+    transform: translateY(0.5rem);
+
+    & > span {
+        font-size: 1.875rem;
+        line-height: 2.25rem;
+    }
+
+    & > img {
+        width: 4rem;
+        height: 4rem;
+    }
+}
+
+@utility logo-lg {
+    gap: 0.625rem;
+    transform: translateY(0.625rem);
+
+    & > span {
+        font-size: 2.25rem;
+        line-height: 2.5rem;
+    }
+
+    & > img {
+        width: 5rem;
+        height: 5rem;
+    }
+}
+
+@utility logo-xl {
+    gap: 0.75rem;
+    transform: translateY(0.75rem);
+
+    & > span {
+        font-size: 3rem;
+        line-height: 1;
+    }
+
+    & > img {
+        width: 6rem;
+        height: 6rem;
+    }
+}

@@ -93,7 +93,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
             />
 
             <FormCheckbox
-                className="mt-2 w-full"
+                className="w-full"
                 disabled={pending}
                 id="terms-accepted"
                 name="terms-accepted"
@@ -104,7 +104,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
             <ErrorList className="self-start" errors={errorsToDisplay} />
 
             <Submit
-                className="min-w-40 !mt-6 mx-auto"
+                className="min-w-40 mt-6! mx-auto"
                 disabled={pending}
                 label={t('auth.form.register')}
                 pending={pending}

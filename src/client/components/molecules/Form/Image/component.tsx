@@ -268,7 +268,7 @@ export const ImageInput: React.FC<ImageInputProps> = ({
     return (
         <div
             className={classNames(
-                'flex flex-col items-center justify-center flex-grow w-full h-full',
+                'flex flex-col items-center justify-center grow w-full h-full',
                 className
             )}
         >
@@ -281,7 +281,7 @@ export const ImageInput: React.FC<ImageInputProps> = ({
                     `bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600`,
                     circularCrop
                         ? `w-full max-w-[140px] aspect-square rounded-full`
-                        : `w-full max-w-[480px] aspect-[16/9] flex-grow rounded-lg`,
+                        : `w-full max-w-[480px] aspect-video grow rounded-lg`,
                     isDragging && 'bg-gray-200 dark:bg-gray-600'
                 )}
                 onDragOver={handleDragOver}

@@ -27,7 +27,7 @@ export const TagSelectionBox: React.FC<TagSelectionBoxProps> = ({
     return (
         <div
             className={classNames(
-                'flex-shrink-0 flex gap-2 bg-white dark:bg-slate-800 p-2',
+                'shrink-0 flex gap-2 bg-white dark:bg-slate-800 p-2',
                 'border rounded-md border-gray-200 dark:border-gray-600',
                 className
             )}
@@ -53,7 +53,7 @@ export const TagSelectionBox: React.FC<TagSelectionBoxProps> = ({
                 color="secondary"
                 outlined
                 size="md"
-                className="w-24 ml-auto flex-shrink-0"
+                className="w-24 ml-auto shrink-0"
             >
                 {isLoading ? <Loader size="sm" /> : t('app.general.suggest')}
             </ButtonBase>

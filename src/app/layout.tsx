@@ -168,7 +168,7 @@ export default async function RootLayout({
                             id={MAIN_PAGE_ID}
                             className="flex flex-col typography-base min-h-screen"
                         >
-                            <div className="fixed top-0 left-0 w-screen h-screen page-background z-[-10]" />
+                            <div className="fixed top-0 left-0 w-screen h-screen page-background -z-10" />
                             {/* DO NOT CHANGE THE ORDER OF THESE COMPONENTS (stacking order and z-index issues) */}
                             <TopNavigation />
                             <BottomNavigation />

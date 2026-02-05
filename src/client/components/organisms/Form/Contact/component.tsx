@@ -66,7 +66,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({
             <ErrorList className="self-start" errors={errorsToDisplay} />
 
             <Submit
-                className="min-w-40 !mt-6 mx-auto"
+                className="min-w-40 mt-6! mx-auto"
                 label={t('contact.form.submit')}
                 pending={pending}
             />

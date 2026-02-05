@@ -175,7 +175,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
                 <ul
                     role="menu"
                     className={classNames(
-                        'absolute z-50 mt-2 min-w-24 rounded-md bg-white dark:bg-gray-800 shadow-lg ring-1 ring-black/5 focus:outline-none',
+                        'absolute z-50 mt-2 min-w-24 rounded-md bg-white dark:bg-gray-800 shadow-lg ring-1 ring-black/5 focus:outline-hidden',
                         'animate-fade-in',
                         placementClass,
                         menuClassName

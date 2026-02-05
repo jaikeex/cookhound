@@ -39,7 +39,7 @@ const classConfig = {
                 'bg-transparent hover:bg-gray-200 dark:hover:bg-gray-700 disabled:bg-transparent',
             color: 'text-black dark:text-gray-200',
             outline:
-                'border border-gray-200 focus:outline-none dark:border-gray-700'
+                'border border-gray-200 focus:outline-hidden dark:border-gray-700'
         }
     },
     sizes: {
@@ -113,7 +113,7 @@ export const ButtonBase: React.FC<BaseButtonProps> = ({
                 classConfig.colors[color].color,
                 outlined && classConfig.colors[color].outline,
                 classConfig.sizes[size].dimensions,
-                'focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:outline-none',
+                'focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:outline-hidden',
                 uppercase && 'uppercase',
                 className
             )}

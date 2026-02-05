@@ -104,7 +104,7 @@ export const RecipeWithHandling: React.FC<RecipeCardProps> = ({
             />
             <Dropdown
                 items={items}
-                className="!absolute top-2 right-2"
+                className="absolute! top-2 right-2"
                 position="left"
                 menuClassName="w-8"
             >

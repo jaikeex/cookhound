@@ -21,15 +21,15 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({
     return (
         <div
             className={classNames(
-                'group focus-within:outline-none focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 focus-within:ring-offset-slate-200 dark:focus-within:ring-offset-slate-800',
-                'flex flex-col h-full overflow-hidden border border-gray-300 rounded-lg shadow-sm',
+                'group focus-within:outline-hidden focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 focus-within:ring-offset-slate-200 dark:focus-within:ring-offset-slate-800',
+                'flex flex-col h-full overflow-hidden border border-gray-300 rounded-lg shadow-xs',
                 'bg-slate-200 dark:bg-slate-800 dark:border-gray-700 animate-fade-in-up'
             )}
             style={{ animationDelay: `${index * 1}ms` }}
         >
             <Link
                 href={`/recipe/${displayId}`}
-                className="flex flex-col h-full text-inherit"
+                className="flex flex-col h-full text-inherit hover:text-blue-900 dark:hover:text-blue-300 transition-colors duration-150"
                 aria-label={title}
             >
                 <RecipeImage
@@ -37,7 +37,7 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({
                     alt={`${title} image`}
                     width={280}
                     height={160}
-                    className="flex-shrink-0 object-cover w-full aspect-video rounded-t-md rounded-b-none"
+                    className="shrink-0 object-cover w-full aspect-video rounded-t-md rounded-b-none"
                 />
                 <div className="flex flex-col justify-between h-full p-2 space-y-2">
                     <Typography
@@ -55,7 +55,7 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({
                                     rating={rating}
                                     disabled
                                     size="sm"
-                                    className="flex-shrink-0 hidden md:block"
+                                    className="shrink-0 hidden md:block"
                                 />
                                 <div className="flex items-center gap-1 md:hidden">
                                     <Typography variant="label">

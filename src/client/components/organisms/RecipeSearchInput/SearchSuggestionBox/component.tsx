@@ -186,7 +186,7 @@ export const SearchSuggestionBox: React.FC<SearchSuggestionBoxProps> = ({
         <div
             ref={containerRef}
             className={classNames(
-                'absolute left-0 right-0 mt-1 rounded-md shadow-lg top-full z-[9000] bg-sheet-200 dark:bg-sheet-900',
+                'absolute left-0 right-0 mt-1 rounded-md shadow-lg top-full z-9000 bg-sheet-200 dark:bg-sheet-900',
                 'animate-fade-in overflow-hidden',
                 className
             )}

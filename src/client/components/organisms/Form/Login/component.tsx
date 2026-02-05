@@ -63,7 +63,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ errors, pending }) => {
             <ErrorList className="self-start" errors={errorsToDisplay} />
 
             <Submit
-                className="min-w-40 !mt-6 mx-auto"
+                className="min-w-40 mt-6! mx-auto"
                 label={t('auth.form.login')}
                 pending={pending}
                 data-testid="login-submit"

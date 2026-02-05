@@ -70,7 +70,7 @@ export const DesktopRecipeBody: React.FC<DesktopRecipeBodyProps> = ({
 
                 {recipe.notes ? (
                     <React.Fragment>
-                        <Divider dashed={true} className={'!mt-8'} />
+                        <Divider dashed={true} className={'mt-8!'} />
                         <div className={'w-full space-y-2'}>
                             <Typography variant={'heading-sm'}>
                                 {t('app.recipe.notes')}

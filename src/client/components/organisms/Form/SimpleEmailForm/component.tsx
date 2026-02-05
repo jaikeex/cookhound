@@ -44,7 +44,7 @@ export const SimpleEmailForm: React.FC<SimpleEmailFormProps> = ({
             />
 
             <Submit
-                className="min-w-40 !mt-10 mx-auto"
+                className="min-w-40 mt-10! mx-auto"
                 disabled={disabled}
                 pending={pending}
                 label={submitLabel || t('app.general.submit')}

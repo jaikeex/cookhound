@@ -21,7 +21,8 @@ export const RecipeLink = forwardRef<HTMLAnchorElement, RecipeLinkProps>(
             onFocus={onFocus}
             className={classNames(
                 'flex items-center gap-2 text-inherit text-start',
-                'focus:outline-none focus:ring-2 focus:ring-primary-500 rounded-sm',
+                'hover:text-blue-900 dark:hover:text-blue-300 transition-colors duration-150',
+                'focus:outline-hidden focus:ring-2 focus:ring-primary-500 rounded-xs',
                 className
             )}
         >

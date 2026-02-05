@@ -47,7 +47,7 @@ export const ShareButton: React.FC<ShareButtonProps> = ({
                 disabled
                     ? 'opacity-50 cursor-not-allowed border-gray-300 dark:border-gray-600'
                     : 'border-gray-200 dark:border-gray-700 hover:border-primary-500 dark:hover:border-primary-400',
-                'focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900'
+                'focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900'
             )}
         >
             <Icon

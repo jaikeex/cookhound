@@ -83,7 +83,7 @@ export const Tag: React.FC<TagProps> = ({
     return (
         <div
             className={classNames(
-                'inline-flex items-center justify-center rounded-sm',
+                'inline-flex items-center justify-center rounded-xs',
                 classConfig.colors[categoryId].bgColor,
                 classConfig.colors[categoryId].color,
                 outlined && classConfig.colors[categoryId].outline,

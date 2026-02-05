@@ -1,0 +1,12 @@
+@utility typography-base {
+    color: rgb(0 0 0);
+
+    .dark & {
+        color: rgb(243 244 246);
+    }
+}
+
+@utility link-disabled {
+    pointer-events: none;
+    color: rgb(107 114 128);
+}

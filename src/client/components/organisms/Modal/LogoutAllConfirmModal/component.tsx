@@ -84,7 +84,7 @@ export const LogoutAllConfirmModal: React.FC<LogoutAllConfirmModalProps> = ({
                 />
             ) : null}
 
-            <div className="flex-shrink-0 flex w-full gap-3 mt-6 pt-4">
+            <div className="shrink-0 flex w-full gap-3 mt-6 pt-4">
                 <ButtonBase
                     onClick={handleCancel}
                     color="subtle"

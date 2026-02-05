@@ -8,10 +8,10 @@ type SkeletonCardProps = Readonly<{
 export const SkeletonCard: React.FC<SkeletonCardProps> = ({ className }) => {
     return (
         <div
-            className={`flex flex-col h-full overflow-hidden border border-gray-300 rounded-lg shadow-sm bg-slate-200 dark:bg-slate-800 dark:border-gray-700 ${className || ''}`}
+            className={`flex flex-col h-full overflow-hidden border border-gray-300 rounded-lg shadow-xs bg-slate-200 dark:bg-slate-800 dark:border-gray-700 ${className || ''}`}
         >
             {/* Skeleton Image */}
-            <div className="flex items-center justify-center flex-shrink-0 object-cover w-full h-32 bg-gray-300 dark:bg-gray-700 animate-pulse">
+            <div className="flex items-center justify-center shrink-0 object-cover w-full h-32 bg-gray-300 dark:bg-gray-700 animate-pulse">
                 <SkeletonImage className="w-full aspect-video" />
             </div>
 
@@ -26,7 +26,7 @@ export const SkeletonCard: React.FC<SkeletonCardProps> = ({ className }) => {
                     <SkeletonBox className="w-12 h-4" />
 
                     {/* Rating Skeleton - Responsive */}
-                    <div className="flex-shrink-0 hidden space-x-1 md:flex">
+                    <div className="shrink-0 hidden space-x-1 md:flex">
                         <SkeletonBox className="w-4 h-4" />
                         <SkeletonBox className="w-4 h-4" />
                         <SkeletonBox className="w-4 h-4" />

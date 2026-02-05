@@ -1,5 +1,14 @@
 const colors = require('tailwindcss/colors');
 
+//§—————————————————————————————————————————————————————————————————————————————————————————————§//
+//§                                         DEPRECATED                                          §//
+///
+//# TW js config is deprecated in v4. This is left here for reference and as a way to maybe
+//# hotfix some issues that may happen after the migration and went unnoticed so far.
+//# I will try and remember to remove this in the fututre.
+///
+//§—————————————————————————————————————————————————————————————————————————————————————————————§//
+
 // Tailwind's default color palette includes colors that have been renamed, and if you spread over these, it will
 // trigger warnings. This code extracts the non-getter properties from the object, so that we don't trigger warnings.
 //? https://github.com/tailwindlabs/tailwindcss/discussions/11127#discussioncomment-10919929

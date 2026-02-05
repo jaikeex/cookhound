@@ -210,7 +210,7 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({
             />
 
             <Submit
-                className="min-w-40 !mt-6 mx-auto w-full"
+                className="min-w-40 mt-6! mx-auto w-full"
                 disabled={pending || !isLoggedin}
                 pending={pending}
                 label={

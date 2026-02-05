@@ -90,7 +90,7 @@ export const CookbookForm: React.FC<CookbookFormProps> = ({
 
             {!hideSubmit ? (
                 <Submit
-                    className="min-w-40 !mt-6 mx-auto"
+                    className="min-w-40 mt-6! mx-auto"
                     pending={pending}
                     label={t('app.cookbook.create')}
                 />

@@ -48,7 +48,7 @@ export const TopNavigation: React.FC<TopNavigationProps> = () => {
             className={classNames(
                 'fixed top-0 left-0 right-0 z-20 flex items-center justify-between w-full p-4 h-14',
                 pathname === '/' || pathname === '/search'
-                    ? 'backdrop-blur-sm bg-white/50 dark:bg-black/50'
+                    ? 'backdrop-blur-xs bg-white/50 dark:bg-black/50'
                     : 'bg-[#d1fae5] dark:bg-[#030712]',
                 isNotfound ? 'hidden' : ''
             )}

@@ -100,7 +100,7 @@ export const IngredientRowView: React.FC<IngredientRowViewProps> = ({
                     <Icon
                         name="checkmark"
                         size={20}
-                        className={`ml-auto mr-[1px] text-green-500 dark:text-green-500 opacity-80 dark:opacity-70`}
+                        className={`ml-auto mr-px text-green-500 dark:text-green-500 opacity-80 dark:opacity-70`}
                     />
                 ) : null}
             </div>

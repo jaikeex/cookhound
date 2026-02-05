@@ -58,7 +58,7 @@ export const Cookbooks: React.FC<CookbooksProps> = ({
                     {cookbook?.description ? (
                         <Typography
                             variant="body-sm"
-                            className="line-clamp-3 break-words"
+                            className="line-clamp-3 wrap-break-word"
                         >
                             {cookbook?.description}
                         </Typography>
@@ -116,7 +116,7 @@ export const Cookbooks: React.FC<CookbooksProps> = ({
                                     <Typography
                                         as="span"
                                         align="left"
-                                        className="flex-shrink truncate"
+                                        className="shrink truncate"
                                     >
                                         {cookbook.title}
                                     </Typography>
