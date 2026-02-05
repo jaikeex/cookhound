@@ -4,13 +4,11 @@
         "target": "ES2022",
         "module": "esnext",
         "moduleResolution": "bundler",
-        "jsx": "preserve",
-
+        "jsx": "react-jsx",
         "strict": true,
         "noUncheckedIndexedAccess": true,
         "noFallthroughCasesInSwitch": true,
         "forceConsistentCasingInFileNames": true,
-
         "baseUrl": ".",
         "paths": {
             "@/*": ["./src/*"]
@@ -18,15 +16,12 @@
         "resolveJsonModule": true,
         "allowJs": true,
         "esModuleInterop": true,
-
         "noEmit": true,
         "incremental": true,
         "isolatedModules": true,
         "skipLibCheck": true,
-
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true,
-
         "plugins": [
             {
                 "name": "next"
@@ -43,7 +38,8 @@
         "next.config.mjs",
         "src/server/queues/worker.ts",
         "libs/**/*.ts",
-        "libs/**/*.js"
+        "libs/**/*.js",
+        ".next/dev/types/**/*.ts"
     ],
     "exclude": ["node_modules", "./src/stories/**", "./scripts", "./docs"]
 }

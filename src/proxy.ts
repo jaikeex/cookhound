@@ -5,24 +5,24 @@ import { MiddlewareError } from '@/server/error';
 // Note to self two months after: If only i had written here why the fuck is that needed...
 import { verifyRouteAccess } from '@/server/utils/session/verify-client';
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
     // DEFAULT RESPONSE
     let response = NextResponse.next();
 
     try {
         //?—————————————————————————————————————————————————————————————————————————————————————————?//
-        //?                     MOST MIDDLEWARE CODE SHOULD BE CALLED FROM HERE                     ?//
+        //?                        MOST PROXY CODE SHOULD BE CALLED FROM HERE                       ?//
         ///
-        //# Add middleware steps in order. Every step must return either a NextResponse, null or
+        //# Add proxy steps in order. Every step must return either a NextResponse, null or
         //# throw a MiddlewareError.
         //#
         //# The contract here is as follows:
         //#  (1) If the step function throws an instance of MiddlewareError with provided
-        //#      response, the middleware execution is stopped immediately and the response is used.
+        //#      response, the proxy execution is stopped immediately and the response is used.
         //#  (2) If the step function returns a NextResponse, that response is saved, overwriting
         //#      any previously saved response and will be used unless some other step function
         //#      down the ladder overwrites it.
-        //#  (3) If the function returns null, the middleware continues without modifying the response.
+        //#  (3) If the function returns null, the proxy continues without modifying the response.
         ///
         //?—————————————————————————————————————————————————————————————————————————————————————————?//
 
@@ -32,7 +32,7 @@ export async function middleware(request: NextRequest) {
             response = error.response;
         } else {
             /**
-             * Unexpected errors from the middleware steps functions are handled here.
+             * Unexpected errors from the proxy steps functions are handled here.
              * No special info needed here, just a generic error message will suffice.
              * Also, no translation necessary.
              */
@@ -47,6 +47,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-    runtime: 'nodejs',
     matcher: ['/((?!api|_next/static|_next/image|favicon.ico|abc).*)']
 };
