@@ -1,4 +1,4 @@
-import type { Ingredient } from '@prisma/client';
+import type { Ingredient } from '@/server/db/generated/prisma/client';
 import { prisma } from '@/server/integrations';
 import { Logger } from '@/server/logger';
 import {

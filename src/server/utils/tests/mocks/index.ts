@@ -1,4 +1,4 @@
-import type { User } from '@prisma/client';
+import type { User } from '@/server/db/generated/prisma/client';
 import type { UserDTO } from '@/common/types';
 import mockUsers from './users.json';
 

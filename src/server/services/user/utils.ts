@@ -1,6 +1,6 @@
 import type { Status, UserVisibilityGroup } from '@/common/types';
 import { UserDTO, UserRole } from '@/common/types';
-import type { User as UserFromDB } from '@prisma/client';
+import type { User as UserFromDB } from '@/server/db/generated/prisma/client';
 import { serializeToPlain } from '@/server/utils/serialization';
 import { RequestContext } from '@/server/utils/reqwest/context';
 

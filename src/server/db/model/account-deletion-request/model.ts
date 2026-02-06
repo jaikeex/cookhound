@@ -6,7 +6,10 @@ import {
 } from '@/server/db/model/model-cache';
 import { prisma } from '@/server/integrations';
 import { Logger } from '@/server/logger';
-import type { AccountDeletionRequest, Prisma } from '@prisma/client';
+import type {
+    AccountDeletionRequest,
+    Prisma
+} from '@/server/db/generated/prisma/client';
 import { ACCOUNT_DELETION_REQUEST_SELECT } from './projections';
 
 //|=============================================================================================|//

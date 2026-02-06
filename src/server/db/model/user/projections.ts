@@ -1,4 +1,4 @@
-import type { Prisma } from '@prisma/client';
+import type { Prisma } from '@/server/db/generated/prisma/client';
 import type { UserVisibilityGroup } from '@/common/types';
 
 export type UserSelect = Prisma.UserSelect;

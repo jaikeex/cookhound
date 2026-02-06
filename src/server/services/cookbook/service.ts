@@ -1,5 +1,5 @@
 import { Logger, LogServiceMethod } from '@/server/logger';
-import type { Cookbook } from '@prisma/client';
+import type { Cookbook } from '@/server/db/generated/prisma/client';
 import type { CookbookForCreate } from './types';
 import type { CookbookForCreatePayload, CookbookDTO } from '@/common/types';
 import { assertAuthenticated } from '@/server/utils/reqwest';

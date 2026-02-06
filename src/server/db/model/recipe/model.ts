@@ -10,7 +10,7 @@ import { NotFoundError } from '@/server/error';
 import { ApplicationErrorCode } from '@/server/error/codes';
 import { prisma } from '@/server/integrations';
 import { Logger } from '@/server/logger';
-import type { Prisma, Recipe } from '@prisma/client';
+import type { Prisma, Recipe } from '@/server/db/generated/prisma/client';
 import {
     getRecipeByDisplayId,
     getRecipeById,
@@ -19,7 +19,7 @@ import {
     searchRecipes,
     getUserRecipes,
     searchUserRecipes
-} from '@prisma/client/sql';
+} from '@/server/db/generated/prisma/sql';
 import { DEFAULT_LOCALE } from '@/common/constants';
 
 //|=============================================================================================|//

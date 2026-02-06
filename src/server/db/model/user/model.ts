@@ -15,11 +15,11 @@ import type {
     User,
     UserPreference,
     EmailChangeRequest
-} from '@prisma/client';
+} from '@/server/db/generated/prisma/client';
 import {
     getUserLastViewedRecipes,
     upsertUserPreference
-} from '@prisma/client/sql';
+} from '@/server/db/generated/prisma/sql';
 
 //|=============================================================================================|//
 

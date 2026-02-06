@@ -15,7 +15,7 @@ import {
     NotFoundError,
     ValidationError
 } from '@/server/error';
-import type { Rating } from '@prisma/client';
+import type { Rating } from '@/server/db/generated/prisma/client';
 import { Logger, LogServiceMethod } from '@/server/logger';
 import { RequestContext } from '@/server/utils/reqwest/context';
 import { randomUUID } from 'crypto';
@@ -28,7 +28,7 @@ import { JOB_NAMES } from '@/server/queues/jobs/names';
 import { ApplicationErrorCode } from '@/server/error/codes';
 import { openaiApiService } from '@/server/services/openai-api/service';
 import type { RecipeFlagDTO } from '@/common/types/flags/recipe-flag';
-import { getFrontPageRecipes } from '@prisma/client/sql';
+import { getFrontPageRecipes } from '@/server/db/generated/prisma/sql';
 
 //|=============================================================================================|//
 

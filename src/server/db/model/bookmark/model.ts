@@ -6,7 +6,7 @@ import {
     generateCacheKey,
     invalidateModelCache
 } from '@/server/db/model/model-cache';
-import type { CookbookBookmark } from '@prisma/client';
+import type { CookbookBookmark } from '@/server/db/generated/prisma/client';
 
 //|=============================================================================================|//
 

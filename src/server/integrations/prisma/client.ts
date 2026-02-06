@@ -1,11 +1,57 @@
-import { PrismaClient, Prisma } from '@prisma/client';
+import 'dotenv/config';
+import { Pool } from 'pg';
+import { PrismaPg } from '@prisma/adapter-pg';
+import { PrismaClient, Prisma } from '@/server/db/generated/prisma/client';
 import { Logger } from '@/server/logger';
 import { InfrastructureError, isServerError } from '@/server/error/server';
 import { InfrastructureErrorCode } from '@/server/error/codes';
+import { ENV_CONFIG_PRIVATE } from '@/common/constants/env';
 
-const globalForPrisma = global as unknown as { prisma?: any };
+const globalForPrisma = global as unknown as {
+    prisma?: ReturnType<typeof createPrismaClient>;
+    pgPool?: Pool;
+};
 
-const baseClient: PrismaClient = globalForPrisma.prisma || new PrismaClient();
+//~=============================================================================================~//
+//$                                     CONNECTION POOL                                         $//
+//~=============================================================================================~//
+
+function createPgPool(): Pool {
+    if (globalForPrisma.pgPool) {
+        return globalForPrisma.pgPool;
+    }
+
+    //?—————————————————————————————————————————————————————————————————————————————————————————?//
+    //?                                           SSL                                           ?//
+    ///
+    //# Two things to note here:
+    //#   (1) Local db is not currently configured to support ssl connections,
+    //#       so this flag needs to be false when running the app in dev mode.
+    //#
+    //#   (2) I am not completely sure (my devops knowledge is limited as of writing this),
+    //#       how the digital ocean managed db is setup on the ssl front, or how exactly
+    //#       will the app interact with it when running on the VPS instead of locally.
+    //#       This configuration works in production right now, and i am too scared to try
+    //#       and change it.
+    ///
+    //?—————————————————————————————————————————————————————————————————————————————————————————?//
+
+    const needsSsl = ENV_CONFIG_PRIVATE.DB_SSL === 'true';
+
+    const pool = new Pool({
+        connectionString: ENV_CONFIG_PRIVATE.DATABASE_URL,
+        max: 20,
+        idleTimeoutMillis: 30000,
+        connectionTimeoutMillis: 5000,
+        ssl: needsSsl ? { rejectUnauthorized: false } : false
+    });
+
+    if (process.env.NODE_ENV !== 'production') {
+        globalForPrisma.pgPool = pool;
+    }
+
+    return pool;
+}
 
 //~=============================================================================================~//
 //$                                  LOG & THROW EXTENSION                                      $//
@@ -93,7 +139,19 @@ const logAndThrowExtension = Prisma.defineExtension({
     }
 });
 
-const prisma = baseClient.$extends(logAndThrowExtension);
+//~=============================================================================================~//
+//$                                          CLIENT                                             $//
+//~=============================================================================================~//
+
+function createPrismaClient() {
+    const pool = createPgPool();
+    const adapter = new PrismaPg(pool);
+    const baseClient = new PrismaClient({ adapter });
+
+    return baseClient.$extends(logAndThrowExtension);
+}
+
+const prisma = globalForPrisma.prisma || createPrismaClient();
 
 if (process.env.NODE_ENV !== 'production') {
     globalForPrisma.prisma = prisma;

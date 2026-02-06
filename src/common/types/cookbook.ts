@@ -1,4 +1,4 @@
-import type { Cookbook } from '@prisma/client';
+import type { Cookbook } from '@/server/db/generated/prisma/client';
 
 export enum CookbookVisibility {
     PUBLIC = 'PUBLIC',

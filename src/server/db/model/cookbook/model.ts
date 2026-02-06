@@ -1,7 +1,7 @@
 import { prisma } from '@/server/integrations';
 import { Logger } from '@/server/logger';
 import type { CookbookForCreate } from '@/server/services/cookbook/types';
-import type { Cookbook } from '@prisma/client';
+import type { Cookbook } from '@/server/db/generated/prisma/client';
 import {
     CACHE_TTL,
     cachePrismaQuery,
@@ -13,9 +13,9 @@ import {
     getCookbookById,
     getCookbooksByOwnerId,
     getCookbookByDisplayId
-} from '@prisma/client/sql';
-import { reorderOwnerCookbooks as reorderOwnerCookbooksSql } from '@prisma/client/sql';
-import { reorderCookbookRecipes as reorderCookbookRecipesSql } from '@prisma/client/sql';
+} from '@/server/db/generated/prisma/sql';
+import { reorderOwnerCookbooks as reorderOwnerCookbooksSql } from '@/server/db/generated/prisma/sql';
+import { reorderCookbookRecipes as reorderCookbookRecipesSql } from '@/server/db/generated/prisma/sql';
 
 //|=============================================================================================|//
 

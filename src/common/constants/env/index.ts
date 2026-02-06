@@ -39,6 +39,7 @@ export const ENV_CONFIG_PRIVATE = createConfig(
         DB_USERNAME: process.env.DB_USERNAME,
         DB_PASSWORD: process.env.DB_PASSWORD,
         DB_PORT: process.env.DB_PORT,
+        DB_SSL: process.env.DB_SSL,
         DATABASE_URL: process.env.DATABASE_URL,
         REDIS_TTL: process.env.REDIS_TTL,
         REDIS_PASSWORD: process.env.REDIS_PASSWORD,

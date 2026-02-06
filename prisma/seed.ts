@@ -1,9 +1,18 @@
-import { PrismaClient } from '@prisma/client';
+import 'dotenv/config';
+import { Pool } from 'pg';
+import { PrismaPg } from '@prisma/adapter-pg';
+import { PrismaClient } from '../src/server/db/generated/prisma/client';
 import { RECIPE_CATEGORY_TAGS } from '../src/common/constants/tags/tags';
 import { EN_TAG_CATEGORIES } from '../src/common/constants/tags/en';
 import { CS_TAG_CATEGORIES } from '../src/common/constants/tags/cs';
 
-const prisma = new PrismaClient();
+const pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: false
+});
+
+const adapter = new PrismaPg(pool);
+const prisma = new PrismaClient({ adapter });
 
 async function main() {
     // Create system user for anonymized content
@@ -85,4 +94,5 @@ main()
     })
     .finally(async () => {
         await prisma.$disconnect();
+        await pool.end();
     });
