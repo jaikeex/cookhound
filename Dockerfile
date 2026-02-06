@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.5
 
-FROM node:20-bookworm AS base
+FROM node:22-bookworm AS base
 WORKDIR /app
 ENV NODE_ENV=production
 
@@ -13,8 +13,9 @@ ARG NEXT_PUBLIC_COOKIE_DOMAIN
 ARG ALLOWED_ORIGINS
 ARG GOOGLE_OAUTH_CLIENT_SECRET
 ARG GOOGLE_OAUTH_REDIRECT_URI
-ARG GOOGLE_SMTP_USERNAME
-ARG GOOGLE_SMTP_PASSWORD
+ARG SMTP_HOST
+ARG SMTP_USERNAME
+ARG SMTP_PASSWORD
 ARG LOG_DIR
 ARG GOOGLE_API_PROJECT_ID
 ARG GOOGLE_LOGGING_CREDENTIALS_BASE64
@@ -27,6 +28,7 @@ ARG DB_NAME
 ARG DB_USERNAME
 ARG DB_PASSWORD
 ARG DB_PORT
+ARG DB_SSL
 ARG DATABASE_URL
 ARG DB_CONNECTIONS
 ARG DB_IDLE_TIMEOUT
@@ -64,7 +66,7 @@ COPY . .
 # 4) Copy static assets into standalone folder
 RUN yarn prisma migrate deploy \
     && yarn prisma generate --sql \
-    && yarn next build \
+    && yarn next build --webpack \
     && node scripts/copy-standalone.js
 
 # -------- Runtime image ----------------------------------------------------------

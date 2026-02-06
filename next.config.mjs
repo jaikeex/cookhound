@@ -2,6 +2,8 @@
 const nextConfig = {
     output: 'standalone',
 
+    serverExternalPackages: ['@prisma/client', '@prisma/adapter-pg'],
+
     allowedDevOrigins: [
         '192.168.0.143',
         '192.168.0.*',

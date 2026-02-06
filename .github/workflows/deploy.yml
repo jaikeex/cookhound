@@ -54,8 +54,9 @@ jobs:
                       ALLOWED_ORIGINS=${{ secrets.ALLOWED_ORIGINS }}
                       GOOGLE_OAUTH_CLIENT_SECRET=${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
                       GOOGLE_OAUTH_REDIRECT_URI=${{ secrets.GOOGLE_OAUTH_REDIRECT_URI }}
-                      GOOGLE_SMTP_USERNAME=${{ secrets.GOOGLE_SMTP_USERNAME }}
-                      GOOGLE_SMTP_PASSWORD=${{ secrets.GOOGLE_SMTP_PASSWORD }}
+                      SMTP_HOST=${{ secrets.SMTP_HOST }}
+                      SMTP_USERNAME=${{ secrets.SMTP_USERNAME }}
+                      SMTP_PASSWORD=${{ secrets.SMTP_PASSWORD }}
                       LOG_DIR=${{ secrets.LOG_DIR }}
                       GOOGLE_API_PROJECT_ID=${{ secrets.GOOGLE_API_PROJECT_ID }}
                       GOOGLE_LOGGING_CREDENTIALS_BASE64=${{ secrets.GOOGLE_LOGGING_CREDENTIALS_BASE64 }}
@@ -68,6 +69,7 @@ jobs:
                       DB_USERNAME=${{ secrets.DB_USERNAME }}
                       DB_PASSWORD=${{ secrets.DB_PASSWORD }}
                       DB_PORT=${{ secrets.DB_PORT }}
+                      DB_SSL=${{ secrets.DB_SSL }}
                       DATABASE_URL=${{ secrets.DATABASE_URL }}
                       DB_CONNECTIONS=${{ secrets.DB_CONNECTIONS }}
                       DB_IDLE_TIMEOUT=${{ secrets.DB_IDLE_TIMEOUT }}
