@@ -15,6 +15,7 @@ export * from './Logo';
 export * from './ScrollToTop';
 export * from './Skeleton';
 export * from './Star';
+export * from './Stepper';
 export * from './StructuredData';
 export * from './Tooltip';
 export * from './Typography';
