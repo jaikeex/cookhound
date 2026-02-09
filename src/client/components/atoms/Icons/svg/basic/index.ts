@@ -8,6 +8,9 @@ import ChevronDoubleUpIcon from './chevron-double-up.svg';
 import ChevronDoubleDownIcon from './chevron-double-down.svg';
 import ChevronDoubleLeftIcon from './chevron-double-left.svg';
 import ChevronDoubleRightIcon from './chevron-double-right.svg';
+import ChevronLeftIcon from './chevron-left.svg';
+import ChevronRightIcon from './chevron-right.svg';
+import ChevronUpIcon from './chevron-up.svg';
 import CloseIcon from './close.svg';
 import DeleteIcon from './delete.svg';
 import DragIcon from './drag.svg';
@@ -17,6 +20,7 @@ import ExitIcon from './exit.svg';
 import HomeIcon from './home.svg';
 import InfoIcon from './info.svg';
 import LinkIcon from './link.svg';
+import MinusIcon from './minus.svg';
 import MoonIcon from './moon.svg';
 import PlusIcon from './plus.svg';
 import ShoppingListIcon from './shopping-list.svg';
@@ -39,6 +43,9 @@ export const basicSvg = {
     ChevronDoubleDownIcon,
     ChevronDoubleLeftIcon,
     ChevronDoubleRightIcon,
+    ChevronLeftIcon,
+    ChevronRightIcon,
+    ChevronUpIcon,
     CloseIcon,
     DeleteIcon,
     DragIcon,
@@ -48,6 +55,7 @@ export const basicSvg = {
     HomeIcon,
     InfoIcon,
     LinkIcon,
+    MinusIcon,
     MoonIcon,
     PlusIcon,
     SearchIcon,
