@@ -1,16 +1,12 @@
-'use client';
-
 import React, { forwardRef } from 'react';
-import { Divider, Typography, Tooltip, IconButton } from '@/client/components';
+import { Divider, Typography, IconButton } from '@/client/components';
 import {
-    RecipeInfo,
     DraggableIngredientRow,
     IngredientRowView
 } from '@/client/components/molecules';
 import Link from 'next/link';
 import type { Ingredient, ShoppingListDTO } from '@/common/types';
 import type { PanInfo } from 'framer-motion';
-import { useLocale } from '@/client/store';
 import { DraggableList } from '@/client/components';
 
 type ShoppingListBodyProps = Readonly<{
@@ -42,8 +38,6 @@ export const ShoppingListBody = forwardRef<
         },
         ref
     ) => {
-        const { t } = useLocale();
-
         return (
             <div key={list.recipe.displayId} className="mt-4" ref={ref}>
                 <Divider className="mb-4" />
@@ -55,18 +49,6 @@ export const ShoppingListBody = forwardRef<
                                 {list.recipe.title}
                             </Typography>
                         </Link>
-
-                        <Tooltip
-                            text={t('app.shopping-list.portion-size-tooltip', {
-                                portionSize: list.recipe.portionSize ?? 0
-                            })}
-                        >
-                            <RecipeInfo
-                                portionSize={list.recipe.portionSize}
-                                verbose={false}
-                                typographyVariant={'body'}
-                            />
-                        </Tooltip>
                     </div>
 
                     {!editing ? (

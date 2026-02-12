@@ -1,28 +1,25 @@
 'use client';
 
 import React from 'react';
-import type { RecipeDTO } from '@/common/types/recipe';
 import {
     DesktopRecipeBody,
     DesktopRecipeHead,
     Divider
 } from '@/client/components';
-import { useDisplayRecipe } from '@/client/components/templates/Recipe/View/useDisplayRecipe';
+import { useRecipeHandling } from '@/client/store';
 
 export type DesktopRecipeViewProps = Readonly<{
     className?: string;
     isPreview?: boolean;
-    recipe: RecipeDTO;
     ref?: React.RefObject<HTMLDivElement> | null;
 }>;
 
 export const DesktopRecipeViewTemplate: React.FC<DesktopRecipeViewProps> = ({
     className,
     isPreview,
-    recipe,
     ref
 }) => {
-    const { rateRecipe, onShoppingListCreate } = useDisplayRecipe(recipe);
+    const { recipe, rateRecipe, onShoppingListCreate } = useRecipeHandling();
 
     return (
         <div

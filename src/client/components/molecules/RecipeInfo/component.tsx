@@ -1,7 +1,12 @@
 'use client';
 
 import React from 'react';
-import { Icon, Typography, type TypographyVariant } from '@/client/components';
+import {
+    Icon,
+    Stepper,
+    Typography,
+    type TypographyVariant
+} from '@/client/components';
 import { useLocale } from '@/client/store';
 import { classNames } from '@/client/utils';
 
@@ -24,7 +29,11 @@ const classConfig = {
 
 type RecipeInfoProps = Readonly<{
     className?: string;
+    disablePortionSize?: boolean;
+    layout?: 'vertical' | 'horizontal';
     portionSize?: number | null;
+    onDecrementPortionSize?: () => void;
+    onIncrementPortionSize?: () => void;
     size?: RecipeInfoSize;
     time?: number | null;
     typographyVariant?: TypographyVariant;
@@ -33,7 +42,11 @@ type RecipeInfoProps = Readonly<{
 
 export const RecipeInfo: React.FC<RecipeInfoProps> = ({
     className,
+    disablePortionSize = false,
+    layout = 'horizontal',
     portionSize,
+    onDecrementPortionSize,
+    onIncrementPortionSize,
     size = 'md',
     time,
     typographyVariant = 'body-sm',
@@ -44,22 +57,11 @@ export const RecipeInfo: React.FC<RecipeInfoProps> = ({
     return (
         <div
             className={classNames(
-                'flex items-center',
+                `flex ${layout === 'vertical' ? 'flex-col items-start' : 'items-center'}`,
                 classConfig.gap[size],
                 className
             )}
         >
-            {portionSize ? (
-                <div
-                    className={`flex items-center ${classConfig.innerGap[size]}`}
-                >
-                    <Icon name={'servings'} size={classConfig.iconSize[size]} />
-                    <Typography variant={typographyVariant} disableLinkStyles>
-                        {verbose ? `${t('app.recipe.servings')}: ` : null}
-                        {portionSize}
-                    </Typography>
-                </div>
-            ) : null}
             {time ? (
                 <div
                     className={`flex items-center ${classConfig.innerGap[size]}`}
@@ -72,6 +74,25 @@ export const RecipeInfo: React.FC<RecipeInfoProps> = ({
                         {time}
                         {verbose ? null : ` ${t('app.recipe.minutes-short')}`}
                     </Typography>
+                </div>
+            ) : null}
+
+            {portionSize ? (
+                <div
+                    className={`flex items-center ${classConfig.innerGap[size]}`}
+                >
+                    <Icon name={'servings'} size={classConfig.iconSize[size]} />
+                    <Typography variant={typographyVariant} disableLinkStyles>
+                        {verbose ? `${t('app.recipe.servings')}: ` : null}
+                        {portionSize}
+                    </Typography>
+
+                    {disablePortionSize ? null : (
+                        <Stepper
+                            onUp={onIncrementPortionSize}
+                            onDown={onDecrementPortionSize}
+                        />
+                    )}
                 </div>
             ) : null}
         </div>

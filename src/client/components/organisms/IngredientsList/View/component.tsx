@@ -1,7 +1,8 @@
 import React, { useMemo } from 'react';
 import type { Ingredient } from '@/common/types';
 import { IngredientRowView, Typography } from '@/client/components';
-import { useIngredientSelectStore } from '@/client/store';
+import { useRecipeHandling } from '@/client/store';
+import { scaleIngredientsToPortionSize } from '@/client/utils';
 
 //~---------------------------------------------------------------------------------------------~//
 //$                                           OPTIONS                                           $//
@@ -31,23 +32,45 @@ export const IngredientsListView: React.FC<IngredientsListViewProps> = ({
     isPreview = false,
     variant = 'desktop'
 }) => {
-    const { selectIngredient, deselectIngredient, selectedIngredients } =
-        useIngredientSelectStore();
+    const {
+        recipe,
+        portionSize,
+        selectIngredient,
+        deselectIngredient,
+        selectedIngredients
+    } = useRecipeHandling();
 
-    const validIngredients = ingredients.filter((ingredient) => {
-        const isNameEmpty = !ingredient.name || ingredient.name === '';
-        const isQuantityEmpty =
-            !ingredient.quantity || ingredient.quantity === '';
-        return !isNameEmpty || !isQuantityEmpty;
-    });
+    const originalPortionSize = recipe.portionSize;
+
+    const validIngredients = useMemo(
+        () =>
+            ingredients.filter((ingredient) => {
+                const isNameEmpty = !ingredient.name || ingredient.name === '';
+                const isQuantityEmpty =
+                    !ingredient.quantity || ingredient.quantity === '';
+
+                return !isNameEmpty || !isQuantityEmpty;
+            }),
+        [ingredients]
+    );
+
+    const portionSizedIngredients = useMemo(
+        () =>
+            scaleIngredientsToPortionSize(
+                validIngredients,
+                originalPortionSize,
+                portionSize
+            ),
+        [originalPortionSize, portionSize, validIngredients]
+    );
 
     const grouped = useMemo(() => {
         const categoryOrderMap = new Map<string, number>();
         const maxCategoryOrder = Math.max(
-            ...validIngredients.map((ing) => ing.categoryOrder || 0)
+            ...portionSizedIngredients.map((ing) => ing.categoryOrder || 0)
         );
 
-        validIngredients.forEach((ing) => {
+        portionSizedIngredients.forEach((ing) => {
             if (
                 ing.category &&
                 ing.categoryOrder !== null &&
@@ -70,7 +93,7 @@ export const IngredientsListView: React.FC<IngredientsListViewProps> = ({
 
         sortedCategories.forEach((cat) => categorized.set(cat, []));
 
-        validIngredients.forEach((ing) => {
+        portionSizedIngredients.forEach((ing) => {
             if (ing.category) {
                 const arr = categorized.get(ing.category);
                 if (arr) arr.push(ing);
@@ -80,7 +103,7 @@ export const IngredientsListView: React.FC<IngredientsListViewProps> = ({
         });
 
         return { uncategorized, categorized, sortedCategories };
-    }, [validIngredients]);
+    }, [portionSizedIngredients]);
 
     const renderIngredient = (ingredient: Ingredient, index: number) => (
         <IngredientRowView

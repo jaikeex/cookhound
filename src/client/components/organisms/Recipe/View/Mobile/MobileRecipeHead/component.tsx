@@ -7,11 +7,11 @@ import {
     Tooltip,
     Typography,
     RecipeInfo,
+    RecipeViewImage,
     TagList
 } from '@/client/components';
-import { useAuth, useLocale } from '@/client/store';
+import { useAuth, useLocale, useRecipeHandling } from '@/client/store';
 import { classNames } from '@/client/utils';
-import { RecipeViewImage } from '@/client/components/molecules/Image/RecipeView/component';
 
 export type MobileRecipeHeadProps = Readonly<{
     isPreview?: boolean;
@@ -26,6 +26,9 @@ export const MobileRecipeHead: React.FC<MobileRecipeHeadProps> = ({
 }) => {
     const { t } = useLocale();
     const { user } = useAuth();
+
+    const { incrementPortionSize, decrementPortionSize, portionSize } =
+        useRecipeHandling();
 
     return (
         <React.Fragment>
@@ -55,8 +58,11 @@ export const MobileRecipeHead: React.FC<MobileRecipeHeadProps> = ({
                 )}
             >
                 <RecipeInfo
-                    portionSize={recipe.portionSize}
                     time={recipe.time}
+                    disablePortionSize={isPreview}
+                    portionSize={portionSize}
+                    onDecrementPortionSize={decrementPortionSize}
+                    onIncrementPortionSize={incrementPortionSize}
                     verbose={false}
                     typographyVariant={'body'}
                 />

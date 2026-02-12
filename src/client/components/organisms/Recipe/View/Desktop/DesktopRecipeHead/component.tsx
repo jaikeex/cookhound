@@ -11,7 +11,7 @@ import {
     TagList
 } from '@/client/components';
 import { RecipeAuthorLinkDesktop } from '@/client/components';
-import { useAuth, useLocale } from '@/client/store';
+import { useAuth, useLocale, useRecipeHandling } from '@/client/store';
 
 export type DesktopRecipeHeadProps = Readonly<{
     isPreview?: boolean;
@@ -26,6 +26,9 @@ export const DesktopRecipeHead: React.FC<DesktopRecipeHeadProps> = ({
 }) => {
     const { t } = useLocale();
     const { user } = useAuth();
+
+    const { incrementPortionSize, decrementPortionSize, portionSize } =
+        useRecipeHandling();
 
     return (
         <div className={'flex justify-between gap-12'}>
@@ -76,8 +79,11 @@ export const DesktopRecipeHead: React.FC<DesktopRecipeHeadProps> = ({
 
                 <RecipeInfo
                     className="mt-4"
-                    portionSize={recipe.portionSize}
                     time={recipe.time}
+                    disablePortionSize={isPreview}
+                    portionSize={portionSize}
+                    onDecrementPortionSize={decrementPortionSize}
+                    onIncrementPortionSize={incrementPortionSize}
                     typographyVariant={'body-sm'}
                     verbose={true}
                 />

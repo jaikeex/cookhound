@@ -1,26 +1,23 @@
 'use client';
 
 import React from 'react';
-import type { RecipeDTO } from '@/common/types/recipe';
 import {
     Divider,
     MobileRecipeBody,
     MobileRecipeHead
 } from '@/client/components';
-import { useDisplayRecipe } from '@/client/components/templates/Recipe/View/useDisplayRecipe';
+import { useRecipeHandling } from '@/client/store';
 
 export type MobileRecipeViewProps = Readonly<{
     className?: string;
     isPreview?: boolean;
-    recipe: RecipeDTO;
 }>;
 
 export const MobileRecipeViewTemplate: React.FC<MobileRecipeViewProps> = ({
     className,
-    isPreview = false,
-    recipe
+    isPreview = false
 }) => {
-    const { rateRecipe, onShoppingListCreate } = useDisplayRecipe(recipe);
+    const { recipe, rateRecipe, onShoppingListCreate } = useRecipeHandling();
 
     return (
         <div className={`max-w-screen-md mx-auto ${className}`}>

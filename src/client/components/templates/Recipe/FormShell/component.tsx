@@ -13,7 +13,7 @@ import {
 import { classNames } from '@/client/utils';
 import type { RecipeDTO } from '@/common/types';
 import type { RecipeFormMode } from '@/client/types/core';
-import { useLocale } from '@/client/store';
+import { useLocale, RecipeHandlingProvider } from '@/client/store';
 
 export type RecipeFormShellProps = Readonly<{
     recipeObject: RecipeDTO | null;
@@ -120,10 +120,9 @@ export const RecipeFormShell: React.FC<RecipeFormShellProps> = ({
                         onClose={handleClosePreview}
                     >
                         {recipeObject && (
-                            <MobileRecipeViewTemplate
-                                recipe={recipeObject}
-                                isPreview={true}
-                            />
+                            <RecipeHandlingProvider recipe={recipeObject}>
+                                <MobileRecipeViewTemplate isPreview={true} />
+                            </RecipeHandlingProvider>
                         )}
                     </Sidebar>
                 </>
@@ -151,10 +150,9 @@ export const RecipeFormShell: React.FC<RecipeFormShellProps> = ({
                     onClose={handleClosePreview}
                 >
                     {recipeObject && (
-                        <DesktopRecipeViewTemplate
-                            recipe={recipeObject}
-                            isPreview={true}
-                        />
+                        <RecipeHandlingProvider recipe={recipeObject}>
+                            <DesktopRecipeViewTemplate isPreview={true} />
+                        </RecipeHandlingProvider>
                     )}
                 </Sidebar>
             ) : null}
@@ -165,11 +163,12 @@ export const RecipeFormShell: React.FC<RecipeFormShellProps> = ({
 
             <div className={'hidden col-span-4 px-2 xl:block'}>
                 {recipeObject ? (
-                    <DesktopRecipeViewTemplate
-                        recipe={recipeObject}
-                        isPreview={true}
-                        className="hidden xl:block"
-                    />
+                    <RecipeHandlingProvider recipe={recipeObject}>
+                        <DesktopRecipeViewTemplate
+                            isPreview={true}
+                            className="hidden xl:block"
+                        />
+                    </RecipeHandlingProvider>
                 ) : (
                     <DesktopRecipeViewSkeleton />
                 )}
