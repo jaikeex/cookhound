@@ -107,8 +107,8 @@ export const RecipeFormShell: React.FC<RecipeFormShellProps> = ({
                     <div
                         id="preview-handle-background"
                         className={classNames(
-                            'fixed left-0 w-[100dvw] h-12 bottom-0',
-                            'bg-gradient-to-t from-[#f0fdf4] via-[#f0fdf4] via-80% to-transparent',
+                            'fixed left-0 w-dvw h-12 bottom-0',
+                            'bg-linear-to-t from-[#f0fdf4] via-[#f0fdf4] via-80% to-transparent',
                             'dark:from-[#030712] dark:via-[#030712] dark:via-80% dark:to-transparent'
                         )}
                     />
