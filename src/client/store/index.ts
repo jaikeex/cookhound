@@ -6,3 +6,4 @@ export * from './ModalContext';
 export * from './QueryContext';
 export * from './ConsentContext';
 export * from './RecipeHandlingContext';
+export * from './ThemeContext';

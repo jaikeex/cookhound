@@ -1,6 +1,6 @@
 import React from 'react';
-import { ThemeProvider } from 'next-themes';
 import {
+    ThemeProvider,
     LocaleProvider,
     AuthProvider,
     SnackbarProvider,
@@ -25,12 +25,7 @@ export const AppProviders: React.FC<AppProvidersProps> = ({
     locale,
     children
 }) => (
-    <ThemeProvider
-        attribute="class"
-        defaultTheme={initialTheme}
-        enableSystem={false}
-        disableTransitionOnChange
-    >
+    <ThemeProvider defaultTheme={initialTheme}>
         <AuthProvider>
             <ConsentProvider initialConsent={initialConsent}>
                 <LocaleProvider

@@ -1,8 +1,8 @@
 'use client';
 
 import { useCallback } from 'react';
-import { useTheme } from 'next-themes';
-import { useConsent } from '@/client/store';
+import { useTheme, useConsent } from '@/client/store';
+import { THEME_STORAGE_KEY } from '@/client/constants';
 import { chqc } from '@/client/request/queryClient';
 import type { UserPreferences } from '@/common/types';
 import { useSettingPersistence } from '@/client/hooks/settingsPersistence';
@@ -37,7 +37,7 @@ export const useThemePersistence = (userId?: number): void => {
     );
 
     useSettingPersistence<string>({
-        storageKey: 'theme',
+        storageKey: THEME_STORAGE_KEY,
         currentValue: resolvedTheme,
         canPersist: canUsePreferences,
         allowedValues: ['light', 'dark', 'system'] as const,

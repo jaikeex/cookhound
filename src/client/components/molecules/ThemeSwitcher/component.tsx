@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useCallback, useMemo, useEffect, useState } from 'react';
-import { useTheme } from 'next-themes';
+import { useTheme } from '@/client/store';
 import {
     IconButton,
     Switch,
