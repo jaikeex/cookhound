@@ -2,6 +2,7 @@ export * from './form';
 export * from './img';
 export * from './object';
 export * from './string';
+export * from './recipe';
 export * from './classnames';
 export * from './user';
 export * from './social-sharing';
