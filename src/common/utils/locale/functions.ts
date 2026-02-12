@@ -1,4 +1,8 @@
-import { DEFAULT_LOCALE, SUPPORTED_LOCALES } from '@/common/constants';
+import {
+    DEFAULT_LOCALE,
+    LOCALE_COOKIE_NAME,
+    SUPPORTED_LOCALES
+} from '@/common/constants';
 import type { Locale } from '@/common/types';
 import type { ReadonlyRequestCookies } from 'next/dist/server/web/spec-extension/adapters/request-cookies';
 
@@ -71,7 +75,7 @@ export async function getUserLocale(
     let localeString;
 
     // Check if the user has a locale cookie
-    const localeFromCookie = cookies.get('locale');
+    const localeFromCookie = cookies.get(LOCALE_COOKIE_NAME);
 
     if (localeFromCookie) {
         // If the user has a locale cookie, use that

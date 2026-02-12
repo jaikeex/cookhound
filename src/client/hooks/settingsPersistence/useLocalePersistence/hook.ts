@@ -6,6 +6,7 @@ import { useConsent } from '@/client/store';
 import { chqc } from '@/client/request/queryClient';
 import type { UserPreferences } from '@/common/types';
 import { useSettingPersistence } from '@/client/hooks/settingsPersistence';
+import { LOCALE_STORAGE_KEY } from '@/client/constants';
 
 /**
  * Persist and restore the user's selected locale if the user granted consent.
@@ -35,7 +36,7 @@ export const useLocalePersistence = (userId?: number): void => {
     );
 
     useSettingPersistence<string>({
-        storageKey: 'locale',
+        storageKey: LOCALE_STORAGE_KEY,
         currentValue: locale,
         canPersist: canUsePreferences,
         allowedValues: ['en', 'cs'] as const,

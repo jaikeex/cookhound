@@ -4,6 +4,7 @@ import { cookies } from 'next/headers';
 import {
     CONSENT_COOKIE_MAX_AGE,
     ENV_CONFIG_PUBLIC,
+    LOCALE_COOKIE_NAME,
     ONE_YEAR_IN_SECONDS,
     SESSION_COOKIE_NAME
 } from '@/common/constants';
@@ -14,7 +15,7 @@ import apiClient from '@/client/request/apiClient';
 export const setLocaleCookie = async (locale: string): Promise<void> => {
     const cookieStore = await cookies();
 
-    cookieStore.set('locale', locale, {
+    cookieStore.set(LOCALE_COOKIE_NAME, locale, {
         path: '/',
         maxAge: ONE_YEAR_IN_SECONDS,
         secure: ENV_CONFIG_PUBLIC.ENV === 'production',
