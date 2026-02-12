@@ -101,7 +101,7 @@ export const useConsent = (): ConsentContextType => {
 //$                                           CONTEXT                                           $//
 //~---------------------------------------------------------------------------------------------~//
 
-const ConsentContext = createContext({} as ConsentContextType);
+const ConsentContext = createContext<ConsentContextType | undefined>(undefined);
 
 type ConsentProviderProps = Readonly<{
     initialConsent?: CookieConsent | null;

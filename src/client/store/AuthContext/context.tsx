@@ -11,7 +11,7 @@ type AuthContextType = {
     setUser: (user: UserDTO | null) => void;
 };
 
-const AuthContext = createContext({} as AuthContextType);
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const useAuth = () => {
     const context = useContext(AuthContext);

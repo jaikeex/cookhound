@@ -21,7 +21,9 @@ type SnackbarContextType = {
     clearAlerts: () => void;
 };
 
-const SnackbarContext = createContext({} as SnackbarContextType);
+const SnackbarContext = createContext<SnackbarContextType | undefined>(
+    undefined
+);
 
 export const useSnackbar = () => {
     const context = useContext(SnackbarContext);

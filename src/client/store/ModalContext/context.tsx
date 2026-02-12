@@ -48,7 +48,7 @@ interface ModalContextType {
 //$                                          PROVIDER                                           $//
 //~=============================================================================================~//
 
-const ModalContext = createContext({} as ModalContextType);
+const ModalContext = createContext<ModalContextType | undefined>(undefined);
 
 export const useModal = () => {
     const context = useContext(ModalContext);

@@ -74,7 +74,9 @@ type RecipeHandlingContextType = Readonly<{
 //$                                          PROVIDER                                           $//
 //~=============================================================================================~//
 
-const RecipeHandlingContext = createContext({} as RecipeHandlingContextType);
+const RecipeHandlingContext = createContext<
+    RecipeHandlingContextType | undefined
+>(undefined);
 
 export const useRecipeHandling = () => {
     const context = useContext(RecipeHandlingContext);
