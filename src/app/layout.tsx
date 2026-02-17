@@ -18,7 +18,11 @@ import {
 } from '@/client/components';
 
 import type { UserDTO } from '@/common/types';
-import { CONTENT_WRAPPER_ID, MAIN_PAGE_ID } from '@/client/constants';
+import {
+    CONTENT_WRAPPER_ID,
+    MAIN_PAGE_ID,
+    THEME_STORAGE_KEY
+} from '@/client/constants';
 import { locales } from '@/client/locales';
 import { classNames } from '@/client/utils';
 import { tServer } from '@/server/utils/locales';
@@ -130,7 +134,7 @@ export default async function RootLayout({
     //|-----------------------------------------------------------------------------------------|//
 
     const themeFromCookie = initialConsent?.accepted?.includes('preferences')
-        ? (cookieStore.get('ui_theme')?.value ?? null)
+        ? (cookieStore.get(THEME_STORAGE_KEY)?.value ?? null)
         : null;
 
     const canUsePreferences =

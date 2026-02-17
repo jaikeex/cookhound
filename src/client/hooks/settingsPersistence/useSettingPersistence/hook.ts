@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { getCookie, setCookie, deleteCookie } from '@/client/utils/cookies';
 import { ONE_YEAR_IN_SECONDS } from '@/common/constants';
 import { AppEvent } from '@/client/events';
@@ -54,6 +54,31 @@ export const useSettingPersistence = <T>(
         cookieMaxAge = ONE_YEAR_IN_SECONDS
     } = params;
 
+    //~————————————————————————————————————————————————————————————————————————————————————————~//
+    //$                                     STABLE REFS                                        $//
+    ///
+    //# There is no way to guarantee that this hook will be called with handler fns properly
+    //# memoized. Using these functions inside dependnency arrays directly would cause a lot
+    //# of unnecessary executions, and can even cause infinite loops.
+    //# Saving these into refs keeps the correct values without destabilising the dependencies.
+    ///
+    //~————————————————————————————————————————————————————————————————————————————————————————~//
+
+    const deserializeRef = useRef(deserialize);
+    deserializeRef.current = deserialize;
+
+    const serializeRef = useRef(serialize);
+    serializeRef.current = serialize;
+
+    const allowedValuesRef = useRef(allowedValues);
+    allowedValuesRef.current = allowedValues;
+
+    const onRestoreRef = useRef(onRestore);
+    onRestoreRef.current = onRestore;
+
+    const onPersistRef = useRef(onPersist);
+    onPersistRef.current = onPersist;
+
     // Clean up immediately on mount if there is no consent
     useEffect(() => {
         if (typeof window === 'undefined' || canPersist) return;
@@ -75,24 +100,26 @@ export const useSettingPersistence = <T>(
             return undefined;
         }
 
-        const parsed = deserialize(rawFromCookie);
+        const parsed = deserializeRef.current(rawFromCookie);
 
         if (parsed == null) {
             return undefined;
         }
 
-        if (allowedValues && !allowedValues.includes(parsed)) {
+        if (
+            allowedValuesRef.current &&
+            !allowedValuesRef.current.includes(parsed)
+        ) {
             return undefined;
         }
 
         return parsed;
-    }, [canPersist, storageKey, deserialize, allowedValues]);
+    }, [canPersist, storageKey]);
 
     useEffect(() => {
-        if (restored === undefined || !onRestore) return;
+        if (restored === undefined || !onRestoreRef.current) return;
 
-        onRestore(restored);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+        onRestoreRef.current(restored);
     }, [restored]);
 
     useEffect(() => {
@@ -109,7 +136,7 @@ export const useSettingPersistence = <T>(
             return;
         }
 
-        const serialized = serialize(currentValue);
+        const serialized = serializeRef.current(currentValue);
 
         if (typeof window !== 'undefined') {
             const currentStored = window.localStorage.getItem(storageKey);
@@ -142,15 +169,8 @@ export const useSettingPersistence = <T>(
         ///
         //?—————————————————————————————————————————————————————————————————————————————————————?//
 
-        onPersist?.(currentValue);
-    }, [
-        currentValue,
-        canPersist,
-        serialize,
-        storageKey,
-        cookieMaxAge,
-        onPersist
-    ]);
+        onPersistRef.current?.(currentValue);
+    }, [currentValue, canPersist, storageKey, cookieMaxAge]);
 
     useAppEventListener(AppEvent.CONSENT_CHANGED, () => {
         if (typeof window === 'undefined' || canPersist) return;
