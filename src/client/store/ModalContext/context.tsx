@@ -6,7 +6,8 @@ import React, {
     useContext,
     useMemo,
     useRef,
-    useState
+    useState,
+    useTransition
 } from 'react';
 import ReactDOM from 'react-dom';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -62,6 +63,7 @@ type ModalProviderProps = React.PropsWithChildren<NonNullable<unknown>>;
 
 export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
     const [modals, setModals] = useState<Modal[]>([]);
+    const [_, startTransition] = useTransition();
 
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -128,12 +130,15 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
             if (!searchParams.get(MODAL_PARAM_KEY)) {
                 const params = new URLSearchParams(searchParams);
                 params.set(MODAL_PARAM_KEY, id);
-                router.push(`?${params.toString()}`, { scroll: false });
+
+                startTransition(() => {
+                    router.push(`?${params.toString()}`, { scroll: false });
+                });
             }
 
             return id;
         },
-        [router, searchParams]
+        [router, searchParams, startTransition]
     );
 
     const handleClose = useCallback(
@@ -211,8 +216,8 @@ type ModalWrapperProps = Readonly<{
 
 const backdropVariants = {
     hidden: { opacity: 0 },
-    visible: { opacity: 1 },
-    exit: { opacity: 0 }
+    visible: { opacity: 1, transition: { duration: 0.3 } },
+    exit: { opacity: 0, transition: { duration: 0.3 } }
 };
 
 const modalVariants = {
@@ -237,7 +242,7 @@ const ModalWrapper: React.FC<ModalWrapperProps> = ({
             {/* Overlay */}
             <motion.div
                 variants={backdropVariants}
-                className="absolute inset-0 bg-black/50 backdrop-blur-xs"
+                className="absolute inset-0 bg-black/80"
                 onClick={disableBackdropClick ? undefined : onClose}
             />
 
