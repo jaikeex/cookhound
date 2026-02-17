@@ -28,12 +28,15 @@ export const FormCheckbox: React.FC<FormCheckboxProps> = ({
                 disabled={disabled}
                 size={size}
             />
-            <InputLabel
-                htmlFor={id}
-                text={label}
-                disabled={disabled}
-                className="cursor-pointer"
-            />
+
+            {label ? (
+                <InputLabel
+                    htmlFor={id}
+                    text={label}
+                    disabled={disabled}
+                    className="cursor-pointer"
+                />
+            ) : null}
         </div>
     );
 };

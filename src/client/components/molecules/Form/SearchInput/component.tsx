@@ -70,9 +70,10 @@ export const SearchInput: React.FC<SearchInputProps> = ({
 
     return (
         <div className={classNames('relative w-full', className)} ref={ref}>
-            {label && (
+            {label ? (
                 <InputLabel htmlFor={id} text={label} disabled={disabled} />
-            )}
+            ) : null}
+
             <div className="relative">
                 <BaseInput
                     type={'search'}
@@ -89,6 +90,7 @@ export const SearchInput: React.FC<SearchInputProps> = ({
                     autoComplete={'off'}
                     min={0}
                 />
+
                 <ButtonBase
                     color="secondary"
                     size="sm"

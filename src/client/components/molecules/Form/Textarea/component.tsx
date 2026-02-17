@@ -1,16 +1,18 @@
 import React from 'react';
+import type { FocusEventHandler } from 'react';
 import { InputError, InputLabel, BaseTextarea } from '@/client/components';
 import type { FormInputProps } from '@/client/components/molecules/Form/types';
 import { classNames } from '@/client/utils';
 
 export type TextareaProps = Readonly<{
     defaultValue?: string | null;
+    onBlur?: FocusEventHandler<HTMLTextAreaElement>;
     onChange?: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
     onKeyDown?: (event: React.KeyboardEvent<HTMLTextAreaElement>) => void;
     placeholder?: string;
     rows?: number;
 }> &
-    Omit<FormInputProps, 'defaultValue' | 'onChange'>;
+    Omit<FormInputProps, 'defaultValue' | 'onChange | onBlur'>;
 
 export const Textarea: React.FC<TextareaProps> = ({
     className,

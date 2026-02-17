@@ -6,6 +6,8 @@ import { classNames } from '@/client/utils';
 export type NumberInputProps = Readonly<{
     allowDecimals?: boolean;
     defaultValue?: number | null;
+    hideArrows?: boolean;
+    min?: number;
     max?: number;
 }> &
     Omit<FormInputProps, 'type' | 'defaultValue'>;
@@ -16,12 +18,15 @@ export const NumberInput: React.FC<NumberInputProps> = ({
     defaultValue,
     disabled,
     error,
+    hideArrows = false,
     id,
     label,
+    min = 0,
     max,
     name,
     onChange,
-    onKeyDown
+    onKeyDown,
+    ...props
 }) => {
     const handleChange = useCallback(
         (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -38,11 +43,18 @@ export const NumberInput: React.FC<NumberInputProps> = ({
 
     return (
         <div className={classNames('relative w-full', className)}>
-            <InputLabel htmlFor={id} text={label} disabled={disabled} />
+            {label ? (
+                <InputLabel htmlFor={id} text={label} disabled={disabled} />
+            ) : null}
+
             <BaseInput
+                {...props}
                 type={'number'}
                 defaultValue={defaultValue}
-                className={className}
+                className={classNames(
+                    className,
+                    hideArrows && 'no-number-arrows'
+                )}
                 id={id}
                 name={name}
                 onChange={handleChange}
@@ -50,7 +62,7 @@ export const NumberInput: React.FC<NumberInputProps> = ({
                 disabled={disabled}
                 autoComplete={name}
                 step={allowDecimals ? '0.01' : '1'}
-                min={0}
+                min={min}
                 max={max}
             />
             {error ? <InputError message={error} /> : null}

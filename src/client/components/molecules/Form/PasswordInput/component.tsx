@@ -18,7 +18,10 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
 }) => {
     return (
         <div className={classNames('w-full relative', className)}>
-            <InputLabel htmlFor={id} text={label} disabled={disabled} />
+            {label ? (
+                <InputLabel htmlFor={id} text={label} disabled={disabled} />
+            ) : null}
+
             <BaseInput
                 {...props}
                 id={id}
@@ -28,7 +31,6 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
                 autoComplete={autoComplete}
                 onChange={onChange}
             />
-
             {error ? <InputError message={error} /> : null}
         </div>
     );

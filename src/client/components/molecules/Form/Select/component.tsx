@@ -36,6 +36,7 @@ export const Select: React.FC<SelectProps> = ({
             {label ? (
                 <InputLabel htmlFor={id} text={label} disabled={disabled} />
             ) : null}
+
             <div className={classNames('relative w-full', className)}>
                 <div className="absolute right-2 top-1/2 -translate-y-1/2">
                     <Icon name="chevronDown" size={20} />

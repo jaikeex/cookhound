@@ -27,6 +27,7 @@ export const TextInput: React.FC<TextInputProps> = ({
             {label ? (
                 <InputLabel htmlFor={id} text={label} disabled={disabled} />
             ) : null}
+
             <BaseInput
                 {...props}
                 type={'text'}
