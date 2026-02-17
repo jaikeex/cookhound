@@ -10,4 +10,5 @@ export * from './Submit';
 export * from './TextInput';
 export * from './Textarea';
 export * from './RadioSelect';
+export * from './RangeSlider';
 export * from './Select';
