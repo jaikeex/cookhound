@@ -82,3 +82,12 @@ export type RecipeRatingPayload = {
     id: string;
     rating: number;
 };
+
+export type RecipeFilterParams = {
+    containsIngredients?: number[];
+    excludesIngredients?: number[];
+    timeMin?: number;
+    timeMax?: number;
+    tags?: number[];
+    hasImage?: boolean;
+};

@@ -38,7 +38,6 @@ class IngredientModel {
 
         return ingredient;
     }
-
     /**
      * Get an ingredient by name
      * Query class -> C2
@@ -66,6 +65,39 @@ class IngredientModel {
         );
 
         return ingredient;
+    }
+
+    /**
+     * Get all ingredients for a language, sorted alphabetically.
+     * Query class -> C2
+     */
+    async getManyByLanguage(
+        language: string,
+        ttl?: number
+    ): Promise<{ id: number; name: string }[]> {
+        log.trace('Getting ingredients by language', { language });
+
+        const cacheKey = generateCacheKey('ingredient', 'findManyByLanguage', {
+            language
+        });
+
+        const ingredients = await cachePrismaQuery(
+            cacheKey,
+            async () => {
+                log.trace('Fetching ingredients from db by language', {
+                    language
+                });
+
+                return prisma.ingredient.findMany({
+                    where: { language },
+                    select: { id: true, name: true },
+                    orderBy: { name: 'asc' }
+                });
+            },
+            ttl ?? CACHE_TTL.TTL_2
+        );
+
+        return ingredients;
     }
 }
 

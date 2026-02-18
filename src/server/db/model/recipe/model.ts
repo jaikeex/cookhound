@@ -11,6 +11,7 @@ import { ApplicationErrorCode } from '@/server/error/codes';
 import { prisma } from '@/server/integrations';
 import { Logger } from '@/server/logger';
 import type { Prisma, Recipe } from '@/server/db/generated/prisma/client';
+import type { RecipeFilterParams } from '@/common/types';
 import {
     getRecipeByDisplayId,
     getRecipeById,
@@ -313,6 +314,100 @@ class RecipeModel {
         );
 
         return recipes;
+    }
+
+    //~=========================================================================================~//
+    //$                                    FILTER COLLECTION                                    $//
+    //~=========================================================================================~//
+
+    /**
+     * Filter recipes by provided criteria.
+     * Query class -> C1
+     */
+    async filterMany(
+        filters: RecipeFilterParams,
+        language: string,
+        limit: number,
+        offset: number,
+        ttl?: number
+    ) {
+        const cacheKey = generateCacheKey('recipe', 'filterMany', {
+            filters,
+            language,
+            limit,
+            offset
+        });
+
+        log.trace('Filtering recipes', { language, limit, offset, filters });
+
+        return await cachePrismaQuery(
+            cacheKey,
+            async () => {
+                log.trace('Fetching filtered recipes from db', {
+                    language,
+                    limit,
+                    offset
+                });
+
+                const andConditions: Prisma.RecipeWhereInput[] = [];
+
+                filters.containsIngredients?.forEach((id) =>
+                    andConditions.push({
+                        ingredients: { some: { ingredientId: id } }
+                    })
+                );
+
+                filters.tags?.forEach((id) =>
+                    andConditions.push({ tags: { some: { tagId: id } } })
+                );
+
+                const where: Prisma.RecipeWhereInput = {
+                    language,
+                    flags: { none: { active: true } },
+                    ...(andConditions.length && { AND: andConditions }),
+                    ...(filters.excludesIngredients?.length && {
+                        NOT: {
+                            ingredients: {
+                                some: {
+                                    ingredientId: {
+                                        in: filters.excludesIngredients
+                                    }
+                                }
+                            }
+                        }
+                    }),
+                    ...(filters.timeMin != null && {
+                        time: { gte: filters.timeMin }
+                    }),
+                    ...(filters.timeMax != null && {
+                        time: { lte: filters.timeMax }
+                    }),
+                    ...(filters.hasImage && { imageUrl: { not: null } })
+                };
+
+                return prisma.recipe.findMany({
+                    where,
+                    select: {
+                        id: true,
+                        displayId: true,
+                        title: true,
+                        imageUrl: true,
+                        rating: true,
+                        timesRated: true,
+                        time: true,
+                        portionSize: true,
+                        createdAt: true
+                    },
+                    orderBy: [
+                        { rating: { sort: 'desc', nulls: 'last' } },
+                        { createdAt: 'desc' }
+                    ],
+                    take: limit,
+                    skip: offset
+                });
+            },
+            ttl ?? CACHE_TTL.TTL_1
+        );
     }
 
     //~=========================================================================================~//
