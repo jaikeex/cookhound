@@ -1,4 +1,5 @@
 export * from './AvatarInput';
+export * from './ComboInput';
 export * from './DraggableInputRow';
 export * from './ErrorList';
 export * from './FormCheckbox';
