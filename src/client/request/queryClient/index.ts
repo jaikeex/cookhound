@@ -5,6 +5,7 @@ import { tagQueryClient, TAG_QUERY_KEYS } from './tag';
 import { cookbookQueryClient, COOKBOOK_QUERY_KEYS } from './cookbook';
 import { fileQueryClient } from './file';
 import { contactQueryClient, CONTACT_QUERY_KEYS } from './contact';
+import { ingredientQueryClient, INGREDIENT_QUERY_KEYS } from './ingredient';
 
 /**
  * Unfortunately, this is the best name i came up with to differentiate it enought from the default
@@ -20,7 +21,8 @@ export const chqc = {
     tag: tagQueryClient,
     file: fileQueryClient,
     cookbook: cookbookQueryClient,
-    contact: contactQueryClient
+    contact: contactQueryClient,
+    ingredient: ingredientQueryClient
 };
 
 export const QUERY_KEYS = {
@@ -29,5 +31,6 @@ export const QUERY_KEYS = {
     recipe: RECIPE_QUERY_KEYS,
     tag: TAG_QUERY_KEYS,
     cookbook: COOKBOOK_QUERY_KEYS,
-    contact: CONTACT_QUERY_KEYS
+    contact: CONTACT_QUERY_KEYS,
+    ingredient: INGREDIENT_QUERY_KEYS
 };

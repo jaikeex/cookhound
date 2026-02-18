@@ -3,6 +3,7 @@ import type { RequestConfig } from '@/client/request/apiClient/ApiRequestWrapper
 import { apiRequestWrapper } from '@/client/request/apiClient/ApiRequestWrapper';
 import type {
     RecipeDTO,
+    RecipeFilterParams,
     RecipeForCreatePayload,
     RecipeForDisplayDTO
 } from '@/common/types';
@@ -168,6 +169,55 @@ class RecipeApiClient {
         return await apiRequestWrapper.get({
             url: `/recipes/user/${userId}/search`,
             params: { query, language, batch, perPage },
+            ...config
+        });
+    }
+
+    /**
+     * Filters recipes by calling `GET /api/recipes/filter`.
+     *
+     * @param language - The locale for recipe display data.
+     * @param batch - The batch number to fetch.
+     * @param perPage - The number of recipes per page.
+     * @param filters - Optional filter criteria.
+     * @param config - Optional fetch request configuration.
+     * @returns A promise that resolves to the filtered list of recipes.
+     * @throws {Error} Throws an error if the request fails.
+     */
+    async filterRecipes(
+        language: Locale,
+        batch: number,
+        perPage: number,
+        filters: RecipeFilterParams = {},
+        config?: RequestConfig
+    ): Promise<RecipeForDisplayDTO[]> {
+        const params = new URLSearchParams();
+
+        params.set('language', language);
+        params.set('batch', String(batch));
+        params.set('perPage', String(perPage));
+
+        filters.containsIngredients?.forEach((id) =>
+            params.append('containsIngredients', String(id))
+        );
+
+        filters.excludesIngredients?.forEach((id) =>
+            params.append('excludesIngredients', String(id))
+        );
+
+        filters.tags?.forEach((id) => params.append('tags', String(id)));
+
+        if (filters.timeMin !== undefined)
+            params.set('timeMin', String(filters.timeMin));
+
+        if (filters.timeMax !== undefined)
+            params.set('timeMax', String(filters.timeMax));
+
+        if (filters.hasImage !== undefined)
+            params.set('hasImage', String(filters.hasImage));
+
+        return await apiRequestWrapper.get({
+            url: `/recipes/filter?${params.toString()}`,
             ...config
         });
     }

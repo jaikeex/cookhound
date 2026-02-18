@@ -1,6 +1,7 @@
 import type { Locale, Recipe } from '@/common/types';
 import type {
     RecipeDTO,
+    RecipeFilterParams,
     RecipeForCreatePayload,
     RecipeForDisplayDTO,
     RecipeRatingPayload,
@@ -13,6 +14,8 @@ import type {
     QueryKey
 } from '@tanstack/react-query';
 import type { RequestError } from '@/client/error';
+
+export type { RecipeFilterParams };
 
 //~---------------------------------------------------------------------------------------------~//
 //$                                            KEYS                                             $//
@@ -118,6 +121,35 @@ export const RECIPE_QUERY_KEYS = Object.freeze({
             query,
             language,
             perPage,
+            'infinite'
+        ] as const,
+
+    filter: (
+        language: Locale,
+        batch: number,
+        perPage: number,
+        filters: RecipeFilterParams
+    ) =>
+        [
+            RECIPE_NAMESPACE_QUERY_KEY,
+            'filter',
+            language,
+            batch,
+            perPage,
+            filters
+        ] as const,
+
+    filterInfinite: (
+        language: Locale,
+        perPage: number,
+        filters: RecipeFilterParams
+    ) =>
+        [
+            RECIPE_NAMESPACE_QUERY_KEY,
+            'filter',
+            language,
+            perPage,
+            filters,
             'infinite'
         ] as const
 });
@@ -257,4 +289,25 @@ export type RateRecipeOptions = Omit<
 export type RegisterRecipeVisitOptions = Omit<
     UseMutationOptions<void, RequestError, RecipeVisitPayload>,
     'mutationFn'
+>;
+
+export type FilterRecipesOptions = Omit<
+    UseQueryOptions<
+        RecipeForDisplayDTO[],
+        RequestError,
+        RecipeForDisplayDTO[],
+        ReturnType<typeof RECIPE_QUERY_KEYS.filter>
+    >,
+    'queryKey' | 'queryFn'
+>;
+
+export type FilterRecipesInfiniteOptions = Omit<
+    UseInfiniteQueryOptions<
+        RecipeForDisplayDTO[],
+        RequestError,
+        RecipeForDisplayDTO[],
+        QueryKey,
+        number
+    >,
+    'queryKey' | 'queryFn' | 'initialPageParam' | 'getNextPageParam'
 >;

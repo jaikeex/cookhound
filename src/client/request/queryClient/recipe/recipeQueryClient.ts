@@ -20,7 +20,10 @@ import type {
     UserSearchRecipesInfiniteOptions,
     UserRecipesInfiniteOptions,
     DeleteRecipeOptions,
-    UpdateRecipeOptions
+    UpdateRecipeOptions,
+    FilterRecipesOptions,
+    FilterRecipesInfiniteOptions,
+    RecipeFilterParams
 } from './types';
 import { RECIPE_QUERY_KEYS } from './types';
 import type { RecipeForCreatePayload } from '@/common/types/recipe';
@@ -363,6 +366,75 @@ class RecipeQueryClient {
                 return allPages.length + 1;
             },
             enabled: Boolean(userId && language && perPage),
+            ...options
+        });
+
+    /**
+     * Returns a filtered, paginated list of recipes (non-infinite).
+     *
+     * @param language - The locale for recipe display data.
+     * @param batch - The batch (page) number to fetch.
+     * @param perPage - The number of recipes per page.
+     * @param filters - Optional filter criteria (ingredients, time range, tags, image).
+     */
+    useFilterRecipes = (
+        language: Locale,
+        batch: number,
+        perPage: number,
+        filters: RecipeFilterParams = {},
+        options?: Partial<FilterRecipesOptions>
+    ) =>
+        useAppQuery(
+            RECIPE_QUERY_KEYS.filter(language, batch, perPage, filters),
+            () =>
+                apiClient.recipe.filterRecipes(
+                    language,
+                    batch,
+                    perPage,
+                    filters
+                ),
+            {
+                enabled: Boolean(language && batch > 0 && perPage > 0),
+                retry: 1,
+                placeholderData: keepPreviousData,
+                ...options
+            }
+        );
+
+    /**
+     * Returns a filtered, paginated list of recipes (infinite).
+     *
+     * @param language - The locale for recipe display data.
+     * @param perPage - The number of recipes per page.
+     * @param filters - Optional filter criteria.
+     * @param maxBatches - The maximum number of batches to fetch.
+     */
+    useFilterRecipesInfinite = (
+        language: Locale,
+        perPage: number,
+        filters: RecipeFilterParams = {},
+        maxBatches?: number,
+        options?: Partial<FilterRecipesInfiniteOptions>
+    ) =>
+        useInfiniteQuery({
+            queryKey: [
+                ...RECIPE_QUERY_KEYS.filterInfinite(language, perPage, filters)
+            ],
+            initialPageParam: 1,
+            queryFn: ({ pageParam }) =>
+                apiClient.recipe.filterRecipes(
+                    language,
+                    Number(pageParam ?? 1),
+                    perPage,
+                    filters
+                ),
+            getNextPageParam: (lastPage, allPages) => {
+                if (lastPage.length < perPage) return null;
+                if (maxBatches !== undefined && allPages.length >= maxBatches)
+                    return null;
+                return allPages.length + 1;
+            },
+            enabled: Boolean(language && perPage > 0),
             ...options
         });
 

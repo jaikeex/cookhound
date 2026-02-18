@@ -5,6 +5,7 @@ import { fileApiClient } from '@/client/request/apiClient/file/FileApiClient';
 import { tagApiClient } from '@/client/request/apiClient/tag/TagApiClient';
 import { cookbookApiClient } from '@/client/request/apiClient/cookbook/CookbookApiClient';
 import { contactApiClient } from '@/client/request/apiClient/contact/ContactApiClient';
+import { ingredientApiClient } from '@/client/request/apiClient/ingredient/IngredientApiClient';
 
 /**
  * A centralized object that exports all the API client instances.
@@ -17,7 +18,8 @@ const apiClient = {
     file: fileApiClient,
     tag: tagApiClient,
     cookbook: cookbookApiClient,
-    contact: contactApiClient
+    contact: contactApiClient,
+    ingredient: ingredientApiClient
 };
 
 export default apiClient;
