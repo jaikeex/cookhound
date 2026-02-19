@@ -9,15 +9,32 @@ import {
 } from '@/server/utils/seo';
 import { StructuredData } from '@/client/components';
 import { tServer } from '@/server/utils/locales';
-import { getUserLocale } from '@/common/utils';
+import { deserializeFilterParams, getUserLocale } from '@/common/utils';
 
 export const dynamic = 'force-dynamic';
 
 //|=============================================================================================|//
 
-export default async function FilterPage() {
+export default async function FilterPage({
+    searchParams
+}: Readonly<{
+    searchParams: Promise<Record<string, string | string[] | undefined>>;
+}>) {
     const cookieStore = await cookies();
     const headerList = await headers();
+
+    const rawParams = await searchParams;
+    const urlSearchParams = new URLSearchParams();
+
+    for (const [key, value] of Object.entries(rawParams)) {
+        if (Array.isArray(value)) {
+            value.forEach((v) => urlSearchParams.append(key, v));
+        } else if (value !== undefined) {
+            urlSearchParams.set(key, value);
+        }
+    }
+
+    const initialFilters = deserializeFilterParams(urlSearchParams);
 
     const locale = await getUserLocale(cookieStore, headerList);
 
@@ -37,7 +54,7 @@ export default async function FilterPage() {
     return (
         <React.Fragment>
             <StructuredData schema={breadcrumbSchema} id="breadcrumb-jsonld" />
-            <FilterTemplate />
+            <FilterTemplate initialFilters={initialFilters} />
         </React.Fragment>
     );
 }

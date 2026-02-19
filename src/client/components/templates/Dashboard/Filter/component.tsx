@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import type { ChangeEvent } from 'react';
 import {
     Banner,
@@ -14,6 +14,7 @@ import { useRecipeFilters } from '@/client/hooks';
 import { useLocale } from '@/client/store';
 import { useRouter } from 'next/navigation';
 import { GRID_COLS } from '@/client/constants';
+import { serializeFilterParams } from '@/common/utils';
 
 type FilterTemplateProps = Readonly<{
     initialFilters?: RecipeFilterParams;
@@ -52,11 +53,29 @@ export const FilterTemplate: React.FC<FilterTemplateProps> = ({
         router.push(`/search?query=${encodeURIComponent(trimmed)}`);
     }, [searchInput, router]);
 
+    /**
+     * This should be considered the only source of truth for the filter params router updates.
+     * Packaging this with the handlers causes issues with batched updates and can lead to
+     * incosistent states...
+     * Also, this always results in a router call on first mount, but should be no concern.
+     * The serialized url will be the same as the current one.
+     */
+    useEffect(() => {
+        const params = serializeFilterParams(filters);
+        const search = params.toString();
+
+        router.replace(search ? `/filter?${search}` : '/filter', {
+            scroll: false
+        });
+        // this is intentional
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [filters]);
+
     //~-----------------------------------------------------------------------------------------~//
     //$                                          RENDER                                         $//
     //~-----------------------------------------------------------------------------------------~//
 
-    const Skeleton = useMemo(() => {
+    const createSkeleton = () => {
         const gridCols = {
             sm: GRID_COLS[2],
             md: GRID_COLS[2],
@@ -71,7 +90,7 @@ export const FilterTemplate: React.FC<FilterTemplateProps> = ({
         ));
 
         return <div className={classes}>{skeletonCards}</div>;
-    }, []);
+    };
 
     return (
         <div className="page-wrapper flex flex-col gap-4 mt-36 md:mt-40">
@@ -94,7 +113,7 @@ export const FilterTemplate: React.FC<FilterTemplateProps> = ({
 
                 <div className="flex-1 min-w-0">
                     {isLoading && recipes.length === 0 ? (
-                        Skeleton
+                        createSkeleton()
                     ) : recipes.length > 0 ? (
                         <RecipeCardList
                             cols={{
