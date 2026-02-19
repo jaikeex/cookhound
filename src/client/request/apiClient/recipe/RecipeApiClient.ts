@@ -191,33 +191,9 @@ class RecipeApiClient {
         filters: RecipeFilterParams = {},
         config?: RequestConfig
     ): Promise<RecipeForDisplayDTO[]> {
-        const params = new URLSearchParams();
-
-        params.set('language', language);
-        params.set('batch', String(batch));
-        params.set('perPage', String(perPage));
-
-        filters.containsIngredients?.forEach((id) =>
-            params.append('containsIngredients', String(id))
-        );
-
-        filters.excludesIngredients?.forEach((id) =>
-            params.append('excludesIngredients', String(id))
-        );
-
-        filters.tags?.forEach((id) => params.append('tags', String(id)));
-
-        if (filters.timeMin !== undefined)
-            params.set('timeMin', String(filters.timeMin));
-
-        if (filters.timeMax !== undefined)
-            params.set('timeMax', String(filters.timeMax));
-
-        if (filters.hasImage !== undefined)
-            params.set('hasImage', String(filters.hasImage));
-
         return await apiRequestWrapper.get({
-            url: `/recipes/filter?${params.toString()}`,
+            url: `/recipes/filter`,
+            params: { language, batch, perPage, ...filters },
             ...config
         });
     }

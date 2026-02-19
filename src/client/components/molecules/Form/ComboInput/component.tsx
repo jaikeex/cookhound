@@ -291,6 +291,7 @@ export const ComboInput: React.FC<ComboInputProps> = ({
                         <li
                             key={option.value}
                             id={`${id}-option-${index}`}
+                            aria-selected={false}
                             role="option"
                             data-index={index}
                             onMouseDown={handleOptionMouseDown}

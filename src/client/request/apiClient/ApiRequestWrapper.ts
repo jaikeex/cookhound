@@ -15,8 +15,11 @@ export type RequestConfig = {
     url?: UrlString;
     /** The data to be sent in the request body. */
     data?: AnyObject;
-    /** The URL parameters to be appended to the URL. */
-    params?: Record<string, string | number | boolean | undefined>;
+    /** The URL parameters to be appended to the URL. Array values are appended as repeated keys. */
+    params?: Record<
+        string,
+        string | number | boolean | undefined | (string | number | boolean)[]
+    >;
     /** Optional custom headers for the request. */
     headers?: HeadersInit;
     /** Optional revalidation time for the request. */
@@ -208,8 +211,13 @@ class ApiRequestWrapper {
         const url = new URL(this.API_URL + config.url);
         if (config.params) {
             Object.entries(config.params).forEach(([key, value]) => {
-                if (value !== undefined) {
-                    url.searchParams.append(key, String(value ?? ''));
+                if (value === undefined) return;
+                if (Array.isArray(value)) {
+                    value.forEach((item) =>
+                        url.searchParams.append(key, String(item))
+                    );
+                } else {
+                    url.searchParams.append(key, String(value));
                 }
             });
         }

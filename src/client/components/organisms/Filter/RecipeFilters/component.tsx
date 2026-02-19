@@ -107,13 +107,23 @@ export const RecipeFilters: React.FC<RecipeFiltersProps> = ({
         [ingredients]
     );
 
-    const hasActiveFilters =
-        (filters.tags?.length ?? 0) > 0 ||
-        (filters.containsIngredients?.length ?? 0) > 0 ||
-        (filters.excludesIngredients?.length ?? 0) > 0 ||
-        filters.timeMin !== undefined ||
-        filters.timeMax !== undefined ||
-        filters.hasImage === true;
+    const hasActiveFilters = useMemo(
+        () =>
+            (filters.tags?.length ?? 0) > 0 ||
+            (filters.containsIngredients?.length ?? 0) > 0 ||
+            (filters.excludesIngredients?.length ?? 0) > 0 ||
+            filters.timeMin !== undefined ||
+            filters.timeMax !== undefined ||
+            filters.hasImage === true,
+        [
+            filters.containsIngredients?.length,
+            filters.excludesIngredients?.length,
+            filters.hasImage,
+            filters.tags?.length,
+            filters.timeMax,
+            filters.timeMin
+        ]
+    );
 
     //~-----------------------------------------------------------------------------------------~//
     //$                                       TAG FILTERS                                       $//

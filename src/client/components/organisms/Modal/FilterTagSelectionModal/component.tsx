@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import type { RecipeTagDTO, TagListDTO } from '@/common/types';
 import type { ModalProps } from '@/client/components/organisms/Modal/types';
 import {
@@ -61,14 +61,13 @@ export const FilterTagSelectionModal: React.FC<
         close?.();
     }, [onCancel, close]);
 
-    if (isLoading) return <Loader />;
+    useEffect(() => {
+        if (error) {
+            alert({ message: t('app.error.default'), variant: 'error' });
+        }
+    }, [error, alert, t]);
 
-    if (error) {
-        alert({
-            message: t('app.error.default'),
-            variant: 'error'
-        });
-    }
+    if (isLoading) return <Loader />;
 
     return (
         <div className="flex flex-col w-full h-full max-h-[85dvh] md:max-h-[70dvh] max-w-[90dvw] md:max-w-[80dvw] xl:max-w-[70dvw]">

@@ -555,6 +555,8 @@ class RecipeModel {
 
             await this.invalidateUserRecipeCache(data.authorId);
 
+            await this.invalidateRecipeListCaches();
+
             return (await tx.recipe.findUnique({
                 where: { id: recipe.id },
                 include: {
