@@ -1,4 +1,5 @@
 export * from './Banner';
+export * from './Filter';
 export * from './Form';
 export * from './IngredientsList';
 export * from './InstructionsList';

@@ -1,5 +1,6 @@
 export * from './Accordion';
 export * from './Banner';
+export * from './Filter';
 export * from './Button';
 export * from './Card';
 export * from './ConsentRow';

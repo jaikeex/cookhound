@@ -17,7 +17,7 @@ import type { InfiniteData } from '@tanstack/react-query';
 //§—————————————————————————————————————————————————————————————————————————————————————————————§//
 //§                                           WARNING                                           §//
 ///
-//# This hook gives absolutely ZERO FUCKS about any other methods of storing the
+//# This hook does not care about any other methods of storing the
 //# search queries besides the native state inside this hook. If the
 //# intention is to also save the query strings inisde url search params, the caller
 //# MUST take care of that itself.

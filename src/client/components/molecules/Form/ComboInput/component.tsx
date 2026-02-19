@@ -21,6 +21,7 @@ export type ComboInputProps = Readonly<{
     /** Called on every keystroke */
     onChange?: (value: string) => void;
     onSelect?: (option: ComboInputOption) => void;
+    resetValueOnSelect?: boolean;
 }> &
     Omit<FormInputProps, 'defaultValue' | 'onChange'>;
 
@@ -40,6 +41,7 @@ export const ComboInput: React.FC<ComboInputProps> = ({
     onSelect,
     options,
     placeholder,
+    resetValueOnSelect,
     ...props
 }) => {
     const [inputValue, setInputValue] = useState(defaultValue);
@@ -94,12 +96,12 @@ export const ComboInput: React.FC<ComboInputProps> = ({
 
     const selectOption = useCallback(
         (option: ComboInputOption) => {
-            setInputValue(option.label);
+            setInputValue(resetValueOnSelect ? '' : option.label);
             setIsOpen(false);
             setHighlightedIndex(-1);
             onSelect?.(option);
         },
-        [onSelect]
+        [onSelect, resetValueOnSelect]
     );
 
     const handleInputChange = useCallback(

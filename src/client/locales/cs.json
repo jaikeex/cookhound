@@ -124,6 +124,7 @@
     "app.general.banner.normal": "v (zatím) desítce skvělých receptů",
     "app.general.add_to_cookbook": "Přidat do kuchařky",
     "app.general.share": "Sdílet",
+    "app.general.clear-all": "Vymazat vše",
     "app.profile.dashboard": "Profil",
     "app.profile.recipes": "Recepty",
     "app.profile.cookbooks": "Kuchařky",
@@ -229,6 +230,15 @@
     "app.recipe.delete-confirmation": "Opravdu chcete odstranit recept {{recipeTitle}}? Tuto akci nelze vrátit zpět.",
     "app.recipe.remove-from-cookbook-confirmation": "Opravdu chcete odstranit tento recept ze seznamu?",
     "app.recipe.age": "Stáří",
+    "app.recipe.filter.title": "Filtrovat recepty",
+    "app.recipe.filter.contains-ingredients": "Musí obsahovat",
+    "app.recipe.filter.excludes-ingredients": "Nesmí obsahovat",
+    "app.recipe.filter.ingredient-placeholder": "Hledat ingredienci…",
+    "app.recipe.filter.time-range": "Doba přípravy (min)",
+    "app.recipe.filter.time-min": "Min",
+    "app.recipe.filter.time-max": "Max",
+    "app.recipe.filter.has-image": "Pouze recepty s fotografií",
+    "app.recipe.filter.link": "Podrobnější filtry",
     "app.share.title": "Sdílet recept",
     "app.share.description": "Sdílejte tento recept se svými přáteli",
     "app.share.facebook": "Facebook",
@@ -389,5 +399,7 @@
     "meta.restricted.title": "Přístup odepřen | Cookhound",
     "meta.restricted.description": "Tato stránka je určena pouze registrovaným uživatelům. Přihlaste se prosím, abyste mohli pokračovat.",
     "meta.not-found.title": "Stránka nebyla nalezena | Cookhound",
-    "meta.not-found.description": "Stránka, kterou hledáte, neexistuje."
+    "meta.not-found.description": "Stránka, kterou hledáte, neexistuje.",
+    "meta.filter.title": "Filtrovat recepty | Cookhound",
+    "meta.filter.description": "Filtrujte recepty podle ingrediencí, tagů, doby přípravy a dalšího."
 }

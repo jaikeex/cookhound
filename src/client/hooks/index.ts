@@ -12,6 +12,7 @@ export * from './useKeyboardOpen';
 export * from './useLocalStorage';
 export * from './useOutsideClick';
 export * from './useRecipeDiscovery';
+export * from './useRecipeFilters';
 export * from './useRecipeFormController';
 export * from './useRunOnce';
 export * from './useScreenSize';

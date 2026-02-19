@@ -40,6 +40,9 @@ export const TopNavigation: React.FC<TopNavigationProps> = () => {
     useAppEventListener(AppEvent.NOT_FOUND_OPENED, () => setIsNotfound(true));
     useAppEventListener(AppEvent.NOT_FOUND_CLOSED, () => setIsNotfound(false));
 
+    const isTransparent =
+        pathname === '/' || pathname === '/search' || pathname === '/filter';
+
     if (isNotfound) return null;
 
     return (
@@ -47,7 +50,7 @@ export const TopNavigation: React.FC<TopNavigationProps> = () => {
             id={TOP_NAVBAR_ID}
             className={classNames(
                 'fixed top-0 left-0 right-0 z-20 flex items-center justify-between w-full p-4 h-14',
-                pathname === '/' || pathname === '/search'
+                isTransparent
                     ? 'backdrop-blur-xs bg-white/50 dark:bg-black/50'
                     : 'bg-[#d1fae5] dark:bg-[#030712]',
                 isNotfound ? 'hidden' : ''

@@ -186,7 +186,7 @@ export const RangeSlider: React.FC<RangeSliderProps> = ({
                     onChange={handleMinSlider}
                     disabled={disabled}
                     aria-label={minLabel}
-                    className="range-slider-thumb range-slider-track absolute inset-x-0 z-10"
+                    className="range-slider-thumb range-slider-track absolute inset-x-0 z-5"
                 />
 
                 <input
@@ -198,8 +198,8 @@ export const RangeSlider: React.FC<RangeSliderProps> = ({
                     onChange={handleMaxSlider}
                     disabled={disabled}
                     aria-label={maxLabel}
-                    // The z-20 here makes it always display over the min value thumb, do not remove it
-                    className="range-slider-thumb range-slider-track absolute inset-x-0 z-20"
+                    // The z-index here makes it always display over the min value thumb, do not lower it
+                    className="range-slider-thumb range-slider-track absolute inset-x-0 z-8"
                 />
             </div>
 
