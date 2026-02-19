@@ -12,6 +12,7 @@ import { validatePayload } from '@/server/utils/reqwest';
 import { ApplicationErrorCode } from '@/server/error/codes';
 import { z } from 'zod';
 import { withRateLimit } from '@/server/utils/rate-limit/wrapper';
+import { SUPPORTED_LOCALES } from '@/common/constants';
 
 //|=============================================================================================|//
 //?                                     VALIDATION SCHEMAS                                      ?//
@@ -24,7 +25,7 @@ const IngredientForCreateSchema = z.strictObject({
 });
 
 const RecipeForUpdateSchema = z.strictObject({
-    language: z.enum(['en', 'cs'], {
+    language: z.enum(SUPPORTED_LOCALES, {
         error: () => 'Language must be supported'
     }),
     title: z.string().trim().min(1).max(200),

@@ -67,10 +67,8 @@ export const useRecipeFilters = (initialFilters: RecipeFilterParams = {}) => {
     const hasMore = Boolean(filterQuery.hasNextPage);
     const error = (filterQuery.error ?? null) as Error | null;
 
-    const isLoading =
-        filterQuery.isLoading ||
-        filterQuery.isFetching ||
-        filterQuery.isFetchingNextPage;
+    const isLoading = filterQuery.isPending;
+    const isFetching = filterQuery.isFetching || filterQuery.isFetchingNextPage;
 
     const loadMore = useCallback(() => {
         if (!filterQuery.hasNextPage || filterQuery.isFetchingNextPage) return;
@@ -118,6 +116,7 @@ export const useRecipeFilters = (initialFilters: RecipeFilterParams = {}) => {
         filters,
         hasMore,
         isLoading,
+        isFetching,
         error,
         setFilters,
         updateFilter,

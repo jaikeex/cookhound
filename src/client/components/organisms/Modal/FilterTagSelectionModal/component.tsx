@@ -9,7 +9,7 @@ import {
     TagSelectionList,
     TagSelectionBox
 } from '@/client/components';
-import { useLocale } from '@/client/store';
+import { useLocale, useSnackbar } from '@/client/store';
 import type { RequestError } from '@/client/error';
 
 type FilterTagSelectionModalProps = Readonly<{
@@ -34,6 +34,7 @@ export const FilterTagSelectionModal: React.FC<
     tagLists
 }) => {
     const { t } = useLocale();
+    const { alert } = useSnackbar();
 
     const [selectedTags, setSelectedTags] =
         useState<RecipeTagDTO[]>(initialTags);
@@ -60,7 +61,14 @@ export const FilterTagSelectionModal: React.FC<
         close?.();
     }, [onCancel, close]);
 
-    if (isLoading || error) return <Loader />;
+    if (isLoading) return <Loader />;
+
+    if (error) {
+        alert({
+            message: t('app.error.default'),
+            variant: 'error'
+        });
+    }
 
     return (
         <div className="flex flex-col w-full h-full max-h-[85dvh] md:max-h-[70dvh] max-w-[90dvw] md:max-w-[80dvw] xl:max-w-[70dvw]">

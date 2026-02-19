@@ -1,15 +1,16 @@
 import { recipeFilterService } from '@/server/services/recipe-filter/service';
 import { makeHandler, ok, validatePayload } from '@/server/utils/reqwest';
 import type { NextRequest } from 'next/server';
-import type { Locale, RecipeFilterParams } from '@/common/types';
+import type { RecipeFilterParams } from '@/common/types';
 import { z } from 'zod';
+import { SUPPORTED_LOCALES } from '@/common/constants';
 
 //|=============================================================================================|//
 //?                                     VALIDATION SCHEMAS                                      ?//
 //|=============================================================================================|//
 
 const FilterRecipesSchema = z.strictObject({
-    language: z.enum(['en', 'cs']),
+    language: z.enum(SUPPORTED_LOCALES),
     batch: z.coerce.number().int().positive(),
     perPage: z.coerce.number().int().positive(),
     containsIngredients: z.array(z.coerce.number().int().positive()).optional(),
@@ -61,12 +62,12 @@ async function getHandler(request: NextRequest) {
         timeMin,
         timeMax,
         tags: payload.tags?.length ? payload.tags : undefined,
-        hasImage: hasImage || undefined
+        hasImage: hasImage === true ? true : undefined
     };
 
     const recipes = await recipeFilterService.filterRecipes(
         filters,
-        language as Locale,
+        language,
         batch,
         perPage
     );

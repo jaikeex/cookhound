@@ -10,6 +10,7 @@ import { withRateLimit } from '@/server/utils/rate-limit';
 import { z } from 'zod';
 import type { RecipeDTO } from '@/common/types';
 import { withAuth } from '@/server/utils/reqwest';
+import { SUPPORTED_LOCALES } from '@/common/constants';
 
 //|=============================================================================================|//
 //?                                     VALIDATION SCHEMAS                                      ?//
@@ -21,7 +22,7 @@ const IngredientForTagSuggestionSchema = z.looseObject({
 });
 
 const RecipeForTagSuggestionPayloadSchema = z.looseObject({
-    language: z.enum(['en', 'cs'], {
+    language: z.enum(SUPPORTED_LOCALES, {
         error: () => 'Language must be supported'
     }),
     title: z.string().trim().min(1).max(200),

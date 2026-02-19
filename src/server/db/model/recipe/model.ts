@@ -11,7 +11,7 @@ import { ApplicationErrorCode } from '@/server/error/codes';
 import { prisma } from '@/server/integrations';
 import { Logger } from '@/server/logger';
 import type { Prisma, Recipe } from '@/server/db/generated/prisma/client';
-import type { RecipeFilterParams } from '@/common/types';
+import type { Locale, RecipeFilterParams } from '@/common/types';
 import {
     getRecipeByDisplayId,
     getRecipeById,
@@ -326,11 +326,25 @@ class RecipeModel {
      */
     async filterMany(
         filters: RecipeFilterParams,
-        language: string,
+        language: Locale,
         limit: number,
         offset: number,
         ttl?: number
-    ) {
+    ): Promise<
+        Prisma.RecipeGetPayload<{
+            select: {
+                id: true;
+                displayId: true;
+                title: true;
+                imageUrl: true;
+                rating: true;
+                timesRated: true;
+                time: true;
+                portionSize: true;
+                createdAt: true;
+            };
+        }>[]
+    > {
         const cacheKey = generateCacheKey('recipe', 'filterMany', {
             filters,
             language,
@@ -706,6 +720,8 @@ class RecipeModel {
             displayId: originalRecipe.displayId
         });
 
+        await this.invalidateRecipeListCaches();
+
         return updatedRecipe;
     }
 
@@ -800,6 +816,13 @@ class RecipeModel {
         await invalidateCacheByPattern(
             `prisma:recipe:findManyForUser:${userId}`
         );
+    }
+
+    private async invalidateRecipeListCaches() {
+        await invalidateCacheByPattern('prisma:recipe:findMany:*');
+        await invalidateCacheByPattern('prisma:recipe:search:*');
+        await invalidateCacheByPattern('prisma:recipe:filterMany:*');
+        await invalidateCacheByPattern('prisma:recipe:findManyFrontPage:*');
     }
 
     /**

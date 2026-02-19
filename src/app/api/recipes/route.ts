@@ -9,16 +9,16 @@ import {
 import type { NextRequest } from 'next/server';
 import { withRateLimit } from '@/server/utils/rate-limit';
 import { withAuth } from '@/server/utils/reqwest';
-import type { Locale } from '@/common/types';
 import { z } from 'zod';
 import { validateQuery } from '@/server/utils/reqwest';
+import { SUPPORTED_LOCALES } from '@/common/constants';
 
 //|=============================================================================================|//
 //?                                     VALIDATION SCHEMAS                                      ?//
 //|=============================================================================================|//
 
 const FrontPageRecipesSchema = z.strictObject({
-    language: z.enum(['en', 'cs'], {
+    language: z.enum(SUPPORTED_LOCALES, {
         error: () => 'Language must be supported'
     }),
     batch: z.coerce.number().int().positive(),
@@ -32,7 +32,7 @@ const IngredientForCreateSchema = z.strictObject({
 });
 
 const RecipeForCreatePayloadSchema = z.strictObject({
-    language: z.enum(['en', 'cs'], {
+    language: z.enum(SUPPORTED_LOCALES, {
         error: () => 'Language must be supported'
     }),
     title: z.string().trim().min(1).max(200),
@@ -64,7 +64,7 @@ async function getHandler(request: NextRequest) {
     const { language, batch, perPage } = payload;
 
     const recipes = await recipeService.getFrontPageRecipes(
-        language as Locale,
+        language,
         batch,
         perPage
     );

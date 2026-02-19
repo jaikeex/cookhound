@@ -6,6 +6,7 @@ import {
     cachePrismaQuery,
     generateCacheKey
 } from '@/server/db/model/model-cache';
+import type { Locale } from '@/common/types';
 
 //|=============================================================================================|//
 
@@ -72,7 +73,7 @@ class IngredientModel {
      * Query class -> C2
      */
     async getManyByLanguage(
-        language: string,
+        language: Locale,
         ttl?: number
     ): Promise<{ id: number; name: string }[]> {
         log.trace('Getting ingredients by language', { language });
@@ -91,7 +92,8 @@ class IngredientModel {
                 return prisma.ingredient.findMany({
                     where: { language },
                     select: { id: true, name: true },
-                    orderBy: { name: 'asc' }
+                    orderBy: { name: 'asc' },
+                    take: 5000
                 });
             },
             ttl ?? CACHE_TTL.TTL_2

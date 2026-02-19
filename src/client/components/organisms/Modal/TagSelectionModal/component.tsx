@@ -136,7 +136,14 @@ export const TagSelectionModal: React.FC<TagSelectionModalProps> = ({
         close?.();
     }, [onCancel, close]);
 
-    if (isLoading || error) return <Loader />;
+    if (isLoading) return <Loader />;
+
+    if (error) {
+        alert({
+            message: t('app.error.default'),
+            variant: 'error'
+        });
+    }
 
     return (
         <div className="flex flex-col w-full h-full max-h-[85dvh] md:max-h-[70dvh] max-w-[90dvw] md:max-w-[80dvw] xl:max-w-[70dvw]">

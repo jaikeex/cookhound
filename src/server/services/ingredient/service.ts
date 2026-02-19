@@ -1,4 +1,4 @@
-import type { IngredientDTO } from '@/common/types';
+import type { IngredientDTO, Locale } from '@/common/types';
 import db from '@/server/db/model';
 import { Logger, LogServiceMethod } from '@/server/logger';
 
@@ -12,7 +12,7 @@ class IngredientService {
      * Get all ingredients for a language, sorted alphabetically.
      */
     @LogServiceMethod({ names: ['language'] })
-    async getAll(language: string): Promise<IngredientDTO[]> {
+    async getAll(language: Locale): Promise<IngredientDTO[]> {
         return db.ingredient.getManyByLanguage(language);
     }
 }

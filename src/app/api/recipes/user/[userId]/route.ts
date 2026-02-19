@@ -1,4 +1,4 @@
-import type { Locale } from '@/common/types';
+import { SUPPORTED_LOCALES } from '@/common/constants';
 import { ApplicationErrorCode } from '@/server/error/codes';
 import { ValidationError } from '@/server/error/server';
 import { recipeService } from '@/server/services';
@@ -11,7 +11,7 @@ import { z } from 'zod';
 //|=============================================================================================|//
 
 const RecipesByUserSchema = z.strictObject({
-    language: z.enum(['en', 'cs'], {
+    language: z.enum(SUPPORTED_LOCALES, {
         error: () => 'Language must be supported'
     }),
     batch: z.coerce.number().int().positive(),
@@ -49,7 +49,7 @@ async function getHandler(request: NextRequest) {
 
     const recipes = await recipeService.getUserRecipes(
         Number(userId),
-        language as Locale,
+        language,
         batch,
         perPage
     );

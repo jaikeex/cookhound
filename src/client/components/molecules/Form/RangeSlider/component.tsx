@@ -74,12 +74,14 @@ export const RangeSlider: React.FC<RangeSliderProps> = ({
     const parseInputValue = useCallback(
         (raw: string): number => {
             if (!allowDecimals) {
-                return Math.round(Number(raw.replace(/[^0-9]/g, '')));
+                // Keep a leading minus when the range allows negative values,
+                const sign = min < 0 && raw.startsWith('-') ? '-' : '';
+                return Math.round(Number(sign + raw.replace(/[^0-9]/g, '')));
             }
 
             return Number(raw);
         },
-        [allowDecimals]
+        [allowDecimals, min]
     );
 
     //———————————————————————————————————————————————————————————————————————————————————————————//

@@ -1,3 +1,5 @@
+'use client';
+
 import {
     RangeSlider,
     Typography,
@@ -8,13 +10,14 @@ import {
     IngredientFilterInput
 } from '@/client/components';
 import { chqc } from '@/client/request/queryClient';
-import { useLocale, useModal } from '@/client/store';
+import { useLocale, useModal, useSnackbar } from '@/client/store';
+import { generateRandomId } from '@/client/utils';
 import type {
     RecipeFilterParams,
     IngredientDTO,
     RecipeTagDTO
 } from '@/common/types';
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 
 export type RecipeFiltersProps = Readonly<{
     className?: string;
@@ -36,6 +39,18 @@ export const RecipeFilters: React.FC<RecipeFiltersProps> = ({
 }) => {
     const { locale, t } = useLocale();
     const { openModal } = useModal();
+    const { alert } = useSnackbar();
+
+    const [controlKey, setControlKey] = useState<string>(generateRandomId(6));
+
+    const handleClear = useCallback(() => {
+        /**
+         * Useful for visually resetting uncontrolled components. If this is passed
+         * as a prop, it will force a new mount on clearing the filters.
+         */
+        setControlKey(generateRandomId(6));
+        clearFilters?.();
+    }, [clearFilters]);
 
     //~-----------------------------------------------------------------------------------------~//
     //$                                    SUPPORT QUERIES                                      $//
@@ -57,24 +72,40 @@ export const RecipeFilters: React.FC<RecipeFiltersProps> = ({
      * All tags flattened from the tag lists so we can resolve names for selected tag ids.
      * Ingredients are already fetched above.
      */
-    const allTags = tagLists?.flatMap((list) => list.tags) ?? [];
-
-    const selectedTags = allTags.filter(
-        (tag) => filters.tags?.includes(tag.id) ?? false
+    const allTags = useMemo(
+        () => tagLists?.flatMap((list) => list.tags) ?? [],
+        [tagLists]
     );
 
-    const selectedContainsIngredients = (ingredients ?? []).filter(
-        (ing) => filters.containsIngredients?.includes(ing.id) ?? false
+    const selectedTags = useMemo(
+        () => allTags.filter((tag) => filters.tags?.includes(tag.id) ?? false),
+        [allTags, filters.tags]
     );
 
-    const selectedExcludesIngredients = (ingredients ?? []).filter(
-        (ing) => filters.excludesIngredients?.includes(ing.id) ?? false
+    const selectedContainsIngredients = useMemo(
+        () =>
+            (ingredients ?? []).filter(
+                (ing) => filters.containsIngredients?.includes(ing.id) ?? false
+            ),
+        [ingredients, filters.containsIngredients]
     );
 
-    const ingredientOptions = (ingredients ?? []).map((ing: IngredientDTO) => ({
-        value: String(ing.id),
-        label: ing.name
-    }));
+    const selectedExcludesIngredients = useMemo(
+        () =>
+            (ingredients ?? []).filter(
+                (ing) => filters.excludesIngredients?.includes(ing.id) ?? false
+            ),
+        [ingredients, filters.excludesIngredients]
+    );
+
+    const ingredientOptions = useMemo(
+        () =>
+            (ingredients ?? []).map((ing: IngredientDTO) => ({
+                value: String(ing.id),
+                label: ing.name
+            })),
+        [ingredients]
+    );
 
     const hasActiveFilters =
         (filters.tags?.length ?? 0) > 0 ||
@@ -92,13 +123,13 @@ export const RecipeFilters: React.FC<RecipeFiltersProps> = ({
         (tags: RecipeTagDTO[]) => {
             updateFilter(
                 'tags',
-                tags.map((t) => t.id)
+                tags.map((tag) => tag.id)
             );
         },
         [updateFilter]
     );
 
-    const getTagModalContent = React.useCallback(
+    const getTagModalContent = useCallback(
         () => (close: () => void) => (
             <FilterTagSelectionModal
                 close={close}
@@ -113,11 +144,11 @@ export const RecipeFilters: React.FC<RecipeFiltersProps> = ({
         [tagsError, selectedTags, isTagsLoading, handleSelectTags, tagLists]
     );
 
-    const openTagModal = React.useCallback(() => {
+    const openTagModal = useCallback(() => {
         openModal(getTagModalContent(), { hideCloseButton: true });
     }, [openModal, getTagModalContent]);
 
-    const removeTag = React.useCallback(
+    const removeTag = useCallback(
         (tagId: number) => () => {
             const next = (filters.tags ?? []).filter((id) => id !== tagId);
             updateFilter('tags', next.length > 0 ? next : undefined);
@@ -129,31 +160,63 @@ export const RecipeFilters: React.FC<RecipeFiltersProps> = ({
     //$                                   INGREDIENT FILTERS                                    $//
     //~-----------------------------------------------------------------------------------------~//
 
-    const handleContainsIngredientSelect = React.useCallback(
+    const handleContainsIngredientSelect = useCallback(
         (option: { value: string; label: string }) => {
             const id = Number(option.value);
             const prev = filters.containsIngredients ?? [];
 
-            if (prev.includes(id)) return;
+            if (filters.excludesIngredients?.includes(id)) {
+                alert({
+                    message: t('app.recipe.filter.contains-error'),
+                    variant: 'error'
+                });
+                return;
+            }
+
+            if (prev.includes(id)) {
+                return;
+            }
 
             updateFilter('containsIngredients', [...prev, id]);
         },
-        [filters.containsIngredients, updateFilter]
+        [
+            alert,
+            filters.containsIngredients,
+            filters.excludesIngredients,
+            updateFilter,
+            t
+        ]
     );
 
-    const handleExcludesIngredientSelect = React.useCallback(
+    const handleExcludesIngredientSelect = useCallback(
         (option: { value: string; label: string }) => {
             const id = Number(option.value);
             const prev = filters.excludesIngredients ?? [];
 
-            if (prev.includes(id)) return;
+            if (filters.containsIngredients?.includes(id)) {
+                alert({
+                    message: t('app.recipe.filter.excludes-error'),
+                    variant: 'error'
+                });
+                return;
+            }
+
+            if (prev.includes(id)) {
+                return;
+            }
 
             updateFilter('excludesIngredients', [...prev, id]);
         },
-        [filters.excludesIngredients, updateFilter]
+        [
+            alert,
+            filters.containsIngredients,
+            filters.excludesIngredients,
+            updateFilter,
+            t
+        ]
     );
 
-    const removeContainsIngredient = React.useCallback(
+    const removeContainsIngredient = useCallback(
         (id: number) => () => {
             const next = (filters.containsIngredients ?? []).filter(
                 (i) => i !== id
@@ -166,7 +229,7 @@ export const RecipeFilters: React.FC<RecipeFiltersProps> = ({
         [filters.containsIngredients, updateFilter]
     );
 
-    const removeExcludesIngredient = React.useCallback(
+    const removeExcludesIngredient = useCallback(
         (id: number) => () => {
             const next = (filters.excludesIngredients ?? []).filter(
                 (i) => i !== id
@@ -183,7 +246,7 @@ export const RecipeFilters: React.FC<RecipeFiltersProps> = ({
     //$                                     TIME RANGE FILTER                                   $//
     //~-----------------------------------------------------------------------------------------~//
 
-    const handleTimeChange = React.useCallback(
+    const handleTimeChange = useCallback(
         (min: number, max: number) => {
             const effectiveMin = min > 0 ? min : undefined;
             const effectiveMax = max < MAX_TIME_MINUTES ? max : undefined;
@@ -212,7 +275,7 @@ export const RecipeFilters: React.FC<RecipeFiltersProps> = ({
                         size="sm"
                         color="danger"
                         outlined
-                        onClick={clearFilters}
+                        onClick={handleClear}
                     >
                         {t('app.general.clear-all')}
                     </ButtonBase>
@@ -289,6 +352,7 @@ export const RecipeFilters: React.FC<RecipeFiltersProps> = ({
                 <RangeSlider
                     id="time-range"
                     name="time-range"
+                    key={controlKey}
                     label={t('app.recipe.filter.time-range')}
                     min={0}
                     max={MAX_TIME_MINUTES}
@@ -301,15 +365,14 @@ export const RecipeFilters: React.FC<RecipeFiltersProps> = ({
                 />
             </div>
 
-            <div className="flex items-center gap-3">
-                <FormCheckbox
-                    name="has-image"
-                    label={t('app.recipe.filter.has-image')}
-                    id="has-image"
-                    onChange={handleImageFilterChange}
-                    className="h-4 w-4 cursor-pointer accent-blue-600"
-                />
-            </div>
+            <FormCheckbox
+                name="has-image"
+                label={t('app.recipe.filter.has-image')}
+                id="has-image"
+                key={controlKey}
+                onChange={handleImageFilterChange}
+                className="h-4 w-4 cursor-pointer accent-blue-600"
+            />
         </div>
     );
 };

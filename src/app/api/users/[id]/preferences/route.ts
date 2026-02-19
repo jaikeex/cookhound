@@ -11,6 +11,7 @@ import {
 import type { NextRequest } from 'next/server';
 import { withAuth } from '@/server/utils/reqwest';
 import { z } from 'zod';
+import { SUPPORTED_LOCALES } from '@/common/constants';
 
 //|=============================================================================================|//
 //?                                     VALIDATION SCHEMAS                                      ?//
@@ -18,7 +19,7 @@ import { z } from 'zod';
 
 const UserPreferencesForUpdateSchema = z.strictObject({
     theme: z.enum(['light', 'dark', 'system']).optional(),
-    locale: z.enum(['en', 'cs']).optional()
+    locale: z.enum(SUPPORTED_LOCALES).optional()
 });
 
 //|=============================================================================================|//

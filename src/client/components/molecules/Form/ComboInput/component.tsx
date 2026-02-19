@@ -1,9 +1,16 @@
 'use client';
 
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, {
+    useCallback,
+    useEffect,
+    useRef,
+    useState,
+    useMemo
+} from 'react';
 import { BaseInput, Icon, InputError, InputLabel } from '@/client/components';
 import type { FormInputProps } from '@/client/components/molecules/Form/types';
 import { classNames } from '@/client/utils';
+import { useLocale } from '@/client/store';
 
 //~---------------------------------------------------------------------------------------------~//
 //$                                           TYPES                                             $//
@@ -18,6 +25,7 @@ export type ComboInputProps = Readonly<{
     options: ReadonlyArray<ComboInputOption>;
     placeholder?: string;
     defaultValue?: string;
+    noResultsMessage?: string;
     /** Called on every keystroke */
     onChange?: (value: string) => void;
     onSelect?: (option: ComboInputOption) => void;
@@ -37,6 +45,7 @@ export const ComboInput: React.FC<ComboInputProps> = ({
     id,
     label,
     name,
+    noResultsMessage,
     onChange,
     onSelect,
     options,
@@ -44,6 +53,8 @@ export const ComboInput: React.FC<ComboInputProps> = ({
     resetValueOnSelect,
     ...props
 }) => {
+    const { t } = useLocale();
+
     const [inputValue, setInputValue] = useState(defaultValue);
     const [isOpen, setIsOpen] = useState(false);
     const [highlightedIndex, setHighlightedIndex] = useState(-1);
@@ -51,8 +62,12 @@ export const ComboInput: React.FC<ComboInputProps> = ({
     const containerRef = useRef<HTMLDivElement>(null);
     const listRef = useRef<HTMLUListElement>(null);
 
-    const filteredOptions = options.filter((option) =>
-        option.label.toLowerCase().includes(inputValue.toLowerCase())
+    const filteredOptions = useMemo(
+        () =>
+            options.filter((option) =>
+                option.label.toLowerCase().includes(inputValue.toLowerCase())
+            ),
+        [inputValue, options]
     );
 
     //|-----------------------------------------------------------------------------------------|//
@@ -117,10 +132,10 @@ export const ComboInput: React.FC<ComboInputProps> = ({
     );
 
     const handleFocus = useCallback(() => {
-        if (filteredOptions.length > 0) {
+        if (filteredOptions.length > 0 || inputValue.length > 0) {
             setIsOpen(true);
         }
-    }, [filteredOptions.length]);
+    }, [filteredOptions.length, inputValue.length]);
 
     const handleKeyDown = useCallback(
         (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -207,6 +222,12 @@ export const ComboInput: React.FC<ComboInputProps> = ({
 
     const showDropdown = isOpen && filteredOptions.length > 0 && !disabled;
 
+    const showNoResults =
+        isOpen &&
+        inputValue.length > 0 &&
+        filteredOptions.length === 0 &&
+        !disabled;
+
     return (
         <div
             ref={containerRef}
@@ -231,7 +252,7 @@ export const ComboInput: React.FC<ComboInputProps> = ({
                     onFocus={handleFocus}
                     className="pr-8"
                     role="combobox"
-                    aria-expanded={showDropdown}
+                    aria-expanded={showDropdown || showNoResults}
                     aria-controls={`${id}-listbox`}
                     aria-autocomplete="list"
                     aria-activedescendant={
@@ -271,7 +292,6 @@ export const ComboInput: React.FC<ComboInputProps> = ({
                             key={option.value}
                             id={`${id}-option-${index}`}
                             role="option"
-                            aria-selected={index === highlightedIndex}
                             data-index={index}
                             onMouseDown={handleOptionMouseDown}
                             onMouseEnter={handleOptionMouseEnter}
@@ -288,6 +308,22 @@ export const ComboInput: React.FC<ComboInputProps> = ({
                         </li>
                     ))}
                 </ul>
+            ) : null}
+
+            {showNoResults ? (
+                <div
+                    role="status"
+                    aria-live="polite"
+                    className={classNames(
+                        'absolute z-50 mt-1 w-full rounded-md shadow-lg',
+                        'bg-gray-200 dark:bg-slate-950',
+                        'border border-slate-600 dark:border-gray-300',
+                        'px-3 py-2 text-sm',
+                        'text-gray-500 dark:text-gray-400'
+                    )}
+                >
+                    {noResultsMessage ?? t('app.general.no-results')}
+                </div>
             ) : null}
 
             {error ? <InputError message={error} /> : null}

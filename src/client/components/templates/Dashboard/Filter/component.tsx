@@ -1,12 +1,13 @@
 'use client';
 
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import type { ChangeEvent } from 'react';
 import {
     Banner,
     RecipeCardList,
     Typography,
-    RecipeFilters
+    RecipeFilters,
+    SkeletonCard
 } from '@/client/components';
 import type { RecipeFilterParams } from '@/common/types';
 import { useRecipeFilters } from '@/client/hooks';
@@ -31,6 +32,7 @@ export const FilterTemplate: React.FC<FilterTemplateProps> = ({
         filters,
         hasMore,
         isLoading,
+        isFetching,
         updateFilter,
         clearFilters,
         loadMore
@@ -54,6 +56,23 @@ export const FilterTemplate: React.FC<FilterTemplateProps> = ({
     //$                                          RENDER                                         $//
     //~-----------------------------------------------------------------------------------------~//
 
+    const Skeleton = useMemo(() => {
+        const gridCols = {
+            sm: GRID_COLS[2],
+            md: GRID_COLS[2],
+            lg: GRID_COLS[3],
+            xl: GRID_COLS[3]
+        };
+
+        const classes = `grid ${gridCols.sm} gap-4 md:${gridCols.md} lg:${gridCols.lg} xl:${gridCols.xl}`;
+
+        const skeletonCards = Array.from({ length: 12 }, (_, index) => (
+            <SkeletonCard key={index} />
+        ));
+
+        return <div className={classes}>{skeletonCards}</div>;
+    }, []);
+
     return (
         <div className="page-wrapper flex flex-col gap-4 mt-36 md:mt-40">
             <Banner
@@ -74,7 +93,9 @@ export const FilterTemplate: React.FC<FilterTemplateProps> = ({
                 </aside>
 
                 <div className="flex-1 min-w-0">
-                    {recipes.length > 0 ? (
+                    {isLoading && recipes.length === 0 ? (
+                        Skeleton
+                    ) : recipes.length > 0 ? (
                         <RecipeCardList
                             cols={{
                                 sm: GRID_COLS[2] ?? 'grid-cols-2',
@@ -85,7 +106,7 @@ export const FilterTemplate: React.FC<FilterTemplateProps> = ({
                             recipes={recipes}
                             loadMore={loadMore}
                             hasMore={hasMore}
-                            isLoading={isLoading}
+                            isLoading={isFetching}
                         />
                     ) : (
                         <div className="flex flex-col items-center justify-center w-full h-64">

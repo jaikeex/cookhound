@@ -1,11 +1,11 @@
 import type { NextRequest } from 'next/server';
 import { recipeService } from '@/server/services/recipe/service';
-import type { Locale } from '@/common/types';
 import { z } from 'zod';
 import { validateQuery } from '@/server/utils/reqwest';
 import { ApplicationErrorCode } from '@/server/error/codes';
 import { ValidationError } from '@/server/error/server';
 import { makeHandler, ok } from '@/server/utils/reqwest';
+import { SUPPORTED_LOCALES } from '@/common/constants';
 
 //|=============================================================================================|//
 //?                                     VALIDATION SCHEMAS                                      ?//
@@ -13,7 +13,7 @@ import { makeHandler, ok } from '@/server/utils/reqwest';
 
 const SearchRecipesByUserSchema = z.strictObject({
     query: z.string().trim().min(1).max(100),
-    language: z.enum(['en', 'cs'], {
+    language: z.enum(SUPPORTED_LOCALES, {
         error: () => 'Language must be supported'
     }),
     perPage: z.coerce.number().int().positive(),
@@ -50,7 +50,7 @@ async function getHandler(request: NextRequest) {
     const recipes = await recipeService.searchUserRecipes(
         Number(userId),
         query,
-        language as Locale,
+        language,
         batch,
         perPage
     );

@@ -1,3 +1,4 @@
+import type { ComboInputOption } from '@/client/components';
 import { ComboInput, ChipButton } from '@/client/components';
 import type { IngredientDTO } from '@/common/types';
 import React from 'react';
@@ -5,11 +6,11 @@ import React from 'react';
 export type IngredientFilterInputProps = Readonly<{
     id: string;
     name: string;
-    options: { value: string; label: string }[];
+    options: ComboInputOption[];
     placeholder: string;
     selectedIngredients: IngredientDTO[];
     chipColor: 'secondary' | 'danger';
-    onSelect: (option: { value: string; label: string }) => void;
+    onSelect: (option: ComboInputOption) => void;
     onRemove: (id: number) => () => void;
 }>;
 

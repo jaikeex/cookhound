@@ -33,9 +33,9 @@ export const Recipes: React.FC<RecipesProps> = ({
     if (isInitialLoading) {
         const gridCols = cols ?? {
             sm: GRID_COLS[2],
-            md: GRID_COLS[3],
-            lg: GRID_COLS[4],
-            xl: GRID_COLS[4]
+            md: GRID_COLS[2],
+            lg: GRID_COLS[3],
+            xl: GRID_COLS[3]
         };
 
         const baseClasses = `grid ${gridCols.sm} gap-4 md:${gridCols.md} lg:${gridCols.lg} xl:${gridCols.xl}`;
