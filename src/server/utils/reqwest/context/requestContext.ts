@@ -3,6 +3,7 @@ import { AsyncLocalStorage } from 'async_hooks';
 import { randomUUID } from 'crypto';
 import { cookies } from 'next/headers';
 import { sessions } from '@/server/utils/session/manager';
+import { setLoggerContextReader } from '@/server/logger/context-reader';
 import {
     DEFAULT_LOCALE,
     SESSION_COOKIE_NAME
@@ -213,3 +214,7 @@ export const RequestContext = {
         this.set('ip', value);
     }
 };
+
+//! Do not remove this
+//? See logger for more details
+setLoggerContextReader(RequestContext);

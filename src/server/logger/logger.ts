@@ -6,7 +6,7 @@ import type { Logger as WinstonLogger, transport } from 'winston';
 import { GoogleCloudLoggingTransport } from './transports';
 import { ENV_CONFIG_PRIVATE, ENV_CONFIG_PUBLIC } from '@/common/constants';
 import { LOG_LEVELS, type LogLevel } from './types';
-import { RequestContext } from '@/server/utils/reqwest/context';
+import { getLoggerContext } from '@/server/logger/context-reader';
 import { ServerError } from '@/server/error';
 import { ApplicationErrorCode } from '@/server/error/codes';
 
@@ -256,7 +256,7 @@ export class Logger {
             return true; // No sampling in dev
         }
 
-        const requestId = RequestContext.getRequestId();
+        const requestId = getLoggerContext().getRequestId();
 
         if (!requestId) {
             return Math.random() < 0.1;
@@ -299,8 +299,9 @@ export class Logger {
 
             finalMessage = this.serialise(message, additional);
 
-            const requestId = RequestContext.getRequestId();
-            const userId = RequestContext.getUserId();
+            const ctx = getLoggerContext();
+            const requestId = ctx.getRequestId();
+            const userId = ctx.getUserId();
 
             const requestIdMessagePart = requestId ? `[${requestId}]` : '[]';
             const userIdMessagePart = userId
