@@ -48,15 +48,22 @@ export const TagSelectionBox: React.FC<TagSelectionBoxProps> = ({
                     </Typography>
                 )}
             </div>
-            <ButtonBase
-                onClick={onSuggest}
-                color="secondary"
-                outlined
-                size="md"
-                className="w-24 ml-auto shrink-0"
-            >
-                {isLoading ? <Loader size="sm" /> : t('app.general.suggest')}
-            </ButtonBase>
+
+            {typeof onSuggest === 'function' ? (
+                <ButtonBase
+                    onClick={onSuggest}
+                    color="secondary"
+                    outlined
+                    size="md"
+                    className="w-24 ml-auto shrink-0"
+                >
+                    {isLoading ? (
+                        <Loader size="sm" />
+                    ) : (
+                        t('app.general.suggest')
+                    )}
+                </ButtonBase>
+            ) : null}
         </div>
     );
 };

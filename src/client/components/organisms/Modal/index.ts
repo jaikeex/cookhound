@@ -3,6 +3,7 @@ export * from './ImageCropperModal';
 export * from './ConsentSettingsModal';
 export * from './LogoutAllConfirmModal';
 export * from './TagSelectionModal';
+export * from './FilterTagSelectionModal';
 export * from './CreateCookbookModal';
 export * from './AddRecipeToCookbookModal';
 export * from './DeleteFromCookbookConfirmationModal';

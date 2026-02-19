@@ -16,13 +16,15 @@ type TagSelectionListProps = Readonly<{
     tagLists: TagListDTO[];
     selectedTags: RecipeTagDTO[];
     onSelect: (tag: RecipeTagDTO) => void;
+    showCategoryLimits?: boolean;
 }>;
 
 export const TagSelectionList: React.FC<TagSelectionListProps> = ({
     className,
     tagLists,
     selectedTags,
-    onSelect
+    onSelect,
+    showCategoryLimits = true
 }) => {
     const { t } = useLocale();
 
@@ -38,6 +40,8 @@ export const TagSelectionList: React.FC<TagSelectionListProps> = ({
 
     const isCategoryLimitReached = useCallback(
         (categoryId: number) => {
+            if (!showCategoryLimits) return false;
+
             const categoryLimit =
                 RECIPE_TAG_CATEGORY_LIMITS_BY_ID[
                     categoryId as keyof typeof RECIPE_TAG_CATEGORY_LIMITS_BY_ID
@@ -49,7 +53,7 @@ export const TagSelectionList: React.FC<TagSelectionListProps> = ({
 
             return selectedCount >= categoryLimit;
         },
-        [selectedTags]
+        [selectedTags, showCategoryLimits]
     );
 
     return (
@@ -61,37 +65,36 @@ export const TagSelectionList: React.FC<TagSelectionListProps> = ({
                             <Typography variant="heading-xs" className="mb-2">
                                 {t(CATEGORY_TRANSLATIONS[list.category])}
                             </Typography>
-                            <Typography
-                                variant="body-sm"
-                                className="mb-2 text-gray-600 dark:text-gray-400"
-                            >
-                                ({t('app.general.max')}:{' '}
-                                {
-                                    RECIPE_TAG_CATEGORY_LIMITS_BY_NAME[
-                                        list.category as keyof typeof RECIPE_TAG_CATEGORY_LIMITS_BY_NAME
-                                    ]
-                                }
-                                )
-                            </Typography>
+
+                            {showCategoryLimits ? (
+                                <Typography
+                                    variant="body-sm"
+                                    className="mb-2 text-gray-600 dark:text-gray-400"
+                                >
+                                    ({t('app.general.max')}:{' '}
+                                    {
+                                        RECIPE_TAG_CATEGORY_LIMITS_BY_NAME[
+                                            list.category as keyof typeof RECIPE_TAG_CATEGORY_LIMITS_BY_NAME
+                                        ]
+                                    }
+                                    )
+                                </Typography>
+                            ) : null}
                         </div>
 
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-2 gap-x-8">
-                            {list.tags.map((tag) => {
-                                return (
-                                    <TagSelect
-                                        key={tag.id}
-                                        name={tag.name}
-                                        disabled={
-                                            !getCheckedStatus(tag) &&
-                                            isCategoryLimitReached(
-                                                tag.categoryId
-                                            )
-                                        }
-                                        isChecked={getCheckedStatus(tag)}
-                                        onChange={handleToggle(tag)}
-                                    />
-                                );
-                            })}
+                            {list.tags.map((tag) => (
+                                <TagSelect
+                                    key={tag.id}
+                                    name={tag.name}
+                                    disabled={
+                                        !getCheckedStatus(tag) &&
+                                        isCategoryLimitReached(tag.categoryId)
+                                    }
+                                    isChecked={getCheckedStatus(tag)}
+                                    onChange={handleToggle(tag)}
+                                />
+                            ))}
                         </div>
                     </div>
                 ))}
