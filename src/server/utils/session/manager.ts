@@ -1,7 +1,7 @@
 import type { UserRole, Status } from '@/common/types';
 import { redisClient } from '@/server/integrations/redis';
 import { randomUUID } from 'crypto';
-import type { Logger as LoggerType } from '@/server/logger';
+import { Logger } from '@/server/logger';
 import { InfrastructureError, ValidationError } from '@/server/error';
 import { InfrastructureErrorCode } from '@/server/error/codes';
 import {
@@ -37,28 +37,7 @@ type CreateSessionOptions = {
 const SESSION_KEY_PREFIX = 'session';
 const USER_SESSIONS_KEY_PREFIX = 'user_sessions';
 
-let logInstance: LoggerType | null = null;
-
-//~=============================================================================================~//
-//$                                           LOGGER                                            $//
-//~=============================================================================================~//
-
-/**
- *# This lazy load is necessary here because this code is needed to be called from request context.
- *# Due to circular dependency problems, nothing that imports logger statically can be imported into
- *# the context, for reasons i did not have time to fix yet (the logger uses info from the context
- *# to anotate the request logs). I plan to resolve this once I encouter it again, but for now
- *# this is the only module that needs it, so here it is...
- */
-async function getLogger(): Promise<LoggerType> {
-    if (logInstance) {
-        return logInstance;
-    }
-
-    const { Logger } = await import('@/server/logger');
-    logInstance = Logger.getInstance('session-manager');
-    return logInstance;
-}
+const log = Logger.getInstance('session-manager');
 
 //~=============================================================================================~//
 //$                                            CLASS                                            $//
@@ -136,14 +115,14 @@ class SessionManager {
                 SessionManager.SESSION_TTL
             );
 
-            (await getLogger()).trace('createSession - success', {
+            log.trace('createSession - success', {
                 userId,
                 sessionId
             });
 
             return sessionId;
         } catch (error: unknown) {
-            (await getLogger()).error('createSession - error', error, {
+            log.error('createSession - error', error, {
                 userId
             });
 
@@ -203,7 +182,7 @@ class SessionManager {
 
             return session;
         } catch (error: unknown) {
-            (await getLogger()).error('validateSession - error', error, {
+            log.error('validateSession - error', error, {
                 sessionId
             });
 
@@ -250,11 +229,11 @@ class SessionManager {
 
             await redisClient.del(sessionKey);
 
-            (await getLogger()).trace('invalidateSession - success', {
+            log.trace('invalidateSession - success', {
                 sessionId
             });
         } catch (error: unknown) {
-            (await getLogger()).error('invalidateSession - error', error, {
+            log.error('invalidateSession - error', error, {
                 sessionId
             });
 
@@ -314,7 +293,7 @@ class SessionManager {
 
             return sessions;
         } catch (error: unknown) {
-            (await getLogger()).error('getUserSessions - error', error, {
+            log.error('getUserSessions - error', error, {
                 userId
             });
 
@@ -345,15 +324,11 @@ class SessionManager {
 
             await redisClient.del(userKey);
 
-            (await getLogger()).trace('invalidateAllUserSessions - success', {
+            log.trace('invalidateAllUserSessions - success', {
                 userId
             });
         } catch (error: unknown) {
-            (await getLogger()).error(
-                'invalidateAllUserSessions - error',
-                error,
-                { userId }
-            );
+            log.error('invalidateAllUserSessions - error', error, { userId });
 
             throw new InfrastructureError(
                 InfrastructureErrorCode.REDIS_COMMAND_FAILED,

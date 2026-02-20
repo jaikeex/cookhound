@@ -73,7 +73,10 @@ export const Banner: React.FC<BannerProps> = ({
                     </div>
 
                     {hideFiltersLink ? null : (
-                        <Link href={'/filter'}>
+                        <Link
+                            href={'/filter'}
+                            className="text-blue-700 dark:text-blue-200 hover:text-blue-500 dark:hover:text-blue-400"
+                        >
                             <Typography
                                 variant={'heading-xs'}
                                 className="font-semibold"

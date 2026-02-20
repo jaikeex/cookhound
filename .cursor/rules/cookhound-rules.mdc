@@ -278,13 +278,13 @@ try {
 
 ## Technologies used
 
--   **React 19.1.1**
--   **Next.js 15.5.3**
--   **TypeScript 5.9.2** with decorators support
--   **Tailwind CSS 3.4.17** with custom design system
--   **Vitest 2.1.1** for testing
--   **Prisma 6.16.1** with TypedSQL
--   **BullMQ 5.58.5** for job queues
+-   **React 19.2**
+-   **Next.js 16**
+-   **TypeScript 5.9.3** with decorators support
+-   **Tailwind CSS 4** with custom design system
+-   **Vitest 2** for testing
+-   **Prisma 7** with TypedSQL
+-   **BullMQ 5** for job queues
 
 Remember: Prioritize type safety, error handling, and user experience in all implementations. Follow the established patterns and maintain consistency with the existing codebase architecture.
 ```

@@ -143,7 +143,7 @@ export const mockEmailChangeRequest = {
     userId: validUser.id,
     newEmail: 'newemail@example.com',
     token: 'email-change-token-123',
-    expiresAt: new Date('2025-12-31T23:59:59.000Z'),
+    expiresAt: new Date('2099-12-31T23:59:59.000Z'),
     createdAt: new Date('2025-01-01T00:00:00.000Z')
 };
 

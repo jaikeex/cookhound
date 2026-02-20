@@ -101,7 +101,7 @@
         "emailVerificationToken": null,
         "emailVerificationTokenExpires": null,
         "passwordResetToken": "reset-token-123",
-        "passwordResetTokenExpires": "2025-12-31T23:59:59.000Z",
+        "passwordResetTokenExpires": "2099-12-31T23:59:59.000Z",
         "lastPasswordReset": null,
         "role": "user",
         "status": "active",

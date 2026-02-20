@@ -12,7 +12,7 @@ export type TextareaProps = Readonly<{
     placeholder?: string;
     rows?: number;
 }> &
-    Omit<FormInputProps, 'defaultValue' | 'onChange | onBlur'>;
+    Omit<FormInputProps, 'defaultValue' | 'onChange' | 'onBlur'>;
 
 export const Textarea: React.FC<TextareaProps> = ({
     className,

@@ -51,10 +51,12 @@ export function withRateLimit(
                 const identifier = getAppRouterClientIdentifier(req);
                 result = await rateLimiter.checkLimit(identifier);
             } catch (error: unknown) {
-                return NextResponse.json(
-                    { error: 'app.error.default' },
-                    { status: 500 }
-                );
+                // fail open in case of redis is outage
+                logger.warn('withRateLimit - skipping rate limit', {
+                    path: req.nextUrl.pathname
+                });
+
+                return handler(req, context);
             }
 
             if (!result.allowed) {

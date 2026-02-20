@@ -207,11 +207,11 @@ describe('SessionManager', () => {
             const lastUserSessionsCall =
                 userSessionsCalls[userSessionsCalls.length - 1];
 
-            expect(lastUserSessionsCall[1]).toEqual([
+            expect(lastUserSessionsCall?.[1]).toEqual([
                 ...existingSessions,
                 newSessionId
             ]);
-            expect(lastUserSessionsCall[2]).toBe(ONE_MONTH_IN_SECONDS);
+            expect(lastUserSessionsCall?.[2]).toBe(ONE_MONTH_IN_SECONDS);
         });
     });
 
