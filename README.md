@@ -15,7 +15,7 @@ These include:
 
 I am always open to feedback. Even though you came here for different reasons, If you would like to share any thoughts on this project, I would be very grateful!
 
-I was (of course) using llms for various tasks when writing this project, mainly the anthropic models (sonnet 4 and then 4.5 when it came out) as well as o3 from openai.
+I was (of course) using llms for various tasks when writing this project, mainly the anthropic models as well as o3 from openai when it was relevant.
 
 ## Overview
 
@@ -32,24 +32,23 @@ Cookhound is a full-stack web application built on a modern stack.
 
 Guiding principles: strict type-safety, clear separation of concerns, minimal runtime dependencies and, above all, realiability.
 
-### LOC count (as of 1.0.3)
+### LOC count (as of 1.1.1)
 
-Total : 898 files, 41137 codes, 6434 comments, 7902 blanks, all 55473 lines
+Total : 964 files, 45211 codes, 6991 comments, 8564 blanks, all 60766 lines
 
 | language           | files |   code | comment | blank |  total |
 | :----------------- | ----: | -----: | ------: | ----: | -----: |
-| TypeScript         |   606 | 21,718 |   5,251 | 4,941 | 31,910 |
-| TypeScript JSX     |   200 | 14,974 |     835 | 2,394 | 18,203 |
-| JSON               |    12 |  1,354 |       0 |    12 |  1,366 |
+| TypeScript         |   645 | 23,002 |   5,461 | 5,201 | 33,664 |
+| TypeScript JSX     |   213 | 16,863 |   1,049 | 2,718 | 20,630 |
+| JSON               |     9 |  1,383 |       0 |     9 |  1,392 |
+| JavaScript         |    13 |  1,328 |     208 |   186 |  1,722 |
+| PostCSS            |    10 |    857 |       9 |   127 |    993 |
 | MS SQL             |    22 |    840 |     244 |   155 |  1,239 |
-| JavaScript         |    11 |    534 |      29 |    90 |    653 |
-| Markdown           |     3 |    521 |       0 |   162 |    683 |
-| Prisma             |     1 |    329 |      44 |    66 |    439 |
-| YAML               |     4 |    276 |       0 |    23 |    299 |
-| XML                |    32 |    254 |       0 |    14 |    268 |
-| JSON with Comments |     2 |    139 |       5 |     7 |    151 |
-| CSS                |     1 |    118 |       6 |    25 |    149 |
-| Docker             |     1 |     71 |      15 |     8 |     94 |
+| Markdown           |     2 |    323 |       0 |   108 |    431 |
+| XML                |    41 |    288 |       0 |    23 |    311 |
+| YAML               |     4 |    199 |       0 |    23 |    222 |
+| Docker             |     1 |     74 |      15 |     8 |     97 |
+| JSON with Comments |     1 |     45 |       0 |     1 |     46 |
 | Shell Script       |     1 |      6 |       3 |     3 |     12 |
 | Ignore             |     1 |      2 |       0 |     1 |      3 |
 | TOML               |     1 |      1 |       2 |     1 |      4 |
@@ -60,7 +59,7 @@ Total : 898 files, 41137 codes, 6434 comments, 7902 blanks, all 55473 lines
 
 #### Node.js
 
-This project requires Node.js version 20 or higher.
+This project requires Node.js version 22 or higher.
 You can download and install Node.js from the official website: https://nodejs.org/en/
 
 #### Yarn
@@ -118,7 +117,7 @@ docker exec -it cookhound-web-1 bash
 The password must be surrounded by single quotes.
 
 ```bash
-redis-cli -h localhost -p 6379 -a 'password'
+redis-cli -h localhost -p 6379 -a '<password>'
 ```
 
 ### edit site nginx config

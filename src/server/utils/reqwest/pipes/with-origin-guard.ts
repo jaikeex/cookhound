@@ -1,13 +1,19 @@
-// with-origin-guard.ts
-
 import type { NextRequest, NextResponse } from 'next/server';
 import { AuthErrorForbidden } from '@/server/error';
 import { ENV_CONFIG_PRIVATE } from '@/common/constants/env';
 
-const ALLOWED_ORIGINS: ReadonlyArray<string> =
-    ENV_CONFIG_PRIVATE.ALLOWED_ORIGINS.split(',')
-        .map((o) => o.trim())
-        .filter(Boolean);
+// defer this to the first actual request.
+let _allowedOrigins: ReadonlyArray<string> | null = null;
+
+function getAllowedOrigins(): ReadonlyArray<string> {
+    if (!_allowedOrigins) {
+        _allowedOrigins = ENV_CONFIG_PRIVATE.ALLOWED_ORIGINS.split(',')
+            .map((origin) => origin.trim())
+            .filter(Boolean);
+    }
+
+    return _allowedOrigins;
+}
 
 /**
  * Simple guard to mitigate csrf.
@@ -46,7 +52,7 @@ export function withOriginGuard<
 
             try {
                 const { protocol, host } = new URL(value);
-                return ALLOWED_ORIGINS.includes(`${protocol}//${host}`);
+                return getAllowedOrigins().includes(`${protocol}//${host}`);
             } catch {
                 return false;
             }

@@ -51,17 +51,25 @@ const loadFromEnv = (
     }
 };
 
-const gsaMap = Object.freeze({
-    GOOGLE_LOGGING_WRITE_CREDENTIALS: (() =>
-        loadFromEnv('GOOGLE_LOGGING_CREDENTIALS_BASE64'))(),
-    GOOGLE_STORAGE_CREDENTIALS: (() =>
-        loadFromEnv('GOOGLE_STORAGE_CREDENTIALS_BASE64'))(),
-    GOOGLE_GMAIL_SEND_CREDENTIALS: (() =>
-        loadFromEnv('GOOGLE_GMAIL_CREDENTIALS_BASE64'))()
-});
+const gsaEnvMap = {
+    GOOGLE_LOGGING_WRITE_CREDENTIALS: 'GOOGLE_LOGGING_CREDENTIALS_BASE64',
+    GOOGLE_STORAGE_CREDENTIALS: 'GOOGLE_STORAGE_CREDENTIALS_BASE64',
+    GOOGLE_GMAIL_SEND_CREDENTIALS: 'GOOGLE_GMAIL_CREDENTIALS_BASE64'
+} as const;
+
+const gsaCache = new Map<string, ServiceAccount>();
 
 export const loadServiceAccount = async (
-    id: keyof typeof gsaMap
+    id: keyof typeof gsaEnvMap
 ): Promise<ServiceAccount> => {
-    return gsaMap[id];
+    const cached = gsaCache.get(id);
+
+    if (cached) {
+        return cached;
+    }
+
+    const account = loadFromEnv(gsaEnvMap[id]);
+    gsaCache.set(id, account);
+
+    return account;
 };
