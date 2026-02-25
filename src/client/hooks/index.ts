@@ -20,3 +20,4 @@ export * from './useUnsavedChangesWarning';
 export * from './useShoppingList';
 export * from './useKeyPress';
 export * from './useLogout';
+export * from './useCaptcha';

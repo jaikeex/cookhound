@@ -8,6 +8,7 @@ import type { NextRequest } from 'next/server';
 import { withRateLimit } from '@/server/utils/rate-limit';
 import { z } from 'zod';
 import { mailService } from '@/server/services';
+import { verifyCaptcha } from '@/server/utils/captcha';
 
 //|=============================================================================================|//
 //?                                     VALIDATION SCHEMAS                                      ?//
@@ -17,7 +18,8 @@ const ContactFormSchema = z.strictObject({
     name: z.string().trim().min(1).max(100),
     email: z.email().trim(),
     subject: z.string().trim().min(1).max(200),
-    message: z.string().trim().min(1).max(2000)
+    message: z.string().trim().min(1).max(2000),
+    captchaToken: z.string().min(1)
 });
 
 //|=============================================================================================|//
@@ -41,6 +43,8 @@ async function postHandler(request: NextRequest) {
     const rawPayload = await readJson(request);
 
     const payload = validatePayload(ContactFormSchema, rawPayload);
+
+    await verifyCaptcha(payload.captchaToken, 'contact');
 
     await mailService.sendContactForm(
         payload.name,

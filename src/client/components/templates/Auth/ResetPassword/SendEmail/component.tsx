@@ -5,12 +5,16 @@ import type {
     LoginFormErrors,
     SimpleEmailFormErrors
 } from '@/client/components';
-import { SimpleEmailForm, Typography } from '@/client/components';
-import type { ResetPasswordEmailPayload } from '@/common/types';
+import {
+    CaptchaDisclosure,
+    SimpleEmailForm,
+    Typography
+} from '@/client/components';
+import type { ResetPasswordEmailFormData } from '@/common/types';
 import { z } from 'zod';
 import { useLocale } from '@/client/store';
-
-import { validateFormData } from '@/client/utils';
+import { useCaptcha } from '@/client/hooks';
+import { validateFormData, executeCaptcha } from '@/client/utils';
 import type { I18nMessage } from '@/client/locales';
 import { chqc } from '@/client/request/queryClient';
 
@@ -36,6 +40,8 @@ export const SendResetPasswordEmailTemplate: React.FC<
     SendResetPasswordEmailTemplateProps
 > = ({ email }) => {
     const { t } = useLocale();
+
+    const { ready: captchaReady } = useCaptcha();
 
     const formRef = React.useRef<HTMLFormElement>(null);
 
@@ -77,7 +83,7 @@ export const SendResetPasswordEmailTemplate: React.FC<
 
             const formElement = event.currentTarget;
             const data = new FormData(formElement);
-            let formData: ResetPasswordEmailPayload;
+            let formData: ResetPasswordEmailFormData;
 
             try {
                 formData = extractFormData(data);
@@ -97,9 +103,18 @@ export const SendResetPasswordEmailTemplate: React.FC<
                 return;
             }
 
+            let captchaToken: string;
+
+            try {
+                captchaToken = await executeCaptcha('reset_password');
+            } catch (error: unknown) {
+                setFormErrors({ server: 'app.error.captcha-failed' });
+                return;
+            }
+
             setFormErrors({});
 
-            sendResetPasswordEmail(formData);
+            sendResetPasswordEmail({ ...formData, captchaToken });
         },
         [sendResetPasswordEmail]
     );
@@ -119,11 +134,13 @@ export const SendResetPasswordEmailTemplate: React.FC<
             <form className="w-full" onSubmit={handleSubmit} ref={formRef}>
                 <SimpleEmailForm
                     errors={formErrors}
-                    disabled={disabled}
+                    disabled={disabled || !captchaReady}
                     pending={isPending}
                     defaultEmail={email}
                 />
             </form>
+
+            <CaptchaDisclosure className="max-w-96" />
 
             {submitted ? (
                 <div className="space-y-4 mt-8!">
@@ -139,7 +156,7 @@ export const SendResetPasswordEmailTemplate: React.FC<
     );
 };
 
-function extractFormData(data: FormData): ResetPasswordEmailPayload {
+function extractFormData(data: FormData): ResetPasswordEmailFormData {
     return {
         email: data.get('email') as string
     };

@@ -2,13 +2,18 @@
 
 import React, { useCallback, useEffect, useState } from 'react';
 import type { ContactFormErrors } from '@/client/components';
-import { ContactForm, Typography } from '@/client/components';
+import {
+    CaptchaDisclosure,
+    ContactForm,
+    Typography
+} from '@/client/components';
 import type { ContactFormData } from '@/common/types';
 import { z } from 'zod';
-import { validateFormData } from '@/client/utils/form';
+import { validateFormData, executeCaptcha } from '@/client/utils';
 import { useLocale, useSnackbar } from '@/client/store';
 import type { I18nMessage } from '@/client/locales';
 import { chqc } from '@/client/request/queryClient';
+import { useCaptcha } from '@/client/hooks';
 
 //~---------------------------------------------------------------------------------------------~//
 //$                                          VALIDATION                                         $//
@@ -44,6 +49,8 @@ export const ContactTemplate: React.FC<ContactTemplateProps> = () => {
     const formRef = React.useRef<HTMLFormElement>(null);
 
     const [formErrors, setFormErrors] = useState<ContactFormErrors>({});
+
+    const { ready: captchaReady } = useCaptcha();
 
     const {
         mutate: submitContact,
@@ -82,8 +89,17 @@ export const ContactTemplate: React.FC<ContactTemplateProps> = () => {
                 return;
             }
 
+            let captchaToken: string;
+
+            try {
+                captchaToken = await executeCaptcha('contact');
+            } catch (error: unknown) {
+                setFormErrors({ server: 'app.error.captcha-failed' });
+                return;
+            }
+
             setFormErrors({});
-            submitContact(formData);
+            submitContact({ ...formData, captchaToken });
         },
         [submitContact]
     );
@@ -95,7 +111,7 @@ export const ContactTemplate: React.FC<ContactTemplateProps> = () => {
     }, [submitError]);
 
     return (
-        <div className="flex flex-col items-center w-full max-w-2xl mx-auto space-y-6 px-4">
+        <div className="flex flex-col items-center w-full max-w-2xl mx-auto space-y-6">
             <div className="text-center space-y-2">
                 <Typography variant="heading-lg" className="text-3xl font-bold">
                     {t('contact.page.title')}
@@ -109,8 +125,13 @@ export const ContactTemplate: React.FC<ContactTemplateProps> = () => {
             </div>
 
             <form className="w-full" onSubmit={handleSubmit} ref={formRef}>
-                <ContactForm errors={formErrors} pending={isPending} />
+                <ContactForm
+                    errors={formErrors}
+                    pending={isPending || !captchaReady}
+                />
             </form>
+
+            <CaptchaDisclosure className="max-w-96" />
         </div>
     );
 };

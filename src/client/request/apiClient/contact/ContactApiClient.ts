@@ -1,6 +1,6 @@
 import type { RequestConfig } from '@/client/request/apiClient/ApiRequestWrapper';
 import { apiRequestWrapper } from '@/client/request/apiClient/ApiRequestWrapper';
-import type { ContactFormData } from '@/common/types';
+import type { ContactFormPayload } from '@/common/types';
 
 /**
  * Service for contact form operations.
@@ -21,7 +21,7 @@ class ContactApiClient {
      * - 500: Internal Server Error, if email sending fails.
      */
     async submitContactForm(
-        data: ContactFormData,
+        data: ContactFormPayload,
         config?: RequestConfig
     ): Promise<{ success: boolean }> {
         return await apiRequestWrapper.post<{ success: boolean }>({

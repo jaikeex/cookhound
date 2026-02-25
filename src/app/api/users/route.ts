@@ -16,6 +16,7 @@ import { RequestContext } from '@/server/utils/reqwest/context';
 import { generateProofHash } from '@/server/utils/crypto';
 import { serializeTermsContent } from '@/server/utils/terms';
 import { withRateLimit } from '@/server/utils/rate-limit';
+import { verifyCaptcha } from '@/server/utils/captcha';
 
 //|=============================================================================================|//
 //?                                     VALIDATION SCHEMAS                                      ?//
@@ -34,7 +35,8 @@ const UserForCreateSchema = z.strictObject({
         .min(1, 'auth.error.password-required')
         .max(40, 'auth.error.password-max-length'),
     username: z.string().trim().min(3).max(40),
-    termsAccepted: z.boolean()
+    termsAccepted: z.boolean(),
+    captchaToken: z.string().min(1)
 });
 
 //|=============================================================================================|//
@@ -65,6 +67,8 @@ async function postHandler(request: NextRequest) {
     const rawPayload = await readJson(request);
 
     const payload = validatePayload(UserForCreateSchema, rawPayload);
+
+    await verifyCaptcha(payload.captchaToken, 'register');
 
     if (!payload.termsAccepted) {
         throw new ValidationError(

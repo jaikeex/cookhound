@@ -27,7 +27,8 @@ export const ENV_CONFIG_PUBLIC = createConfig(
             process.env.NEXT_PUBLIC_TYPESENSE_SEARCH_ONLY_KEY,
         TYPESENSE_HOST: process.env.NEXT_PUBLIC_TYPESENSE_HOST,
         TYPESENSE_PORT: process.env.NEXT_PUBLIC_TYPESENSE_PORT,
-        TYPESENSE_PROTOCOL: process.env.NEXT_PUBLIC_TYPESENSE_PROTOCOL
+        TYPESENSE_PROTOCOL: process.env.NEXT_PUBLIC_TYPESENSE_PROTOCOL,
+        CAPTCHA_SITE_KEY: process.env.NEXT_PUBLIC_CAPTCHA_SITE_KEY
     },
     'ENV_CONFIG_PUBLIC',
     process.env.NEXT_PUBLIC_ENV !== 'test'
@@ -68,7 +69,8 @@ export const ENV_CONFIG_PRIVATE = createConfig(
         ALLOWED_ORIGINS: process.env.ALLOWED_ORIGINS,
         MAIL_DRIVER: process.env.MAIL_DRIVER,
         MAIL_GMAIL_FROM: process.env.MAIL_GMAIL_FROM,
-        CONTACT_EMAIL: process.env.CONTACT_EMAIL
+        CONTACT_EMAIL: process.env.CONTACT_EMAIL,
+        CAPTCHA_SECRET_KEY: process.env.CAPTCHA_SECRET_KEY
     },
     'ENV_CONFIG_PRIVATE',
     process.env.NEXT_PUBLIC_ENV !== 'test' && typeof window === 'undefined'

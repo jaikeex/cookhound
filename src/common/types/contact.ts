@@ -4,3 +4,7 @@ export type ContactFormData = {
     subject: string;
     message: string;
 };
+
+export type ContactFormPayload = ContactFormData & {
+    captchaToken: string;
+};

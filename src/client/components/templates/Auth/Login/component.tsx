@@ -141,7 +141,7 @@ export const LoginTemplate: React.FC<LoginTemplateProps> = ({
     }, [error, loginError]);
 
     return (
-        <div className="flex flex-col items-center w-full max-w-md mx-auto space-y-4">
+        <div className="flex flex-col items-center w-full max-w-md mx-auto space-y-4 pt-4">
             <form className="w-full" onSubmit={handleSubmit} ref={formRef}>
                 <LoginForm
                     errors={formErrors}

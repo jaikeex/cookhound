@@ -5,6 +5,7 @@ export type UserForCreatePayload = {
     email: string;
     password: string;
     termsAccepted: boolean;
+    captchaToken: string;
 };
 
 export type UserForGoogleCreatePayload = {

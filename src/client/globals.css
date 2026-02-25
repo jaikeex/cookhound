@@ -37,3 +37,7 @@ arises that can be hotfixed by simply uncommenting this import. I will try and r
 @import './styles/utilities/logo.css';
 
 @import './styles/base.css';
+
+.grecaptcha-badge {
+    visibility: hidden !important;
+}

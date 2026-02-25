@@ -8,13 +8,15 @@ import {
 import { userService } from '@/server/services/user/service';
 import { z } from 'zod';
 import { withRateLimit } from '@/server/utils/rate-limit';
+import { verifyCaptcha } from '@/server/utils/captcha';
 
 //|=============================================================================================|//
 //?                                     VALIDATION SCHEMAS                                      ?//
 //|=============================================================================================|//
 
 const SendResetPasswordEmailSchema = z.strictObject({
-    email: z.email().trim()
+    email: z.email().trim(),
+    captchaToken: z.string().min(1)
 });
 
 const ResetPasswordSchema = z.strictObject({
@@ -37,6 +39,8 @@ async function postHandler(request: NextRequest) {
     const rawPayload = await readJson(request);
 
     const payload = validatePayload(SendResetPasswordEmailSchema, rawPayload);
+
+    await verifyCaptcha(payload.captchaToken, 'reset_password');
 
     const { email } = payload;
 

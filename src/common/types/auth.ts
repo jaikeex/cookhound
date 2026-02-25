@@ -11,6 +11,11 @@ export type AuthCodePayload = {
 
 export type ResetPasswordEmailPayload = {
     email: string;
+    captchaToken: string;
+};
+
+export type ResetPasswordEmailFormData = {
+    email: string;
 };
 
 export type ResetPasswordPayload = {

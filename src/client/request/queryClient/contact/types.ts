@@ -1,11 +1,11 @@
 import type { UseMutationOptions } from '@tanstack/react-query';
-import type { ContactFormData } from '@/common/types';
+import type { ContactFormPayload } from '@/common/types';
 import type { RequestError } from '@/client/error';
 
 export type SubmitContactFormOptions = UseMutationOptions<
     { success: boolean },
     RequestError,
-    ContactFormData
+    ContactFormPayload
 >;
 
 export const CONTACT_QUERY_KEYS = {

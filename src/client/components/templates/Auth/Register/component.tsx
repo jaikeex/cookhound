@@ -2,15 +2,16 @@
 
 import React, { useCallback, useEffect, useState } from 'react';
 import type { UserForCreatePayload } from '@/common/types';
-import { useGoogleSignIn } from '@/client/hooks';
+import { useGoogleSignIn, useCaptcha } from '@/client/hooks';
 import type { RegisterFormErrors } from '@/client/components';
 import {
+    CaptchaDisclosure,
     Divider,
     GoogleSigninButton,
     RegisterForm,
     Typography
 } from '@/client/components';
-import { validateFormData } from '@/client/utils';
+import { validateFormData, executeCaptcha } from '@/client/utils';
 import { useRouter } from 'next/navigation';
 import { useAuth, useLocale, useSnackbar } from '@/client/store';
 import type { I18nMessage } from '@/client/locales';
@@ -77,6 +78,8 @@ export const RegisterTemplate: React.FC<RegisterTemplateProps> = () => {
     const { setUser } = useAuth();
     const { alert } = useSnackbar();
     const { t } = useLocale();
+
+    const { ready: captchaReady } = useCaptcha();
 
     const formRef = React.useRef<HTMLFormElement>(null);
 
@@ -165,13 +168,23 @@ export const RegisterTemplate: React.FC<RegisterTemplateProps> = () => {
                 return;
             }
 
+            let captchaToken: string;
+
+            try {
+                captchaToken = await executeCaptcha('register');
+            } catch (error: unknown) {
+                setFormErrors({ server: 'app.error.captcha-failed' });
+                return;
+            }
+
             setFormErrors({});
 
             const userForCreate: UserForCreatePayload = {
                 username: formData.username,
                 email: formData.email,
                 password: formData.password,
-                termsAccepted: formData.termsAccepted
+                termsAccepted: formData.termsAccepted,
+                captchaToken
             };
 
             createUser(userForCreate);
@@ -190,11 +203,13 @@ export const RegisterTemplate: React.FC<RegisterTemplateProps> = () => {
     }, [createUserError, googleSignInError]);
 
     return (
-        <div className="flex flex-col items-center w-full max-w-md mx-auto space-y-4">
+        <div className="flex flex-col items-center w-full max-w-md mx-auto space-y-4 pt-4">
             <form className="w-full" onSubmit={handleSubmit} ref={formRef}>
                 <RegisterForm
                     errors={formErrors}
-                    pending={isPending || isGoogleSignInPending}
+                    pending={
+                        isPending || isGoogleSignInPending || !captchaReady
+                    }
                 />
             </form>
 
@@ -211,6 +226,8 @@ export const RegisterTemplate: React.FC<RegisterTemplateProps> = () => {
                 label={t('auth.form.continue-with-google')}
                 pending={isGoogleSignInPending}
             />
+
+            <CaptchaDisclosure className="max-w-96" />
         </div>
     );
 };

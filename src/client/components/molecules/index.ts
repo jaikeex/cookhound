@@ -2,6 +2,7 @@ export * from './Accordion';
 export * from './Banner';
 export * from './Filter';
 export * from './Button';
+export * from './CaptchaDisclosure';
 export * from './Card';
 export * from './ConsentRow';
 export * from './Footer';

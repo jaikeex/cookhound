@@ -52,6 +52,8 @@ jobs:
                       NEXT_PUBLIC_ORIGIN=${{ secrets.NEXT_PUBLIC_ORIGIN }}
                       NEXT_PUBLIC_COOKIE_DOMAIN=${{ secrets.NEXT_PUBLIC_COOKIE_DOMAIN }}
                       ALLOWED_ORIGINS=${{ secrets.ALLOWED_ORIGINS }}
+                      NEXT_PUBLIC_CAPTCHA_SITE_KEY=${{ secrets.NEXT_PUBLIC_CAPTCHA_SITE_KEY }}
+                      CAPTCHA_SECRET_KEY=${{ secrets.CAPTCHA_SECRET_KEY }}
                       GOOGLE_OAUTH_CLIENT_SECRET=${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
                       GOOGLE_OAUTH_REDIRECT_URI=${{ secrets.GOOGLE_OAUTH_REDIRECT_URI }}
                       SMTP_HOST=${{ secrets.SMTP_HOST }}

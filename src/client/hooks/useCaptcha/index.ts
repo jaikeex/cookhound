@@ -1,0 +1,1 @@
+export { useCaptcha } from './hook';

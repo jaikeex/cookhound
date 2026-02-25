@@ -19,6 +19,16 @@ declare global {
     // If FN does not return a promise, the return type itself is used.
     type AwaitedReturn<Fn extends (...args: any[]) => any> =
         ReturnType<Fn> extends Promise<infer R> ? R : ReturnType<Fn>;
+
+    interface Window {
+        grecaptcha?: {
+            ready: (cb: () => void) => void;
+            execute: (
+                siteKey: string,
+                opts: { action: string }
+            ) => Promise<string>;
+        };
+    }
 }
 
 export {};
