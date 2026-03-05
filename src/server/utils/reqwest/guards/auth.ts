@@ -1,7 +1,7 @@
 import type { ClientError } from '@/server/error';
 import { RequestContext } from '@/server/utils/reqwest/context';
 import { UserRole } from '@/common/types';
-import { AuthErrorUnauthorized } from '@/server/error';
+import { AuthErrorUnauthorized, AuthErrorForbidden } from '@/server/error';
 import { deleteSessionCookie } from '@/server/utils/session';
 
 /**
@@ -61,4 +61,22 @@ export function assertSelfOrAdmin(userId: number, error?: ClientError): void {
     if (currentUserId !== userId && role !== UserRole.Admin) {
         throw error ?? new AuthErrorUnauthorized();
     }
+}
+
+/**
+ * Asserts that the caller has the Admin role.
+ *
+ * @param error - The error to throw if the caller is not an admin.
+ * @throws {AuthErrorUnauthorized} If the caller is not authenticated.
+ * @throws {AuthErrorForbidden} If the caller is authenticated but not an admin.
+ */
+export function assertAdmin(error?: ClientError): number {
+    const userId = assertAuthenticated();
+    const role = RequestContext.getUserRole();
+
+    if (role !== UserRole.Admin) {
+        throw error ?? new AuthErrorForbidden();
+    }
+
+    return userId;
 }

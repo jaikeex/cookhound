@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { type UserRole, Status } from '@/common/types';
+import { UserRole, Status } from '@/common/types';
 import { ENV_CONFIG_PUBLIC } from '@/common/constants';
 import { MiddlewareError } from '@/server/error';
 import { type ServerSession } from './manager';
@@ -11,6 +11,7 @@ interface RouteConfig {
 }
 
 export const PROTECTED_ROUTES: RouteConfig[] = [
+    { path: '/admin', roles: [UserRole.Admin] },
     { path: '/recipe/create', roles: [] },
     { path: '/shopping-list', roles: [] },
     { path: '/user/change-email', roles: [] },
