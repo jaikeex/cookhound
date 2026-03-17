@@ -1,3 +1,4 @@
+export * from './admin/service';
 export * from './auth/service';
 export * from './ingredient/service';
 export * from './recipe/service';

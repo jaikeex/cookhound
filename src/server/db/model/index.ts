@@ -1,25 +1,27 @@
+import accountDeletionRequestModel from './account-deletion-request/model';
+import adminModel from './admin/model';
+import cookbookModel from './cookbook/model';
 import ingredientModel from './ingredient/model';
 import ratingModel from './rating/model';
 import recipeModel from './recipe/model';
 import recipeTagModel from './recipe-tag/model';
 import shoppingListModel from './shopping-list/model';
 import userModel from './user/model';
-import cookbookModel from './cookbook/model';
-import accountDeletionRequestModel from './account-deletion-request/model';
 
 //|---------------------------------------------------------------------------------------------|//
 //?                                           MODELS                                            ?//
 //|---------------------------------------------------------------------------------------------|//
 
 const dbModel = {
+    accountDeletionRequest: accountDeletionRequestModel,
+    admin: adminModel,
+    cookbook: cookbookModel,
     ingredient: ingredientModel,
     rating: ratingModel,
     recipe: recipeModel,
-    shoppingList: shoppingListModel,
     recipeTag: recipeTagModel,
-    user: userModel,
-    cookbook: cookbookModel,
-    accountDeletionRequest: accountDeletionRequestModel
+    shoppingList: shoppingListModel,
+    user: userModel
 };
 
 export default dbModel;
