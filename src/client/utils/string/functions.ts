@@ -28,3 +28,14 @@ export const multiplyNumberInString = (
 
     return result;
 };
+
+/**
+ * Formats an ISO date string to a short localized string representation.
+ */
+export function formatDate(isoDate: string): string {
+    return new Date(isoDate).toLocaleDateString(undefined, {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+    });
+}

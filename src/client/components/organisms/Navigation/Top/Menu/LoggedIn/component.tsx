@@ -8,7 +8,7 @@ import {
     ThemeSwitcher,
     Typography
 } from '@/client/components';
-import type { UserDTO } from '@/common/types';
+import { UserRole, type UserDTO } from '@/common/types';
 import { useLocale } from '@/client/store/I18nContext';
 import Link from 'next/link';
 
@@ -48,6 +48,21 @@ export const LoggedInMenuContent: React.FC<LoggedInMenuContentProps> = ({
                         {t('app.general.my-account')}
                     </ButtonBase>
                 </Link>
+
+                {user.role === UserRole.Admin ? (
+                    <Link
+                        href="/admin"
+                        className="flex flex-col items-center gap-4"
+                        tabIndex={-1}
+                    >
+                        <ButtonBase
+                            className="mx-auto w-52"
+                            aria-label={t('admin.title')}
+                        >
+                            {t('admin.title')}
+                        </ButtonBase>
+                    </Link>
+                ) : null}
 
                 <LogoutButton />
             </div>

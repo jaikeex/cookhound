@@ -12,7 +12,7 @@ export const FrontPageSkeleton: React.FC = () => {
             {/* Banner Skeleton */}
             <div
                 className={classNames(
-                    'fixed top-0 left-0 z-10 w-full h-[160px] md:h-[206px]',
+                    'fixed top-0 left-0 z-10 w-full h-40 md:h-51.5',
                     'bg-linear-to-b from-green-100 to-green-200 dark:from-gray-800 dark:to-gray-900'
                 )}
             >
@@ -34,7 +34,7 @@ export const FrontPageSkeleton: React.FC = () => {
             {/* Gradient Overlay Skeleton */}
             <div
                 className={classNames(
-                    'fixed left-0 w-dvw h-6 top-[160px] md:top-[204px] z-10',
+                    'fixed left-0 w-dvw h-6 top-40 md:top-51 z-10',
                     'bg-linear-to-b from-[#f0fdf4] via-[#f0fdf4] via-80% to-transparent',
                     'dark:from-[#030712] dark:via-[#030712] dark:via-80% dark:to-transparent'
                 )}
@@ -43,7 +43,7 @@ export const FrontPageSkeleton: React.FC = () => {
             {/* Recipe Cards Grid */}
             <div
                 className={classNames(
-                    'max-w-screen-sm px-4 mx-auto mt-32 md:mt-36 md:max-w-screen-md xl:max-w-screen-lg',
+                    'max-w-screen-sm px-4 mx-auto mt-32 md:mt-36 md:max-w-3xl xl:max-w-5xl',
                     'grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-4'
                 )}
             >
