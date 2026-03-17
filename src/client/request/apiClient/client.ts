@@ -1,3 +1,4 @@
+import { adminApiClient } from '@/client/request/apiClient/admin/AdminApiClient';
 import { userApiClient } from '@/client/request/apiClient/user/UserApiClient';
 import { recipeApiClient } from '@/client/request/apiClient/recipe/RecipeApiClient';
 import { authApiClient } from '@/client/request/apiClient/auth/AuthApiClient';
@@ -12,6 +13,7 @@ import { ingredientApiClient } from '@/client/request/apiClient/ingredient/Ingre
  * This allows for a single import point for all API services.
  */
 const apiClient = {
+    admin: adminApiClient,
     user: userApiClient,
     recipe: recipeApiClient,
     auth: authApiClient,

@@ -1,3 +1,4 @@
+import { adminQueryClient, ADMIN_QUERY_KEYS } from './admin';
 import { userQueryClient, USER_QUERY_KEYS } from './user';
 import { authQueryClient, AUTH_QUERY_KEYS } from './auth';
 import { recipeQueryClient, RECIPE_QUERY_KEYS } from './recipe';
@@ -15,6 +16,7 @@ import { ingredientQueryClient, INGREDIENT_QUERY_KEYS } from './ingredient';
  * Stands for Cookhound Query Client.
  */
 export const chqc = {
+    admin: adminQueryClient,
     user: userQueryClient,
     auth: authQueryClient,
     recipe: recipeQueryClient,
@@ -26,6 +28,7 @@ export const chqc = {
 };
 
 export const QUERY_KEYS = {
+    admin: ADMIN_QUERY_KEYS,
     user: USER_QUERY_KEYS,
     auth: AUTH_QUERY_KEYS,
     recipe: RECIPE_QUERY_KEYS,
