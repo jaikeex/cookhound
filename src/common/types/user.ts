@@ -50,7 +50,8 @@ export enum UserRole {
 
 export enum Status {
     Active = 'active',
-    PendingDeletion = 'pending_deletion'
+    PendingDeletion = 'pending_deletion',
+    Banned = 'banned'
 }
 
 export enum AuthType {

@@ -69,6 +69,15 @@ function redirectToRestrictedWithLogin(pathname: string) {
     );
 }
 
+function redirectToBanned() {
+    throw new MiddlewareError(
+        'Account banned',
+        NextResponse.redirect(
+            new URL('/error/banned', ENV_CONFIG_PUBLIC.ORIGIN)
+        )
+    );
+}
+
 function redirectToProfile(userId: number) {
     throw new MiddlewareError(
         'Account pending deletion - access restricted to profile only',
@@ -156,6 +165,11 @@ export const verifyRouteAccess: MiddlewareStepFunction = async (request) => {
     //?--------------------------------------------------------------------------------
     // From now on, the route is protected and the user is logged in and authenticated.
     //?--------------------------------------------------------------------------------
+
+    // If the user is banned, end it right here
+    if (session && session.status === Status.Banned) {
+        return redirectToBanned();
+    }
 
     // Check if user has pending deletion status
     if (session && session.status === Status.PendingDeletion) {

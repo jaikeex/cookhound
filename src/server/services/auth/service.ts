@@ -81,6 +81,15 @@ class AuthService {
             );
         }
 
+        if (user.status === 'banned') {
+            log.info('login - account banned', { email });
+
+            throw new AuthErrorForbidden(
+                'auth.error.account-banned',
+                ApplicationErrorCode.ACCOUNT_BANNED
+            );
+        }
+
         if (!user.emailVerified) {
             log.info('login - email not verified', { email });
             throw new AuthErrorForbidden(
@@ -202,6 +211,17 @@ class AuthService {
         let user: UserDTO;
 
         if (dbUser) {
+            if (dbUser.status === 'banned') {
+                log.info('loginWithGoogle - account banned', {
+                    email: userInfoData.email
+                });
+
+                throw new AuthErrorForbidden(
+                    'auth.error.account-banned',
+                    ApplicationErrorCode.ACCOUNT_BANNED
+                );
+            }
+
             log.trace('loginWithGoogle - user found', {
                 email: userInfoData.email
             });
