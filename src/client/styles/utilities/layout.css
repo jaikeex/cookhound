@@ -28,6 +28,26 @@
     }
 }
 
+@utility page-wrapper-wide {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: var(--breakpoint-sm);
+
+    @media (width >= 768px) {
+        max-width: var(--breakpoint-md);
+    }
+
+    @media (width >= 1024px) {
+        max-width: var(--breakpoint-xl);
+    }
+
+    @media (width >= 2000px) {
+        max-width: var(--breakpoint-2xl);
+    }
+}
+
 @utility sheet {
     background-color: var(--color-gray-200);
     box-shadow: -4px 4px 15px 0 rgba(0, 0, 0, 0.3);

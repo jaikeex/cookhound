@@ -32,7 +32,7 @@ export const Select: React.FC<SelectProps> = ({
     placeholder
 }) => {
     return (
-        <React.Fragment>
+        <div className="relative w-full">
             {label ? (
                 <InputLabel htmlFor={id} text={label} disabled={disabled} />
             ) : null}
@@ -79,6 +79,6 @@ export const Select: React.FC<SelectProps> = ({
 
                 {error ? <InputError message={error} /> : null}
             </div>
-        </React.Fragment>
+        </div>
     );
 };

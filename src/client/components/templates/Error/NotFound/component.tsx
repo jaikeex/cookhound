@@ -24,7 +24,7 @@ export const NotFoundTemplate: React.FC<NotFoundTemplateProps> = () => {
     }, []);
 
     return (
-        <div className="flex flex-col items-center min-h-screen pt-10 text-center">
+        <div className="flex flex-col items-center pt-10 text-center">
             <Logo className="logo-md mb-8" />
 
             <Typography variant="heading-lg" className="mb-4">

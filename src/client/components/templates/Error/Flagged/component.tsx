@@ -11,7 +11,7 @@ export const FlaggedTemplate: React.FC<FlaggedTemplateProps> = () => {
     const { t } = useLocale();
 
     return (
-        <div className="flex flex-col items-center min-h-screen pt-10 text-center">
+        <div className="flex flex-col items-center pt-10 text-center">
             <Typography variant="heading-lg" className="mb-4">
                 {t('app.recipe.error.flagged')}
             </Typography>

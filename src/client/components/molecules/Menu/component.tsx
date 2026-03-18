@@ -22,6 +22,11 @@ export const Menu: React.FC<MenuProps> = ({ className, items, ...props }) => {
     const pathname = usePathname();
     const searchParams = useSearchParams();
 
+    const hasExactPathnameMatch = items.some((item) => {
+        const p = new URL(item.href, ENV_CONFIG_PUBLIC.ORIGIN).pathname;
+        return pathname === p;
+    });
+
     const menuItems = items.map(({ href, label }) => {
         const hrefUrl = new URL(href, ENV_CONFIG_PUBLIC.ORIGIN);
         const hrefPathname = hrefUrl.pathname;
@@ -43,13 +48,16 @@ export const Menu: React.FC<MenuProps> = ({ className, items, ...props }) => {
          * Consider a path active if:
          * 1. The full URL (pathname + navigational query params) matches exactly, OR
          * 2. The pathname matches exactly and href has no query params, OR
-         * 3. The current path is a child route of the href path (for nested routes) and href has no query params
+         * 3. The current path is a child route of the href path (for nested routes)
+         *    and href has no query params
          */
         const isExactUrlMatch = currentUrl === href;
         const hasNoQueryParams = hrefSearchParams.toString() === '';
         const isExactPathnameMatch = pathname === hrefPathname;
         const isChildRoute =
-            hrefPathname !== '/' && pathname.startsWith(`${hrefPathname}/`);
+            !hasExactPathnameMatch &&
+            hrefPathname !== '/' &&
+            pathname.startsWith(`${hrefPathname}/`);
 
         const isActive =
             isExactUrlMatch ||

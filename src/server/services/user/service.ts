@@ -32,7 +32,7 @@ import type {
     CookieConsentForVerifyDTO
 } from '@/common/types/cookie-consent';
 import type { TermsAcceptanceForCreate } from '@/common/types';
-import { ONE_DAY_IN_MILLISECONDS } from '@/common/constants';
+import { DEFAULT_LOCALE, ONE_DAY_IN_MILLISECONDS } from '@/common/constants';
 import { areConsentsEqual } from '@/common/utils';
 import {
     generateProofHash,
@@ -41,6 +41,7 @@ import {
 } from '@/server/utils/crypto';
 import { serializeTermsContent } from '@/server/utils/terms';
 import { serializeConsentContent } from '@/server/utils/consent';
+import { RequestContext } from '@/server/utils/reqwest/context';
 
 //|=============================================================================================|//
 
@@ -1265,7 +1266,7 @@ class UserService {
             );
         }
 
-        if (user.status === 'pending_deletion') {
+        if (user.status === Status.PendingDeletion) {
             log.warn('initiateAccountDeletion - deletion already pending', {
                 userId
             });
@@ -1325,10 +1326,12 @@ class UserService {
         //|-------------------------------------------------------------------------------------|//
 
         try {
+            const locale = RequestContext.getUserLocale() ?? DEFAULT_LOCALE;
+
             await mailService.sendAccountDeletionConfirmation(
                 user.email,
                 user.username,
-                scheduledFor.toISOString()
+                scheduledFor.toLocaleDateString(locale)
             );
         } catch (error) {
             log.error('Failed to send account deletion confirmation email', {
@@ -1372,7 +1375,7 @@ class UserService {
             );
         }
 
-        if (user.status !== 'pending_deletion') {
+        if (user.status !== Status.PendingDeletion) {
             log.warn('cancelAccountDeletion - user not pending deletion', {
                 userId
             });

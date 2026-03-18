@@ -9,9 +9,7 @@ export const DesktopRecipeViewSkeleton: React.FC<
     DesktopRecipeViewSkeletonProps
 > = ({ className }) => {
     return (
-        <div
-            className={`max-w-screen-md 3xl:max-w-screen-lg px-4 mx-auto ${className}`}
-        >
+        <div className={`max-w-3xl 3xl:max-w-5xl px-4 mx-auto ${className}`}>
             <div className={'space-y-4'}>
                 <div className={'flex justify-between gap-12'}>
                     <div
