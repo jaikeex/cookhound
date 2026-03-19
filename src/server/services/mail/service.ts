@@ -107,6 +107,29 @@ class MailService {
     }
 
     /**
+     * Sends a notice that an admin has scheduled the user's account for deletion.
+     *
+     * @param email - The recipient's email address.
+     * @param username - The recipient's username.
+     * @param scheduledDate - The scheduled deletion date (formatted string).
+     */
+    @LogServiceMethod({ names: ['email', 'username', 'scheduledDate'] })
+    async sendAdminAccountDeletionNotice(
+        email: string,
+        username: string,
+        scheduledDate: string
+    ) {
+        await queueManager.addJob(
+            JOB_NAMES.SEND_ADMIN_ACCOUNT_DELETION_NOTICE,
+            {
+                scheduledDate,
+                to: { name: username, address: email },
+                locale: RequestContext.getUserLocale() ?? DEFAULT_LOCALE
+            }
+        );
+    }
+
+    /**
      * Sends an account deletion reminder email.
      *
      * @param email - The recipient's email address.

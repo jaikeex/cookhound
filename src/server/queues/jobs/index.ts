@@ -36,6 +36,7 @@ export * from './emails/SendEmailChangeConfirmationJob';
 export * from './emails/SendEmailChangeNoticeJob';
 export * from './emails/SendEmailChangedAuditJob';
 export * from './emails/SendAccountDeletionConfirmationJob';
+export * from './emails/SendAdminAccountDeletionNoticeJob';
 export * from './emails/SendAccountDeletionReminderJob';
 export * from './emails/SendAccountDeletionCancelledJob';
 export * from './emails/SendAccountDeletedJob';

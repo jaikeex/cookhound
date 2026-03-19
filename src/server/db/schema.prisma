@@ -55,6 +55,7 @@ model User {
   @@index([emailVerificationToken])
   @@index([passwordResetToken])
   @@index([status])
+  @@index([role])
   @@index([deletionScheduledFor])
   @@map("users")
 }
@@ -435,4 +436,20 @@ model CookbookBookmark {
   @@unique([userId, bookmarkOrder])
   @@index([cookbookId])
   @@map("cookbook_bookmarks")
+}
+
+model AdminActionLog {
+  id           Int      @id @default(autoincrement())
+  adminUserId  Int      @map("admin_user_id")
+  targetUserId Int      @map("target_user_id")
+  action       String   @db.VarChar(50)
+  details      Json?    @default("{}")
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamp(3)
+
+  /// Indexes
+  @@index([adminUserId])
+  @@index([targetUserId])
+  @@index([action])
+  @@index([createdAt])
+  @@map("admin_action_logs")
 }

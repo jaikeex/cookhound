@@ -65,6 +65,7 @@ export function assertSelfOrAdmin(userId: number, error?: ClientError): void {
 
 /**
  * Asserts that the caller has the Admin role.
+ * Returns the authenticated admin id for convenience.
  *
  * @param error - The error to throw if the caller is not an admin.
  * @throws {AuthErrorUnauthorized} If the caller is not authenticated.
@@ -79,4 +80,21 @@ export function assertAdmin(error?: ClientError): number {
     }
 
     return userId;
+}
+
+/**
+ * Asserts that the admin is not performing an action on themselves.
+ * Returns the authenticated admin id for convenience.
+ *
+ * @param targetUserId - The target user id.
+ * @throws {AuthErrorForbidden} If the admin is targeting themselves.
+ */
+export function assertAdminAndNotSelf(targetUserId: number): number {
+    const adminUserId = assertAdmin();
+
+    if (adminUserId === targetUserId) {
+        throw new AuthErrorForbidden('admin.users.error.self-action');
+    }
+
+    return adminUserId;
 }

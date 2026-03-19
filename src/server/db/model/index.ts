@@ -1,4 +1,5 @@
 import accountDeletionRequestModel from './account-deletion-request/model';
+import adminActionLogModel from './admin-action-log/model';
 import adminModel from './admin/model';
 import cookbookModel from './cookbook/model';
 import ingredientModel from './ingredient/model';
@@ -14,6 +15,7 @@ import userModel from './user/model';
 
 const dbModel = {
     accountDeletionRequest: accountDeletionRequestModel,
+    adminActionLog: adminActionLogModel,
     admin: adminModel,
     cookbook: cookbookModel,
     ingredient: ingredientModel,
