@@ -350,12 +350,6 @@ class AdminService {
         // Invalidate sessions so the user sees the pending deletion state
         await sessions.invalidateAllUserSessions(targetUserId);
 
-        await this.changeUserStatus(
-            targetUserId,
-            Status.Banned,
-            'Admin deletion scheduled'
-        );
-
         const proofHash = createHash('sha256')
             .update(`${targetUserId}-${scheduledFor.toISOString()}`)
             .digest('hex');

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import { Menu, Typography, type MenuItem } from '@/client/components';
+import { Menu, NavTabs, Typography, type MenuItem } from '@/client/components';
 import { useLocale } from '@/client/store/I18nContext';
 
 type AdminLayoutShellProps = Readonly<{
@@ -9,7 +9,12 @@ type AdminLayoutShellProps = Readonly<{
 }>;
 
 const NAV_ITEM_KEYS = [
-    { href: '/admin', labelKey: 'admin.nav.dashboard' as const }
+    { href: '/admin', labelKey: 'admin.nav.dashboard' as const },
+    { href: '/admin/users', labelKey: 'admin.nav.users' as const },
+    {
+        href: '/admin/api-docs',
+        labelKey: 'admin.nav.apiDocs' as const
+    }
 ] as const;
 
 export const AdminLayoutShell: React.FC<AdminLayoutShellProps> = ({
@@ -27,7 +32,7 @@ export const AdminLayoutShell: React.FC<AdminLayoutShellProps> = ({
     );
 
     return (
-        <div className="page-wrapper flex flex-col md:flex-row gap-6 mt-8">
+        <div className="page-wrapper-wide flex flex-col md:flex-row gap-6 mt-8">
             <div className="w-full md:w-56 shrink-0">
                 <Typography
                     variant="label"
@@ -36,7 +41,16 @@ export const AdminLayoutShell: React.FC<AdminLayoutShellProps> = ({
                     {t('admin.title')}
                 </Typography>
 
-                <Menu items={menuItems} aria-label="Admin navigation" />
+                <Menu
+                    items={menuItems}
+                    aria-label="Admin navigation"
+                    className="hidden md:flex"
+                />
+                <NavTabs
+                    items={menuItems}
+                    aria-label="Admin navigation"
+                    className="md:hidden"
+                />
             </div>
 
             <main className="flex-1 min-w-0">{children}</main>

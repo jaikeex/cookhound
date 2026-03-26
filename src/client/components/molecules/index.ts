@@ -13,6 +13,7 @@ export * from './IngredientCategory';
 export * from './InstructionRow';
 export * from './Instructions';
 export * from './Menu';
+export * from './NavTabs';
 export * from './List';
 export * from './Pagination';
 export * from './Popup';
