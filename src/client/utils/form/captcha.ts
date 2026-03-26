@@ -7,6 +7,10 @@ import type { CaptchaAction } from '@/common/types';
  * @param action - name for the action being protected.
  */
 export function executeCaptcha(action: CaptchaAction): Promise<string> {
+    if (!ENV_CONFIG_PUBLIC.CAPTCHA_SITE_KEY) {
+        return Promise.resolve('captcha-bypass');
+    }
+
     return new Promise((resolve, reject) => {
         if (typeof window === 'undefined' || !window.grecaptcha) {
             reject(new Error('grecaptcha not loaded'));

@@ -62,7 +62,8 @@ export async function createVerifiedTestUser() {
                     username: testUser.username,
                     email: testUser.email,
                     password: testUser.password,
-                    termsAccepted: testUser.termsAccepted
+                    termsAccepted: testUser.termsAccepted,
+                    captchaToken: 'e2e-test-bypass'
                 })
             }
         );

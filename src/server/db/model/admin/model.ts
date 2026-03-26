@@ -1,4 +1,4 @@
-import type { Prisma } from '@/server/db/generated/prisma';
+import type { Prisma } from '@/server/db/generated/prisma/client';
 import { prisma } from '@/server/integrations';
 import { Logger } from '@/server/logger';
 

@@ -72,7 +72,7 @@ export const UserResponseSchema = z.object({
     email: z.string().nullable(),
     cookieConsent: z.array(CookieConsentResponseSchema).nullable(),
     termsAcceptance: z.array(TermsAcceptanceResponseSchema).nullable(),
-    preferences: z.object({}).passthrough(),
+    preferences: z.record(z.string(), z.any()),
     role: z.enum(['guest', 'user', 'admin']),
     status: z.enum(['active', 'pending_deletion', 'banned']),
     authType: z.enum(['local', 'google']),

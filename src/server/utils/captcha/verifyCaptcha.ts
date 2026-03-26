@@ -1,4 +1,4 @@
-import { ENV_CONFIG_PRIVATE } from '@/common/constants/env';
+import { ENV_CONFIG_PRIVATE, isE2ETestMode } from '@/common/constants/env';
 import type { CaptchaAction } from '@/common/types';
 import { ValidationError } from '@/server/error';
 import { Logger } from '@/server/logger';
@@ -27,6 +27,10 @@ export async function verifyCaptcha(
     token: string,
     action: CaptchaAction
 ): Promise<void> {
+    if (isE2ETestMode()) {
+        return;
+    }
+
     let data: RecaptchaVerifyResponse;
 
     try {

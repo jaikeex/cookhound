@@ -16,6 +16,11 @@ export function useCaptcha(): { ready: boolean } {
     const [ready, setReady] = useState(false);
 
     useEffect(() => {
+        if (!ENV_CONFIG_PUBLIC.CAPTCHA_SITE_KEY) {
+            setReady(true);
+            return;
+        }
+
         const script = document.createElement('script');
 
         script.src = `https://www.google.com/recaptcha/api.js?render=${ENV_CONFIG_PUBLIC.CAPTCHA_SITE_KEY}`;
