@@ -11,6 +11,11 @@ import {
 } from '@/server/utils/reqwest';
 import { withAdmin } from '@/server/utils/reqwest/pipes';
 import { withRateLimit } from '@/server/utils/rate-limit';
+import {
+    registerRouteDocs,
+    AdminUserDetailResponseSchema
+} from '@/server/utils/api-docs';
+import { AuthLevel } from '@/common/types';
 
 //|=============================================================================================|//
 //?                                     VALIDATION SCHEMAS                                      ?//
@@ -77,3 +82,55 @@ export const DELETE = makeHandler(
     withAdmin,
     withRateLimit({ maxRequests: 30, windowSizeInSeconds: 60 })
 );
+
+//|=============================================================================================|//
+//?                                        DOCUMENTATION                                        ?//
+//|=============================================================================================|//
+
+registerRouteDocs('/api/admin/users/{userId}', {
+    category: 'Admin',
+    subcategory: 'User Management',
+    GET: {
+        summary: 'Get detailed user information.',
+        description: `Returns full admin-level detail for a
+            user.`,
+        auth: AuthLevel.ADMIN,
+        rateLimit: { maxRequests: 30, windowSizeInSeconds: 60 },
+        clientUsage: [
+            {
+                apiClient: 'apiClient.admin.getUserById',
+                hook: 'chqc.admin.useAdminUserDetail'
+            }
+        ],
+        responses: {
+            200: {
+                description: 'Detailed user data',
+                schema: AdminUserDetailResponseSchema
+            },
+            401: 'Not authenticated',
+            403: 'Not an admin',
+            404: 'User not found',
+            429: 'Rate limit exceeded'
+        }
+    },
+    DELETE: {
+        summary: 'Schedule user account deletion.',
+        description: `Cannot target own account.`,
+        auth: AuthLevel.ADMIN,
+        rateLimit: { maxRequests: 30, windowSizeInSeconds: 60 },
+        bodySchema: ScheduleDeletionSchema,
+        clientUsage: [
+            {
+                apiClient: 'apiClient.admin.scheduleAccountDeletion',
+                hook: 'chqc.admin.useScheduleAccountDeletion'
+            }
+        ],
+        responses: {
+            204: 'Deletion scheduled',
+            401: 'Not authenticated',
+            403: 'Not an admin or targeting self',
+            404: 'User not found',
+            429: 'Rate limit exceeded'
+        }
+    }
+});

@@ -13,6 +13,8 @@ import type { NextRequest } from 'next/server';
 import { z } from 'zod';
 import { ApplicationErrorCode } from '@/server/error/codes';
 import { withAuth } from '@/server/utils/reqwest';
+import { registerRouteDocs, UserResponseSchema } from '@/server/utils/api-docs';
+import { AuthLevel } from '@/common/types';
 
 //|=============================================================================================|//
 //?                                     VALIDATION SCHEMAS                                      ?//
@@ -88,3 +90,53 @@ export const PUT = makeHandler(
         windowSizeInSeconds: 60 * 60 // 1 hour
     })
 );
+
+//|=============================================================================================|//
+//?                                        DOCUMENTATION                                        ?//
+//|=============================================================================================|//
+
+registerRouteDocs('/api/users/me/email', {
+    category: 'Users',
+    subcategory: 'Account',
+    POST: {
+        summary: 'Request an email address change.',
+        description: `Sends a confirmation link to the new address.
+            Not applied until confirmed.`,
+        auth: AuthLevel.AUTHENTICATED,
+        rateLimit: { maxRequests: 5, windowSizeInSeconds: 3600 },
+        bodySchema: ChangeEmailSchema,
+        clientUsage: [
+            {
+                apiClient: 'apiClient.user.initiateEmailChange',
+                hook: 'chqc.user.useInitiateEmailChange'
+            }
+        ],
+        responses: {
+            204: 'Confirmation email sent',
+            400: 'Validation failed',
+            401: 'Not authenticated',
+            429: 'Rate limit exceeded'
+        }
+    },
+    PUT: {
+        summary: 'Verify and complete an email change via token.',
+        description: `Confirms the email change using the
+            verification token.`,
+        auth: AuthLevel.PUBLIC,
+        rateLimit: { maxRequests: 5, windowSizeInSeconds: 3600 },
+        clientUsage: [
+            {
+                apiClient: 'apiClient.user.confirmEmailChange',
+                hook: 'chqc.user.useConfirmEmailChange'
+            }
+        ],
+        responses: {
+            200: {
+                description: 'Email changed, updated user data',
+                schema: UserResponseSchema
+            },
+            400: 'Invalid or expired token',
+            429: 'Rate limit exceeded'
+        }
+    }
+});

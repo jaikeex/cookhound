@@ -3,6 +3,11 @@ import type { NextRequest } from 'next/server';
 import { NotFoundError, ValidationError } from '@/server/error';
 import { makeHandler, ok } from '@/server/utils/reqwest';
 import { ApplicationErrorCode } from '@/server/error/codes';
+import {
+    registerRouteDocs,
+    RecipeResponseSchema
+} from '@/server/utils/api-docs';
+import { AuthLevel } from '@/common/types';
 
 //|=============================================================================================|//
 
@@ -44,3 +49,29 @@ async function getHandler(request: NextRequest) {
 }
 
 export const GET = makeHandler(getHandler);
+
+//|=============================================================================================|//
+//?                                        DOCUMENTATION                                        ?//
+//|=============================================================================================|//
+
+registerRouteDocs('/api/recipes/display/{displayId}', {
+    category: 'Recipes',
+    GET: {
+        summary: 'Get a recipe by display ID.',
+        description: `Returns the full recipe detail.`,
+        auth: AuthLevel.PUBLIC,
+        clientUsage: [
+            {
+                apiClient: 'apiClient.recipe.getRecipeByDisplayId',
+                hook: 'chqc.recipe.useRecipeByDisplayId'
+            }
+        ],
+        responses: {
+            200: {
+                description: 'Recipe data',
+                schema: RecipeResponseSchema
+            },
+            404: 'Recipe not found'
+        }
+    }
+});

@@ -10,6 +10,8 @@ import {
 import { withRateLimit } from '@/server/utils/rate-limit/wrapper';
 import { withAuth } from '@/server/utils/reqwest';
 import { z } from 'zod';
+import { registerRouteDocs } from '@/server/utils/api-docs/registry';
+import { AuthLevel } from '@/common/types';
 
 //|=============================================================================================|//
 //?                                     VALIDATION SCHEMAS                                      ?//
@@ -64,3 +66,32 @@ export const POST = makeHandler(
         windowSizeInSeconds: 60
     })
 );
+
+//|=============================================================================================|//
+//?                                        DOCUMENTATION                                        ?//
+//|=============================================================================================|//
+
+registerRouteDocs('/api/recipes/{id}/ratings', {
+    category: 'Recipes',
+    subcategory: 'Ratings & Visits',
+    POST: {
+        summary: 'Rate a recipe.',
+        description: `Upserts — one rating per user per recipe.`,
+        auth: AuthLevel.AUTHENTICATED,
+        rateLimit: { maxRequests: 10, windowSizeInSeconds: 60 },
+        paramsSchema: RatingParamsSchema,
+        bodySchema: RatingForCreateSchema,
+        clientUsage: [
+            {
+                apiClient: 'apiClient.recipe.rateRecipe',
+                hook: 'chqc.recipe.useRateRecipe'
+            }
+        ],
+        responses: {
+            200: 'Rating submitted',
+            400: 'Invalid recipe ID or rating',
+            401: 'Not authenticated',
+            429: 'Rate limit exceeded'
+        }
+    }
+});

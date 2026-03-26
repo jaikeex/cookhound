@@ -6,6 +6,17 @@ import { ENV_CONFIG_PRIVATE } from '@/common/constants';
 import { withRateLimit } from '@/server/utils/rate-limit';
 import { withAuth } from '@/server/utils/reqwest';
 import { randomUUID } from 'crypto';
+import { registerRouteDocs } from '@/server/utils/api-docs/registry';
+import { AuthLevel } from '@/common/types';
+import { z } from 'zod';
+
+//|=============================================================================================|//
+//?                                     RESPONSE SCHEMAS                                        ?//
+//|=============================================================================================|//
+
+const FileUploadResponseSchema = z.object({
+    objectUrl: z.string()
+});
 
 /**
  * Handles POST requests to `/api/file/recipe-img` to upload a recipe image.
@@ -39,3 +50,34 @@ export const POST = makeHandler(
         windowSizeInSeconds: 600 // 10 minutes
     })
 );
+
+//|=============================================================================================|//
+//?                                        DOCUMENTATION                                        ?//
+//|=============================================================================================|//
+
+registerRouteDocs('/api/file/recipe-img', {
+    category: 'File Upload',
+    subcategory: 'Images',
+    POST: {
+        summary: 'Upload a recipe image.',
+        description: `WebP only.`,
+        auth: AuthLevel.AUTHENTICATED,
+        rateLimit: { maxRequests: 10, windowSizeInSeconds: 600 },
+        requestContentType: 'multipart/form-data',
+        clientUsage: [
+            {
+                apiClient: 'apiClient.file.uploadRecipeImage',
+                hook: 'chqc.file.useUploadRecipeImage'
+            }
+        ],
+        responses: {
+            200: {
+                description: 'Object URL of the uploaded image',
+                schema: FileUploadResponseSchema
+            },
+            401: 'Not authenticated',
+            415: 'Unsupported media type',
+            429: 'Rate limit exceeded'
+        }
+    }
+});

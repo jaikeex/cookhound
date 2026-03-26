@@ -11,6 +11,8 @@ import { z } from 'zod';
 import { ApplicationErrorCode } from '@/server/error/codes';
 import { ValidationError } from '@/server/error/server';
 import { withRateLimit } from '@/server/utils/rate-limit';
+import { registerRouteDocs } from '@/server/utils/api-docs/registry';
+import { AuthLevel } from '@/common/types';
 
 //|=============================================================================================|//
 //?                                     VALIDATION SCHEMAS                                      ?//
@@ -70,3 +72,29 @@ export const POST = makeHandler(
         windowSizeInSeconds: 15
     })
 );
+
+//|=============================================================================================|//
+//?                                        DOCUMENTATION                                        ?//
+//|=============================================================================================|//
+
+registerRouteDocs('/api/recipes/{id}/visits', {
+    category: 'Recipes',
+    subcategory: 'Ratings & Visits',
+    POST: {
+        summary: 'Record a recipe visit.',
+        description: `Also updates last-viewed history if userId
+            is provided.`,
+        auth: AuthLevel.PUBLIC,
+        rateLimit: { maxRequests: 10, windowSizeInSeconds: 15 },
+        bodySchema: RecipeVisitForCreateSchema,
+        clientUsage: [
+            {
+                apiClient: 'apiClient.recipe.registerRecipeVisit',
+                hook: 'chqc.recipe.useRegisterRecipeVisit'
+            }
+        ],
+        responses: {
+            201: 'Visit recorded'
+        }
+    }
+});

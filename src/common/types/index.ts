@@ -12,3 +12,4 @@ export * from './cookbook';
 export * from './terms-acceptance';
 
 export * from './dto';
+export * from './api-docs';

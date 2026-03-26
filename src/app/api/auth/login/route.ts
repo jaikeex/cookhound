@@ -12,6 +12,8 @@ import { z } from 'zod';
 import { ApplicationErrorCode } from '@/server/error/codes';
 import { createSessionCookie } from '@/server/utils/session/cookie';
 import { withRateLimit } from '@/server/utils/rate-limit';
+import { registerRouteDocs, UserResponseSchema } from '@/server/utils/api-docs';
+import { AuthLevel } from '@/common/types';
 
 //|=============================================================================================|//
 //?                                     VALIDATION SCHEMAS                                      ?//
@@ -82,3 +84,33 @@ export const POST = makeHandler(
         windowSizeInSeconds: 60
     })
 );
+
+//|=============================================================================================|//
+//?                                        DOCUMENTATION                                        ?//
+//|=============================================================================================|//
+
+registerRouteDocs('/api/auth/login', {
+    category: 'Auth',
+    subcategory: 'Credentials',
+    POST: {
+        summary: 'Authenticate a user with email and password.',
+        description: `Creates a session and sets a cookie. The
+            keepLoggedIn flag extends session lifetime.`,
+        auth: AuthLevel.GUEST,
+        rateLimit: { maxRequests: 10, windowSizeInSeconds: 60 },
+        bodySchema: LoginSchema,
+        clientUsage: [
+            { apiClient: 'apiClient.auth.login', hook: 'chqc.auth.useLogin' }
+        ],
+        responses: {
+            200: {
+                description: 'User data with session cookie',
+                schema: UserResponseSchema
+            },
+            400: 'Validation failed',
+            401: 'Invalid credentials',
+            403: 'Already authenticated',
+            429: 'Rate limit exceeded'
+        }
+    }
+});

@@ -12,6 +12,8 @@ import type { NextRequest } from 'next/server';
 import { withAuth } from '@/server/utils/reqwest';
 import { z } from 'zod';
 import { SUPPORTED_LOCALES } from '@/common/constants';
+import { registerRouteDocs } from '@/server/utils/api-docs/registry';
+import { AuthLevel } from '@/common/types';
 
 //|=============================================================================================|//
 //?                                     VALIDATION SCHEMAS                                      ?//
@@ -55,3 +57,30 @@ async function putHandler(request: NextRequest) {
 
 // not rate limited by design
 export const PUT = makeHandler(putHandler, withAuth);
+
+//|=============================================================================================|//
+//?                                        DOCUMENTATION                                        ?//
+//|=============================================================================================|//
+
+registerRouteDocs('/api/users/{id}/preferences', {
+    category: 'Users',
+    subcategory: 'Profile',
+    PUT: {
+        summary: 'Update user preferences (theme, locale).',
+        description: `Owner-only. Persists UI preferences
+            (theme, locale).`,
+        auth: AuthLevel.AUTHENTICATED,
+        bodySchema: UserPreferencesForUpdateSchema,
+        clientUsage: [
+            {
+                apiClient: 'apiClient.user.updateUserPreferences',
+                hook: 'chqc.user.useUpdateUserPreferences'
+            }
+        ],
+        responses: {
+            204: 'Preferences updated',
+            401: 'Not authenticated',
+            403: 'Not authorized'
+        }
+    }
+});

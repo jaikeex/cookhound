@@ -7,6 +7,8 @@ import { ApplicationErrorCode } from '@/server/error/codes';
 import { createSessionCookie } from '@/server/utils/session/cookie';
 import { assertAnonymous, ok } from '@/server/utils/reqwest';
 import { withRateLimit } from '@/server/utils/rate-limit';
+import { registerRouteDocs, UserResponseSchema } from '@/server/utils/api-docs';
+import { AuthLevel } from '@/common/types';
 
 //|=============================================================================================|//
 //?                                     VALIDATION SCHEMAS                                      ?//
@@ -70,3 +72,36 @@ export const POST = makeHandler(
         windowSizeInSeconds: 60
     })
 );
+
+//|=============================================================================================|//
+//?                                        DOCUMENTATION                                        ?//
+//|=============================================================================================|//
+
+registerRouteDocs('/api/auth/google', {
+    category: 'Auth',
+    subcategory: 'OAuth',
+    POST: {
+        summary: 'Authenticate with a Google OAuth authorization code.',
+        description: `Logs in an existing linked account or creates
+            a new one.`,
+        auth: AuthLevel.GUEST,
+        rateLimit: { maxRequests: 10, windowSizeInSeconds: 60 },
+        bodySchema: GoogleAuthSchema,
+        clientUsage: [
+            {
+                apiClient: 'apiClient.auth.loginWithGoogleOauth',
+                hook: 'chqc.auth.useLoginWithGoogleOauth'
+            }
+        ],
+        responses: {
+            200: {
+                description: 'User data with session cookie',
+                schema: UserResponseSchema
+            },
+            400: 'Validation failed',
+            401: 'Google authentication failed',
+            403: 'Already authenticated',
+            429: 'Rate limit exceeded'
+        }
+    }
+});

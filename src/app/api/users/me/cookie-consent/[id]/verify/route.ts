@@ -9,6 +9,25 @@ import {
     assertSelfOrAdmin
 } from '@/server/utils/reqwest';
 import type { NextRequest } from 'next/server';
+import { registerRouteDocs } from '@/server/utils/api-docs';
+import { AuthLevel } from '@/common/types';
+import { z } from 'zod';
+
+//|=============================================================================================|//
+//?                                     VALIDATION SCHEMAS                                      ?//
+//|=============================================================================================|//
+
+const ConsentVerifyResponseSchema = z.object({
+    valid: z.boolean(),
+    details: z.object({
+        version: z.string(),
+        createdAt: z.string(),
+        verified: z.string(),
+        accepted: z.array(z.string()),
+        storedHash: z.string(),
+        computedHash: z.string().optional()
+    })
+});
 
 //|=============================================================================================|//
 //?                                          HANDLERS                                           ?//
@@ -66,3 +85,26 @@ async function getHandler(request: NextRequest) {
 }
 
 export const GET = makeHandler(getHandler, withAuth);
+
+//|=============================================================================================|//
+//?                                        DOCUMENTATION                                        ?//
+//|=============================================================================================|//
+
+registerRouteDocs('/api/users/me/cookie-consent/{id}/verify', {
+    category: 'Users',
+    subcategory: 'Compliance',
+    GET: {
+        summary: 'Verify the integrity of a cookie consent record.',
+        description: `Checks that the consent record has not been
+            tampered with.`,
+        auth: AuthLevel.AUTHENTICATED,
+        responses: {
+            200: {
+                description: 'Verification result with hash comparison',
+                schema: ConsentVerifyResponseSchema
+            },
+            401: 'Not authenticated',
+            403: 'Not authorized'
+        }
+    }
+});

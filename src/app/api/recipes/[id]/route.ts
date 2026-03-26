@@ -1,3 +1,7 @@
+import {
+    registerRouteDocs,
+    RecipeResponseSchema
+} from '@/server/utils/api-docs';
 import { recipeService } from '@/server/services/recipe/service';
 import type { NextRequest } from 'next/server';
 import { NotFoundError, ValidationError } from '@/server/error';
@@ -13,6 +17,7 @@ import { ApplicationErrorCode } from '@/server/error/codes';
 import { z } from 'zod';
 import { withRateLimit } from '@/server/utils/rate-limit/wrapper';
 import { SUPPORTED_LOCALES } from '@/common/constants';
+import { AuthLevel } from '@/common/types';
 
 //|=============================================================================================|//
 //?                                     VALIDATION SCHEMAS                                      ?//
@@ -150,3 +155,69 @@ export const PUT = makeHandler(
 );
 
 export const DELETE = makeHandler(deleteHandler, withAuth);
+
+//|=============================================================================================|//
+//?                                        DOCUMENTATION                                        ?//
+//|=============================================================================================|//
+
+registerRouteDocs('/api/recipes/{id}', {
+    category: 'Recipes',
+    GET: {
+        summary: 'Get a recipe by ID.',
+        description: `Returns the full recipe detail.`,
+        auth: AuthLevel.PUBLIC,
+        clientUsage: [
+            {
+                apiClient: 'apiClient.recipe.getRecipeById',
+                hook: 'chqc.recipe.useRecipeById'
+            }
+        ],
+        responses: {
+            200: {
+                description: 'Recipe data',
+                schema: RecipeResponseSchema
+            },
+            400: 'Invalid recipe ID',
+            404: 'Recipe not found'
+        }
+    },
+    PUT: {
+        summary: 'Update a recipe.',
+        description: `Owner-only. All fields can be modified.`,
+        auth: AuthLevel.AUTHENTICATED,
+        rateLimit: { maxRequests: 5, windowSizeInSeconds: 60 },
+        bodySchema: RecipeForUpdateSchema,
+        clientUsage: [
+            {
+                apiClient: 'apiClient.recipe.updateRecipe',
+                hook: 'chqc.recipe.useUpdateRecipe'
+            }
+        ],
+        responses: {
+            200: {
+                description: 'Updated recipe',
+                schema: RecipeResponseSchema
+            },
+            400: 'Invalid ID or payload',
+            401: 'Not authenticated',
+            429: 'Rate limit exceeded'
+        }
+    },
+    DELETE: {
+        summary: 'Delete a recipe.',
+        description: `Owner-only. Also removes from the search
+            index.`,
+        auth: AuthLevel.AUTHENTICATED,
+        clientUsage: [
+            {
+                apiClient: 'apiClient.recipe.deleteRecipe',
+                hook: 'chqc.recipe.useDeleteRecipe'
+            }
+        ],
+        responses: {
+            204: 'Recipe deleted',
+            400: 'Invalid recipe ID',
+            401: 'Not authenticated'
+        }
+    }
+});

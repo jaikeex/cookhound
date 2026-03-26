@@ -12,6 +12,11 @@ import { userService } from '@/server/services/user/service';
 import { withAuth } from '@/server/utils/reqwest';
 import { z } from 'zod';
 import { withRateLimit } from '@/server/utils/rate-limit';
+import {
+    registerRouteDocs,
+    ShoppingListResponseSchema
+} from '@/server/utils/api-docs';
+import { AuthLevel } from '@/common/types';
 
 //|=============================================================================================|//
 //?                                     VALIDATION SCHEMAS                                      ?//
@@ -161,3 +166,97 @@ export const PUT = makeHandler(
     })
 );
 export const DELETE = makeHandler(deleteHandler, withAuth);
+
+//|=============================================================================================|//
+//?                                        DOCUMENTATION                                        ?//
+//|=============================================================================================|//
+
+registerRouteDocs('/api/users/{id}/shopping-list', {
+    category: 'Users',
+    subcategory: 'Shopping List',
+    GET: {
+        summary: 'Get the shopping list for a user.',
+        description: `Returns the shopping list grouped by recipe.`,
+        auth: AuthLevel.AUTHENTICATED,
+        clientUsage: [
+            {
+                apiClient: 'apiClient.user.getShoppingList',
+                hook: 'chqc.user.useShoppingList'
+            }
+        ],
+        responses: {
+            200: {
+                description: 'Shopping list data',
+                schema: ShoppingListResponseSchema
+            },
+            401: 'Not authenticated',
+            403: 'Not authorized'
+        }
+    },
+    POST: {
+        summary: 'Add a recipe to the shopping list.',
+        description: `Upserts — if the recipe is already on the
+            list, the existing entry is replaced.`,
+        auth: AuthLevel.AUTHENTICATED,
+        rateLimit: { maxRequests: 10, windowSizeInSeconds: 60 },
+        bodySchema: ShoppingListPayloadSchema,
+        clientUsage: [
+            {
+                apiClient: 'apiClient.user.upsertShoppingList',
+                hook: 'chqc.user.useUpsertShoppingList'
+            }
+        ],
+        responses: {
+            200: {
+                description: 'Updated shopping list',
+                schema: ShoppingListResponseSchema
+            },
+            400: 'Validation failed',
+            401: 'Not authenticated',
+            403: 'Not authorized',
+            429: 'Rate limit exceeded'
+        }
+    },
+    PUT: {
+        summary: 'Update a shopping list entry.',
+        description: `Updates ingredient states for a recipe on
+            the shopping list.`,
+        auth: AuthLevel.AUTHENTICATED,
+        rateLimit: { maxRequests: 10, windowSizeInSeconds: 60 },
+        bodySchema: ShoppingListPayloadSchema,
+        clientUsage: [
+            {
+                apiClient: 'apiClient.user.updateShoppingList',
+                hook: 'chqc.user.useUpdateShoppingList'
+            }
+        ],
+        responses: {
+            200: {
+                description: 'Updated shopping list',
+                schema: ShoppingListResponseSchema
+            },
+            400: 'Validation failed',
+            401: 'Not authenticated',
+            403: 'Not authorized',
+            429: 'Rate limit exceeded'
+        }
+    },
+    DELETE: {
+        summary: 'Remove a recipe from the shopping list.',
+        description: `Clears the entire list if no recipeId is
+            provided.`,
+        auth: AuthLevel.AUTHENTICATED,
+        bodySchema: DeleteShoppingListPayloadSchema,
+        clientUsage: [
+            {
+                apiClient: 'apiClient.user.deleteShoppingList',
+                hook: 'chqc.user.useDeleteShoppingList'
+            }
+        ],
+        responses: {
+            204: 'Removed',
+            401: 'Not authenticated',
+            403: 'Not authorized'
+        }
+    }
+});

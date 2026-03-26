@@ -7,6 +7,11 @@ import {
 } from '@/server/utils/reqwest';
 import type { NextRequest } from 'next/server';
 import { z } from 'zod';
+import {
+    registerRouteDocs,
+    RecipeDisplayResponseSchema
+} from '@/server/utils/api-docs';
+import { AuthLevel } from '@/common/types';
 
 //|=============================================================================================|//
 //?                                     VALIDATION SCHEMAS                                      ?//
@@ -38,3 +43,32 @@ async function getHandler(request: NextRequest) {
 }
 
 export const GET = makeHandler(getHandler);
+
+//|=============================================================================================|//
+//?                                        DOCUMENTATION                                        ?//
+//|=============================================================================================|//
+
+registerRouteDocs('/api/users/{id}/last-viewed', {
+    category: 'Users',
+    subcategory: 'Profile',
+    GET: {
+        summary: 'Get last viewed recipes for a user.',
+        description: `Owner-only. Ordered by view time
+            descending.`,
+        auth: AuthLevel.AUTHENTICATED,
+        clientUsage: [
+            {
+                apiClient: 'apiClient.user.getUserLastViewedRecipes',
+                hook: 'chqc.user.useLastViewedRecipes'
+            }
+        ],
+        responses: {
+            200: {
+                description: 'Last viewed recipes',
+                schema: z.array(RecipeDisplayResponseSchema)
+            },
+            401: 'Not authenticated',
+            403: 'Not authorized'
+        }
+    }
+});

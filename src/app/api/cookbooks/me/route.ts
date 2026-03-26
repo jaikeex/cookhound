@@ -10,6 +10,8 @@ import {
 import { cookbookService } from '@/server/services/cookbook/service';
 import { z } from 'zod';
 import { withRateLimit } from '@/server/utils/rate-limit/wrapper';
+import { registerRouteDocs } from '@/server/utils/api-docs/registry';
+import { AuthLevel } from '@/common/types';
 
 //|=============================================================================================|//
 //?                                     VALIDATION SCHEMAS                                      ?//
@@ -48,3 +50,31 @@ export const PUT = makeHandler(
         windowSizeInSeconds: 15
     })
 );
+
+//|=============================================================================================|//
+//?                                        DOCUMENTATION                                        ?//
+//|=============================================================================================|//
+
+registerRouteDocs('/api/cookbooks/me', {
+    category: 'Cookbooks',
+    subcategory: 'User Collections',
+    PUT: {
+        summary: 'Reorder own cookbooks.',
+        description: `Expects the complete ordered list of cookbook
+            IDs.`,
+        auth: AuthLevel.AUTHENTICATED,
+        rateLimit: { maxRequests: 10, windowSizeInSeconds: 15 },
+        bodySchema: CookbookReorderSchema,
+        clientUsage: [
+            {
+                apiClient: 'apiClient.cookbook.reorderOwnCookbooks',
+                hook: 'chqc.cookbook.useReorderOwnCookbooks'
+            }
+        ],
+        responses: {
+            200: 'Cookbooks reordered',
+            401: 'Not authenticated',
+            429: 'Rate limit exceeded'
+        }
+    }
+});

@@ -5,6 +5,11 @@ import { recipeService } from '@/server/services';
 import { makeHandler, ok, validateQuery } from '@/server/utils/reqwest';
 import { type NextRequest } from 'next/server';
 import { z } from 'zod';
+import {
+    registerRouteDocs,
+    RecipeDisplayResponseSchema
+} from '@/server/utils/api-docs';
+import { AuthLevel } from '@/common/types';
 
 //|=============================================================================================|//
 //?                                     VALIDATION SCHEMAS                                      ?//
@@ -58,3 +63,35 @@ async function getHandler(request: NextRequest) {
 }
 
 export const GET = makeHandler(getHandler);
+
+//|=============================================================================================|//
+//?                                        DOCUMENTATION                                        ?//
+//|=============================================================================================|//
+
+registerRouteDocs('/api/recipes/user/{userId}', {
+    category: 'Recipes',
+    subcategory: 'By User',
+    GET: {
+        summary: 'Get recipes by a specific user (paginated).',
+        description: `Returns recipes authored by the specified user,
+            filtered by language and paginated.`,
+        auth: AuthLevel.PUBLIC,
+        querySchema: RecipesByUserSchema,
+        clientUsage: [
+            {
+                apiClient: 'apiClient.recipe.getUserRecipes',
+                hook: 'chqc.recipe.useUserRecipes'
+            },
+            {
+                apiClient: 'apiClient.recipe.getUserRecipes',
+                hook: 'chqc.recipe.useUserRecipesInfinite'
+            }
+        ],
+        responses: {
+            200: {
+                description: 'Paginated recipe list',
+                schema: z.array(RecipeDisplayResponseSchema)
+            }
+        }
+    }
+});

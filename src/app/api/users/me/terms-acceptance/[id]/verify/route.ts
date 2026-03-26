@@ -9,6 +9,24 @@ import {
     assertSelfOrAdmin
 } from '@/server/utils/reqwest';
 import type { NextRequest } from 'next/server';
+import { registerRouteDocs } from '@/server/utils/api-docs';
+import { AuthLevel } from '@/common/types';
+import { z } from 'zod';
+
+//|=============================================================================================|//
+//?                                     VALIDATION SCHEMAS                                      ?//
+//|=============================================================================================|//
+
+const TermsVerifyResponseSchema = z.object({
+    valid: z.boolean(),
+    details: z.object({
+        version: z.string(),
+        createdAt: z.string(),
+        verified: z.string(),
+        storedHash: z.string(),
+        computedHash: z.string().optional()
+    })
+});
 
 //|=============================================================================================|//
 //?                                          HANDLERS                                           ?//
@@ -65,3 +83,26 @@ async function getHandler(request: NextRequest) {
 }
 
 export const GET = makeHandler(getHandler, withAuth);
+
+//|=============================================================================================|//
+//?                                        DOCUMENTATION                                        ?//
+//|=============================================================================================|//
+
+registerRouteDocs('/api/users/me/terms-acceptance/{id}/verify', {
+    category: 'Users',
+    subcategory: 'Compliance',
+    GET: {
+        summary: 'Verify the integrity of a terms acceptance record.',
+        description: `Checks that the acceptance record has not
+            been tampered with.`,
+        auth: AuthLevel.AUTHENTICATED,
+        responses: {
+            200: {
+                description: 'Verification result with hash comparison',
+                schema: TermsVerifyResponseSchema
+            },
+            401: 'Not authenticated',
+            403: 'Not authorized'
+        }
+    }
+});

@@ -17,6 +17,8 @@ import { generateProofHash } from '@/server/utils/crypto';
 import { serializeTermsContent } from '@/server/utils/terms';
 import { withRateLimit } from '@/server/utils/rate-limit';
 import { verifyCaptcha } from '@/server/utils/captcha';
+import { registerRouteDocs, UserResponseSchema } from '@/server/utils/api-docs';
+import { AuthLevel } from '@/common/types';
 
 //|=============================================================================================|//
 //?                                     VALIDATION SCHEMAS                                      ?//
@@ -115,3 +117,36 @@ export const POST = makeHandler(
         windowSizeInSeconds: 60 * 60 // 1 hour
     })
 );
+
+//|=============================================================================================|//
+//?                                        DOCUMENTATION                                        ?//
+//|=============================================================================================|//
+
+registerRouteDocs('/api/users', {
+    category: 'Users',
+    subcategory: 'Registration',
+    POST: {
+        summary: 'Register a new user account.',
+        description: `Sends a verification email after creation.`,
+        auth: AuthLevel.GUEST,
+        rateLimit: { maxRequests: 10, windowSizeInSeconds: 3600 },
+        bodySchema: UserForCreateSchema,
+        captchaRequired: true,
+        clientUsage: [
+            {
+                apiClient: 'apiClient.user.createUser',
+                hook: 'chqc.user.useCreateUser'
+            }
+        ],
+        responses: {
+            201: {
+                description: 'User created',
+                schema: UserResponseSchema
+            },
+            400: 'Validation failed',
+            403: 'Already authenticated',
+            409: 'Email or username already taken',
+            429: 'Rate limit exceeded'
+        }
+    }
+});

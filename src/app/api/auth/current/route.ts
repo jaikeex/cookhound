@@ -1,5 +1,7 @@
 import { authService } from '@/server/services/auth/service';
 import { makeHandler, ok } from '@/server/utils/reqwest';
+import { registerRouteDocs, UserResponseSchema } from '@/server/utils/api-docs';
+import { AuthLevel } from '@/common/types';
 
 //|=============================================================================================|//
 
@@ -21,3 +23,30 @@ async function getHandler() {
 
 // Not using withAuth here on purpose. @see AuthService.getCurrentUser
 export const GET = makeHandler(getHandler);
+
+//|=============================================================================================|//
+//?                                        DOCUMENTATION                                        ?//
+//|=============================================================================================|//
+
+registerRouteDocs('/api/auth/current', {
+    category: 'Auth',
+    subcategory: 'Session',
+    GET: {
+        summary: 'Get the currently authenticated user.',
+        description: `Returns the full user profile matching the session cookie, 
+            or null if no valid session exists.`,
+        auth: AuthLevel.PUBLIC,
+        clientUsage: [
+            {
+                apiClient: 'apiClient.auth.getCurrentUser',
+                hook: 'chqc.auth.useCurrentUser'
+            }
+        ],
+        responses: {
+            200: {
+                description: 'Current user data or null',
+                schema: UserResponseSchema.nullable()
+            }
+        }
+    }
+});

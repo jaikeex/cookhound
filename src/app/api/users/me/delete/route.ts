@@ -11,6 +11,8 @@ import {
 import type { NextRequest } from 'next/server';
 import { z } from 'zod';
 import { withAuth } from '@/server/utils/reqwest';
+import { registerRouteDocs } from '@/server/utils/api-docs';
+import { AuthLevel } from '@/common/types';
 
 //|=============================================================================================|//
 //?                                     VALIDATION SCHEMAS                                      ?//
@@ -19,6 +21,11 @@ import { withAuth } from '@/server/utils/reqwest';
 const InitiateAccountDeletionSchema = z.strictObject({
     password: z.string().min(1).max(100).trim(),
     reason: z.string().max(500).trim().optional()
+});
+
+const AccountDeletionResponseSchema = z.object({
+    scheduledFor: z.string(),
+    daysRemaining: z.number()
 });
 
 //|=============================================================================================|//
@@ -74,3 +81,50 @@ export const POST = makeHandler(
 );
 
 export const DELETE = makeHandler(deleteHandler, withAuth);
+
+//|=============================================================================================|//
+//?                                        DOCUMENTATION                                        ?//
+//|=============================================================================================|//
+
+registerRouteDocs('/api/users/me/delete', {
+    category: 'Users',
+    subcategory: 'Account',
+    POST: {
+        summary: 'Initiate account deletion (30-day grace period).',
+        description: `Schedules the account for deletion after a
+            30-day grace period.`,
+        auth: AuthLevel.AUTHENTICATED,
+        rateLimit: { maxRequests: 5, windowSizeInSeconds: 3600 },
+        bodySchema: InitiateAccountDeletionSchema,
+        clientUsage: [
+            {
+                apiClient: 'apiClient.user.initiateAccountDeletion',
+                hook: 'chqc.user.useInitiateAccountDeletion'
+            }
+        ],
+        responses: {
+            200: {
+                description: 'Deletion scheduled with date and days remaining',
+                schema: AccountDeletionResponseSchema
+            },
+            400: 'Validation failed',
+            401: 'Not authenticated',
+            429: 'Rate limit exceeded'
+        }
+    },
+    DELETE: {
+        summary: 'Cancel a pending account deletion.',
+        description: `Restores the account to active status.`,
+        auth: AuthLevel.AUTHENTICATED,
+        clientUsage: [
+            {
+                apiClient: 'apiClient.user.cancelAccountDeletion',
+                hook: 'chqc.user.useCancelAccountDeletion'
+            }
+        ],
+        responses: {
+            204: 'Deletion cancelled',
+            401: 'Not authenticated'
+        }
+    }
+});

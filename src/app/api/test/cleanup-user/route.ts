@@ -10,6 +10,8 @@ import {
 } from '@/server/utils/reqwest';
 import type { NextRequest } from 'next/server';
 import { z } from 'zod';
+import { registerRouteDocs } from '@/server/utils/api-docs/registry';
+import { AuthLevel } from '@/common/types';
 
 //|=============================================================================================|//
 //?                                     VALIDATION SCHEMAS                                      ?//
@@ -60,3 +62,23 @@ async function deleteHandler(request: NextRequest) {
 
 // Only export handler when in E2E test mode
 export const DELETE = isE2ETestMode() ? makeHandler(deleteHandler) : undefined;
+
+//|=============================================================================================|//
+//?                                        DOCUMENTATION                                        ?//
+//|=============================================================================================|//
+
+registerRouteDocs('/api/test/cleanup-user', {
+    category: 'Test Helpers',
+    DELETE: {
+        summary: 'Delete a test user and associated data.',
+        description: `Removes a user and all associated data by
+            email.`,
+        auth: AuthLevel.PUBLIC,
+        testOnly: true,
+        bodySchema: CleanupUserSchema,
+        responses: {
+            204: 'User deleted',
+            404: 'E2E mode disabled or user not found'
+        }
+    }
+});

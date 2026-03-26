@@ -11,6 +11,8 @@ import {
 import { withAdmin } from '@/server/utils/reqwest/pipes';
 import { withRateLimit } from '@/server/utils/rate-limit';
 import type { UserRole } from '@/common/types';
+import { registerRouteDocs } from '@/server/utils/api-docs/registry';
+import { AuthLevel } from '@/common/types';
 
 //|=============================================================================================|//
 //?                                     VALIDATION SCHEMAS                                      ?//
@@ -52,3 +54,33 @@ export const PATCH = makeHandler(
     withAdmin,
     withRateLimit({ maxRequests: 30, windowSizeInSeconds: 60 })
 );
+
+//|=============================================================================================|//
+//?                                        DOCUMENTATION                                        ?//
+//|=============================================================================================|//
+
+registerRouteDocs('/api/admin/users/{userId}/role', {
+    category: 'Admin',
+    subcategory: 'User Actions',
+    PATCH: {
+        summary: "Change a user's role.",
+        description: `Cannot change own role.`,
+        auth: AuthLevel.ADMIN,
+        rateLimit: { maxRequests: 30, windowSizeInSeconds: 60 },
+        bodySchema: ChangeRoleSchema,
+        clientUsage: [
+            {
+                apiClient: 'apiClient.admin.changeUserRole',
+                hook: 'chqc.admin.useChangeUserRole'
+            }
+        ],
+        responses: {
+            204: 'Role updated',
+            400: 'Invalid role',
+            401: 'Not authenticated',
+            403: 'Not an admin or targeting self',
+            404: 'User not found',
+            429: 'Rate limit exceeded'
+        }
+    }
+});

@@ -3,6 +3,8 @@ import { makeHandler, ok, validateQuery } from '@/server/utils/reqwest';
 import type { NextRequest } from 'next/server';
 import { z } from 'zod';
 import { SUPPORTED_LOCALES } from '@/common/constants';
+import { registerRouteDocs } from '@/server/utils/api-docs/registry';
+import { AuthLevel } from '@/common/types';
 
 //|=============================================================================================|//
 //?                                     VALIDATION SCHEMAS                                      ?//
@@ -10,6 +12,11 @@ import { SUPPORTED_LOCALES } from '@/common/constants';
 
 const IngredientsQuerySchema = z.strictObject({
     language: z.enum(SUPPORTED_LOCALES)
+});
+
+const IngredientResponseSchema = z.object({
+    id: z.number(),
+    name: z.string()
 });
 
 //|=============================================================================================|//
@@ -35,3 +42,30 @@ async function getHandler(request: NextRequest) {
 }
 
 export const GET = makeHandler(getHandler);
+
+//|=============================================================================================|//
+//?                                        DOCUMENTATION                                        ?//
+//|=============================================================================================|//
+
+registerRouteDocs('/api/ingredients', {
+    category: 'Ingredients',
+    GET: {
+        summary: 'List all ingredients for a given language.',
+        description: `Returns the complete list of known ingredients
+            for the specified language.`,
+        auth: AuthLevel.PUBLIC,
+        querySchema: IngredientsQuerySchema,
+        clientUsage: [
+            {
+                apiClient: 'apiClient.ingredient.getIngredients',
+                hook: 'chqc.ingredient.useIngredients'
+            }
+        ],
+        responses: {
+            200: {
+                description: 'Ingredient list',
+                schema: z.array(IngredientResponseSchema)
+            }
+        }
+    }
+});

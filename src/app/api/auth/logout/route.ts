@@ -2,6 +2,8 @@ import { authService } from '@/server/services/auth/service';
 import { RequestContext } from '@/server/utils/reqwest/context';
 import { makeHandler, noContent } from '@/server/utils/reqwest';
 import { withAuth } from '@/server/utils/reqwest';
+import { registerRouteDocs } from '@/server/utils/api-docs/registry';
+import { AuthLevel } from '@/common/types';
 
 //|=============================================================================================|//
 
@@ -27,3 +29,24 @@ async function postHandler() {
 }
 
 export const POST = makeHandler(postHandler, withAuth);
+
+//|=============================================================================================|//
+//?                                        DOCUMENTATION                                        ?//
+//|=============================================================================================|//
+
+registerRouteDocs('/api/auth/logout', {
+    category: 'Auth',
+    subcategory: 'Session',
+    POST: {
+        summary: 'Log out the current user session.',
+        description: `Invalidates the current session only.`,
+        auth: AuthLevel.AUTHENTICATED,
+        clientUsage: [
+            { apiClient: 'apiClient.auth.logout', hook: 'chqc.auth.useLogout' }
+        ],
+        responses: {
+            204: 'Logged out',
+            401: 'Not authenticated'
+        }
+    }
+});

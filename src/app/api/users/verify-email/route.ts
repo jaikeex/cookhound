@@ -11,6 +11,8 @@ import type { NextRequest } from 'next/server';
 import { z } from 'zod';
 import { ApplicationErrorCode } from '@/server/error/codes';
 import { withRateLimit } from '@/server/utils/rate-limit';
+import { registerRouteDocs } from '@/server/utils/api-docs/registry';
+import { AuthLevel } from '@/common/types';
 
 //|=============================================================================================|//
 //?                                     VALIDATION SCHEMAS                                      ?//
@@ -103,3 +105,51 @@ export const PUT = makeHandler(
         windowSizeInSeconds: 60
     })
 );
+
+//|=============================================================================================|//
+//?                                        DOCUMENTATION                                        ?//
+//|=============================================================================================|//
+
+registerRouteDocs('/api/users/verify-email', {
+    category: 'Users',
+    subcategory: 'Registration',
+    POST: {
+        summary: 'Resend the email verification email.',
+        description: `Resends the verification email to the
+            provided address.`,
+        auth: AuthLevel.GUEST,
+        rateLimit: { maxRequests: 10, windowSizeInSeconds: 60 },
+        bodySchema: SendVerificationEmailSchema,
+        clientUsage: [
+            {
+                apiClient: 'apiClient.user.resendVerificationEmail',
+                hook: 'chqc.user.useResendVerificationEmail'
+            }
+        ],
+        responses: {
+            204: 'Verification email sent',
+            400: 'Validation failed',
+            403: 'Already authenticated',
+            429: 'Rate limit exceeded'
+        }
+    },
+    PUT: {
+        summary: 'Verify email address using a token.',
+        description: `Confirms email using the verification
+            token. Single-use, time-limited.`,
+        auth: AuthLevel.GUEST,
+        rateLimit: { maxRequests: 10, windowSizeInSeconds: 60 },
+        clientUsage: [
+            {
+                apiClient: 'apiClient.user.verifyEmail',
+                hook: 'chqc.user.useVerifyEmail'
+            }
+        ],
+        responses: {
+            204: 'Email verified',
+            400: 'Invalid or expired token',
+            403: 'Already authenticated',
+            429: 'Rate limit exceeded'
+        }
+    }
+});

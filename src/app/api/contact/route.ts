@@ -9,6 +9,8 @@ import { withRateLimit } from '@/server/utils/rate-limit';
 import { z } from 'zod';
 import { mailService } from '@/server/services';
 import { verifyCaptcha } from '@/server/utils/captcha';
+import { registerRouteDocs } from '@/server/utils/api-docs/registry';
+import { AuthLevel } from '@/common/types';
 
 //|=============================================================================================|//
 //?                                     VALIDATION SCHEMAS                                      ?//
@@ -63,3 +65,31 @@ export const POST = makeHandler(
         windowSizeInSeconds: 60 * 60 // 1 hour
     })
 );
+
+//|=============================================================================================|//
+//?                                        DOCUMENTATION                                        ?//
+//|=============================================================================================|//
+
+registerRouteDocs('/api/contact', {
+    category: 'Contact',
+    POST: {
+        summary: 'Submit a contact form message.',
+        description: `Delivers the message to site administrators
+            via email.`,
+        auth: AuthLevel.PUBLIC,
+        rateLimit: { maxRequests: 3, windowSizeInSeconds: 3600 },
+        bodySchema: ContactFormSchema,
+        captchaRequired: true,
+        clientUsage: [
+            {
+                apiClient: 'apiClient.contact.submitContactForm',
+                hook: 'chqc.contact.useSubmitContactForm'
+            }
+        ],
+        responses: {
+            200: 'Message sent',
+            400: 'Validation failed',
+            429: 'Rate limit exceeded'
+        }
+    }
+});

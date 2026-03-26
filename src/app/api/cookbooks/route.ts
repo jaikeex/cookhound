@@ -9,7 +9,12 @@ import { withRateLimit } from '@/server/utils/rate-limit';
 import { withAuth } from '@/server/utils/reqwest';
 import { z } from 'zod';
 import { CookbookVisibility } from '@/common/types';
+import {
+    registerRouteDocs,
+    CookbookResponseSchema
+} from '@/server/utils/api-docs';
 import { cookbookService } from '@/server/services/cookbook/service';
+import { AuthLevel } from '@/common/types';
 
 //|=============================================================================================|//
 //?                                     VALIDATION SCHEMAS                                      ?//
@@ -49,3 +54,34 @@ export const POST = makeHandler(
         windowSizeInSeconds: 60
     })
 );
+
+//|=============================================================================================|//
+//?                                        DOCUMENTATION                                        ?//
+//|=============================================================================================|//
+
+registerRouteDocs('/api/cookbooks', {
+    category: 'Cookbooks',
+    POST: {
+        summary: 'Create a new cookbook.',
+        description: `Creates a new cookbook owned by the authenticated
+            user.`,
+        auth: AuthLevel.AUTHENTICATED,
+        rateLimit: { maxRequests: 5, windowSizeInSeconds: 60 },
+        bodySchema: CookbookForCreateSchema,
+        clientUsage: [
+            {
+                apiClient: 'apiClient.cookbook.createCookbook',
+                hook: 'chqc.cookbook.useCreateCookbook'
+            }
+        ],
+        responses: {
+            201: {
+                description: 'Created cookbook',
+                schema: CookbookResponseSchema
+            },
+            400: 'Validation failed',
+            401: 'Not authenticated',
+            429: 'Rate limit exceeded'
+        }
+    }
+});

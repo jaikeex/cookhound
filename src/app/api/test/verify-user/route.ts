@@ -10,6 +10,8 @@ import {
 } from '@/server/utils/reqwest';
 import type { NextRequest } from 'next/server';
 import { z } from 'zod';
+import { registerRouteDocs } from '@/server/utils/api-docs/registry';
+import { AuthLevel } from '@/common/types';
 
 //|=============================================================================================|//
 //?                                     VALIDATION SCHEMAS                                      ?//
@@ -17,6 +19,11 @@ import { z } from 'zod';
 
 const GetVerificationTokenSchema = z.strictObject({
     email: z.email().trim()
+});
+
+const VerifyUserResponseSchema = z.object({
+    token: z.string().nullable(),
+    email: z.string()
 });
 
 //|=============================================================================================|//
@@ -61,3 +68,26 @@ async function postHandler(request: NextRequest) {
 
 // Only export handler when in E2E test mode
 export const POST = isE2ETestMode() ? makeHandler(postHandler) : undefined;
+
+//|=============================================================================================|//
+//?                                        DOCUMENTATION                                        ?//
+//|=============================================================================================|//
+
+registerRouteDocs('/api/test/verify-user', {
+    category: 'Test Helpers',
+    POST: {
+        summary: 'Get verification token for a test user.',
+        description: `Retrieves the pending verification token by
+            email.`,
+        auth: AuthLevel.PUBLIC,
+        testOnly: true,
+        bodySchema: GetVerificationTokenSchema,
+        responses: {
+            200: {
+                description: 'Verification token and email',
+                schema: VerifyUserResponseSchema
+            },
+            404: 'E2E mode disabled or user not found'
+        }
+    }
+});

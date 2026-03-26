@@ -9,6 +9,8 @@ import { userService } from '@/server/services/user/service';
 import { z } from 'zod';
 import { withRateLimit } from '@/server/utils/rate-limit';
 import { verifyCaptcha } from '@/server/utils/captcha';
+import { registerRouteDocs } from '@/server/utils/api-docs/registry';
+import { AuthLevel } from '@/common/types';
 
 //|=============================================================================================|//
 //?                                     VALIDATION SCHEMAS                                      ?//
@@ -83,3 +85,51 @@ export const PUT = makeHandler(
         windowSizeInSeconds: 60 * 60 // 1 hour
     })
 );
+
+//|=============================================================================================|//
+//?                                        DOCUMENTATION                                        ?//
+//|=============================================================================================|//
+
+registerRouteDocs('/api/users/reset-password', {
+    category: 'Users',
+    subcategory: 'Account',
+    POST: {
+        summary: 'Send a password reset email.',
+        description: `Always returns 204 regardless of whether the
+            email exists.`,
+        auth: AuthLevel.PUBLIC,
+        rateLimit: { maxRequests: 5, windowSizeInSeconds: 3600 },
+        bodySchema: SendResetPasswordEmailSchema,
+        captchaRequired: true,
+        clientUsage: [
+            {
+                apiClient: 'apiClient.user.sendResetPasswordEmail',
+                hook: 'chqc.user.useSendResetPasswordEmail'
+            }
+        ],
+        responses: {
+            204: 'Reset email sent',
+            400: 'Validation failed',
+            429: 'Rate limit exceeded'
+        }
+    },
+    PUT: {
+        summary: 'Reset password using a token from email.',
+        description: `Single-use, time-limited token. Invalidates
+            all existing sessions on success.`,
+        auth: AuthLevel.PUBLIC,
+        rateLimit: { maxRequests: 5, windowSizeInSeconds: 3600 },
+        bodySchema: ResetPasswordSchema,
+        clientUsage: [
+            {
+                apiClient: 'apiClient.user.resetPassword',
+                hook: 'chqc.user.useResetPassword'
+            }
+        ],
+        responses: {
+            204: 'Password reset successful',
+            400: 'Invalid or expired token',
+            429: 'Rate limit exceeded'
+        }
+    }
+});

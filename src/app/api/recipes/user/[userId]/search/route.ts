@@ -6,6 +6,11 @@ import { ApplicationErrorCode } from '@/server/error/codes';
 import { ValidationError } from '@/server/error/server';
 import { makeHandler, ok } from '@/server/utils/reqwest';
 import { SUPPORTED_LOCALES } from '@/common/constants';
+import {
+    registerRouteDocs,
+    RecipeDisplayResponseSchema
+} from '@/server/utils/api-docs';
+import { AuthLevel } from '@/common/types';
 
 //|=============================================================================================|//
 //?                                     VALIDATION SCHEMAS                                      ?//
@@ -59,3 +64,35 @@ async function getHandler(request: NextRequest) {
 }
 
 export const GET = makeHandler(getHandler);
+
+//|=============================================================================================|//
+//?                                        DOCUMENTATION                                        ?//
+//|=============================================================================================|//
+
+registerRouteDocs('/api/recipes/user/{userId}/search', {
+    category: 'Recipes',
+    subcategory: 'By User',
+    GET: {
+        summary: 'Search recipes by a specific user.',
+        description: `Full-text search scoped to a single user's
+            recipes. Uses Typesense with database fallback.`,
+        auth: AuthLevel.PUBLIC,
+        querySchema: SearchRecipesByUserSchema,
+        clientUsage: [
+            {
+                apiClient: 'apiClient.recipe.searchUserRecipes',
+                hook: 'chqc.recipe.useUserSearchRecipes'
+            },
+            {
+                apiClient: 'apiClient.recipe.searchUserRecipes',
+                hook: 'chqc.recipe.useUserSearchRecipesInfinite'
+            }
+        ],
+        responses: {
+            200: {
+                description: 'Search results',
+                schema: z.array(RecipeDisplayResponseSchema)
+            }
+        }
+    }
+});

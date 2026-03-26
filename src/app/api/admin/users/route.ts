@@ -4,6 +4,11 @@ import { adminService } from '@/server/services';
 import { makeHandler, ok, validateQuery } from '@/server/utils/reqwest';
 import { withAdmin } from '@/server/utils/reqwest/pipes';
 import { withRateLimit } from '@/server/utils/rate-limit';
+import {
+    registerRouteDocs,
+    AdminUserListResponseSchema
+} from '@/server/utils/api-docs';
+import { AuthLevel } from '@/common/types';
 
 //|=============================================================================================|//
 //?                                     VALIDATION SCHEMAS                                      ?//
@@ -42,3 +47,34 @@ export const GET = makeHandler(
     withAdmin,
     withRateLimit({ maxRequests: 30, windowSizeInSeconds: 60 })
 );
+
+//|=============================================================================================|//
+//?                                        DOCUMENTATION                                        ?//
+//|=============================================================================================|//
+
+registerRouteDocs('/api/admin/users', {
+    category: 'Admin',
+    subcategory: 'User Management',
+    GET: {
+        summary: 'List users with filtering and pagination.',
+        description: `Paginated and filterable.`,
+        auth: AuthLevel.ADMIN,
+        rateLimit: { maxRequests: 30, windowSizeInSeconds: 60 },
+        querySchema: AdminUsersQuerySchema,
+        clientUsage: [
+            {
+                apiClient: 'apiClient.admin.getUsers',
+                hook: 'chqc.admin.useAdminUsers'
+            }
+        ],
+        responses: {
+            200: {
+                description: 'Paginated user list',
+                schema: AdminUserListResponseSchema
+            },
+            401: 'Not authenticated',
+            403: 'Not an admin',
+            429: 'Rate limit exceeded'
+        }
+    }
+});

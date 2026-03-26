@@ -8,6 +8,11 @@ import {
 import type { NextRequest } from 'next/server';
 import { z } from 'zod';
 import { cookbookService } from '@/server/services/cookbook/service';
+import {
+    registerRouteDocs,
+    CookbookResponseSchema
+} from '@/server/utils/api-docs';
+import { AuthLevel } from '@/common/types';
 
 //|=============================================================================================|//
 //?                                     VALIDATION SCHEMAS                                      ?//
@@ -60,3 +65,45 @@ async function deleteHandler(request: NextRequest) {
 
 export const GET = makeHandler(getHandler);
 export const DELETE = makeHandler(deleteHandler, withAuth);
+
+//|=============================================================================================|//
+//?                                        DOCUMENTATION                                        ?//
+//|=============================================================================================|//
+
+registerRouteDocs('/api/cookbooks/{id}', {
+    category: 'Cookbooks',
+    GET: {
+        summary: 'Get a cookbook by ID.',
+        description: `Includes the recipe list.`,
+        auth: AuthLevel.PUBLIC,
+        clientUsage: [
+            {
+                apiClient: 'apiClient.cookbook.getCookbookById',
+                hook: 'chqc.cookbook.useCookbookById'
+            }
+        ],
+        responses: {
+            200: {
+                description: 'Cookbook data with recipes',
+                schema: CookbookResponseSchema
+            },
+            404: 'Cookbook not found'
+        }
+    },
+    DELETE: {
+        summary: 'Delete a cookbook.',
+        description: `Owner-only. Recipes in the cookbook are not
+            affected.`,
+        auth: AuthLevel.AUTHENTICATED,
+        clientUsage: [
+            {
+                apiClient: 'apiClient.cookbook.deleteCookbook',
+                hook: 'chqc.cookbook.useDeleteCookbook'
+            }
+        ],
+        responses: {
+            204: 'Cookbook deleted',
+            401: 'Not authenticated'
+        }
+    }
+});

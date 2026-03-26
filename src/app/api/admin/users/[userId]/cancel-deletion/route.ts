@@ -4,6 +4,8 @@ import { adminService } from '@/server/services';
 import { makeHandler, noContent, validateParams } from '@/server/utils/reqwest';
 import { withAdmin } from '@/server/utils/reqwest/pipes';
 import { withRateLimit } from '@/server/utils/rate-limit';
+import { registerRouteDocs } from '@/server/utils/api-docs/registry';
+import { AuthLevel } from '@/common/types';
 
 //|=============================================================================================|//
 //?                                     VALIDATION SCHEMAS                                      ?//
@@ -38,3 +40,31 @@ export const POST = makeHandler(
     withAdmin,
     withRateLimit({ maxRequests: 30, windowSizeInSeconds: 60 })
 );
+
+//|=============================================================================================|//
+//?                                        DOCUMENTATION                                        ?//
+//|=============================================================================================|//
+
+registerRouteDocs('/api/admin/users/{userId}/cancel-deletion', {
+    category: 'Admin',
+    subcategory: 'User Actions',
+    POST: {
+        summary: 'Cancel a pending user account deletion.',
+        description: `Restores the account to active status.`,
+        auth: AuthLevel.ADMIN,
+        rateLimit: { maxRequests: 30, windowSizeInSeconds: 60 },
+        clientUsage: [
+            {
+                apiClient: 'apiClient.admin.cancelAccountDeletion',
+                hook: 'chqc.admin.useCancelAccountDeletion'
+            }
+        ],
+        responses: {
+            204: 'Deletion cancelled',
+            401: 'Not authenticated',
+            403: 'Not an admin or targeting self',
+            404: 'User not found or not pending deletion',
+            429: 'Rate limit exceeded'
+        }
+    }
+});

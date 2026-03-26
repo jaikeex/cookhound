@@ -15,10 +15,28 @@ import { generateProofHash } from '@/server/utils/crypto';
 import { serializeConsentContent } from '@/server/utils/consent';
 import { ValidationError } from '@/server/error';
 import { ApplicationErrorCode } from '@/server/error/codes';
+import { registerRouteDocs } from '@/server/utils/api-docs';
+import { AuthLevel } from '@/common/types';
 
 //|=============================================================================================|//
 //?                                     VALIDATION SCHEMAS                                      ?//
 //|=============================================================================================|//
+
+const CookieConsentResponseSchema = z.object({
+    id: z.string(),
+    userId: z.string(),
+    consent: z.boolean(),
+    version: z.string(),
+    userIpAddress: z.string(),
+    userAgent: z.string(),
+    createdAt: z.string(),
+    revokedAt: z.string().nullable(),
+    updatedAt: z.string(),
+    proofHash: z.string(),
+    accepted: z.array(
+        z.enum(['essential', 'preferences', 'analytics', 'marketing'])
+    )
+});
 
 const UserCookieConsentForCreateSchema = z.strictObject({
     consent: z.boolean(),
@@ -88,3 +106,33 @@ async function postHandler(request: NextRequest) {
 
 // not rate limited by design
 export const POST = makeHandler(postHandler, withAuth);
+
+//|=============================================================================================|//
+//?                                        DOCUMENTATION                                        ?//
+//|=============================================================================================|//
+
+registerRouteDocs('/api/users/me/cookie-consent', {
+    category: 'Users',
+    subcategory: 'Compliance',
+    POST: {
+        summary: 'Save user cookie consent with proof hash.',
+        description: `Records a consent decision with a
+            tamper-proof hash for GDPR compliance.`,
+        auth: AuthLevel.AUTHENTICATED,
+        bodySchema: UserCookieConsentForCreateSchema,
+        clientUsage: [
+            {
+                apiClient: 'apiClient.user.createUserCookieConsent',
+                hook: 'chqc.user.useCreateUserCookieConsent'
+            }
+        ],
+        responses: {
+            200: {
+                description: 'Consent saved',
+                schema: CookieConsentResponseSchema
+            },
+            400: 'Validation failed',
+            401: 'Not authenticated'
+        }
+    }
+});

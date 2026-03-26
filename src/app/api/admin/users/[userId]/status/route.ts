@@ -11,6 +11,8 @@ import {
 import { withAdmin } from '@/server/utils/reqwest/pipes';
 import { withRateLimit } from '@/server/utils/rate-limit';
 import type { Status } from '@/common/types';
+import { registerRouteDocs } from '@/server/utils/api-docs/registry';
+import { AuthLevel } from '@/common/types';
 
 //|=============================================================================================|//
 //?                                     VALIDATION SCHEMAS                                      ?//
@@ -53,3 +55,34 @@ export const PATCH = makeHandler(
     withAdmin,
     withRateLimit({ maxRequests: 30, windowSizeInSeconds: 60 })
 );
+
+//|=============================================================================================|//
+//?                                        DOCUMENTATION                                        ?//
+//|=============================================================================================|//
+
+registerRouteDocs('/api/admin/users/{userId}/status', {
+    category: 'Admin',
+    subcategory: 'User Actions',
+    PATCH: {
+        summary: "Change a user's status (ban/unban).",
+        description: `Banning invalidates all sessions. Cannot
+            target own account.`,
+        auth: AuthLevel.ADMIN,
+        rateLimit: { maxRequests: 30, windowSizeInSeconds: 60 },
+        bodySchema: ChangeStatusSchema,
+        clientUsage: [
+            {
+                apiClient: 'apiClient.admin.changeUserStatus',
+                hook: 'chqc.admin.useChangeUserStatus'
+            }
+        ],
+        responses: {
+            204: 'Status updated',
+            400: 'Invalid status',
+            401: 'Not authenticated',
+            403: 'Not an admin or targeting self',
+            404: 'User not found',
+            429: 'Rate limit exceeded'
+        }
+    }
+});

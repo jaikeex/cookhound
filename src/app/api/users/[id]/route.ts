@@ -12,6 +12,8 @@ import {
 import { withAuth } from '@/server/utils/reqwest';
 import type { NextRequest } from 'next/server';
 import { z } from 'zod';
+import { registerRouteDocs, UserResponseSchema } from '@/server/utils/api-docs';
+import { AuthLevel } from '@/common/types';
 
 //|=============================================================================================|//
 //?                                     VALIDATION SCHEMAS                                      ?//
@@ -117,3 +119,56 @@ export const PUT = makeHandler(
         windowSizeInSeconds: 60
     })
 );
+
+//|=============================================================================================|//
+//?                                        DOCUMENTATION                                        ?//
+//|=============================================================================================|//
+
+registerRouteDocs('/api/users/{id}', {
+    category: 'Users',
+    subcategory: 'Profile',
+    GET: {
+        summary: 'Get a user profile by ID.',
+        description: `Own profile returns full details; other
+            users receive a public subset.`,
+        auth: AuthLevel.PUBLIC,
+        clientUsage: [
+            {
+                apiClient: 'apiClient.user.getUserById',
+                hook: 'chqc.user.useGetUserById'
+            }
+        ],
+        responses: {
+            200: {
+                description: 'User profile data',
+                schema: UserResponseSchema
+            },
+            400: 'Invalid user ID',
+            404: 'User not found'
+        }
+    },
+    PUT: {
+        summary: 'Update a user profile.',
+        description: `Owner-only. Updates the caller's own
+            profile.`,
+        auth: AuthLevel.AUTHENTICATED,
+        rateLimit: { maxRequests: 10, windowSizeInSeconds: 60 },
+        bodySchema: UserForUpdateSchema,
+        clientUsage: [
+            {
+                apiClient: 'apiClient.user.updateUserById',
+                hook: 'chqc.user.useUpdateUserById'
+            }
+        ],
+        responses: {
+            200: {
+                description: 'Updated user data',
+                schema: UserResponseSchema
+            },
+            400: 'Validation failed',
+            401: 'Not authenticated',
+            403: 'Not authorized',
+            429: 'Rate limit exceeded'
+        }
+    }
+});

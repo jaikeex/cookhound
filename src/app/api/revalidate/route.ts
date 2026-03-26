@@ -1,6 +1,8 @@
 import { ENV_CONFIG_PRIVATE } from '@/common/constants';
 import { revalidatePath } from 'next/cache';
 import type { NextRequest } from 'next/server';
+import { registerRouteDocs } from '@/server/utils/api-docs/registry';
+import { AuthLevel } from '@/common/types';
 
 /**
  * Handles GET requests to `/api/revalidate` to revalidate a Next.js cache path.
@@ -41,3 +43,20 @@ export async function GET(request: NextRequest) {
         });
     }
 }
+
+//|=============================================================================================|//
+//?                                        DOCUMENTATION                                        ?//
+//|=============================================================================================|//
+
+registerRouteDocs('/api/revalidate', {
+    category: 'Revalidation',
+    GET: {
+        summary: 'Revalidate a Next.js page cache by path.',
+        description: `Triggers on-demand ISR. Requires a
+            revalidation token.`,
+        auth: AuthLevel.PUBLIC,
+        responses: {
+            200: 'Revalidation result'
+        }
+    }
+});

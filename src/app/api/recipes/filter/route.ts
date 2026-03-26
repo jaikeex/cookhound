@@ -4,6 +4,11 @@ import type { NextRequest } from 'next/server';
 import type { RecipeFilterParams } from '@/common/types';
 import { z } from 'zod';
 import { SUPPORTED_LOCALES } from '@/common/constants';
+import {
+    registerRouteDocs,
+    RecipeDisplayResponseSchema
+} from '@/server/utils/api-docs';
+import { AuthLevel } from '@/common/types';
 
 //|=============================================================================================|//
 //?                                     VALIDATION SCHEMAS                                      ?//
@@ -76,3 +81,35 @@ async function getHandler(request: NextRequest) {
 }
 
 export const GET = makeHandler(getHandler);
+
+//|=============================================================================================|//
+//?                                        DOCUMENTATION                                        ?//
+//|=============================================================================================|//
+
+registerRouteDocs('/api/recipes/filter', {
+    category: 'Recipes',
+    subcategory: 'Search & Filtering',
+    GET: {
+        summary: 'Filter recipes by criteria.',
+        description: `Filters are combined with AND logic.`,
+        auth: AuthLevel.PUBLIC,
+        querySchema: FilterRecipesSchema,
+        clientUsage: [
+            {
+                apiClient: 'apiClient.recipe.filterRecipes',
+                hook: 'chqc.recipe.useFilterRecipes'
+            },
+            {
+                apiClient: 'apiClient.recipe.filterRecipes',
+                hook: 'chqc.recipe.useFilterRecipesInfinite'
+            }
+        ],
+        responses: {
+            200: {
+                description: 'Filtered recipe list',
+                schema: z.array(RecipeDisplayResponseSchema)
+            },
+            400: 'Invalid filter parameters'
+        }
+    }
+});

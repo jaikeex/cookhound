@@ -2,6 +2,11 @@ import { makeHandler, ok, validateParams } from '@/server/utils/reqwest';
 import type { NextRequest } from 'next/server';
 import { z } from 'zod';
 import { cookbookService } from '@/server/services/cookbook/service';
+import {
+    registerRouteDocs,
+    CookbookResponseSchema
+} from '@/server/utils/api-docs';
+import { AuthLevel } from '@/common/types';
 
 //|=============================================================================================|//
 //?                                     VALIDATION SCHEMAS                                      ?//
@@ -37,3 +42,29 @@ async function getHandler(request: NextRequest) {
 }
 
 export const GET = makeHandler(getHandler);
+
+//|=============================================================================================|//
+//?                                        DOCUMENTATION                                        ?//
+//|=============================================================================================|//
+
+registerRouteDocs('/api/cookbooks/display/{displayId}', {
+    category: 'Cookbooks',
+    GET: {
+        summary: 'Get a cookbook by display ID.',
+        description: `Includes the recipe list.`,
+        auth: AuthLevel.PUBLIC,
+        clientUsage: [
+            {
+                apiClient: 'apiClient.cookbook.getCookbookByDisplayId',
+                hook: 'chqc.cookbook.useCookbookByDisplayId'
+            }
+        ],
+        responses: {
+            200: {
+                description: 'Cookbook data with recipes',
+                schema: CookbookResponseSchema
+            },
+            404: 'Cookbook not found'
+        }
+    }
+});

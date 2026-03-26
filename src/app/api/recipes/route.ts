@@ -12,6 +12,12 @@ import { withAuth } from '@/server/utils/reqwest';
 import { z } from 'zod';
 import { validateQuery } from '@/server/utils/reqwest';
 import { SUPPORTED_LOCALES } from '@/common/constants';
+import {
+    registerRouteDocs,
+    RecipeDisplayResponseSchema,
+    RecipeResponseSchema
+} from '@/server/utils/api-docs';
+import { AuthLevel } from '@/common/types';
 
 //|=============================================================================================|//
 //?                                     VALIDATION SCHEMAS                                      ?//
@@ -104,3 +110,57 @@ export const POST = makeHandler(
         windowSizeInSeconds: 600 // 10 minutes
     })
 );
+
+//|=============================================================================================|//
+//?                                        DOCUMENTATION                                        ?//
+//|=============================================================================================|//
+
+registerRouteDocs('/api/recipes', {
+    category: 'Recipes',
+    GET: {
+        summary: 'List front-page recipes (paginated).',
+        description: `Returns a batch of recipes for the front page,
+            filtered by language. Results are ordered by creation date
+            descending and recipe rating (higher first).`,
+        auth: AuthLevel.PUBLIC,
+        querySchema: FrontPageRecipesSchema,
+        clientUsage: [
+            {
+                apiClient: 'apiClient.recipe.getRecipeList',
+                hook: 'chqc.recipe.useRecipeList'
+            },
+            {
+                apiClient: 'apiClient.recipe.getRecipeList',
+                hook: 'chqc.recipe.useRecipeListInfinite'
+            }
+        ],
+        responses: {
+            200: {
+                description: 'Paginated recipe list',
+                schema: z.array(RecipeDisplayResponseSchema)
+            }
+        }
+    },
+    POST: {
+        summary: 'Create a new recipe.',
+        description: `Creates a new recipe owned by the authenticated user.`,
+        auth: AuthLevel.AUTHENTICATED,
+        rateLimit: { maxRequests: 20, windowSizeInSeconds: 600 },
+        bodySchema: RecipeForCreatePayloadSchema,
+        clientUsage: [
+            {
+                apiClient: 'apiClient.recipe.createRecipe',
+                hook: 'chqc.recipe.useCreateRecipe'
+            }
+        ],
+        responses: {
+            201: {
+                description: 'Created recipe',
+                schema: RecipeResponseSchema
+            },
+            400: 'Validation failed',
+            401: 'Not authenticated',
+            429: 'Rate limit exceeded'
+        }
+    }
+});
