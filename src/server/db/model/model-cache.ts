@@ -62,21 +62,38 @@ export async function cachePrismaQuery<T>(
     fetchFn: () => Promise<T>,
     ttl: number = Number(ENV_CONFIG_PRIVATE.REDIS_TTL)
 ): Promise<T> {
-    const now = new Date();
+    try {
+        const now = new Date();
+        const cachedData = await redisClient.get<T>(key);
 
-    const cachedData = await redisClient.get<T>(key);
+        if (cachedData !== null) {
+            log.trace(`Cache hit for key: ${key}`);
+            const time = new Date().getTime() - now.getTime();
 
-    if (cachedData !== null) {
-        log.trace(`Cache hit for key: ${key}`);
-        const time = new Date().getTime() - now.getTime();
-        log.trace(`Time to fetch data from cache for key: ${key}: ${time}ms`);
-        return cachedData;
+            log.trace(
+                `Time to fetch data from cache for key: ${key}: ${time}ms`
+            );
+
+            return cachedData;
+        }
+    } catch (error: unknown) {
+        log.warn('Redis read failed, falling through to database', {
+            key,
+            error
+        });
     }
 
     log.trace(`Cache miss for key: ${key}`);
     const data = await fetchFn();
 
-    await redisClient.set(key, data, ttl);
+    try {
+        await redisClient.set(key, data, ttl);
+    } catch (error: unknown) {
+        log.warn('Redis write failed, skipping cache population', {
+            key,
+            error
+        });
+    }
 
     return data;
 }
@@ -86,7 +103,11 @@ export async function cachePrismaQuery<T>(
  * @param key - Cache key to invalidate
  */
 export async function invalidateCache(key: string): Promise<void> {
-    await redisClient.del(key);
+    try {
+        await redisClient.del(key);
+    } catch (error: unknown) {
+        log.warn('Redis invalidation failed', { key, error });
+    }
 }
 
 /**
@@ -94,13 +115,17 @@ export async function invalidateCache(key: string): Promise<void> {
  * @param pattern - Redis pattern to match (e.g., "prisma:user:*")
  */
 export async function invalidateCacheByPattern(pattern: string): Promise<void> {
-    const keys = await redisClient.keys(pattern);
-    if (keys.length > 0) {
-        await Promise.all(keys.map((key) => redisClient.del(key)));
+    try {
+        const keys = await redisClient.keys(pattern);
+        if (keys.length > 0) {
+            await Promise.all(keys.map((key) => redisClient.del(key)));
 
-        log.trace(
-            `Invalidated ${keys.length} cache entries matching pattern: ${pattern}`
-        );
+            log.trace(
+                `Invalidated ${keys.length} cache entries matching pattern: ${pattern}`
+            );
+        }
+    } catch (error: unknown) {
+        log.warn('Redis pattern invalidation failed', { pattern, error });
     }
 }
 

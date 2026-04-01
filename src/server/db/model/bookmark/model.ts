@@ -7,6 +7,7 @@ import {
     invalidateModelCache
 } from '@/server/db/model/model-cache';
 import type { CookbookBookmark } from '@/server/db/generated/prisma/client';
+import { reorderBookmarks as reorderBookmarksSql } from '@/server/db/generated/prisma/sql';
 
 //|=============================================================================================|//
 
@@ -106,12 +107,9 @@ class BookmarkModel {
         log.trace('Reordering bookmarks', { userId, orderedCookbookIds });
 
         await prisma.$transaction(async (tx) => {
-            const cases = orderedCookbookIds
-                .map((id, idx) => `WHEN ${id} THEN ${idx + 1}`)
-                .join(' ');
-            const ids = orderedCookbookIds.join(',');
-            const raw = `UPDATE "cookbook_bookmarks" SET "bookmark_order" = CASE "cookbook_id" ${cases} END WHERE "user_id" = ${userId} AND "cookbook_id" IN (${ids});`;
-            await tx.$executeRawUnsafe(raw);
+            await tx.$queryRawTyped(
+                reorderBookmarksSql(userId, orderedCookbookIds as number[])
+            );
         });
 
         await this.invalidateBookmarkCache({ userId });

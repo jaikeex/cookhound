@@ -120,6 +120,7 @@ class CookbookModel {
     async deleteOne(id: number): Promise<void> {
         log.trace('Deleting cookbook', { id });
         await prisma.$transaction(async (tx) => {
+            await tx.cookbookBookmark.deleteMany({ where: { cookbookId: id } });
             await tx.cookbookRecipe.deleteMany({ where: { cookbookId: id } });
             await tx.cookbook.delete({ where: { id } });
         });

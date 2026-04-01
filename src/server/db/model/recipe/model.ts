@@ -816,7 +816,7 @@ class RecipeModel {
 
     private async invalidateUserRecipeCache(userId: number) {
         await invalidateCacheByPattern(
-            `prisma:recipe:findManyForUser:${userId}`
+            `prisma:recipe:findManyForUser:*"userId":${userId}*`
         );
     }
 

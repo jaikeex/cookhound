@@ -88,7 +88,24 @@ class RedisClient {
 
     async keys(pattern: string): Promise<string[]> {
         await this.connect();
-        return await this.client.keys(pattern);
+        const keys: string[] = [];
+
+        let cursor = '0';
+
+        do {
+            const [nextCursor, batch] = await this.client.scan(
+                cursor,
+                'MATCH',
+                pattern,
+                'COUNT',
+                100
+            );
+
+            cursor = nextCursor;
+            keys.push(...batch);
+        } while (cursor !== '0');
+
+        return keys;
     }
 
     async flushAll(): Promise<void> {
