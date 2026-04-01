@@ -252,19 +252,11 @@ class RecipeService {
 
         const recipe = await this.getRecipeById(recipeId);
 
-        if (!recipe) {
-            log.warn('updateRecipe - recipe not found', { recipeId });
-            throw new NotFoundError(
-                'app.error.not-found',
-                ApplicationErrorCode.RECIPE_NOT_FOUND
-            );
-        }
-
         if (
             recipe.authorId !== currentUserId &&
             RequestContext.getUserRole() !== UserRole.Admin
         ) {
-            log.warn('updateRecipe - recipe not found', { recipeId });
+            log.warn('updateRecipe - access denied', { recipeId });
             throw new AuthErrorForbidden(
                 'app.error.bad-request',
                 ApplicationErrorCode.RECIPE_ACCESS_DENIED
@@ -314,19 +306,11 @@ class RecipeService {
 
         const recipe = await this.getRecipeById(recipeId);
 
-        if (!recipe) {
-            log.warn('deleteRecipe - recipe not found', { recipeId });
-            throw new NotFoundError(
-                'app.error.not-found',
-                ApplicationErrorCode.RECIPE_NOT_FOUND
-            );
-        }
-
         if (
             currentUserId !== recipe.authorId &&
             RequestContext.getUserRole() !== UserRole.Admin
         ) {
-            log.warn('deleteRecipe - recipe not found', { recipeId });
+            log.warn('deleteRecipe - access denied', { recipeId });
             throw new AuthErrorForbidden(
                 'app.error.bad-request',
                 ApplicationErrorCode.RECIPE_ACCESS_DENIED
@@ -410,14 +394,6 @@ class RecipeService {
         }
 
         const recipe = await this.getRecipeById(recipeId);
-
-        if (!recipe) {
-            log.warn('rateRecipe - recipe not found', { recipeId });
-            throw new NotFoundError(
-                'app.error.not-found',
-                ApplicationErrorCode.RECIPE_NOT_FOUND
-            );
-        }
 
         const existingRating: Rating | null =
             await db.rating.getOneByUserIdAndRecipeId(authorId, recipeId);
@@ -650,10 +626,8 @@ class RecipeService {
                 results = await recipeSearchIndex.searchSingleQuery(
                     queryTerms[0],
                     language,
-                    // I read in docs that fetching extra is useful for dealing with duplicates.
-                    // I dont really know how that helps but here it is...
-                    perPage * 2,
-                    0
+                    perPage,
+                    offset
                 );
             } else {
                 // multi query fetch.
@@ -746,13 +720,7 @@ class RecipeService {
             }));
         }
 
-        //|-------------------------------------------------------------------------------------|//
-        //?                                        RETURN                                       ?//
-        //|-------------------------------------------------------------------------------------|//
-
-        const paginatedResults = results.slice(offset, offset + perPage);
-
-        return paginatedResults;
+        return results;
     }
 
     //~-----------------------------------------------------------------------------------------~//

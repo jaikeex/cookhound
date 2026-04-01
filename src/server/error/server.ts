@@ -25,7 +25,13 @@ export function isServerError(error: unknown): error is ServerError {
         return true;
     }
 
-    if (typeof error === 'object' && error !== null && 'name' in error) {
+    if (
+        typeof error === 'object' &&
+        error !== null &&
+        'name' in error &&
+        'status' in error &&
+        'code' in error
+    ) {
         return serverErrorNames.includes(error.name as ServerErrorName);
     }
 

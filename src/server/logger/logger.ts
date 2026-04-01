@@ -262,12 +262,8 @@ export class Logger {
             return Math.random() < 0.1;
         }
 
-        const hash = requestId.split('').reduce((acc, char) => {
-            return acc + char.charCodeAt(0);
-        }, 0);
-
-        // Log ~10% of requests
-        return hash % 10 === 0;
+        const token = parseInt(requestId[0] || '0', 16);
+        return token < 1;
     }
 
     //|-----------------------------------------------------------------------------------------|//

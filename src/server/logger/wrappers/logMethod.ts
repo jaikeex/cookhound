@@ -61,7 +61,7 @@ export function LogServiceMethod(
 
         const className = target.constructor.name;
 
-        descriptor.value = async function (...args: unknown[]) {
+        descriptor.value = function (...args: unknown[]) {
             const log = Logger.getInstance(className);
 
             let payload: Record<string, unknown> = {};
@@ -74,10 +74,18 @@ export function LogServiceMethod(
 
             log[attemptLevel](`${String(propertyKey)} - attempt`, payload);
 
-            const result = await original.apply(this, args);
+            const result = original.apply(this, args);
+
+            // If the original method returns a promise, chain the success log onto it...
+            // otherwise log synchronously and return the value unchanged.
+            if (result instanceof Promise) {
+                return result.then((value: unknown) => {
+                    log[successLevel](`${String(propertyKey)} - success`);
+                    return value;
+                });
+            }
 
             log[successLevel](`${String(propertyKey)} - success`);
-
             return result;
         };
 
