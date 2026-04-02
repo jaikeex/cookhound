@@ -28,8 +28,7 @@ const FileUploadResponseSchema = z.object({
 async function postHandler(request: NextRequest) {
     const { data } = await readMultipartFile(request, {
         fieldName: 'avatar-image',
-        maxSize: 5 * 1024 * 1024,
-        allowedContentTypes: ['image/webp']
+        maxSize: 5 * 1024 * 1024
     });
 
     const fileName = `avatar-image-${randomUUID()}.webp`;

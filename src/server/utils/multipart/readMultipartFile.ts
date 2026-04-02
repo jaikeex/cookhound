@@ -9,7 +9,6 @@ import { ApplicationErrorCode } from '@/server/error/codes';
 export interface ReadMultipartFileOptions {
     fieldName?: string;
     maxSize?: number;
-    allowedContentTypes?: string[];
 }
 
 export interface MultipartFile {
@@ -19,7 +18,10 @@ export interface MultipartFile {
 }
 
 /**
- * Helper for reading a single file from a multipart/form-data request.
+ * Reads a single WebP file from a multipart/form-data request.
+ *
+ * The server only accepts WebP images. The client is responsible for converting
+ * images to WebP before uploading.
  *
  * @param req - The Next.js request object.
  * @param opts - The options for the readMultipartFile function.
@@ -76,29 +78,12 @@ export async function readMultipartFile(
         );
     }
 
-    if (
-        opts.allowedContentTypes &&
-        !opts.allowedContentTypes.some(
-            (t) =>
-                maybeFile.type.localeCompare(t, undefined, {
-                    sensitivity: 'accent'
-                }) === 0
-        )
-    ) {
-        throw new UnsupportedMediaTypeError(
-            'app.error.file-type-unsupported',
-            ApplicationErrorCode.FILE_TYPE_UNSUPPORTED
-        );
-    }
-
     /**
      * Convert to Uint8Array. This avoids double copies because File.arrayBuffer()
      * yields a detached buffer referencing existing memory.
      */
     const arrayBuffer = await maybeFile.arrayBuffer();
-    const data = new Uint8Array(arrayBuffer) as Uint8Array & {
-        readonly _maxSize: typeof maxSize;
-    };
+    const data = new Uint8Array(arrayBuffer);
 
     if (!isWebP(data)) {
         throw new UnsupportedMediaTypeError(
