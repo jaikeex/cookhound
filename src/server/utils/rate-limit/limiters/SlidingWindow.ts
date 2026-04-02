@@ -4,6 +4,9 @@ import type {
     RateLimitResult
 } from '@/server/utils/rate-limit/types';
 import { redisClient } from '@/server/integrations';
+import { Logger } from '@/server/logger';
+
+const log = Logger.getInstance('rate-limit');
 
 //|=============================================================================================|//
 
@@ -27,54 +30,62 @@ export class SlidingWindowRateLimit implements RateLimiter {
 
         const currentSubWindow = Math.floor(now / subWindowSizeMs);
         const key = this.config.keyGenerator(identifier);
+        const currentSubWindowKey = `${key}:${currentSubWindow}`;
 
-        const subWindowKeys = [];
+        // Atomically increment the current sub-window FIRST to claim a slot.
+        // INCR is atomic in redis, so concurrent requests each get a unique count.
+        // NOTE: INCR re-applies the TTL on every call via a pipeline (INCR + EXPIRE),
+        // which slightly extends the sub-window's expiration on each request.
+        // This is a minor inaccuracy inherent to sub-window rate limiting and is
+        // acceptable in practice, the drift is bounded by subWindowSize.
+        const newCurrentCount = await redisClient.incr(
+            currentSubWindowKey,
+            this.config.windowSizeInSeconds
+        );
 
-        // Build Redis keys for all sub-windows that make up the current sliding window.
-        for (let i = 0; i < this.config.subWindowCount; i++) {
-            const subWindowKey = `${key}:${currentSubWindow - i}`;
-            subWindowKeys.push(subWindowKey);
+        // Fetch request counts for all OTHER sub-windows in the sliding window.
+        const otherSubWindowKeys: string[] = [];
+
+        for (let i = 1; i < this.config.subWindowCount; i++) {
+            otherSubWindowKeys.push(`${key}:${currentSubWindow - i}`);
         }
 
-        // Fetch request counts for all sub-windows.
-        const subWindowCounts = await Promise.all(
-            subWindowKeys.map(async (subKey) => {
+        const otherCounts = await Promise.all(
+            otherSubWindowKeys.map(async (subKey) => {
                 const count = await redisClient.get<number>(subKey);
                 return count || 0;
             })
         );
 
-        // Sum up all requests across the sliding window segments to get total count.
-        const totalRequests = subWindowCounts.reduce(
-            (sum, count) => sum + count,
-            0
-        );
+        const totalRequests =
+            newCurrentCount +
+            otherCounts.reduce((sum, count) => sum + count, 0);
 
-        const allowed = totalRequests < this.config.maxRequests;
+        if (totalRequests > this.config.maxRequests) {
+            // Over the limit, roll back the optimistic increment.
+            try {
+                await redisClient.decr(currentSubWindowKey);
+            } catch (error: unknown) {
+                log.warn(
+                    'checkLimit - failed to roll back optimistic increment',
+                    { error, key: currentSubWindowKey }
+                );
+            }
 
-        if (allowed) {
-            // Increment the counter for the current sub-window ONLY if the request is allowed
-            // The TTL is set to the full window size to ensure old sub-windows automatically expire.
-            const currentSubWindowKey = `${key}:${currentSubWindow}`;
-            const currentCount =
-                (await redisClient.get<number>(currentSubWindowKey)) || 0;
-
-            await redisClient.set(
-                currentSubWindowKey,
-                currentCount + 1,
-                this.config.windowSizeInSeconds
-            );
+            return {
+                allowed: false,
+                remainingRequests: 0,
+                totalRequests: totalRequests - 1
+            };
         }
 
-        const remainingRequests = Math.max(
-            0,
-            this.config.maxRequests - totalRequests - (allowed ? 1 : 0)
-        );
-
         return {
-            allowed,
-            remainingRequests,
-            totalRequests: totalRequests + (allowed ? 1 : 0)
+            allowed: true,
+            remainingRequests: Math.max(
+                0,
+                this.config.maxRequests - totalRequests
+            ),
+            totalRequests
         };
     }
 

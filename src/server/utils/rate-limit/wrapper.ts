@@ -25,6 +25,8 @@ export function withRateLimit(
 ): <T extends (req: NextRequest, context?: unknown) => Promise<Response>>(
     handler: T
 ) => T {
+    const rateLimiter = createRateLimiter(options);
+
     return <
         T extends (req: NextRequest, context?: unknown) => Promise<Response>
     >(
@@ -39,12 +41,11 @@ export function withRateLimit(
                 return handler(req, context);
             }
 
-            logger.info('withRateLimit - guarded request received', {
+            logger.trace('withRateLimit - guarded request received', {
                 path: req.nextUrl.pathname,
                 method: req.method
             });
 
-            const rateLimiter = createRateLimiter(options);
             let result: RateLimitResult;
 
             try {
