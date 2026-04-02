@@ -20,7 +20,10 @@ const mockRedisClient = {
     get: vi.fn(),
     set: vi.fn(),
     del: vi.fn(),
-    keys: vi.fn()
+    keys: vi.fn(),
+    sadd: vi.fn(),
+    srem: vi.fn(),
+    smembers: vi.fn()
 };
 
 vi.mock('@/server/integrations/redis', () => ({
@@ -52,6 +55,9 @@ describe('SessionManager', () => {
     beforeEach(async () => {
         vi.clearAllMocks();
         setupRedisMocks(mockRedisClient);
+        mockRedisClient.sadd.mockResolvedValue(undefined);
+        mockRedisClient.srem.mockResolvedValue(undefined);
+        mockRedisClient.smembers.mockResolvedValue([]);
 
         const imported = await import('./manager');
         SessionManager = imported.sessions;
@@ -99,7 +105,6 @@ describe('SessionManager', () => {
 
         it('should store session data in correct Redis keys', async () => {
             mockRedisClient.set.mockResolvedValue('OK');
-            mockRedisClient.get.mockResolvedValue([]);
 
             const sessionId = await SessionManager.createSession(
                 1,
@@ -112,9 +117,9 @@ describe('SessionManager', () => {
                 ONE_MONTH_IN_SECONDS
             );
 
-            expect(mockRedisClient.set).toHaveBeenCalledWith(
-                'user_sessions:1',
-                expect.arrayContaining([sessionId]),
+            expect(mockRedisClient.sadd).toHaveBeenCalledWith(
+                'user-sessions:1',
+                sessionId,
                 ONE_MONTH_IN_SECONDS
             );
         });
@@ -179,18 +184,7 @@ describe('SessionManager', () => {
             );
         });
 
-        it('should add session to existing user sessions', async () => {
-            const existingSessions = [
-                'existing-session-1',
-                'existing-session-2'
-            ];
-
-            mockRedisClient.get.mockImplementation((key) => {
-                if (key === 'user_sessions:1') {
-                    return Promise.resolve([...existingSessions]);
-                }
-                return Promise.resolve(null);
-            });
+        it('should add session to user sessions set atomically', async () => {
             mockRedisClient.set.mockResolvedValue('OK');
 
             const newSessionId = await SessionManager.createSession(
@@ -198,20 +192,12 @@ describe('SessionManager', () => {
                 validOptions
             );
 
-            const userSessionsCalls = mockRedisClient.set.mock.calls.filter(
-                (call) => call[0] === 'user_sessions:1'
+            // sadd is atomic — no need to read existing sessions first
+            expect(mockRedisClient.sadd).toHaveBeenCalledWith(
+                'user-sessions:1',
+                newSessionId,
+                ONE_MONTH_IN_SECONDS
             );
-
-            expect(userSessionsCalls.length).toBeGreaterThan(0);
-
-            const lastUserSessionsCall =
-                userSessionsCalls[userSessionsCalls.length - 1];
-
-            expect(lastUserSessionsCall?.[1]).toEqual([
-                ...existingSessions,
-                newSessionId
-            ]);
-            expect(lastUserSessionsCall?.[2]).toBe(ONE_MONTH_IN_SECONDS);
         });
     });
 
@@ -331,11 +317,7 @@ describe('SessionManager', () => {
     describe('invalidateSession', () => {
         it('should successfully remove session from Redis', async () => {
             const mockSession = createMockSession({ userId: 1 });
-            const userSessions = ['test-session'];
-            mockRedisClient.get
-                .mockResolvedValueOnce(mockSession) // First call for session
-                .mockResolvedValueOnce(userSessions); // Second call for user sessions
-            mockRedisClient.set.mockResolvedValue('OK');
+            mockRedisClient.get.mockResolvedValueOnce(mockSession);
             mockRedisClient.del.mockResolvedValue(1);
 
             await SessionManager.invalidateSession('test-session');
@@ -345,22 +327,16 @@ describe('SessionManager', () => {
             );
         });
 
-        it('should remove session ID from user session set', async () => {
+        it('should atomically remove session ID from user session set', async () => {
             const mockSession = createMockSession({ userId: 1 });
-            const userSessions = ['test-session', 'other-session'];
-
-            mockRedisClient.get
-                .mockResolvedValueOnce(mockSession) // First call for session
-                .mockResolvedValueOnce(userSessions); // Second call for user sessions
-            mockRedisClient.set.mockResolvedValue('OK');
+            mockRedisClient.get.mockResolvedValueOnce(mockSession);
             mockRedisClient.del.mockResolvedValue(1);
 
             await SessionManager.invalidateSession('test-session');
 
-            expect(mockRedisClient.set).toHaveBeenCalledWith(
-                'user_sessions:1',
-                ['other-session'],
-                ONE_MONTH_IN_SECONDS
+            expect(mockRedisClient.srem).toHaveBeenCalledWith(
+                'user-sessions:1',
+                'test-session'
             );
         });
 
@@ -373,18 +349,19 @@ describe('SessionManager', () => {
             ).resolves.not.toThrow();
         });
 
-        it('should cleanup user session set when last session removed', async () => {
+        it('should handle last session removal (Redis auto-deletes empty sets)', async () => {
             const mockSession = createMockSession({ userId: 1 });
-            const userSessions = ['test-session']; // Only one session
-
-            mockRedisClient.get
-                .mockResolvedValueOnce(mockSession)
-                .mockResolvedValueOnce(userSessions);
+            mockRedisClient.get.mockResolvedValueOnce(mockSession);
             mockRedisClient.del.mockResolvedValue(1);
 
             await SessionManager.invalidateSession('test-session');
 
-            expect(mockRedisClient.del).toHaveBeenCalledWith('user_sessions:1');
+            // srem is called; Redis automatically deletes the set key
+            // when the last member is removed — no explicit del needed.
+            expect(mockRedisClient.srem).toHaveBeenCalledWith(
+                'user-sessions:1',
+                'test-session'
+            );
         });
 
         it('should handle empty session ID gracefully', async () => {
@@ -413,7 +390,7 @@ describe('SessionManager', () => {
     describe('invalidateAllUserSessions', () => {
         it('should remove all sessions for a user', async () => {
             const userSessions = ['session-1', 'session-2', 'session-3'];
-            mockRedisClient.get.mockResolvedValue(userSessions);
+            mockRedisClient.smembers.mockResolvedValue(userSessions);
             mockRedisClient.del.mockResolvedValue(1);
 
             await SessionManager.invalidateAllUserSessions(1);
@@ -428,12 +405,12 @@ describe('SessionManager', () => {
                 'session:session-3'
             );
 
-            expect(mockRedisClient.del).toHaveBeenCalledWith('user_sessions:1');
+            expect(mockRedisClient.del).toHaveBeenCalledWith('user-sessions:1');
         });
 
         it('should cleanup all Redis keys properly', async () => {
             const userSessions = ['session-1', 'session-2'];
-            mockRedisClient.get.mockResolvedValue(userSessions);
+            mockRedisClient.smembers.mockResolvedValue(userSessions);
             mockRedisClient.del.mockResolvedValue(1);
 
             await SessionManager.invalidateAllUserSessions(42);
@@ -442,8 +419,7 @@ describe('SessionManager', () => {
         });
 
         it('should handle users with no sessions', async () => {
-            mockRedisClient.get.mockResolvedValue(null);
-            mockRedisClient.del.mockResolvedValue(0);
+            mockRedisClient.smembers.mockResolvedValue([]);
 
             await expect(
                 SessionManager.invalidateAllUserSessions(1)
@@ -453,8 +429,7 @@ describe('SessionManager', () => {
         });
 
         it('should handle empty session array', async () => {
-            mockRedisClient.get.mockResolvedValue([]);
-            mockRedisClient.del.mockResolvedValue(0);
+            mockRedisClient.smembers.mockResolvedValue([]);
 
             await SessionManager.invalidateAllUserSessions(1);
 
@@ -478,8 +453,8 @@ describe('SessionManager', () => {
                 userId: 1
             });
 
+            mockRedisClient.smembers.mockResolvedValue(sessionIds);
             mockRedisClient.get
-                .mockResolvedValueOnce(sessionIds)
                 .mockResolvedValueOnce(session1)
                 .mockResolvedValueOnce(session2);
 
@@ -490,7 +465,7 @@ describe('SessionManager', () => {
             expect(result[1].sessionId).toBe('session-2');
         });
 
-        it('should filter out expired sessions', async () => {
+        it('should filter out expired sessions and remove them from set', async () => {
             const sessionIds = ['valid-session', 'expired-session'];
             const validSession = createMockSession({
                 sessionId: 'valid-session',
@@ -501,28 +476,23 @@ describe('SessionManager', () => {
                 expiresAt: pastDate(1)
             });
 
+            mockRedisClient.smembers.mockResolvedValue(sessionIds);
             mockRedisClient.get
-                .mockResolvedValueOnce(sessionIds)
                 .mockResolvedValueOnce(validSession)
                 .mockResolvedValueOnce(expiredSession);
-            mockRedisClient.set.mockResolvedValue('OK');
 
             const result = await SessionManager.getUserSessions(1);
 
             expect(result).toHaveLength(1);
             expect(result[0].sessionId).toBe('valid-session');
+            expect(mockRedisClient.srem).toHaveBeenCalledWith(
+                'user-sessions:1',
+                'expired-session'
+            );
         });
 
         it('should return empty array for users with no sessions', async () => {
-            mockRedisClient.get.mockResolvedValue([]);
-
-            const result = await SessionManager.getUserSessions(1);
-
-            expect(result).toEqual([]);
-        });
-
-        it('should handle null session list', async () => {
-            mockRedisClient.get.mockResolvedValue(null);
+            mockRedisClient.smembers.mockResolvedValue([]);
 
             const result = await SessionManager.getUserSessions(1);
 
@@ -533,8 +503,8 @@ describe('SessionManager', () => {
             const sessionIds = ['session-1', 'session-2', 'session-3'];
             const session1 = createMockSession({ sessionId: 'session-1' });
 
+            mockRedisClient.smembers.mockResolvedValue(sessionIds);
             mockRedisClient.get
-                .mockResolvedValueOnce(sessionIds)
                 .mockResolvedValueOnce(session1)
                 .mockResolvedValueOnce(null)
                 .mockResolvedValueOnce(null);
@@ -543,26 +513,39 @@ describe('SessionManager', () => {
 
             expect(result).toHaveLength(1);
             expect(result[0].sessionId).toBe('session-1');
+
+            // Stale IDs should be removed from the set
+            expect(mockRedisClient.srem).toHaveBeenCalledWith(
+                'user-sessions:1',
+                'session-2'
+            );
+            expect(mockRedisClient.srem).toHaveBeenCalledWith(
+                'user-sessions:1',
+                'session-3'
+            );
         });
 
-        it('should cleanup stale session IDs from user sessions set', async () => {
+        it('should cleanup stale session IDs atomically via srem', async () => {
             const sessionIds = ['valid-session', 'stale-session'];
             const validSession = createMockSession({
                 sessionId: 'valid-session'
             });
 
+            mockRedisClient.smembers.mockResolvedValue(sessionIds);
             mockRedisClient.get
-                .mockResolvedValueOnce(sessionIds)
                 .mockResolvedValueOnce(validSession)
                 .mockResolvedValueOnce(null); // stale session
-            mockRedisClient.set.mockResolvedValue('OK');
 
             await SessionManager.getUserSessions(1);
 
-            expect(mockRedisClient.set).toHaveBeenCalledWith(
-                'user_sessions:1',
-                ['valid-session'],
-                ONE_MONTH_IN_SECONDS
+            expect(mockRedisClient.srem).toHaveBeenCalledWith(
+                'user-sessions:1',
+                'stale-session'
+            );
+            // Valid session should NOT be removed
+            expect(mockRedisClient.srem).not.toHaveBeenCalledWith(
+                'user-sessions:1',
+                'valid-session'
             );
         });
     });

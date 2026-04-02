@@ -34,8 +34,20 @@ type CreateSessionOptions = {
     loginMethod: 'manual' | 'google';
 };
 
+/**
+ * Prefix for individual session data keys: `session:{sessionId}`.
+ * The session cookie maps directly to one of these keys.
+ */
 const SESSION_KEY_PREFIX = 'session';
-const USER_SESSIONS_KEY_PREFIX = 'user_sessions';
+
+/**
+ * Prefix for the user -> session IDs reverse mapping: 'user-sessions:{userId}'.
+ *
+ * This mapping is NOT used for authentication. It exists only for:
+ *   - getUserSessions() - listing all active sessions for a user
+ *   - invalidateAllUserSessions() - force-logout a user from all devices
+ */
+const USER_SESSIONS_KEY_PREFIX = 'user-sessions';
 
 const log = Logger.getInstance('session-manager');
 
@@ -103,15 +115,9 @@ class SessionManager {
                 SessionManager.SESSION_TTL
             );
 
-            // Update users -> sessions mapping
-            const userKey = this.getUserSessionsKey(userId);
-
-            const existing = (await redisClient.get<string[]>(userKey)) || [];
-            existing.push(sessionId);
-
-            await redisClient.set(
-                userKey,
-                existing,
+            await redisClient.sadd(
+                this.getUserSessionsKey(userId),
+                sessionId,
                 SessionManager.SESSION_TTL
             );
 
@@ -158,7 +164,7 @@ class SessionManager {
             const expiresAtMs = new Date(session.expiresAt).getTime();
 
             if (expiresAtMs <= now) {
-                // Session expired – deport it to mexico
+                // Session expired – clean it up
                 await this.invalidateSession(sessionId);
                 return null;
             }
@@ -209,22 +215,10 @@ class SessionManager {
             const session = await redisClient.get<ServerSession>(sessionKey);
 
             if (session) {
-                const userKey = this.getUserSessionsKey(session.userId);
-
-                const userSessions =
-                    (await redisClient.get<string[]>(userKey)) || [];
-
-                const updated = userSessions.filter((id) => id !== sessionId);
-
-                if (updated.length === 0) {
-                    await redisClient.del(userKey);
-                } else {
-                    await redisClient.set(
-                        userKey,
-                        updated,
-                        SessionManager.SESSION_TTL
-                    );
-                }
+                await redisClient.srem(
+                    this.getUserSessionsKey(session.userId),
+                    sessionId
+                );
             }
 
             await redisClient.del(sessionKey);
@@ -255,12 +249,11 @@ class SessionManager {
     async getUserSessions(userId: number): Promise<ServerSession[]> {
         try {
             const userKey = this.getUserSessionsKey(userId);
-            const sessionIds = (await redisClient.get<string[]>(userKey)) || [];
+            const sessionIds = await redisClient.smembers(userKey);
 
             if (!sessionIds.length) return [];
 
             const sessions: ServerSession[] = [];
-            const validSessionIds: string[] = [];
 
             /**
              *# Fetch sessions sequentially to limit Redis round-trips. In most cases users have < 3 active
@@ -278,17 +271,9 @@ class SessionManager {
                     new Date(session.expiresAt).getTime() > Date.now()
                 ) {
                     sessions.push(session);
-                    validSessionIds.push(id);
+                } else {
+                    await redisClient.srem(userKey, id);
                 }
-            }
-
-            // Clean up stale IDs if necessary.
-            if (validSessionIds.length !== sessionIds.length) {
-                await redisClient.set(
-                    userKey,
-                    validSessionIds,
-                    SessionManager.SESSION_TTL
-                );
             }
 
             return sessions;
@@ -314,7 +299,7 @@ class SessionManager {
     async invalidateAllUserSessions(userId: number): Promise<void> {
         try {
             const userKey = this.getUserSessionsKey(userId);
-            const sessionIds = (await redisClient.get<string[]>(userKey)) || [];
+            const sessionIds = await redisClient.smembers(userKey);
 
             if (!sessionIds.length) return;
 

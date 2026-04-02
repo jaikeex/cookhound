@@ -86,6 +86,71 @@ class RedisClient {
         await this.client.del(key);
     }
 
+    //~-----------------------------------------------------------------------------------------~//
+    //$                                     SET OPERATIONS                                      $//
+    //~-----------------------------------------------------------------------------------------~//
+
+    async sadd(
+        key: string,
+        member: string,
+        ttlInSeconds?: number
+    ): Promise<void> {
+        await this.connect();
+
+        if (ttlInSeconds) {
+            const pipeline = this.client.pipeline();
+            pipeline.sadd(key, member);
+            pipeline.expire(key, ttlInSeconds);
+
+            await pipeline.exec();
+        } else {
+            await this.client.sadd(key, member);
+        }
+    }
+
+    async srem(key: string, member: string): Promise<void> {
+        await this.connect();
+        await this.client.srem(key, member);
+    }
+
+    async smembers(key: string): Promise<string[]> {
+        await this.connect();
+        return this.client.smembers(key);
+    }
+
+    //~-----------------------------------------------------------------------------------------~//
+    //$                                   COUNTER OPERATIONS                                    $//
+    //~-----------------------------------------------------------------------------------------~//
+
+    async incr(key: string, ttlInSeconds?: number): Promise<number> {
+        await this.connect();
+
+        if (ttlInSeconds) {
+            const pipeline = this.client.pipeline();
+            pipeline.incr(key);
+            pipeline.expire(key, ttlInSeconds);
+
+            const results = await pipeline.exec();
+
+            if (results?.[0]?.[0]) {
+                throw results[0][0];
+            }
+
+            return (results?.[0]?.[1] as number) ?? 0;
+        }
+
+        return this.client.incr(key);
+    }
+
+    async decr(key: string): Promise<number> {
+        await this.connect();
+        return this.client.decr(key);
+    }
+
+    //~-----------------------------------------------------------------------------------------~//
+    //$                                    SCAN / KEY LOOKUP                                    $//
+    //~-----------------------------------------------------------------------------------------~//
+
     async keys(pattern: string): Promise<string[]> {
         await this.connect();
         const keys: string[] = [];

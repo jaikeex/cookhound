@@ -296,17 +296,29 @@ export function setupRedisMocks(
         setResult?: string;
         delResult?: number;
         keysResult?: string[];
+        smembersResult?: string[];
     } = {}
 ) {
     const {
         getResult = null,
         setResult = 'OK',
         delResult = 1,
-        keysResult = []
+        keysResult = [],
+        smembersResult = []
     } = options;
 
     mockRedis.get.mockResolvedValue(getResult);
     mockRedis.set.mockResolvedValue(setResult);
     mockRedis.del.mockResolvedValue(delResult);
     mockRedis.keys.mockResolvedValue(keysResult);
+
+    // Set operations (used by SessionManager)
+    if (mockRedis.sadd) mockRedis.sadd.mockResolvedValue(undefined);
+    if (mockRedis.srem) mockRedis.srem.mockResolvedValue(undefined);
+    if (mockRedis.smembers)
+        mockRedis.smembers.mockResolvedValue(smembersResult);
+
+    // Counter operations (used by SlidingWindowRateLimit)
+    if (mockRedis.incr) mockRedis.incr.mockResolvedValue(1);
+    if (mockRedis.decr) mockRedis.decr.mockResolvedValue(0);
 }
