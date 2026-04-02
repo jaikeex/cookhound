@@ -25,11 +25,11 @@ export function generateRecipeSchema(recipe: RecipeDTO, baseUrl?: string) {
     };
 
     if (recipe.createdAt) {
-        schema.publishedTime = recipe.createdAt;
+        schema.datePublished = recipe.createdAt;
     }
 
     if (recipe.updatedAt) {
-        schema.modifiedTime = recipe.updatedAt;
+        schema.dateModified = recipe.updatedAt;
     }
 
     // Map tags to cuisine/category

@@ -9,7 +9,7 @@ const TIME_COST = 2;
 const PARALLELISM = 4;
 
 // generated with a string that is not possible as a password
-export const RANDOM_HASH =
+const RANDOM_HASH =
     '$argon2id$v=19$m=47104,t=2,p=4$N3s//I0cws7RW9s4jG6ZCg$ZRwN8AnQiHKX3kdITvqNAuNdWsAPBKVbWDf8Z14qdx0';
 
 export async function hashPassword(password: string): Promise<string> {
@@ -69,7 +69,7 @@ export function needsRehash(hash: string | null | undefined): boolean {
             return true;
         }
 
-        params.split(',').forEach((param) => {
+        for (const param of params.split(',')) {
             const [key, value] = param.split('=');
 
             if (!key || !value) {
@@ -77,7 +77,7 @@ export function needsRehash(hash: string | null | undefined): boolean {
             }
 
             paramMap[key] = parseInt(value, 10);
-        });
+        }
 
         if (!paramMap['m'] || !paramMap['t'] || !paramMap['p']) {
             return true;

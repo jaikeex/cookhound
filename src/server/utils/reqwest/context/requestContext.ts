@@ -76,12 +76,16 @@ export const RequestContext = {
                 ctx.requestPath = 'PATH UNKNOWN';
             }
             ///---------------------------------------------------------------------------------///
+            ///                                  COOKIES                                       ///
+            ///---------------------------------------------------------------------------------///
+
+            const cookieStore = await cookies();
+
+            ///---------------------------------------------------------------------------------///
             ///                                     LOCALE                                      ///
             ///---------------------------------------------------------------------------------///
 
             try {
-                const cookieStore = await cookies();
-
                 const locale = await getUserLocale(cookieStore, req.headers);
                 ctx.userLocale = locale;
             } catch {
@@ -93,7 +97,7 @@ export const RequestContext = {
             ///                                     SESSION                                     ///
             ///---------------------------------------------------------------------------------///
 
-            const session = (await cookies()).get(SESSION_COOKIE_NAME)?.value;
+            const session = cookieStore.get(SESSION_COOKIE_NAME)?.value;
 
             if (session) {
                 const serverSession = await sessions.validateSession(session);

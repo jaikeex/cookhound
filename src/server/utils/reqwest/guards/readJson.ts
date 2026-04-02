@@ -1,5 +1,5 @@
 import type { NextRequest } from 'next/server';
-import { PayloadTooLargeError } from '@/server/error';
+import { PayloadTooLargeError, ValidationError } from '@/server/error';
 
 /**
  * Reads and parses the JSON body of the request while enforcing a maximum size limit.
@@ -32,7 +32,7 @@ export async function readJson<T = unknown>(
     const reader = req.body?.getReader();
 
     if (!reader) {
-        return undefined as T;
+        throw new ValidationError();
     }
 
     let received = 0;

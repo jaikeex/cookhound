@@ -44,7 +44,6 @@ export function validateQuery<T>(schema: z.ZodType<T>, url: URL): T {
             .join(', ');
 
         log.warn('Query parameter validation failed', {
-            query: queryObject,
             schema: schema.description,
             validationErrors: errorDetails
         });
@@ -86,7 +85,6 @@ export function validateHeaders<T>(schema: z.ZodType<T>, headers: Headers): T {
             .join(', ');
 
         log.warn('Header validation failed', {
-            headers: headersObject,
             schema: schema.description,
             validationErrors: errorDetails
         });
@@ -149,7 +147,6 @@ export function validatePayload<T>(schema: z.ZodType<T>, payload: unknown): T {
             .join(', ');
 
         log.warn('Request payload validation failed', {
-            payload,
             schema: schema.description,
             validationErrors: errorDetails
         });

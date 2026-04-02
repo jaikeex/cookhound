@@ -1,7 +1,7 @@
 //§—————————————————————————————————————————————————————————————————————————————————————————————§//
 //§                                     NO BARREL FILE HERE                                     §//
 ///
-//# Util functions often import random stuff from across the server code. I don't thing that
+//# Util functions often import random stuff from across the server code. I don't think that
 //# is a bad thing, but it has a huge potential for creating import problems when exported
 //# through a barell file. Since i expect this folder to get rather large as times go on,
 //# instead of dealing with all these problems and then using targeted imports anyway, I hereby
