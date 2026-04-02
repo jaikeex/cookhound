@@ -1,9 +1,7 @@
 #!/bin/sh
 
-# Get the name of the branch
-branch=$(git symbolic-ref --short HEAD)
 # Default prefix
-prefix="[ROOT][${branch}] - "
+prefix="[ROOT] - "
 
 # Check for changes in specific directories
 router_changes=$(git diff --cached --name-only | grep ^src/app/ || true)
@@ -11,13 +9,13 @@ client_changes=$(git diff --cached --name-only | grep ^src/client/ || true)
 server_changes=$(git diff --cached --name-only | grep ^src/server/ || true)
 
 if [ ! -z "$client_changes" ] && [ ! -z "$server_changes" ] && [ ! -z "$router_changes" ]; then
-    prefix="[PROJECT][${branch}] - "
+    prefix="[PROJECT] - "
 elif [ ! -z "$client_changes" ]; then
-    prefix="[CLIENT][${branch}] - "
+    prefix="[CLIENT] - "
 elif [ ! -z "$server_changes" ]; then
-    prefix="[SERVER][${branch}] - "
+    prefix="[SERVER] - "
 elif [ ! -z "$router_changes" ]; then
-    prefix="[ROUTER][${branch}] - "
+    prefix="[ROUTER] - "
 fi
 # Check if the commit is a merge commit, in which case do not alter the commit message
 if [ "$2" = "merge" ]; then
