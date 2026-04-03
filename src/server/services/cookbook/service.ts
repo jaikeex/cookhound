@@ -16,9 +16,17 @@ import { createCookbookDTO, verifyCookbookOwnership } from './utils';
 const log = Logger.getInstance('cookbook-service');
 
 /**
- * Service class for managing cookbooks.
+ * Manages cookbook operations and recipe-to-cookbook associations,
+ * including ordering of both recipes within a cookbook and the cookbooks themselves.
  */
 class CookbookService {
+    /**
+     * Retrieves a single cookbook by its database ID.
+     *
+     * @param id - Database ID of the cookbook.
+     * @returns The cookbook DTO.
+     * @throws {NotFoundError} If the cookbook does not exist.
+     */
     @LogServiceMethod({ names: ['id'] })
     async getCookbookById(id: number): Promise<CookbookDTO> {
         const cookbook = await db.cookbook.getOneById(id);
@@ -33,6 +41,13 @@ class CookbookService {
         return cookbookDTO;
     }
 
+    /**
+     * Retrieves a single cookbook by its public-facing display ID.
+     *
+     * @param displayId - Public UUID used in cookbook URLs.
+     * @returns The cookbook DTO.
+     * @throws {NotFoundError} If the cookbook does not exist.
+     */
     @LogServiceMethod({ names: ['displayId'] })
     async getCookbookByDisplayId(displayId: string): Promise<CookbookDTO> {
         const cookbook = await db.cookbook.getOneByDisplayId(displayId);
@@ -44,6 +59,12 @@ class CookbookService {
         return createCookbookDTO(cookbook);
     }
 
+    /**
+     * Retrieves all cookbooks owned by a specific user.
+     *
+     * @param ownerId - Database ID of the cookbook owner.
+     * @returns List of cookbook DTOs (may be empty).
+     */
     @LogServiceMethod({ names: ['ownerId'] })
     async getCookbooksByOwnerId(ownerId: number): Promise<CookbookDTO[]> {
         const cookbooks = await db.cookbook.getManyByOwnerId(ownerId);
@@ -51,6 +72,14 @@ class CookbookService {
         return cookbooks.map((cookbook) => createCookbookDTO(cookbook));
     }
 
+    /**
+     * Creates a new cookbook owned by the authenticated user.
+     * The language is resolved from the request context.
+     *
+     * @param payload - Cookbook data: title, description, and visibility.
+     * @returns The raw Prisma cookbook record.
+     * @throws {AuthErrorUnauthorized} If the caller is not authenticated.
+     */
     @LogServiceMethod({ names: ['payload'] })
     async createCookbook(payload: CookbookForCreatePayload): Promise<Cookbook> {
         const userId = assertAuthenticated();
@@ -73,6 +102,12 @@ class CookbookService {
         return cookbook;
     }
 
+    /**
+     * Deletes a cookbook. Only the owner may delete it.
+     *
+     * @param cookbookId - Database ID of the cookbook to delete.
+     * @throws {AuthErrorForbidden} If the caller is not the cookbook owner.
+     */
     @LogServiceMethod({ names: ['cookbookId'] })
     async deleteCookbook(cookbookId: number): Promise<void> {
         await verifyCookbookOwnership(cookbookId);
@@ -80,6 +115,15 @@ class CookbookService {
         await db.cookbook.deleteOne(cookbookId);
     }
 
+    /**
+     * Adds a recipe to a cookbook. Returns { success: false } instead of
+     * throwing if the recipe is already in the cookbook (constraint violation).
+     *
+     * @param cookbookId - Database ID of the target cookbook.
+     * @param recipeId - Database ID of the recipe to add.
+     * @returns `{ success: true }` on insert, `{ success: false }` if already present.
+     * @throws {AuthErrorForbidden} If the caller is not the cookbook owner.
+     */
     @LogServiceMethod({ names: ['cookbookId', 'recipeId'] })
     async addRecipeToCookbook(
         cookbookId: number,
@@ -111,6 +155,13 @@ class CookbookService {
         }
     }
 
+    /**
+     * Removes a recipe from a cookbook. Only the owner may modify the cookbook.
+     *
+     * @param cookbookId - Database ID of the cookbook.
+     * @param recipeId - Database ID of the recipe to remove.
+     * @throws {AuthErrorForbidden} If the caller is not the cookbook owner.
+     */
     @LogServiceMethod({ names: ['cookbookId', 'recipeId'] })
     async removeRecipeFromCookbook(
         cookbookId: number,
@@ -126,6 +177,13 @@ class CookbookService {
         );
     }
 
+    /**
+     * Replaces the recipe ordering within a cookbook.
+     *
+     * @param cookbookId - Database ID of the cookbook.
+     * @param orderedRecipeIds - Recipe IDs in the desired display order.
+     * @throws {AuthErrorForbidden} If the caller is not the cookbook owner.
+     */
     @LogServiceMethod({ names: ['cookbookId', 'orderedRecipeIds'] })
     async reorderCookbookRecipes(
         cookbookId: number,
@@ -141,6 +199,12 @@ class CookbookService {
         );
     }
 
+    /**
+     * Replaces the display ordering of a user's own cookbooks.
+     *
+     * @param ownerId - Database ID of the cookbook owner.
+     * @param orderedCookbookIds - Cookbook IDs in the desired display order.
+     */
     @LogServiceMethod({ names: ['ownerId', 'orderedCookbookIds'] })
     async reorderOwnCookbooks(
         ownerId: number,

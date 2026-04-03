@@ -34,11 +34,23 @@ import { getFrontPageRecipes } from '@/server/db/generated/prisma/sql';
 
 const log = Logger.getInstance('recipe-service');
 
+/**
+ * Manages recipe lifecycle operations including creation, updates, deletion,
+ * search, ratings, and front-page listing. Coordinates with the Typesense
+ * search index and content evaluation.
+ */
 class RecipeService {
     //~-----------------------------------------------------------------------------------------~//
     //$                                        GET BY ID                                        $//
     //~-----------------------------------------------------------------------------------------~//
 
+    /**
+     * Retrieves a full recipe by its database ID, including any active content flags.
+     *
+     * @param id - Database ID of the recipe.
+     * @returns The complete recipe DTO with ingredients, instructions, tags, and flags.
+     * @throws {NotFoundError} If the recipe does not exist or is missing required fields.
+     */
     @LogServiceMethod({ names: ['id'] })
     async getRecipeById(id: number): Promise<RecipeDTO> {
         const recipe = await db.recipe.getOneById(id);
@@ -106,6 +118,13 @@ class RecipeService {
     //$                                    GET BY DISPLAY ID                                    $//
     //~-----------------------------------------------------------------------------------------~//
 
+    /**
+     * Retrieves a full recipe by its public-facing display ID.
+     *
+     * @param displayId - Public UUID used in recipe URLs.
+     * @returns The complete recipe DTO with an incremented view count.
+     * @throws {NotFoundError} If the recipe does not exist or is missing required fields.
+     */
     @LogServiceMethod({ names: ['displayId'] })
     async getRecipeByDisplayId(displayId: string): Promise<RecipeDTO> {
         const recipe = await db.recipe.getOneByDisplayId(displayId);
@@ -146,7 +165,7 @@ class RecipeService {
             rating: recipe.rating ? Number(recipe.rating) : null,
             tags: recipe.tags as RecipeTagDTO[],
             timesRated: recipe.timesRated ?? 0,
-            timesViewed: (recipe.timesViewed ?? 0) + 1, // Include the increment we just made
+            timesViewed: recipe.timesViewed ?? 0,
             ingredients: recipe.ingredients as Ingredient[],
             instructions: recipe.instructions as string[],
             flags: null,
@@ -178,6 +197,15 @@ class RecipeService {
     //$                                         CREATE                                          $//
     //~-----------------------------------------------------------------------------------------~//
 
+    /**
+     * Creates a new recipe authored by the authenticated user.
+     * After persistence, triggers an asynchronous content evaluation and
+     * indexes the recipe in Typesense.
+     *
+     * @param payload - Recipe data: title, ingredients, instructions, tags, etc.
+     * @returns The fully hydrated recipe DTO.
+     * @throws {AuthErrorUnauthorized} If the caller is not authenticated.
+     */
     @LogServiceMethod({ success: 'notice', names: ['payload'] })
     async createRecipe(payload: RecipeForCreatePayload): Promise<RecipeDTO> {
         const authorId = RequestContext.getUserId();
@@ -238,6 +266,18 @@ class RecipeService {
     //$                                         UPDATE                                          $//
     //~-----------------------------------------------------------------------------------------~//
 
+    /**
+     * Partially updates a recipe's fields. Only the author or an admin
+     * may perform the update. After persistence, triggers a content
+     * re-evaluation and revalidates the recipe's route cache.
+     *
+     * @param recipeId - Database ID of the recipe to update.
+     * @param payload - Fields to update (only provided keys are changed).
+     * @returns The updated recipe DTO.
+     * @throws {AuthErrorUnauthorized} If the caller is not authenticated.
+     * @throws {AuthErrorForbidden} If the caller is neither the author nor an admin.
+     * @throws {NotFoundError} If the recipe does not exist.
+     */
     @LogServiceMethod({ names: ['recipeId', 'payload'] })
     async updateRecipe(
         recipeId: number,
@@ -295,6 +335,16 @@ class RecipeService {
     //$                                         DELETE                                          $//
     //~-----------------------------------------------------------------------------------------~//
 
+    /**
+     * Permanently deletes a recipe. Only the author or an admin may delete.
+     * Removes the recipe from the database, revalidates the route cache,
+     * and removes it from the Typesense search index.
+     *
+     * @param recipeId - Database ID of the recipe to delete.
+     * @throws {AuthErrorUnauthorized} If the caller is not authenticated.
+     * @throws {AuthErrorForbidden} If the caller is neither the author nor an admin.
+     * @throws {NotFoundError} If the recipe does not exist.
+     */
     @LogServiceMethod({ names: ['recipeId'] })
     async deleteRecipe(recipeId: number): Promise<void> {
         const currentUserId = RequestContext.getUserId();
@@ -342,6 +392,12 @@ class RecipeService {
     //$                                      REGISTER VISIT                                     $//
     //~-----------------------------------------------------------------------------------------~//
 
+    /**
+     * Enqueues a background job to record a recipe view. Failures are not propagated.
+     *
+     * @param recipeId - Database ID of the viewed recipe.
+     * @param userId - Database ID of the viewer, or `null` for anonymous visits.
+     */
     @LogServiceMethod({ names: ['recipeId', 'userId'] })
     async registerRecipeVisit(
         recipeId: number,
@@ -377,6 +433,17 @@ class RecipeService {
     //$                                         RATING                                          $//
     //~-----------------------------------------------------------------------------------------~//
 
+    /**
+     * Submits or updates a rating for a recipe by the authenticated user.
+     * Recalculates the recipe's average rating, revalidates the route cache,
+     * and updates the Typesense search index.
+     *
+     * @param recipeId - Database ID of the recipe to rate.
+     * @param rating - Rating value (0–5 inclusive).
+     * @throws {ValidationError} If the rating is out of the 0–5 range.
+     * @throws {AuthErrorUnauthorized} If the caller is not authenticated.
+     * @throws {NotFoundError} If the recipe does not exist.
+     */
     @LogServiceMethod({ names: ['recipeId', 'rating'] })
     async rateRecipe(recipeId: number, rating: number): Promise<void> {
         if (rating < 0 || rating > 5) {
@@ -451,17 +518,15 @@ class RecipeService {
     //~-----------------------------------------------------------------------------------------~//
 
     /**
-     * Fetch a paginated set of recipes for the front-page infinite scroll.
-     * The method will try to prioritise recent and highly-rated recipes while
-     * ensuring that only recipes that have been rated at least a certain
-     * amount of times are returned. If there are not enough recipes that meet
-     * the strict threshold, it will gradually lower the requirement until the
-     * requested batch size is fulfilled or no further loosening is possible.
+     * Fetches a paginated batch of recipes for the front-page infinite scroll.
+     * Prioritises highly-rated recipes, progressively lowering the minimum
+     * rating-count threshold until the batch is filled or no further
+     * loosening is possible. Flagged recipes are excluded.
      *
-     * @param language The language of the recipes to fetch.
-     * @param batch 1-based index of the batch that is being requested. The
-     *              first batch is 1.
-     * @param perPage Size of the batch. Defaults to 24.
+     * @param language - Locale to filter recipes by.
+     * @param batch - 1-based batch index (max 5).
+     * @param perPage - Batch size (max 100, defaults to 24).
+     * @returns Display-ready recipe DTOs for the requested page.
      */
     @LogServiceMethod({ names: ['language', 'batch', 'perPage'] })
     async getFrontPageRecipes(
@@ -536,9 +601,16 @@ class RecipeService {
     //~-----------------------------------------------------------------------------------------~//
 
     /**
-     * Search recipes by a free-text query across title, notes, ingredients and instructions.
-     * Results are filtered by language and returned in paginated batches.
-     * Supports multi-query search with "|" delimiter - returns recipes that match ALL queries.
+     * Searches recipes by free-text query across title, notes, ingredients,
+     * and instructions via Typesense. Supports multi-term queries delimited
+     * by "|", results must match ALL terms. Falls back to a
+     * database text search if Typesense is unavailable.
+     *
+     * @param query - Free-text search query (pipe-delimited for multi-term).
+     * @param language - Locale to filter recipes by.
+     * @param batch - 1-based batch index (max 20).
+     * @param perPage - Batch size (max 100, defaults to 24).
+     * @returns Display-ready recipe DTOs matching the query.
      */
     @LogServiceMethod({ names: ['query', 'language', 'batch', 'perPage'] })
     async searchRecipes(
@@ -727,6 +799,16 @@ class RecipeService {
     //$                                 USER RECIPES FETCH                                      $//
     //~-----------------------------------------------------------------------------------------~//
 
+    /**
+     * Fetches a paginated list of recipes authored by a specific user.
+     * Includes active content flags (visible to the author).
+     *
+     * @param userId - Database ID of the author.
+     * @param language - Locale to filter recipes by.
+     * @param batch - 1-based batch index.
+     * @param perPage - Batch size (max 100, defaults to 24).
+     * @returns Display-ready recipe DTOs with flag information, or an empty array.
+     */
     @LogServiceMethod({ names: ['userId', 'language', 'batch', 'perPage'] })
     async getUserRecipes(
         userId: number,
@@ -777,6 +859,17 @@ class RecipeService {
     //$                                   USER RECIPES SEARCH                                   $//
     //~-----------------------------------------------------------------------------------------~//
 
+    /**
+     * Searches a user's own recipes by free-text query against the database.
+     * Includes active content flags in the results.
+     *
+     * @param userId - Database ID of the author whose recipes to search.
+     * @param query - Free-text search string.
+     * @param language - Locale to filter recipes by.
+     * @param batch - 1-based batch index.
+     * @param perPage - Batch size (max 100, defaults to 24).
+     * @returns Display-ready recipe DTOs matching the query, or an empty array.
+     */
     @LogServiceMethod({
         names: ['userId', 'query', 'language', 'batch', 'perPage']
     })

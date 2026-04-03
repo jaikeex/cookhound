@@ -38,8 +38,8 @@ const AUTH_USER_GROUPS = ['self'] as UserVisibilityGroup[];
 const AUTH_USER_SELECT = getUserSelect(AUTH_USER_GROUPS);
 
 /**
- * Service class for handling authentication-related logic.
- * This includes user login, logout, session management, and OAuth.
+ * Handles authentication flows including local login, Google OAuth,
+ * session lifecycle, and current-user resolution.
  */
 class AuthService {
     //~-----------------------------------------------------------------------------------------~//
@@ -51,16 +51,14 @@ class AuthService {
     //|-----------------------------------------------------------------------------------------|//
 
     /**
-     * Authenticates a user with their email and password.
-     * It validates credentials, and on success, updates the last login time
-     * and returns a session and user data.
-     * Also checks if the password hash needs updating and rehashes it if needed.
+     * Authenticates a user with email and password. On success, creates a
+     * new session and updates the last login timestamp. Transparently
+     * rehashes the password if the stored hash uses an outdated algorithm.
      *
-     * @param payload - The user's login credentials.
-     * @returns A promise that resolves to an object containing the session and user data.
-     * @throws {ServerError} Throws an error with status 400 if email or password are not provided.
-     * @throws {ServerError} Throws an error with status 401 for invalid credentials.
-     * @throws {ServerError} Throws an error with status 403 if the user's email is not verified.
+     * @param payload - Login credentials (email and password).
+     * @returns Session token and the authenticated user DTO.
+     * @throws {AuthErrorUnauthorized} If the credentials are invalid.
+     * @throws {AuthErrorForbidden} If the account is banned or the email is not verified.
      */
     @LogServiceMethod({ excludeArgs: true })
     async login(payload: UserForLogin): Promise<AuthResponse> {
@@ -131,15 +129,15 @@ class AuthService {
     //|-----------------------------------------------------------------------------------------|//
 
     /**
-     * Authenticates a user using a Google OAuth authorization code.
-     * It exchanges the code for an access token, fetches user info from Google,
-     * and then either finds an existing user or creates a new one.
+     * Authenticates a user via Google OAuth. Exchanges the authorization code
+     * for an access token, fetches the user's Google profile, and either
+     * logs in the existing user or creates a new account.
      *
-     * @param payload - The payload containing the Google OAuth authorization code.
-     * @returns A promise that resolves to an object containing the session and user data.
-     * @throws {ServerError} Throws an error with status 400 if the Google OAuth code is missing.
-     * @throws {ServerError} Throws an error with status 401 if the access token is missing.
-     * @throws {ServerError} Throws an error with status 401 if the user info is missing.
+     * @param payload - The Google OAuth authorization code.
+     * @returns Session token and the authenticated (or newly created) user DTO.
+     * @throws {ValidationError} If the authorization code is missing.
+     * @throws {AuthErrorUnauthorized} If the token exchange or profile fetch fails.
+     * @throws {AuthErrorForbidden} If the account is banned.
      */
     @LogServiceMethod({ names: ['payload'] })
     async loginWithGoogle(payload: AuthCodePayload): Promise<AuthResponse> {
@@ -255,10 +253,10 @@ class AuthService {
     //~-----------------------------------------------------------------------------------------~//
 
     /**
-     * Logs out the currently authenticated user by deleting the session.
+     * Logs out the current session by invalidating it server-side
+     * and deleting the session cookie.
      *
-     * @returns void.
-     * @throws {ServerError} Throws an error with status 500 if there is an error.
+     * @param sessionId - ID of the session to invalidate.
      */
     @LogServiceMethod({ names: ['sessionId'] })
     async logout(sessionId: string): Promise<void> {
@@ -273,10 +271,9 @@ class AuthService {
     //~-----------------------------------------------------------------------------------------~//
 
     /**
-     * Logs out the currently authenticated user on all devices by invalidating every
-     * server-side session associated with their account and deleting the current session cookie.
+     * Invalidates all sessions for the authenticated user across all
+     * devices and deletes the current session cookie.
      *
-     * @returns void
      * @throws {AuthErrorUnauthorized} If no authenticated user is found in the request context.
      */
     @LogServiceMethod({ names: ['userId'] })
@@ -298,11 +295,13 @@ class AuthService {
     //~-----------------------------------------------------------------------------------------~//
 
     /**
-     * Retrieves the currently authenticated user based on the session ID.
+     * Resolves the currently authenticated user from the request context.
+     * If the user no longer exists or their email is unverified, all sessions
+     * are invalidated and an unauthorized error is thrown. Registers a user
+     * visit on success.
      *
-     * @returns A promise that resolves to the authenticated user's data.
-     * @throws {ServerError} Throws an error with status 401 if the user is not authenticated.
-     * @throws {ServerError} Throws an error with status 404 if the user is not found.
+     * @returns The authenticated user DTO with self-visibility fields.
+     * @throws {AuthErrorUnauthorized} If not authenticated, user not found, or email unverified.
      */
     @LogServiceMethod({ names: ['userId'] })
     async getCurrentUser(): Promise<UserDTO> {

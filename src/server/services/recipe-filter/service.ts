@@ -12,6 +12,9 @@ import { Logger, LogServiceMethod } from '@/server/logger';
 
 const log = Logger.getInstance('recipe-filter-service');
 
+/**
+ * Provides multi-dimensional recipe filtering with pagination.
+ */
 class RecipeFilterService {
     private readonly MAX_BATCHES = 20;
 
@@ -24,7 +27,13 @@ class RecipeFilterService {
      *  - excludesIngredients: NONE of the selected ingredients may be present
      *  - tags: ALL selected tags must be present
      *  - timeMin / timeMax: inclusive range on recipe.time (NULL times are excluded)
-     *  - hasImage: when true, only recipes with an imageUrl are returned
+     *  - hasImage: only recipes with an image URL
+     *
+     * @param filters - Filter criteria (all optional).
+     * @param language - Locale to filter recipes by.
+     * @param batch - 1-based batch index (max 20).
+     * @param perPage - Batch size (max 100).
+     * @returns Display-ready recipe DTOs matching the filters.
      */
     @LogServiceMethod({ names: ['language', 'batch', 'perPage'] })
     async filterRecipes(

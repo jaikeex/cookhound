@@ -7,9 +7,15 @@ import { Logger, LogServiceMethod } from '@/server/logger';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const log = Logger.getInstance('ingredient-service');
 
+/**
+ * Provides read access to the ingredient catalogue.
+ */
 class IngredientService {
     /**
-     * Get all ingredients for a language, sorted alphabetically.
+     * Returns all ingredients for a given locale, sorted alphabetically.
+     *
+     * @param language - Locale to filter ingredients by.
+     * @returns Alphabetically sorted ingredient DTOs.
      */
     @LogServiceMethod({ names: ['language'] })
     async getAll(language: Locale): Promise<IngredientDTO[]> {

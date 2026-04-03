@@ -37,13 +37,20 @@ const log = Logger.getInstance('admin-service');
 const ACCOUNT_DELETION_GRACE_PERIOD_DAYS = 30;
 
 /**
- * Service class for admin operations.
+ * Administrative operations for user management, dashboard analytics,
+ * and account lifecycle actions.
  */
 class AdminService {
     //~=========================================================================================~//
     //$                                       DASHBOARD                                         $//
     //~=========================================================================================~//
 
+    /**
+     * Aggregates key platform metrics for the admin dashboard: user/recipe
+     * totals, open flags, 30-day growth, and the most recent users and recipes.
+     *
+     * @returns Dashboard statistics DTO with counts and recent activity.
+     */
     @LogServiceMethod()
     async getDashboardStats(): Promise<AdminDashboardStatsDTO> {
         assertAdmin();
@@ -108,6 +115,12 @@ class AdminService {
     //$                                    USER MANAGEMENT                                      $//
     //~=========================================================================================~//
 
+    /**
+     * Retrieves a paginated, filterable, sortable list of users.
+     *
+     * @param options - Pagination, search, and filter criteria.
+     * @returns Paginated user list with recipe counts.
+     */
     @LogServiceMethod({ names: ['page', 'pageSize', 'search'] })
     async getUsers(options: {
         page: number;
@@ -146,6 +159,14 @@ class AdminService {
         };
     }
 
+    /**
+     * Retrieves the full admin-level detail view of a single user,
+     * including activity timestamps, deletion state, and content counts.
+     *
+     * @param userId - Database ID of the user.
+     * @returns Detailed user DTO for the admin panel.
+     * @throws {NotFoundError} If the user does not exist.
+     */
     @LogServiceMethod({ names: ['userId'] })
     async getUserById(userId: number): Promise<AdminUserDetailDTO> {
         assertAdmin();
@@ -177,6 +198,15 @@ class AdminService {
         return userDto;
     }
 
+    /**
+     * Changes a user role (User or Admin). Cannot target self.
+     * Logs the action to the admin audit trail.
+     *
+     * @param targetUserId - Database ID of the user whose role is changing.
+     * @param newRole - The new role to assign.
+     * @throws {NotFoundError} If the target user does not exist.
+     * @throws {ValidationError} If the role value is invalid.
+     */
     @LogServiceMethod({ names: ['targetUserId', 'newRole'] })
     async changeUserRole(
         targetUserId: number,
@@ -208,6 +238,17 @@ class AdminService {
         );
     }
 
+    /**
+     * Changes a user's status (Active or Banned). Cannot target self or
+     * users pending deletion. Banning invalidates all active sessions.
+     * Logs the action to the admin audit trail.
+     *
+     * @param targetUserId - Database ID of the user whose status is changing.
+     * @param newStatus - The new status to assign.
+     * @param reason - Optional reason for the status change (stored in the audit log).
+     * @throws {NotFoundError} If the target user does not exist.
+     * @throws {ValidationError} If the status is invalid, unchanged, or the user is pending deletion.
+     */
     @LogServiceMethod({ names: ['targetUserId', 'newStatus'] })
     async changeUserStatus(
         targetUserId: number,
@@ -258,6 +299,12 @@ class AdminService {
         );
     }
 
+    /**
+     * Forcibly invalidates all sessions for a target user. Cannot target self.
+     *
+     * @param targetUserId - Database ID of the user to log out.
+     * @throws {NotFoundError} If the target user does not exist.
+     */
     @LogServiceMethod({ names: ['targetUserId'] })
     async forceLogout(targetUserId: number): Promise<void> {
         const adminUserId = assertAdminAndNotSelf(targetUserId);
@@ -272,6 +319,14 @@ class AdminService {
         );
     }
 
+    /**
+     * Generates a password reset token for a target user and sends them
+     * a reset email. Cannot target self or Google OAuth accounts.
+     *
+     * @param targetUserId - Database ID of the user.
+     * @throws {NotFoundError} If the target user does not exist.
+     * @throws {ValidationError} If the account uses Google OAuth (no password to reset).
+     */
     @LogServiceMethod({ names: ['targetUserId'] })
     async forcePasswordReset(targetUserId: number): Promise<void> {
         const adminUserId = assertAdminAndNotSelf(targetUserId);
@@ -307,6 +362,14 @@ class AdminService {
         );
     }
 
+    /**
+     * Manually marks a user's email as verified (admin override).
+     * Cannot target self.
+     *
+     * @param targetUserId - Database ID of the user.
+     * @throws {NotFoundError} If the target user does not exist.
+     * @throws {ValidationError} If the email is already verified.
+     */
     @LogServiceMethod({ names: ['targetUserId'] })
     async verifyEmail(targetUserId: number): Promise<void> {
         const adminUserId = assertAdminAndNotSelf(targetUserId);
@@ -331,6 +394,15 @@ class AdminService {
         );
     }
 
+    /**
+     * Admin-initiated account deletion with a 30 day grace period.
+     * Marks the user as pending deletion, invalidates all their sessions,
+     * creates an audit record, and sends a notification email.
+     *
+     * @param targetUserId - Database ID of the user to schedule for deletion.
+     * @param reason - Optional reason for the deletion (stored in the audit record).
+     * @throws {NotFoundError} If the target user does not exist.
+     */
     @LogServiceMethod({ names: ['targetUserId'] })
     async scheduleAccountDeletion(
         targetUserId: number,
@@ -374,10 +446,6 @@ class AdminService {
             }
         );
 
-        //|-------------------------------------------------------------------------------------|//
-        //?                                   SEND EMAIL                                        ?//
-        //|-------------------------------------------------------------------------------------|//
-
         try {
             const locale = RequestContext.getUserLocale() ?? DEFAULT_LOCALE;
 
@@ -395,6 +463,14 @@ class AdminService {
         }
     }
 
+    /**
+     * Cancels a pending account deletion, restoring the user to active status.
+     * Updates the audit record to reflect cancellation.
+     *
+     * @param targetUserId - Database ID of the user.
+     * @throws {NotFoundError} If the target user does not exist.
+     * @throws {ValidationError} If the user is not currently pending deletion.
+     */
     @LogServiceMethod({ names: ['targetUserId'] })
     async cancelAccountDeletion(targetUserId: number): Promise<void> {
         const adminUserId = assertAdminAndNotSelf(targetUserId);
@@ -428,6 +504,10 @@ class AdminService {
     //$                                        HELPERS                                          $//
     //~=========================================================================================~//
 
+    /**
+     * Fetches a user by ID or throws {@link NotFoundError}. Used internally
+     * as a guard before performing admin actions.
+     */
     private async requireUser(userId: number) {
         const user = await db.admin.getUserById(userId);
 
@@ -441,6 +521,10 @@ class AdminService {
         return user;
     }
 
+    /**
+     * Writes an entry to the admin action audit log. Failures are logged
+     * but do not propagate.
+     */
     private async logAction(
         adminUserId: number,
         targetUserId: number,

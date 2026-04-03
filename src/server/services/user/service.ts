@@ -48,8 +48,10 @@ import { RequestContext } from '@/server/utils/reqwest/context';
 const log = Logger.getInstance('user-service');
 
 /**
- * Service class for user-related business logic.
- * It handles user creation, email verification, and other user-centric operations.
+ * Manages user lifecycle operations including registration, authentication,
+ * profile management, consent/terms tracking, and account deletion.
+ *
+ * @see {@link RequestContext} for authenticated user resolution
  */
 class UserService {
     //~-----------------------------------------------------------------------------------------~//
@@ -61,13 +63,12 @@ class UserService {
     //|-----------------------------------------------------------------------------------------|//
 
     /**
-     * Creates a new user with local authentication (email and password).
-     * It hashes the password, generates a verification token, and sends a verification email.
+     * Registers a new user with local (email + password) authentication.
+     * Sends a verification email upon successful creation.
      *
-     * @param payload - The data for creating a new user, including email, password, and username.
-     * @returns A promise that resolves to the newly created user object.
-     * @throws {ServerError} Throws an error with status 400 if required fields are missing.
-     * @throws {ServerError} Throws an error with status 409 if email or username is already taken.
+     * @param payload - Registration data: email, password, and username.
+     * @returns The created user DTO (includes email since the caller is the owner).
+     * @throws {ConflictError} If the email or username is already taken.
      */
     @LogServiceMethod({ success: 'notice', excludeArgs: true })
     async createUser(payload: UserForCreatePayload): Promise<UserDTO> {
@@ -131,11 +132,12 @@ class UserService {
     //|-----------------------------------------------------------------------------------------|//
 
     /**
-     * Creates a new user from a Google OAuth sign-in.
+     * Registers a new user from a Google OAuth sign-in.
+     * The user's email is marked as verified automatically.
      *
-     * @param payload - The data from Google, including email, username, and avatar URL.
-     * @returns A promise that resolves to the newly created user object.
-     * @throws {ServerError} Throws an error if a user with the same email already exists.
+     * @param payload - Google profile data: email, username, and avatar URL.
+     * @returns The created user DTO.
+     * @throws {ConflictError} If a user with the same email already exists.
      */
     @LogServiceMethod({ success: 'notice', names: ['payload'] })
     async createUserFromGoogle(
@@ -177,6 +179,15 @@ class UserService {
     //$                                           GET BY ID                                     $//
     //~-----------------------------------------------------------------------------------------~//
 
+    /**
+     * Retrieves a user by their database ID. The returned fields are scoped
+     * based on the relationship between the requesting user and the target
+     * (self sees more data than a stranger).
+     *
+     * @param id - Database ID of the user to retrieve.
+     * @returns The user DTO with fields appropriate to the caller's permission level.
+     * @throws {NotFoundError} If no user with the given ID exists.
+     */
     @LogServiceMethod({ names: ['id'] })
     async getUserById(id: number): Promise<UserDTO> {
         const groups = getUserDataPermissionGroups(id);
@@ -201,6 +212,14 @@ class UserService {
     //$                                       GET SHOPPING LIST                                 $//
     //~-----------------------------------------------------------------------------------------~//
 
+    /**
+     * Retrieves the authenticated user's shopping list, grouped by recipe.
+     * Each entry contains the recipe summary and its associated ingredients.
+     *
+     * @param userId - Database ID of the owning user.
+     * @returns Shopping list entries grouped by recipe.
+     * @throws {NotFoundError} If a referenced recipe no longer exists.
+     */
     @LogServiceMethod({ names: ['userId'] })
     async getShoppingList(userId: number): Promise<ShoppingListDTO[]> {
         const shoppingList = await db.shoppingList.getShoppingList(userId);
@@ -245,6 +264,16 @@ class UserService {
     //$                                     CREATE SHOPPING LIST                                $//
     //~-----------------------------------------------------------------------------------------~//
 
+    /**
+     * Adds ingredients from a recipe to the user's shopping list.
+     * If the recipe already has entries, they are merged.
+     *
+     * @param userId - Database ID of the owning user.
+     * @param recipeId - Recipe the ingredients belong to.
+     * @param ingredients - Ingredient entries to add to the list.
+     * @returns The full updated shopping list (all recipes).
+     * @throws {ValidationError} If the ingredient references are invalid.
+     */
     @LogServiceMethod({ names: ['userId', 'recipeId', 'ingredients'] })
     async createShoppingList(
         userId: number,
@@ -293,6 +322,15 @@ class UserService {
     //$                                    UPDATE SHOPPING LIST                                 $//
     //~-----------------------------------------------------------------------------------------~//
 
+    /**
+     * Replaces the shopping list entries for a specific recipe.
+     * If the update list is empty, the recipe's entries are removed entirely.
+     *
+     * @param userId - Database ID of the owning user.
+     * @param recipeId - Recipe whose entries should be replaced.
+     * @param updates - New ingredient entries (replaces existing).
+     * @returns The full updated shopping list, or an empty array if cleared.
+     */
     @LogServiceMethod({ names: ['userId', 'recipeId', 'updates'] })
     async updateShoppingList(
         userId: number,
@@ -339,6 +377,13 @@ class UserService {
     //$                                     DELETE SHOPPING LIST                                $//
     //~-----------------------------------------------------------------------------------------~//
 
+    /**
+     * Deletes shopping list entries for a user. If a recipe ID is provided,
+     * only that recipe's entries are removed; otherwise the entire list is cleared.
+     *
+     * @param userId - Database ID of the owning user.
+     * @param recipeId - Optional recipe to scope the deletion to.
+     */
     @LogServiceMethod({ names: ['userId', 'recipeId'] })
     async deleteShoppingList(userId: number, recipeId?: number): Promise<void> {
         await db.shoppingList.deleteShoppingList(userId, recipeId);
@@ -350,6 +395,12 @@ class UserService {
     //$                                    GET LAST VIEWED RECIPES                              $//
     //~-----------------------------------------------------------------------------------------~//
 
+    /**
+     * Returns the most recently viewed recipes for a user,
+     *
+     * @param userId - Database ID of the user.
+     * @returns Ordered list of recently viewed recipes, or an empty array if none.
+     */
     @LogServiceMethod({ names: ['userId'] })
     async getLastViewedRecipes(userId: number): Promise<RecipeForDisplayDTO[]> {
         const recipes = await db.user.getLastViewedRecipes(userId);
@@ -377,6 +428,14 @@ class UserService {
     //$                                     UPDATE ONE BY ID                                    $//
     //~-----------------------------------------------------------------------------------------~//
 
+    /**
+     * Partially updates a user's profile fields.
+     *
+     * @param userId - Database ID of the user to update.
+     * @param payload - Fields to update (only provided keys are changed).
+     * @returns The updated user DTO.
+     * @throws {NotFoundError} If no user with the given ID exists.
+     */
     @LogServiceMethod({ names: ['userId', 'payload'] })
     async updateOneById(
         userId: number,
@@ -401,6 +460,20 @@ class UserService {
     //$                                   CREATE COOKIE CONSENT                                 $//
     //~-----------------------------------------------------------------------------------------~//
 
+    /**
+     * Records a new cookie consent decision for a user. If the new consent
+     * is identical to the latest stored consent, the write is skipped.
+     * Otherwise the previous consent is revoked before persisting the new one.
+     *
+     * @param userId - Database ID of the consenting user.
+     * @param payload - Consent details: categories, version, IP, and user agent.
+     * @returns The active cookie consent record (newly created or existing duplicate).
+     * @throws {NotFoundError} If the user does not exist.
+     * @throws {ServerError} If revoking the previous consent fails (prevents duplicate active consents).
+     *
+     * @remarks Revocation failure is treated as fatal to avoid duplicate active
+     * consent records, which would violate GDPR audit requirements.
+     */
     @LogServiceMethod({ names: ['userId', 'payload'] })
     async createUserCookieConsent(
         userId: number,
@@ -497,6 +570,18 @@ class UserService {
     //$                                  CREATE TERMS ACCEPTANCE                                $//
     //~-----------------------------------------------------------------------------------------~//
 
+    /**
+     * Records a new terms-of-service acceptance for a user.
+     * Revokes the previous active acceptance before persisting the new one.
+     *
+     * @param userId - Database ID of the accepting user.
+     * @param payload - Acceptance details: version, proof hash, IP, and user agent.
+     * @throws {NotFoundError} If the user does not exist.
+     * @throws {ServerError} If revoking the previous acceptance fails (prevents duplicate active records).
+     *
+     * @remarks Revocation failure is treated as fatal to avoid multiple active
+     * acceptance records per user.
+     */
     @LogServiceMethod({ names: ['userId', 'payload'] })
     async createUserTermsAcceptance(
         userId: number,
@@ -565,12 +650,14 @@ class UserService {
     //~-----------------------------------------------------------------------------------------~//
 
     /**
-     * Verifies the proof hash of a terms acceptance record by regenerating
-     * the hash from the stored data and comparing it with the stored hash.
+     * Verifies the integrity of a terms acceptance record by regenerating
+     * its proof hash and comparing it to the stored value.
      *
-     * @param userId - The ID of the user who owns the terms acceptance
-     * @param acceptanceId - The ID of the terms acceptance record to verify
-     * @returns Verification result with validity status and details
+     * @param userId - Database ID of the record owner.
+     * @param acceptanceId - ID of the terms acceptance record to verify.
+     * @returns Validity flag with version, timestamps, and the computed hash on mismatch.
+     * @throws {NotFoundError} If no terms acceptance record exists for the user.
+     * @throws {AuthErrorForbidden} If the record belongs to a different user.
      */
     @LogServiceMethod({ names: ['userId', 'acceptanceId'] })
     async verifyTermsAcceptanceHash(
@@ -642,12 +729,14 @@ class UserService {
     //~-----------------------------------------------------------------------------------------~//
 
     /**
-     * Verifies the proof hash of a cookie consent record by regenerating
-     * the hash from the stored data and comparing it with the stored hash.
+     * Verifies the integrity of a cookie consent record by regenerating
+     * its proof hash and comparing it to the stored value.
      *
-     * @param userId - The ID of the user who owns the cookie consent
-     * @param consentId - The ID of the cookie consent record to verify
-     * @returns Verification result with validity status and details
+     * @param userId - Database ID of the record owner.
+     * @param consentId - ID of the cookie consent record to verify.
+     * @returns Validity flag with version, timestamps, accepted categories, and the computed hash on mismatch.
+     * @throws {NotFoundError} If no cookie consent record exists for the user.
+     * @throws {AuthErrorForbidden} If the record belongs to a different user.
      */
     @LogServiceMethod({ names: ['userId', 'consentId'] })
     async verifyCookieConsentHash(
@@ -721,6 +810,14 @@ class UserService {
     //$                                 UPDATE USER PREFERENCES                                 $//
     //~-----------------------------------------------------------------------------------------~//
 
+    /**
+     * Merges new preference values into the user's existing preferences.
+     * Only the keys present in the payload are overwritten.
+     *
+     * @param userId - Database ID of the user.
+     * @param preferences - Preference fields to merge.
+     * @throws {NotFoundError} If the user does not exist.
+     */
     @LogServiceMethod({ names: ['userId', 'preferences'] })
     async updateUserPreferences(
         userId: number,
@@ -756,12 +853,12 @@ class UserService {
     //~-----------------------------------------------------------------------------------------~//
 
     /**
-     * Verifies a user's email address using a verification token.
+     * Confirms a user's email address using the token sent during registration.
+     * Clears the verification token on success.
      *
-     * @param token - The email verification token.
-     * @throws {ServerError} Throws an error with status 400 if the token is missing.
-     * @throws {ServerError} Throws an error with status 404 if the user is not found.
-     * @throws {ServerError} Throws an error with status 403 if the email is already verified.
+     * @param token - The email verification token from the confirmation link.
+     * @throws {NotFoundError} If no user matches the token.
+     * @throws {AuthErrorForbidden} If the email is already verified.
      */
     @LogServiceMethod({ success: 'notice', names: ['token'] })
     async verifyEmail(token: string): Promise<void> {
@@ -807,11 +904,12 @@ class UserService {
     //~-----------------------------------------------------------------------------------------~//
 
     /**
-     * Resends an email verification link to a user.
-     * It generates a new token and sends it to the user's email.
+     * Generates a fresh verification token and resends the verification email.
+     * Replaces any previously issued token.
      *
-     * @param email - The email address of the user.
-     * @throws {ServerError} Throws an error if the email is missing, user not found, or email is already verified.
+     * @param email - Email address of the user requesting re-verification.
+     * @throws {NotFoundError} If no user with the given email exists.
+     * @throws {AuthErrorForbidden} If the email is already verified.
      */
     @LogServiceMethod({ names: ['email'] })
     async resendVerificationEmail(email: string): Promise<void> {
@@ -869,11 +967,11 @@ class UserService {
     //~-----------------------------------------------------------------------------------------~//
 
     /**
-     * Sends a password reset email to a user.
-     * It generates a new token and sends it to the user's email.
+     * Generates a password reset token and sends a reset link to the user's email.
      *
-     * @param email - The email address of the user.
-     * @throws {ServerError} Throws an error if the email is missing, not verified or the user is not found.
+     * @param email - Email address of the user requesting the reset.
+     * @throws {NotFoundError} If no user with the given email exists.
+     * @throws {AuthErrorForbidden} If the email is not yet verified or the account uses Google OAuth.
      */
     @LogServiceMethod({ names: ['email'] })
     async sendPasswordResetEmail(email: string): Promise<void> {
@@ -941,10 +1039,15 @@ class UserService {
     //~-----------------------------------------------------------------------------------------~//
 
     /**
-     * Resets a user's password using a password reset token.
+     * Sets a new password using a previously issued reset token.
+     * Clears the token and records the reset timestamp to enforce a
+     * one-reset-per-day cooldown.
      *
-     * @param token - The password reset token.
-     * @param password - The new password.
+     * @param token - The password reset token from the reset link.
+     * @param password - The new plaintext password (will be hashed).
+     * @throws {NotFoundError} If no user matches the token.
+     * @throws {AuthErrorForbidden} If the account uses Google OAuth.
+     * @throws {ValidationError} If the token is expired or a reset was performed within the last 24 hours.
      */
 
     @LogServiceMethod({ success: 'notice', excludeArgs: true })
@@ -1016,14 +1119,15 @@ class UserService {
 
     /**
      * Initiates the email change flow for the authenticated user.
+     * Requires password confirmation, then sends a confirmation link to
+     * the new address and a notice to the current address.
      *
-     * @param userId - ID of the user requesting the change (must equal RequestContext.getUserId())
-     * @param newEmail - E-mail address that should replace the current one
-     * @param currentPassword - The user’s current password (required for local accounts)
-     *
-     * @throws ValidationError   If required fields are missing or the new email is identical to the existing one
-     * @throws ConflictError     If the new email is already taken by a different user
-     * @throws AuthErrorForbidden If the password is invalid or password authentication is not possible
+     * @param userId - Database ID of the requesting user.
+     * @param newEmail - Desired replacement email address.
+     * @param currentPassword - Current password for identity verification (local auth only).
+     * @throws {ValidationError} If the new email is identical to the current one.
+     * @throws {ConflictError} If the new email is already taken.
+     * @throws {AuthErrorForbidden} If the password is invalid or the account uses Google OAuth.
      */
     @LogServiceMethod({ success: 'notice', names: ['userId', 'newEmail'] })
     async initiateEmailChange(
@@ -1127,10 +1231,14 @@ class UserService {
     //~-----------------------------------------------------------------------------------------~//
 
     /**
-     * Confirms email change request by token, swaps the e-mail in the DB and sends an audit mail.
+     * Confirms a pending email change using the token from the confirmation link.
+     * Swaps the email in the database and sends an audit notification to
+     * both the old and new addresses.
      *
-     * @param token - The confirmation token supplied in the confirmation link
-     * @returns The updated `UserDTO` object.
+     * @param token - Confirmation token from the email change link.
+     * @returns The updated user DTO reflecting the new email.
+     * @throws {ValidationError} If the token is invalid or expired.
+     * @throws {NotFoundError} If the owning user no longer exists.
      */
     @LogServiceMethod({ success: 'notice', names: ['token'] })
     async confirmEmailChange(token: string): Promise<UserDTO> {
@@ -1225,14 +1333,19 @@ class UserService {
     //~-----------------------------------------------------------------------------------------~//
 
     /**
-     * Initiate account deletion for a user
+     * Begins the account deletion flow by marking the user as pending deletion
+     * with a 30-day grace period. Creates an audit record and sends a
+     * confirmation email.
      *
-     * @param userId - The ID of the user requesting deletion
-     * @param password - The user's current password (for local auth)
-     * @param reason - Optional reason for deletion
-     * @param ipAddress - IP address of the request
-     * @param userAgent - User agent of the request
-     * @returns Deletion scheduled date and days remaining
+     * @param userId - Database ID of the user requesting deletion.
+     * @param password - Current password for identity verification (local auth only).
+     * @param reason - Optional user-provided reason for leaving.
+     * @param ipAddress - Request IP address for the audit trail.
+     * @param userAgent - Request user agent for the audit trail.
+     * @returns The scheduled deletion date and remaining grace period days.
+     * @throws {NotFoundError} If the user does not exist.
+     * @throws {ConflictError} If deletion is already pending.
+     * @throws {AuthErrorForbidden} If the password is invalid (local auth).
      */
     @LogServiceMethod({
         success: 'notice',
@@ -1348,10 +1461,13 @@ class UserService {
     }
 
     /**
-     * Cancel account deletion for a user
-     * Restores Active status, clears deletion fields, updates audit record
+     * Cancels a pending account deletion within the grace period.
+     * Restores the user to active status, marks the audit record as
+     * cancelled, and sends a confirmation email.
      *
-     * @param userId - The ID of the user canceling deletion
+     * @param userId - Database ID of the user cancelling deletion.
+     * @throws {NotFoundError} If the user does not exist.
+     * @throws {ValidationError} If the user is not pending deletion or the grace period has expired.
      */
     @LogServiceMethod({ success: 'notice', names: ['userId'] })
     async cancelAccountDeletion(userId: number): Promise<void> {
@@ -1432,8 +1548,11 @@ class UserService {
     }
 
     /**
-     * Process scheduled deletions - hard delete users past their grace period
-     * This method should be called by a cron job
+     * Processes all users whose deletion grace period has expired by
+     * performing a hard delete and sending a final notification email.
+     * Intended to be invoked by a scheduled cron job.
+     *
+     * @returns Count of successfully processed and failed deletions.
      */
     @LogServiceMethod({ success: 'notice' })
     async processScheduledDeletions(): Promise<{

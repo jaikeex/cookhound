@@ -6,7 +6,17 @@ import { Logger, LogServiceMethod } from '@/server/logger';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const log = Logger.getInstance('google-api-service');
 
+/**
+ * Wraps Google Cloud Platform APIs.
+ */
 class GoogleApiService {
+    /**
+     * Uploads a recipe image to the dedicated Cloud Storage bucket.
+     *
+     * @param fileName - Object name (key) for the uploaded file.
+     * @param data - Raw image data (array, Uint8Array, or BodyInit).
+     * @returns The Cloud Storage upload response.
+     */
     @LogServiceMethod({ names: ['fileName'] })
     async uploadRecipeImage(
         fileName: string,
@@ -31,6 +41,13 @@ class GoogleApiService {
         return response;
     }
 
+    /**
+     * Uploads a user avatar image to the dedicated Cloud Storage bucket.
+     *
+     * @param fileName - Object name (key) for the uploaded file.
+     * @param data - Raw image data (array, Uint8Array, or BodyInit).
+     * @returns The Cloud Storage upload response.
+     */
     @LogServiceMethod({ names: ['fileName'] })
     async uploadAvatarImage(
         fileName: string,
@@ -55,6 +72,14 @@ class GoogleApiService {
         return response;
     }
 
+    /**
+     * Writes a batch of structured log entries to Google Cloud Logging.
+     * All entries are written under a single application log name with
+     * a global resource type.
+     *
+     * @param logs - Log entries to write.
+     * @returns The Cloud Logging write response.
+     */
     @LogServiceMethod({ names: ['logs'] })
     async writeLogsToGoogleCloud(logs: LogEntry[]) {
         //?—————————————————————————————————————————————————————————————————————————————————————?//

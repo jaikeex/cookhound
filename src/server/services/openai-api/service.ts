@@ -18,7 +18,17 @@ import recipeTagModel from '@/server/db/model/recipe-tag/model';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const log = Logger.getInstance('openai-api-service');
 
+/**
+ * Integrates cookhound with OpenAI APIs.
+ */
 class OpenAIApiService {
+    /**
+     * Enqueues an asynchronous content evaluation job for a recipe.
+     * The evaluation runs in the worker process and may flag the recipe
+     * if violations are detected.
+     *
+     * @param recipe - The full recipe DTO to evaluate.
+     */
     @LogServiceMethod({ names: ['recipe'] })
     async evaluateRecipeContent(recipe: RecipeDTO) {
         const ingredientsForEvaluation = recipe.ingredients.map((i) => ({
@@ -51,14 +61,12 @@ class OpenAIApiService {
     //|-------------------------------------------------------------------------------------|//
 
     /**
-     * Suggests the best fitting tags for a given recipe.
+     * Suggests the best-fitting tags for a recipe using OpenAI. Asks the model to
+     * pick tag slugs from the predefined {@link RECIPE_CATEGORY_TAGS} catalogue while
+     * respecting per-category limits, then maps the returned slugs to database records.
      *
-     * This calls the OpenAI model directly (no queue) and asks it to pick tag slugs
-     * from our predefined list in `RECIPE_CATEGORY_TAGS` while respecting category
-     * limits defined in `RECIPE_TAG_CATEGORY_LIMITS_BY_NAME`.
-     *
-     * The method then maps the returned slugs to database records and returns them
-     * in the `RecipeTagDTO` format expected by the application.
+     * @param recipe - The full recipe DTO to analyse.
+     * @returns Suggested tags as RecipeTagDTO[] (may be empty if no tags fit).
      */
     @LogServiceMethod({ names: ['recipe'] })
     async suggestRecipeTags(recipe: RecipeDTO): Promise<RecipeTagDTO[]> {
@@ -160,6 +168,10 @@ class OpenAIApiService {
     //?                                  PROMPT BUILDERS                                   ?//
     //|-------------------------------------------------------------------------------------|//
 
+    /**
+     * Builds the JSON prompt payload for the tag suggestion model call,
+     * including the recipe data, available tags, and category limits.
+     */
     private buildTagSuggestionPrompt(recipe: RecipeDTO): string {
         return JSON.stringify({
             recipe: {
