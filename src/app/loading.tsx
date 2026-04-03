@@ -1,6 +1,10 @@
 import React from 'react';
-import { FrontPageSkeleton } from '@/client/components/templates/Dashboard/FrontPage/skeleton';
+import { Loader } from '@/client/components';
 
 export default function Loading() {
-    return <FrontPageSkeleton />;
+    return (
+        <div className="flex items-center justify-center min-h-[50vh]">
+            <Loader size="lg" />
+        </div>
+    );
 }
