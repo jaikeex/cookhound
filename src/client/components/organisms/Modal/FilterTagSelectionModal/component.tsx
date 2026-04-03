@@ -71,7 +71,7 @@ export const FilterTagSelectionModal: React.FC<
 
     return (
         <div className="flex flex-col w-full h-full max-h-[85dvh] md:max-h-[70dvh] max-w-[90dvw] md:max-w-[80dvw] xl:max-w-[70dvw]">
-            <TagSelectionBox className="min-h-[70px]" tags={selectedTags} />
+            <TagSelectionBox className="min-h-17.5" tags={selectedTags} />
 
             <TagSelectionList
                 tagLists={tagLists ?? []}

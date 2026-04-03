@@ -7,8 +7,6 @@ import { useLocale, useSnackbar } from '@/client/store';
 import ReactCrop, { type Crop, type PixelCrop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 
-// NOTE: Keep this component simple – buttons are styled with Tailwind classes.
-
 export type ImageCropperModalProps = Readonly<{
     file: File;
     onComplete: (cropped: File) => void;

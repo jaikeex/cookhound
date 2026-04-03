@@ -35,12 +35,12 @@ export const Banner: React.FC<BannerProps> = ({
             <div
                 id="banner"
                 className={classNames(
-                    'fixed top-0 left-0 w-full z-10 h-[180px] md:h-[226px]',
+                    'fixed top-0 left-0 w-full z-10 h-45 md:h-56.5',
                     'bg-linear-to-b from-green-100 to-green-200 dark:from-gray-800 dark:to-gray-900'
                 )}
             >
                 <Image
-                    className="absolute top-0 left-0 object-cover w-full h-[180px] md:h-[226px] opacity-20"
+                    className="absolute top-0 left-0 object-cover w-full h-45 md:h-56.5 opacity-20"
                     src="/img/banner.avif"
                     alt="Recipe Finder"
                     width={1000}
@@ -90,7 +90,7 @@ export const Banner: React.FC<BannerProps> = ({
 
             <div
                 className={classNames(
-                    'fixed left-0 w-dvw h-6 top-[180px] md:top-[224px] z-9',
+                    'fixed left-0 w-dvw h-6 top-45 md:top-56 z-9',
                     'bg-linear-to-b from-[#f0fdf4] via-[#f0fdf4] via-80% to-transparent',
                     'dark:from-[#030712] dark:via-[#030712] dark:via-80% dark:to-transparent'
                 )}

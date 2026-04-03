@@ -43,7 +43,7 @@ export const ConsentBanner: React.FC = () => {
         <div
             data-nosnippet
             className={classNames(
-                'fixed bottom-0 left-0 z-[999] w-full p-4 md:p-6 flex flex-col md:flex-row items-center gap-4',
+                'fixed bottom-0 left-0 z-999 w-full p-4 md:p-6 flex flex-col md:flex-row items-center gap-4',
                 'bg-teal-50 dark:bg-gray-800 shadow-[0_-2px_10px_rgba(0,0,0,0.15)]'
             )}
         >
