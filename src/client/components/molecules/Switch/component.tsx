@@ -93,7 +93,7 @@ export const Switch: React.FC<SwitchProps> = ({
                     'relative w-11 h-6 rounded-full transition-colors',
                     'bg-gray-400 peer-checked:bg-blue-600 dark:bg-gray-700 dark:peer-checked:bg-blue-600',
                     'peer-focus-visible:ring-2 peer-focus-visible:ring-primary-500',
-                    'after:absolute after:top-[2px] after:start-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:transition-transform',
+                    'after:absolute after:top-0.5 after:start-0.5 after:h-5 after:w-5 after:rounded-full after:bg-white after:transition-transform',
                     'peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full'
                 )}
             />

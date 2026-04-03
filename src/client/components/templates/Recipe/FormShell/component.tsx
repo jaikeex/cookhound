@@ -76,7 +76,7 @@ export const RecipeFormShell: React.FC<RecipeFormShellProps> = ({
             <form
                 className={classNames(
                     'col-span-7 overflow-auto xl:col-span-3 pb-8',
-                    'w-full min-w-[240px] md:min-w-[480px] md:w-auto'
+                    'w-full min-w-60 md:min-w-120 md:w-auto'
                 )}
                 onSubmit={handleSubmit}
                 ref={formRef}

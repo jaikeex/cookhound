@@ -28,7 +28,7 @@ export const Icon: React.FC<IconProps> = forwardRef<HTMLDivElement, IconProps>(
                     'flex flex-col items-center gap-0.5',
                     disabled
                         ? 'text-gray-500 dark:text-gray-500'
-                        : '!typography-base',
+                        : 'typography-base!',
                     className
                 )}
             >

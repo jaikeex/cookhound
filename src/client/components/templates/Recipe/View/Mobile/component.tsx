@@ -20,7 +20,7 @@ export const MobileRecipeViewTemplate: React.FC<MobileRecipeViewProps> = ({
     const { recipe, rateRecipe, onShoppingListCreate } = useRecipeHandling();
 
     return (
-        <div className={`max-w-screen-md mx-auto ${className}`}>
+        <div className={`max-w-3xl mx-auto ${className}`}>
             <div className={'space-y-4'}>
                 <MobileRecipeHead
                     recipe={recipe}

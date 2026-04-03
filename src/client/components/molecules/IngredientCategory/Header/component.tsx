@@ -111,7 +111,7 @@ export const CategoryHeader: React.FC<CategoryHeaderProps> = ({
                         {error && (
                             <Typography
                                 variant="body-xs"
-                                className="text-red-500 mt-1 absolute bottom-[-18px] left-0"
+                                className="text-red-500 mt-1 absolute -bottom-4.5 left-0"
                             >
                                 {error}
                             </Typography>

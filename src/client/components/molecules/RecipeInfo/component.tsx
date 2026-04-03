@@ -72,7 +72,9 @@ export const RecipeInfo: React.FC<RecipeInfoProps> = ({
                             ? `${t('app.recipe.preparation-time')}: `
                             : null}
                         {time}
-                        {verbose ? null : ` ${t('app.recipe.minutes-short')}`}
+                        {verbose
+                            ? ` ${t('app.recipe.minutes')}`
+                            : ` ${t('app.recipe.minutes-short')}`}
                     </Typography>
                 </div>
             ) : null}

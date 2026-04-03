@@ -78,7 +78,7 @@ export const SearchInput: React.FC<SearchInputProps> = ({
                 <BaseInput
                     type={'search'}
                     placeholder={placeholder}
-                    className="pr-[106px]"
+                    className="pr-26.5"
                     id={id}
                     name={name}
                     value={inputValue}

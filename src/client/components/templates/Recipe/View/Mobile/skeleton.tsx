@@ -9,11 +9,11 @@ export const MobileRecipeViewSkeleton: React.FC<
     MobileRecipeViewSkeletonProps
 > = ({ className }) => {
     return (
-        <div className={`max-w-screen-md mx-auto ${className}`}>
+        <div className={`max-w-3xl mx-auto ${className}`}>
             <div className={'space-y-4'}>
                 {/* Recipe image skeleton */}
                 <SkeletonImage
-                    className={'w-full aspect-video mx-auto max-w-[480px]'}
+                    className={'w-full aspect-video mx-auto max-w-120'}
                 />
 
                 {/* Recipe title skeleton */}
