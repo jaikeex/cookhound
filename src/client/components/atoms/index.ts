@@ -17,6 +17,7 @@ export * from './Skeleton';
 export * from './Star';
 export * from './Stepper';
 export * from './StructuredData';
+export * from './Time';
 export * from './Tooltip';
 export * from './Typography';
 export * from './Radio';

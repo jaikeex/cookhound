@@ -82,7 +82,7 @@ export const ProfileBodyInfo: React.FC<ProfileBodyInfoProps> = ({ user }) => {
             ) : null}
 
             <section>
-                <Typography variant="heading-sm">
+                <Typography as="h2" variant="heading-sm">
                     {t('app.profile.settings.section-credentials')}
                 </Typography>
 
@@ -122,13 +122,13 @@ export const ProfileBodyInfo: React.FC<ProfileBodyInfoProps> = ({ user }) => {
 
                 {/* <Divider subtle className="mt-3" /> */}
 
-                <Typography variant="heading-sm" className="mt-8">
+                <Typography as="h2" variant="heading-sm" className="mt-8">
                     {t('app.profile.settings.section-privacy')}
                 </Typography>
 
                 <Divider className="mt-1" />
 
-                <Typography variant="heading-xs" className="font-semibold mt-3">
+                <Typography as="h3" variant="heading-xs" className="font-semibold mt-3">
                     {t('app.profile.settings.logout')}
                 </Typography>
 

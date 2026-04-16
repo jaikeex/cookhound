@@ -2,7 +2,7 @@
 
 import React, { useMemo } from 'react';
 import type { UserDTO } from '@/common/types';
-import { Avatar, AvatarInput, Typography } from '@/client/components';
+import { Avatar, AvatarInput, Time, Typography } from '@/client/components';
 import { useLocale } from '@/client/store';
 import { getAgeString } from '@/client/utils';
 
@@ -35,7 +35,7 @@ export const ProfileHeadDesktop: React.FC<ProfileHeadPropsDesktop> = ({
             )}
 
             <div className="flex flex-col gap-2 h-32 col-span-3">
-                <Typography variant="heading-md">{user.username}</Typography>
+                <Typography as="h1" variant="heading-md">{user.username}</Typography>
 
                 {isCurrentUser ? (
                     <React.Fragment>
@@ -43,7 +43,9 @@ export const ProfileHeadDesktop: React.FC<ProfileHeadPropsDesktop> = ({
 
                         <Typography variant="body-sm" className="mt-auto">
                             {t('app.profile.account-age')}:&nbsp;
-                            {accountAge}
+                            <Time dateTime={user.createdAt}>
+                                {accountAge}
+                            </Time>
                         </Typography>
                     </React.Fragment>
                 ) : null}

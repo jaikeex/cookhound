@@ -44,7 +44,7 @@ export const DesktopProfileTemplate: React.FC<DesktopRecipeViewProps> = ({
     }));
 
     return (
-        <div className={classNames('page-wrapper gap-4 px-4', className)}>
+        <article className={classNames('page-wrapper gap-4 px-4', className)}>
             <ProfileHeadDesktop user={user} isCurrentUser={isCurrentUser} />
             <div className="grid grid-cols-4 gap-12 mt-10">
                 <Menu items={menuItems} className="col-span-1" />
@@ -52,6 +52,6 @@ export const DesktopProfileTemplate: React.FC<DesktopRecipeViewProps> = ({
                     {items.find((item) => item.param === tab)?.content}
                 </div>
             </div>
-        </div>
+        </article>
     );
 };

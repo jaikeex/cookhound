@@ -88,7 +88,7 @@ export const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
 
     return (
         <div className="flex flex-col w-full h-full max-h-[85dvh] md:max-h-[70dvh] max-w-[90dvw] md:max-w-[50dvw] xl:max-w-[40dvw] px-4 overflow-y-auto">
-            <Typography variant="heading-sm" className="shrink-0">
+            <Typography as="h2" variant="heading-sm" className="shrink-0">
                 {t('app.profile.deleteAccount.modal.title')}
             </Typography>
 

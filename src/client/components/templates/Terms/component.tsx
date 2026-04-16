@@ -12,8 +12,8 @@ export type TermsTemplateProps = NonNullable<unknown>;
 
 export const TermsTemplate: React.FC<TermsTemplateProps> = () => {
     return (
-        <div className="max-w-4xl mx-auto px-4 py-12">
-            <Typography variant="heading-xl" className="mb-8">
+        <article className="max-w-4xl mx-auto px-4 py-12">
+            <Typography as="h1" variant="heading-xl" className="mb-8">
                 {TERMS_TITLE}
             </Typography>
 
@@ -24,7 +24,7 @@ export const TermsTemplate: React.FC<TermsTemplateProps> = () => {
             {TERMS_CONTENT.map((section, sectionIdx) => (
                 <section key={`section-${sectionIdx}`} className="mb-8">
                     {section.title ? (
-                        <Typography variant="heading-sm" className="mb-4">
+                        <Typography as="h3" variant="heading-sm" className="mb-4">
                             {section.title}
                         </Typography>
                     ) : null}
@@ -50,6 +50,6 @@ export const TermsTemplate: React.FC<TermsTemplateProps> = () => {
                     ))}
                 </section>
             ))}
-        </div>
+        </article>
     );
 };

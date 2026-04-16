@@ -168,7 +168,7 @@ export default async function RootLayout({
                         <ClientShell />
                         <ConsentBanner />
                         <ScrollToTop />
-                        <div
+                        <main
                             id={MAIN_PAGE_ID}
                             className="flex flex-col typography-base min-h-screen"
                         >
@@ -186,7 +186,7 @@ export default async function RootLayout({
                                 {children}
                             </div>
                             <Footer />
-                        </div>
+                        </main>
                     </AppProviders>
                 </QueryProvider>
             </body>

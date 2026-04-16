@@ -11,7 +11,7 @@ import { useRecipeHandling } from '@/client/store';
 export type DesktopRecipeViewProps = Readonly<{
     className?: string;
     isPreview?: boolean;
-    ref?: React.RefObject<HTMLDivElement> | null;
+    ref?: React.RefObject<HTMLElement> | null;
 }>;
 
 export const DesktopRecipeViewTemplate: React.FC<DesktopRecipeViewProps> = ({
@@ -22,7 +22,7 @@ export const DesktopRecipeViewTemplate: React.FC<DesktopRecipeViewProps> = ({
     const { recipe, rateRecipe, onShoppingListCreate } = useRecipeHandling();
 
     return (
-        <div
+        <article
             className={`px-2 mx-auto max-w-screen-sm md:max-w-3xl 3xl:max-w-5xl ${className}`}
             ref={ref}
         >
@@ -40,6 +40,6 @@ export const DesktopRecipeViewTemplate: React.FC<DesktopRecipeViewProps> = ({
                     onShoppingListCreate={onShoppingListCreate}
                 />
             </div>
-        </div>
+        </article>
     );
 };

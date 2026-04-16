@@ -22,8 +22,8 @@ export const PrivacyTemplate: React.FC<PrivacyTemplateProps> = () => {
     }, [openModal]);
 
     return (
-        <div className="max-w-4xl mx-auto px-4 py-12 whitespace-pre-line">
-            <Typography variant="heading-xl" className="mb-8">
+        <article className="max-w-4xl mx-auto px-4 py-12 whitespace-pre-line">
+            <Typography as="h1" variant="heading-xl" className="mb-8">
                 {PRIVACY_TITLE}
             </Typography>
 
@@ -34,7 +34,7 @@ export const PrivacyTemplate: React.FC<PrivacyTemplateProps> = () => {
             {PRIVACY_CONTENT.map((section, sectionIdx) => (
                 <section key={`section-${sectionIdx}`} className="mb-8">
                     {section.title ? (
-                        <Typography variant="heading-sm" className="mb-4">
+                        <Typography as="h3" variant="heading-sm" className="mb-4">
                             {section.title}
                         </Typography>
                     ) : null}
@@ -62,6 +62,6 @@ export const PrivacyTemplate: React.FC<PrivacyTemplateProps> = () => {
                     ))}
                 </section>
             ))}
-        </div>
+        </article>
     );
 };

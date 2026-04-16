@@ -2,7 +2,7 @@
 
 import React, { useMemo } from 'react';
 import type { UserDTO } from '@/common/types';
-import { Avatar, AvatarInput, Divider, Typography } from '@/client/components';
+import { Avatar, AvatarInput, Divider, Time, Typography } from '@/client/components';
 import { useLocale } from '@/client/store';
 import { getAgeString } from '@/client/utils';
 
@@ -30,7 +30,7 @@ export const ProfileHeadMobile: React.FC<ProfileHeadPropsMobile> = ({
                 <Avatar src={user.avatarUrl ?? 'default'} size="xxxl" />
             )}
 
-            <Typography variant="heading-md">{user.username}</Typography>
+            <Typography as="h1" variant="heading-md">{user.username}</Typography>
 
             {isCurrentUser ? (
                 <React.Fragment>
@@ -45,7 +45,9 @@ export const ProfileHeadMobile: React.FC<ProfileHeadPropsMobile> = ({
                             </Typography>
 
                             <Typography variant="body-sm">
-                                {accountAge}
+                                <Time dateTime={user.createdAt}>
+                                    {accountAge}
+                                </Time>
                             </Typography>
                         </div>
                     </div>

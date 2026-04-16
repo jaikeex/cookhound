@@ -35,7 +35,7 @@ export default function GlobalError({ error }: ErrorPageProps) {
                 <div className="flex flex-col items-center min-h-screen pt-10 text-center">
                     <Logo className="logo-md mb-8" />
 
-                    <Typography variant="heading-lg" className="mb-4">
+                    <Typography as="h1" variant="heading-lg" className="mb-4">
                         {messages['app.error.global']}
                     </Typography>
 

@@ -5,6 +5,9 @@ import type { Metadata } from 'next';
 import { cookies, headers } from 'next/headers';
 import { getLocalizedMetadata } from '@/server/utils/seo';
 import { ENV_CONFIG_PUBLIC } from '@/common/constants';
+import { prisma } from '@/server/integrations';
+
+export const revalidate = 3600;
 
 type RecipePageParams = {
     readonly params: Promise<
@@ -33,6 +36,20 @@ export default async function Page({ params }: RecipePageParams) {
             <RecipeStructuredData recipePromise={recipePromise} />
         </React.Fragment>
     );
+}
+
+//|=============================================================================================|//
+
+export async function generateStaticParams(): Promise<
+    Array<{ displayId: string }>
+> {
+    const recipes = await prisma.recipe.findMany({
+        select: { displayId: true }
+    });
+
+    return recipes.map((recipe) => ({
+        displayId: recipe.displayId
+    }));
 }
 
 //|=============================================================================================|//

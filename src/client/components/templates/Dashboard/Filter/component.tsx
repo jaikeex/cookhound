@@ -130,6 +130,7 @@ export const FilterTemplate: React.FC<FilterTemplateProps> = ({
                     ) : (
                         <div className="flex flex-col items-center justify-center w-full h-64">
                             <Typography
+                                as="h2"
                                 variant="heading-md"
                                 className="text-center"
                             >

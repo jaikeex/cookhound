@@ -38,7 +38,7 @@ export const DesktopRecipeHead: React.FC<DesktopRecipeHeadProps> = ({
                 }
             >
                 <div className={'flex flex-col w-full gap-2'}>
-                    <Typography variant={'heading-xl'}>
+                    <Typography as="h1" variant={'heading-xl'}>
                         {recipe.title}
                     </Typography>
 

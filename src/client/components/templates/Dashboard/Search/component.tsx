@@ -145,7 +145,7 @@ export const SearchTemplate: React.FC<SearchTemplateProps> = ({
                         'flex flex-col items-center justify-center w-full h-64'
                     )}
                 >
-                    <Typography variant="heading-md" className="text-center">
+                    <Typography as="h2" variant="heading-md" className="text-center">
                         {t('app.general.search-no-results')}
                     </Typography>
                 </div>

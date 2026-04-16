@@ -111,9 +111,9 @@ export const ContactTemplate: React.FC<ContactTemplateProps> = () => {
     }, [submitError]);
 
     return (
-        <div className="flex flex-col items-center w-full max-w-2xl mx-auto space-y-6">
+        <article className="flex flex-col items-center w-full max-w-2xl mx-auto space-y-6">
             <div className="text-center space-y-2">
-                <Typography variant="heading-lg" className="text-3xl font-bold">
+                <Typography as="h1" variant="heading-lg" className="text-3xl font-bold">
                     {t('contact.page.title')}
                 </Typography>
                 <Typography
@@ -132,7 +132,7 @@ export const ContactTemplate: React.FC<ContactTemplateProps> = () => {
             </form>
 
             <CaptchaDisclosure className="max-w-96" />
-        </div>
+        </article>
     );
 };
 

@@ -30,7 +30,7 @@ export const DesktopRecipeBody: React.FC<DesktopRecipeBodyProps> = ({
     return (
         <div className={'flex gap-12'}>
             <div className={'w-[35%]'}>
-                <Typography variant={'heading-sm'}>
+                <Typography as="h2" variant={'heading-sm'}>
                     {t('app.recipe.ingredients')}
                 </Typography>
                 <IngredientsListView
@@ -63,7 +63,7 @@ export const DesktopRecipeBody: React.FC<DesktopRecipeBodyProps> = ({
             </div>
 
             <div className={'space-y-2 w-[65%]'}>
-                <Typography variant={'heading-sm'}>
+                <Typography as="h2" variant={'heading-sm'}>
                     {t('app.recipe.instructions')}
                 </Typography>
                 <InstructionsView recipe={recipe} variant={'desktop'} />
@@ -72,7 +72,7 @@ export const DesktopRecipeBody: React.FC<DesktopRecipeBodyProps> = ({
                     <React.Fragment>
                         <Divider dashed={true} className={'mt-8!'} />
                         <div className={'w-full space-y-2'}>
-                            <Typography variant={'heading-sm'}>
+                            <Typography as="h2" variant={'heading-sm'}>
                                 {t('app.recipe.notes')}
                             </Typography>
                             <Typography variant={'body-sm'}>

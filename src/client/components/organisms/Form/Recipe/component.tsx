@@ -163,7 +163,7 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({
             <Divider />
 
             <div className={'flex items-center justify-between'}>
-                <Typography variant={'heading-sm'}>
+                <Typography as="h2" variant={'heading-sm'}>
                     {t('app.recipe.ingredients')}
                 </Typography>
                 <InputError
@@ -180,7 +180,7 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({
             <Divider />
 
             <div className={'flex items-center justify-between'}>
-                <Typography variant={'heading-sm'}>
+                <Typography as="h2" variant={'heading-sm'}>
                     {t('app.recipe.instructions')}
                 </Typography>
                 <InputError

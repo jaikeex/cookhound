@@ -1,6 +1,6 @@
 'use client';
 
-import { Avatar, Typography } from '@/client/components';
+import { Avatar, Time, Typography } from '@/client/components';
 import { classNames, getAgeString } from '@/client/utils';
 import React from 'react';
 import { useLocale } from '@/client/store';
@@ -35,7 +35,8 @@ export const RecipeAuthorLinkDesktop: React.FC<
         <div className={classNames('flex items-center gap-3', className)}>
             {authorId === -1 ? (
                 <Typography variant="body-sm" color="muted">
-                    {t('app.recipe.age')}: {ageString}
+                    {t('app.recipe.age')}:{' '}
+                    <Time dateTime={createdAt}>{ageString}</Time>
                 </Typography>
             ) : isLoadingAuthor ? (
                 <div className="flex items-center gap-2">
@@ -65,13 +66,15 @@ export const RecipeAuthorLinkDesktop: React.FC<
                         </Typography>
 
                         <Typography variant="body-xs" color="muted">
-                            {t('app.recipe.age')}: {ageString}
+                            {t('app.recipe.age')}:{' '}
+                            <Time dateTime={createdAt}>{ageString}</Time>
                         </Typography>
                     </div>
                 </React.Fragment>
             ) : (
                 <Typography variant="body-sm" color="muted">
-                    {t('app.recipe.age')}: {ageString}
+                    {t('app.recipe.age')}:{' '}
+                    <Time dateTime={createdAt}>{ageString}</Time>
                 </Typography>
             )}
         </div>

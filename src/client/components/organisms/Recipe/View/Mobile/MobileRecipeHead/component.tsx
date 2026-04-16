@@ -40,7 +40,7 @@ export const MobileRecipeHead: React.FC<MobileRecipeHeadProps> = ({
                 isPreview={isPreview}
             />
 
-            <Typography variant={'heading-xl'} className={'text-center'}>
+            <Typography as="h1" variant={'heading-xl'} className={'text-center'}>
                 {recipe.title}
             </Typography>
 

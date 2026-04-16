@@ -353,7 +353,7 @@ export const ShoppingListTemplate: React.FC<ShoppingListTemplateProps> = ({
     ) {
         return (
             <div className="max-w-md pt-20 mx-auto min-w-72">
-                <Typography variant="heading-md" className="text-center">
+                <Typography as="h2" variant="heading-md" className="text-center">
                     {t('app.shopping-list.empty')}
                 </Typography>
                 <Link href="/">

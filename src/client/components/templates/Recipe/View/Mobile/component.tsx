@@ -20,7 +20,7 @@ export const MobileRecipeViewTemplate: React.FC<MobileRecipeViewProps> = ({
     const { recipe, rateRecipe, onShoppingListCreate } = useRecipeHandling();
 
     return (
-        <div className={`max-w-3xl mx-auto ${className}`}>
+        <article className={`max-w-3xl mx-auto ${className}`}>
             <div className={'space-y-4'}>
                 <MobileRecipeHead
                     recipe={recipe}
@@ -34,6 +34,6 @@ export const MobileRecipeViewTemplate: React.FC<MobileRecipeViewProps> = ({
                     onShoppingListCreate={onShoppingListCreate}
                 />
             </div>
-        </div>
+        </article>
     );
 };

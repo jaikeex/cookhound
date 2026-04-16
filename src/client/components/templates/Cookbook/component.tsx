@@ -129,8 +129,8 @@ export const CookbookTemplate: React.FC<CookbookTemplateProps> = ({
     }, [recipesById]);
 
     return (
-        <section className="page-wrapper">
-            <Typography variant="heading-md">{cookbook.title}</Typography>
+        <article className="page-wrapper">
+            <Typography as="h1" variant="heading-md">{cookbook.title}</Typography>
 
             <Typography variant="body-sm" className="mt-2">
                 {cookbook.description}
@@ -172,6 +172,6 @@ export const CookbookTemplate: React.FC<CookbookTemplateProps> = ({
             ) : (
                 <RecipeCardList recipes={cookbook.recipes} hasMore={false} />
             )}
-        </section>
+        </article>
     );
 };

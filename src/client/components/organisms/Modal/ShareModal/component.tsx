@@ -98,7 +98,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({
 
     return (
         <div className="flex flex-col w-full h-full max-h-[85dvh] md:max-h-[70dvh] max-w-[90dvw] md:max-w-[80dvw] xl:max-w-[60dvw] px-4">
-            <Typography variant="heading-md" className="mb-2">
+            <Typography as="h2" variant="heading-md" className="mb-2">
                 {t('app.share.title')}
             </Typography>
 
