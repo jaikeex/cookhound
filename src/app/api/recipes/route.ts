@@ -43,6 +43,7 @@ const RecipeForCreatePayloadSchema = z.strictObject({
     }),
     title: z.string().trim().min(1).max(200),
     instructions: z.array(z.string().trim().min(1)).min(1),
+    description: z.string().trim().max(300).nullable(),
     notes: z.string().trim().max(1400).nullable(),
     time: z.coerce.number().int().positive().nullable(),
     portionSize: z.coerce.number().int().positive().nullable(),

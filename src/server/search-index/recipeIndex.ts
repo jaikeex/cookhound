@@ -27,6 +27,7 @@ interface RecipeDocument {
     displayId: string;
     language: Locale;
     title: string;
+    description: string | null;
     notes: string | null;
     ingredients: string[];
     instructions: string[];
@@ -159,6 +160,7 @@ class RecipeSearchIndex {
                     { name: 'displayId', type: 'string' },
                     { name: 'language', type: 'string' },
                     { name: 'title', type: 'string' },
+                    { name: 'description', type: 'string', optional: true },
                     { name: 'notes', type: 'string', optional: true },
                     { name: 'ingredients', type: 'string[]', optional: true },
                     { name: 'instructions', type: 'string[]', optional: true },
@@ -199,6 +201,7 @@ class RecipeSearchIndex {
             displayId: recipe.displayId,
             language: recipe.language,
             title: recipe.title,
+            description: recipe.description ?? '',
             notes: recipe.notes ?? '',
             ingredients: recipe.ingredients?.map((i) => i.name) ?? [],
             instructions: recipe.instructions ?? [],
@@ -297,7 +300,8 @@ class RecipeSearchIndex {
                     .documents()
                     .search({
                         q: query,
-                        query_by: 'title,notes,ingredients,instructions,tags',
+                        query_by:
+                            'title,description,notes,ingredients,instructions,tags',
                         sort_by: 'rating:desc,timesRated:desc',
                         filter_by: `language:=${language}`,
                         prefix: true,

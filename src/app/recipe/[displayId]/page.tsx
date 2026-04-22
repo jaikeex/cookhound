@@ -66,11 +66,15 @@ export async function generateMetadata({
 
         const canonical = `${ENV_CONFIG_PUBLIC.ORIGIN}/recipe/${recipeDisplayId}`;
 
+        const recipeDescription = recipe.description?.trim() || undefined;
+
         return getLocalizedMetadata(cookieStore, headerList, {
             titleKey: 'meta.recipe.title',
             descriptionKey: 'meta.recipe.description',
             ogTitleKey: 'meta.recipe.title',
             ogDescriptionKey: 'meta.recipe.description',
+            description: recipeDescription,
+            ogDescription: recipeDescription,
             twitterCard: 'summary_large_image',
             images: recipe.imageUrl ? [recipe.imageUrl] : [],
             params: { recipeTitle: recipe.title },

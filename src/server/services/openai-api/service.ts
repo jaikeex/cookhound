@@ -43,6 +43,7 @@ class OpenAIApiService {
             portionSize: recipe.portionSize,
             ingredients: ingredientsForEvaluation,
             instructions: recipe.instructions,
+            description: recipe.description,
             notes: recipe.notes
         };
 
@@ -178,6 +179,7 @@ class OpenAIApiService {
                 title: recipe.title,
                 ingredients: recipe.ingredients,
                 instructions: recipe.instructions,
+                description: recipe.description,
                 notes: recipe.notes
             },
             availableTags: RECIPE_CATEGORY_TAGS,

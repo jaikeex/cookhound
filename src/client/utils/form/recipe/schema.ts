@@ -5,6 +5,7 @@ export const recipeFormSchema = z.object({
     portionSize: z.number().nullable(),
     time: z.number().nullable(),
     imageUrl: z.string().trim().nullable(),
+    description: z.string().trim().max(300).nullable(),
     notes: z.string().trim().nullable(),
     ingredients: z
         .array(

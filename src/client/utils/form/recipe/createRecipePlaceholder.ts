@@ -22,6 +22,7 @@ export function createRecipePlaceholder(
         flags: [],
         tags: [],
         time: null,
+        description: null,
         notes: null,
         ingredients: [],
         instructions: [],

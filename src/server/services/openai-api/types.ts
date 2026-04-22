@@ -7,6 +7,7 @@ export type RecipeForEvaluation = {
     portionSize: number | null;
     ingredients: IngredientForEvaluation[];
     instructions: string[];
+    description: string | null;
     notes: string | null;
 };
 

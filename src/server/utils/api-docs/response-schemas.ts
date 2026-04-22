@@ -97,6 +97,7 @@ export const RecipeResponseSchema = z.object({
     portionSize: z.number().nullable(),
     ingredients: z.array(IngredientResponseSchema),
     instructions: z.array(z.string()),
+    description: z.string().nullable(),
     notes: z.string().nullable(),
     imageUrl: z.string(),
     rating: z.number().nullable(),

@@ -2,7 +2,7 @@
 -- Parameters:
 --   $1 :: int    – authorId (user ID of the recipe author)
 --   $2 :: text   – language (recipe language filter)
---   $3 :: text   – searchTerm (search query for title, notes, ingredients, and instructions)
+--   $3 :: text   – searchTerm (search query for title, description, notes, ingredients, and instructions)
 --   $4 :: int    – limit (maximum number of recipes to return)
 --   $5 :: int    – offset (number of recipes to skip)
 --
@@ -52,6 +52,7 @@ WHERE
     AND r.language = $2
     AND (
         r.title ILIKE '%' || $3 || '%'
+        OR r.description ILIKE '%' || $3 || '%'
         OR r.notes ILIKE '%' || $3 || '%'
         OR i.name ILIKE '%' || $3 || '%'
         OR instr.text ILIKE '%' || $3 || '%'

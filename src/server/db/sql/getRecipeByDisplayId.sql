@@ -11,6 +11,7 @@ SELECT
     r.author_id AS "authorId",
     r.time,
     r.portion_size AS "portionSize",
+    r.description,
     r.notes,
     r.image_url AS "imageUrl",
     r.rating,

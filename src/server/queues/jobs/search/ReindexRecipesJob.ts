@@ -66,6 +66,7 @@ class ReindexRecipesJob extends BaseJob {
                         language: recipe.language as Locale,
                         time: recipe.time,
                         portionSize: recipe.portionSize,
+                        description: recipe.description ?? null,
                         notes: recipe.notes,
                         imageUrl: recipe.imageUrl ?? '',
                         rating: recipe.rating ? Number(recipe.rating) : null,

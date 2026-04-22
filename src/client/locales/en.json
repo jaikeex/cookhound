@@ -178,6 +178,8 @@
     "app.profile.pendingDeletion.cancel.modal.confirm": "Yes, Cancel Deletion",
     "app.profile.pendingDeletion.cancel.modal.cancel": "No, Keep Deletion Scheduled",
     "app.recipe.title": "Recipe title",
+    "app.recipe.description": "Description",
+    "app.recipe.description-placeholder": "A short summary shown on the recipe page and in search previews.",
     "app.recipe.ingredients": "Ingredients",
     "app.recipe.instructions": "Instructions",
     "app.recipe.notes": "Notes",

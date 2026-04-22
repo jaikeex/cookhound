@@ -56,10 +56,16 @@ export function generateRecipeSchema(recipe: RecipeDTO, baseUrl?: string) {
         };
     }
 
-    if (recipe.instructions && recipe.instructions.length > 0) {
+    const authoredDescription = recipe.description?.trim();
+
+    if (authoredDescription) {
+        schema.description =
+            authoredDescription.length > 160
+                ? authoredDescription.substring(0, 157) + '...'
+                : authoredDescription;
+    } else if (recipe.instructions && recipe.instructions.length > 0) {
         const firstInstruction = recipe.instructions[0];
         if (firstInstruction) {
-            // Use first instruction as a brief description
             schema.description =
                 firstInstruction.length > 160
                     ? firstInstruction.substring(0, 157) + '...'

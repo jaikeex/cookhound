@@ -1,11 +1,11 @@
 -- Search recipes by text across multiple fields
 -- Parameters:
 --   $1 :: text   – language (recipe language filter)
---   $2 :: text   – searchTerm (search query for title, notes, ingredients, and instructions)
+--   $2 :: text   – searchTerm (search query for title, description, notes, ingredients, and instructions)
 --   $3 :: int    – limit (maximum number of recipes to return)
 --   $4 :: int    – offset (number of recipes to skip)
 --
--- Performs case-insensitive search across recipe title, notes, ingredient names, and instructions.
+-- Performs case-insensitive search across recipe title, description, notes, ingredient names, and instructions.
 -- Excludes recipes with active flags.
 SELECT
     DISTINCT r.id,
@@ -30,6 +30,7 @@ WHERE
     AND rf.recipe_id IS NULL
     AND (
         r.title ILIKE '%' || $2 || '%'
+        OR r.description ILIKE '%' || $2 || '%'
         OR r.notes ILIKE '%' || $2 || '%'
         OR i.name ILIKE '%' || $2 || '%'
         OR instr.text ILIKE '%' || $2 || '%'

@@ -12,6 +12,7 @@ export type RecipeDTO = {
     portionSize: number | null;
     ingredients: Ingredient[];
     instructions: string[];
+    description: string | null;
     notes: string | null;
     imageUrl: string;
     rating: number | null;
@@ -52,6 +53,7 @@ export type RecipeForCreatePayload = {
     language: Locale;
     title: string;
     instructions: string[];
+    description: string | null;
     notes: string | null;
     time: number | null;
     portionSize: number | null;

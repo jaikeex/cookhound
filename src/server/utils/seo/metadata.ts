@@ -8,6 +8,8 @@ import { ENV_CONFIG_PUBLIC } from '@/common/constants';
 type MetadataConfig = {
     titleKey: I18nMessage;
     descriptionKey: I18nMessage;
+    description?: string;
+    ogDescription?: string;
     imageUrl?: string;
     images?: string[];
     ogTitleKey?: I18nMessage;
@@ -58,19 +60,24 @@ export async function getLocalizedMetadata(
     const canonicalUrl = config.canonical || baseUrl;
 
     const title = tServer(locale, config.titleKey, config.params);
+
     const description = validateDescription(
-        tServer(locale, config.descriptionKey, config.params)
+        config.description ??
+            tServer(locale, config.descriptionKey, config.params)
     );
 
     const ogTitle = config.ogTitleKey
         ? tServer(locale, config.ogTitleKey, config.params)
         : title;
-    const ogDescription = config.ogDescriptionKey
-        ? validateDescription(
-              tServer(locale, config.ogDescriptionKey, config.params),
-              200
-          )
-        : description;
+
+    const ogDescription = config.ogDescription
+        ? validateDescription(config.ogDescription, 200)
+        : config.ogDescriptionKey
+          ? validateDescription(
+                tServer(locale, config.ogDescriptionKey, config.params),
+                200
+            )
+          : description;
 
     const metadata: Metadata = {
         metadataBase: new URL(baseUrl),

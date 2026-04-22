@@ -156,6 +156,7 @@ model Recipe {
   authorId    Int      @map("author_id")
   language    String   @db.VarChar(2)
   title       String   @db.VarChar(255)
+  description String?  @map("description") @db.Text
   notes       String?  @map("notes") @db.Text
   time        Int?     @map("time")
   portionSize Int?     @map("portion_size")

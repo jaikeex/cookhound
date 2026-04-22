@@ -131,7 +131,17 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({
                 label={t('app.recipe.title')}
                 name={'title'}
                 onChange={handleInputChange('title')}
-                onKeyDown={handleInputKeyPress('recipe-portionSize')}
+                onKeyDown={handleInputKeyPress('recipe-description')}
+            />
+
+            <Textarea
+                defaultValue={defaultValues?.description}
+                id={'recipe-description'}
+                label={t('app.recipe.description')}
+                name={'description'}
+                onChange={handleInputChange('description')}
+                placeholder={t('app.recipe.description-placeholder')}
+                rows={3}
             />
 
             <Divider className="md:hidden" />

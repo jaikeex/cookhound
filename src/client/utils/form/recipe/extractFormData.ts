@@ -5,6 +5,7 @@ export interface ExtractedRecipeFormData {
     portionSize: number | null;
     time: number | null;
     imageUrl: string | null;
+    description: string | null;
     notes: string | null;
     ingredients: Omit<Ingredient, 'id'>[];
     instructions: string[];
@@ -78,11 +79,15 @@ export async function extractFormData(
         imageUrl = (data.get('imageUrl') as string) || null;
     }
 
+    const descriptionRaw = (data.get('description') as string) ?? '';
+    const descriptionTrimmed = descriptionRaw.trim();
+
     return {
         title: (data.get('title') as string) ?? '',
         portionSize: parseInt(data.get('portionSize') as string) || null,
         time: parseInt(data.get('time') as string) || null,
         imageUrl,
+        description: descriptionTrimmed.length > 0 ? descriptionTrimmed : null,
         notes: (data.get('notes') as string) ?? null,
         ingredients,
         instructions,

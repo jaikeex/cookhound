@@ -4,7 +4,8 @@ import React from 'react';
 import {
     Divider,
     MobileRecipeBody,
-    MobileRecipeHead
+    MobileRecipeHead,
+    Typography
 } from '@/client/components';
 import { useRecipeHandling } from '@/client/store';
 
@@ -27,7 +28,15 @@ export const MobileRecipeViewTemplate: React.FC<MobileRecipeViewProps> = ({
                     isPreview={isPreview}
                     onRateRecipe={rateRecipe}
                 />
+
+                {recipe.description ? (
+                    <Typography variant="body" align="center">
+                        {recipe.description}
+                    </Typography>
+                ) : null}
+
                 <Divider />
+
                 <MobileRecipeBody
                     recipe={recipe}
                     isPreview={isPreview}

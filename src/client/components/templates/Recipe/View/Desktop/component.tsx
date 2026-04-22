@@ -4,7 +4,8 @@ import React from 'react';
 import {
     DesktopRecipeBody,
     DesktopRecipeHead,
-    Divider
+    Divider,
+    Typography
 } from '@/client/components';
 import { useRecipeHandling } from '@/client/store';
 
@@ -32,6 +33,11 @@ export const DesktopRecipeViewTemplate: React.FC<DesktopRecipeViewProps> = ({
                     isPreview={isPreview}
                     onRateRecipe={rateRecipe}
                 />
+
+                {recipe.description ? (
+                    <Typography variant="body">{recipe.description}</Typography>
+                ) : null}
+
                 <Divider />
 
                 <DesktopRecipeBody
