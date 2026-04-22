@@ -27,7 +27,7 @@ export const NotFoundTemplate: React.FC<NotFoundTemplateProps> = () => {
         <div className="flex flex-col items-center pt-10 text-center">
             <Logo className="logo-md mb-8" />
 
-            <Typography variant="heading-lg" className="mb-4">
+            <Typography as="h1" variant="heading-lg" className="mb-4">
                 {t('app.error.not-found')}
             </Typography>
             <Typography

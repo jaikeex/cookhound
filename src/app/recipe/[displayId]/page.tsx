@@ -5,6 +5,9 @@ import type { Metadata } from 'next';
 import { cookies, headers } from 'next/headers';
 import { getLocalizedMetadata } from '@/server/utils/seo';
 import { ENV_CONFIG_PUBLIC } from '@/common/constants';
+import db from '@/server/db/model';
+
+export const revalidate = 3600;
 
 type RecipePageParams = {
     readonly params: Promise<
@@ -33,6 +36,14 @@ export default async function Page({ params }: RecipePageParams) {
             <RecipeStructuredData recipePromise={recipePromise} />
         </React.Fragment>
     );
+}
+
+//|=============================================================================================|//
+
+export async function generateStaticParams(): Promise<
+    Array<{ displayId: string }>
+> {
+    return db.recipe.listDisplayIdsForStaticGeneration(undefined, 0); // no need to cache this
 }
 
 //|=============================================================================================|//

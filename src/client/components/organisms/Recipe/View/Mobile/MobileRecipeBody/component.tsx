@@ -81,7 +81,7 @@ export const MobileRecipeBody: React.FC<MobileRecipeBodyProps> = ({
                         <React.Fragment>
                             <Divider dashed={true} className={'mt-8!'} />
                             <div className={'w-full space-y-2'}>
-                                <Typography variant={'heading-sm'}>
+                                <Typography as="h2" variant={'heading-sm'}>
                                     {t('app.recipe.notes')}
                                 </Typography>
                                 <Typography variant={'body-sm'}>

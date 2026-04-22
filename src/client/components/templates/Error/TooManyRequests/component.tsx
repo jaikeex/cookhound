@@ -14,7 +14,7 @@ export const TooManyRequestsTemplate: React.FC<
 
     return (
         <div className="flex flex-col items-center pt-10 text-center">
-            <Typography variant="heading-lg" className="mb-4">
+            <Typography as="h1" variant="heading-lg" className="mb-4">
                 {t('app.error.too-many-requests')}
             </Typography>
             <Typography

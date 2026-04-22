@@ -282,6 +282,7 @@
     "app.cookbook.no-cookbooks-description": "Create your first cookbook. The recipe will be added automatically.",
     "app.cookbook.create-first": "Create your first cookbook",
     "app.cookbook.create-and-add-success": "Cookbook created and recipe added successfully",
+    "app.shopping-list.title": "Shopping list",
     "app.shopping-list.edited": "Shopping list updated",
     "app.shopping-list.delete-recipe-shopping-list": "Are you sure you want to delete this recipe from the shopping list?",
     "app.shopping-list.portion-size-tooltip": "Portion size: {{portionSize}}",

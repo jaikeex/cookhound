@@ -124,7 +124,7 @@ export const AddRecipeToCookbookModal: React.FC<
     if (options.length === 0) {
         return (
             <div className="flex flex-col w-full h-full max-h-[85dvh] md:max-h-[70dvh] max-w-[80dvw] md:max-w-[60dvw] xl:max-w-[40dvw] px-4">
-                <Typography variant="heading-md">
+                <Typography as="h2" variant="heading-md">
                     {t('app.cookbook.no-cookbooks-title')}
                 </Typography>
 
@@ -159,7 +159,7 @@ export const AddRecipeToCookbookModal: React.FC<
     // Normal state with cookbook selection
     return (
         <div className="flex flex-col w-full h-full max-h-[85dvh] md:max-h-[70dvh] max-w-[80dvw] md:max-w-[60dvw] xl:max-w-[40dvw] px-4">
-            <Typography variant="heading-md">
+            <Typography as="h2" variant="heading-md">
                 {t('app.cookbook.select-title')}
             </Typography>
 

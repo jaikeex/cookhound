@@ -25,7 +25,7 @@ export const MobileProfileTemplate: React.FC<MobileRecipeViewProps> = ({
     }));
 
     return (
-        <div className={classNames(className)}>
+        <article className={classNames(className)}>
             <ProfileHeadMobile user={user} isCurrentUser={isCurrentUser} />
             <Tabs
                 tabs={tabs}
@@ -33,6 +33,6 @@ export const MobileProfileTemplate: React.FC<MobileRecipeViewProps> = ({
                 className="mt-4"
                 buttonRowClassName="sticky top-14 z-10"
             />
-        </div>
+        </article>
     );
 };

@@ -23,7 +23,9 @@ export const ShoppingListHead: React.FC<ShoppingListHeadProps> = ({
     return (
         <React.Fragment>
             <div className="flex items-center justify-between">
-                <Typography variant="heading-md">Nákupní seznam</Typography>
+                <Typography as="h1" variant="heading-md">
+                    {t('app.shopping-list.title')}
+                </Typography>
 
                 {editing ? (
                     <ButtonBase

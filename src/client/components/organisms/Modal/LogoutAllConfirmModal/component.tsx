@@ -64,7 +64,7 @@ export const LogoutAllConfirmModal: React.FC<LogoutAllConfirmModalProps> = ({
 
     return (
         <div className="flex flex-col w-full h-full max-h-[85dvh] md:max-h-[70dvh] max-w-[80dvw] md:max-w-[40dvw] xl:max-w-[30dvw] px-4">
-            <Typography variant="heading-sm">
+            <Typography as="h2" variant="heading-sm">
                 {t('auth.logout-all.title')}
             </Typography>
             <Typography className="mt-2">

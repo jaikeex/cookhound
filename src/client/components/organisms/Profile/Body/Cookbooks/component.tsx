@@ -87,7 +87,7 @@ export const Cookbooks: React.FC<CookbooksProps> = ({
     return (
         <div className={className}>
             <div className="flex items-center gap-2 justify-between">
-                <Typography variant="heading-md">
+                <Typography as="h2" variant="heading-md">
                     {t('app.profile.cookbooks')}
                 </Typography>
 

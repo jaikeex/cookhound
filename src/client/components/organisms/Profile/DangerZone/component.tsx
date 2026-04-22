@@ -20,7 +20,7 @@ export const DangerZone: React.FC<DangerZoneProps> = ({ className }) => {
 
     return (
         <div className={className}>
-            <Typography variant="heading-sm" className="text-danger">
+            <Typography as="h2" variant="heading-sm" className="text-danger">
                 {t('app.profile.settings.section-danger-zone')}
             </Typography>
 

@@ -282,6 +282,7 @@
     "app.cookbook.no-cookbooks-description": "Vytvořte svou první kuchařku. Recept do ní bude přidán automaticky.",
     "app.cookbook.create-first": "Vytvořit první kuchařku",
     "app.cookbook.create-and-add-success": "Kuchařka byla vytvořena a recept byl úspěšně přidán",
+    "app.shopping-list.title": "Nákupní seznam",
     "app.shopping-list.edited": "Nákupní seznam byl aktualizován",
     "app.shopping-list.delete-recipe-shopping-list": "Opravdu chcete odstranit tento recept ze seznamu?",
     "app.shopping-list.portion-size-tooltip": "Počet procí: {{portionSize}}",

@@ -109,7 +109,7 @@ export const ConsentSettingsModal: React.FC<ConsentSettingsModalProps> = ({
 
     return (
         <div className="flex flex-col gap-6 w-[90vw] max-w-lg">
-            <Typography as="h6" variant="heading-md" align="center">
+            <Typography as="h2" variant="heading-md" align="center">
                 {t('app.cookies.modal.title')}
             </Typography>
 

@@ -176,7 +176,7 @@ export default async function RootLayout({
                             {/* DO NOT CHANGE THE ORDER OF THESE COMPONENTS (stacking order and z-index issues) */}
                             <TopNavigation />
                             <BottomNavigation />
-                            <div
+                            <main
                                 id={CONTENT_WRAPPER_ID}
                                 className={classNames(
                                     'flex-1 px-2 pt-16 md:px-4 md:pt-24',
@@ -184,7 +184,7 @@ export default async function RootLayout({
                                 )}
                             >
                                 {children}
-                            </div>
+                            </main>
                             <Footer />
                         </div>
                     </AppProviders>

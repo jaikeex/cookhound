@@ -86,6 +86,43 @@ class RecipeModel {
         return recipe[0] ?? null;
     }
 
+    /**
+     * List recipe display IDs eligible for static generation.
+     * Excludes recipes with an active flag. Bounded to avoid unbounded build cost;
+     * the long tail is served via on-demand rendering (Next.js `dynamicParams`).
+     * Query class -> C2
+     */
+    async listDisplayIdsForStaticGeneration(
+        limit = 5000,
+        ttl?: number
+    ): Promise<Array<{ displayId: string }>> {
+        const cacheKey = generateCacheKey('recipe', 'listDisplayIdsForSSG', {
+            limit
+        });
+
+        log.trace('Listing recipe displayIds for SSG', { limit });
+
+        return cachePrismaQuery(
+            cacheKey,
+            async () => {
+                log.trace('Fetching recipe displayIds for SSG from db', {
+                    limit
+                });
+                return prisma.recipe.findMany({
+                    where: { flags: { none: { active: true } } },
+                    select: { displayId: true },
+                    orderBy: [
+                        { rating: 'desc' },
+                        { timesViewed: 'desc' },
+                        { createdAt: 'desc' }
+                    ],
+                    take: limit
+                });
+            },
+            ttl ?? CACHE_TTL.TTL_2
+        );
+    }
+
     async getMany(
         language: string,
         limit: number,

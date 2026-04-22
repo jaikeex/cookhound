@@ -276,7 +276,7 @@ export const RecipeFilters: React.FC<RecipeFiltersProps> = ({
     return (
         <div className={className}>
             <div className="flex items-center justify-between h-8">
-                <Typography variant="heading-sm">
+                <Typography as="h2" variant="heading-sm">
                     {t('app.recipe.filter.title')}
                 </Typography>
 
