@@ -6,10 +6,46 @@ import { redisClient } from '@/server/integrations';
 import { InfrastructureError } from '@/server/error';
 import { InfrastructureErrorCode } from '@/server/error/codes';
 import { CACHE_TTL } from '@/server/db/model/model-cache';
+import type { CollectionFieldSchema } from 'typesense/lib/Typesense/Collection';
 
 const log = Logger.getInstance('recipe-index');
 
 const COLLECTION_NAME = 'recipes';
+
+//?—————————————————————————————————————————————————————————————————————————————————————————————?//
+//?                                DECLARED TYPESENSE SCHEMA                                    ?//
+///
+//# Single source of truth for the recipe collection's Typesense schema. Both the create path
+//# and the sync path read from this list, so adding a new field means editing THIS array only.
+//#
+//# This is additive only at runtime. Removing, renaming, or retyping a field is destructive and
+//# must go through a manual reindex.
+//# Also, id is a typesense reserved primary key. It must be declared on create but is never
+//# returned by retrieve, and cannot be added or altered by the collection update, so
+//# declaring it as reserved and skipping it on the sync path is the preferred approach.
+///
+//?—————————————————————————————————————————————————————————————————————————————————————————————?//
+
+const RESERVED_FIELD_NAMES: ReadonlySet<string> = new Set(['id']);
+
+const RECIPE_COLLECTION_FIELDS: CollectionFieldSchema[] = [
+    { name: 'id', type: 'string' },
+    { name: 'displayId', type: 'string' },
+    { name: 'language', type: 'string' },
+    { name: 'title', type: 'string' },
+    { name: 'description', type: 'string', optional: true },
+    { name: 'notes', type: 'string', optional: true },
+    { name: 'ingredients', type: 'string[]', optional: true },
+    { name: 'instructions', type: 'string[]', optional: true },
+    { name: 'tags', type: 'string[]', optional: true },
+    { name: 'rating', type: 'float', optional: true },
+    { name: 'timesRated', type: 'int32', optional: true },
+    { name: 'isFlagged', type: 'int32', optional: true },
+    { name: 'time', type: 'int32', optional: true },
+    { name: 'portionSize', type: 'int32', optional: true },
+    { name: 'authorId', type: 'int32' },
+    { name: 'imageUrl', type: 'string', optional: true }
+];
 
 //?—————————————————————————————————————————————————————————————————————————————————————————————?//
 //?                                         ISFLAGGED                                           ?//
@@ -45,6 +81,7 @@ class RecipeSearchIndex {
     private static instance: RecipeSearchIndex | null = null;
     private client: any;
     private collectionReady: boolean = false;
+    private readyPromise: Promise<void> | null = null;
 
     private constructor() {
         this.client = typesenseClient.getClient();
@@ -120,18 +157,40 @@ class RecipeSearchIndex {
     }
 
     //~-----------------------------------------------------------------------------------------~//
-    //$                                    CREATE COLLECTION                                    $//
+    //$                              CREATE / RECONCILE COLLECTION                              $//
     //~-----------------------------------------------------------------------------------------~//
 
-    private async ensureCollectionExists(): Promise<void> {
+    /**
+     * Ensures the Typesense recipe collection exists AND matches the schema declared.
+     * On cold start this creates a fresh collection. On start against a live collection
+     * that has drifted this issues a n update to add the missing fields.
+     */
+    async ensureCollectionReady(): Promise<void> {
         if (this.collectionReady) {
             return;
         }
 
+        if (this.readyPromise) {
+            return this.readyPromise;
+        }
+
+        this.readyPromise = this.reconcileCollection();
+
         try {
-            await this.client.collections(COLLECTION_NAME).retrieve();
+            await this.readyPromise;
             this.collectionReady = true;
-            return;
+        } finally {
+            this.readyPromise = null;
+        }
+    }
+
+    private async reconcileCollection(): Promise<void> {
+        let collection: { fields?: unknown } | null = null;
+
+        try {
+            collection = await this.client
+                .collections(COLLECTION_NAME)
+                .retrieve();
         } catch (error: unknown) {
             /**
              * This explicit check is needed to detect when the collection is not present in typesense.
@@ -142,40 +201,50 @@ class RecipeSearchIndex {
                 (error as any)?.name === 'ObjectNotFound' ||
                 (error as any)?.code === 404;
 
-            if (!isNotFound) {
-                log.error('Failed to retrieve Typesense collection', error);
-                throw new InfrastructureError(
-                    InfrastructureErrorCode.TYPESENSE_COLLECTION_CREATE_FAILED
-                );
+            if (isNotFound) {
+                await this.createCollection();
+                return;
             }
+
+            log.error('Failed to retrieve Typesense collection', error);
+            throw new InfrastructureError(
+                InfrastructureErrorCode.TYPESENSE_COLLECTION_RETRIEVE_FAILED
+            );
         }
 
+        //———————————————————————————————————————————————————————————————————————————————————————//
+        //                                    EMPTY RETRIEVE                                     //
+        //
+        // The sync fn would treat every declared field as missing and issue an update which
+        // typesense rejects, because the primary id cannot be added again with update.
+        //
+        // Bail out of the execution explicitly here so that the error logs the actual issue
+        // instead of the misleading sync failure.
+        //———————————————————————————————————————————————————————————————————————————————————————//
+
+        const fields = collection?.fields;
+
+        if (!Array.isArray(fields) || fields.length === 0) {
+            log.error(
+                'Typesense retrieve returned a collection with no fields — refusing to reconcile',
+                { collection }
+            );
+            throw new InfrastructureError(
+                InfrastructureErrorCode.TYPESENSE_SCHEMA_SYNC_FAILED
+            );
+        }
+
+        await this.syncCollectionSchema(fields as { name: string }[]);
+    }
+
+    private async createCollection(): Promise<void> {
         log.info('Typesense collection not found – creating…');
 
         try {
             await this.client.collections().create({
                 name: COLLECTION_NAME,
-                fields: [
-                    { name: 'id', type: 'string' },
-                    { name: 'displayId', type: 'string' },
-                    { name: 'language', type: 'string' },
-                    { name: 'title', type: 'string' },
-                    { name: 'description', type: 'string', optional: true },
-                    { name: 'notes', type: 'string', optional: true },
-                    { name: 'ingredients', type: 'string[]', optional: true },
-                    { name: 'instructions', type: 'string[]', optional: true },
-                    { name: 'tags', type: 'string[]', optional: true },
-                    { name: 'rating', type: 'float', optional: true },
-                    { name: 'timesRated', type: 'int32', optional: true },
-                    { name: 'isFlagged', type: 'int32', optional: true },
-                    { name: 'time', type: 'int32', optional: true },
-                    { name: 'portionSize', type: 'int32', optional: true },
-                    { name: 'authorId', type: 'int32' },
-                    { name: 'imageUrl', type: 'string', optional: true }
-                ]
+                fields: RECIPE_COLLECTION_FIELDS
             });
-
-            this.collectionReady = true;
 
             log.info('Typesense recipe collection created successfully');
         } catch (error: unknown) {
@@ -187,6 +256,43 @@ class RecipeSearchIndex {
             log.error('Failed to create Typesense collection', error);
             throw new InfrastructureError(
                 InfrastructureErrorCode.TYPESENSE_COLLECTION_CREATE_FAILED
+            );
+        }
+    }
+
+    private async syncCollectionSchema(
+        liveFields: { name: string }[]
+    ): Promise<void> {
+        const liveNames = new Set(liveFields.map((f) => f.name));
+
+        const missing = RECIPE_COLLECTION_FIELDS.filter(
+            (f) => !RESERVED_FIELD_NAMES.has(f.name) && !liveNames.has(f.name)
+        );
+
+        if (missing.length === 0) {
+            return;
+        }
+
+        log.info('Typesense recipe collection schema drift detected', {
+            added: missing.map((f) => f.name)
+        });
+
+        try {
+            await this.client
+                .collections(COLLECTION_NAME)
+                .update({ fields: missing });
+
+            log.info('Typesense recipe collection schema reconciled', {
+                added: missing.map((f) => f.name)
+            });
+        } catch (error: unknown) {
+            log.error(
+                'Failed to sync Typesense recipe collection schema',
+                error,
+                { attempted: missing.map((f) => f.name) }
+            );
+            throw new InfrastructureError(
+                InfrastructureErrorCode.TYPESENSE_SCHEMA_SYNC_FAILED
             );
         }
     }
@@ -223,7 +329,7 @@ class RecipeSearchIndex {
     async upsert(recipe: RecipeDTO): Promise<void> {
         try {
             // Do not ever remove this.
-            await this.ensureCollectionExists();
+            await this.ensureCollectionReady();
 
             await this.client
                 .collections(COLLECTION_NAME)
@@ -291,7 +397,7 @@ class RecipeSearchIndex {
 
         return await this.cacheSearchQuery(cacheKey, async () => {
             try {
-                await this.ensureCollectionExists();
+                await this.ensureCollectionReady();
 
                 const page = Math.floor(offset / limit) + 1;
 
@@ -379,6 +485,7 @@ class RecipeSearchIndex {
 
             // Reset the collection ready flag here
             this.collectionReady = false;
+            this.readyPromise = null;
 
             log.info(
                 'All documents deleted successfully in Typesense collection',
