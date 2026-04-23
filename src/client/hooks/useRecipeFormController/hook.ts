@@ -48,12 +48,19 @@ export const useRecipeFormController = ({
     const [changedFields, setChangedFields] = useState<string[]>([]);
     const [formErrors, setFormErrors] = useState<RecipeFormErrors>({});
 
-    const {
-        recipeObject,
-        setRecipeObject,
-        updateRecipeObject,
-        resetSuggestions
-    } = useCreateRecipeStore();
+    const recipeObject = useCreateRecipeStore((state) => state.recipeObject);
+
+    const setRecipeObject = useCreateRecipeStore(
+        (state) => state.setRecipeObject
+    );
+
+    const updateRecipeObject = useCreateRecipeStore(
+        (state) => state.updateRecipeObject
+    );
+
+    const resetSuggestions = useCreateRecipeStore(
+        (state) => state.resetSuggestions
+    );
 
     const formRef = useRef<HTMLFormElement>(null);
 

@@ -36,12 +36,17 @@ export const TagSelectionModal: React.FC<TagSelectionModalProps> = ({
     const { t } = useLocale();
     const { alert } = useSnackbar();
 
-    const {
-        recipeObject,
-        incrementSuggestions,
-        getRemainingsuggestions,
-        canSuggest
-    } = useCreateRecipeStore();
+    const recipeObject = useCreateRecipeStore((state) => state.recipeObject);
+
+    const incrementSuggestions = useCreateRecipeStore(
+        (state) => state.incrementSuggestions
+    );
+
+    const getRemainingsuggestions = useCreateRecipeStore(
+        (state) => state.getRemainingsuggestions
+    );
+
+    const canSuggest = useCreateRecipeStore((state) => state.canSuggest);
 
     const { mutate: suggestTags, isPending: isSuggesting } =
         chqc.tag.useSuggestions({

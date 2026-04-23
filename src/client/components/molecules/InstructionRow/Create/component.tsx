@@ -26,10 +26,11 @@ export const InstructionRowCreate: React.FC<InstructionRowCreateProps> = ({
     const [instruction, setInstruction] = useState<string>(
         defaultInstruction ?? ''
     );
-    const { recipeObject } = useCreateRecipeStore();
+    const instructionsCount = useCreateRecipeStore(
+        (state) => state.recipeObject?.instructions?.length ?? 0
+    );
 
-    const disableHandling =
-        index === 0 && recipeObject?.instructions.length === 1;
+    const disableHandling = index === 0 && instructionsCount === 1;
 
     const handleRemove = useCallback(() => {
         onRemove?.(index);

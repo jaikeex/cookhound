@@ -32,10 +32,11 @@ export const IngredientRowCreate: React.FC<IngredientRowCreateProps> = ({
         defaultIngredient ?? ({} as Ingredient)
     );
 
-    const { recipeObject } = useCreateRecipeStore();
+    const ingredientsCount = useCreateRecipeStore(
+        (state) => state.recipeObject?.ingredients?.length ?? 0
+    );
 
-    const disableHandling =
-        index === 0 && recipeObject?.ingredients.length === 1;
+    const disableHandling = index === 0 && ingredientsCount === 1;
 
     const handleRemove = useCallback(() => {
         onRemove?.(index);
