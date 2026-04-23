@@ -1,7 +1,9 @@
-import React, { useMemo } from 'react';
+'use client';
+
+import React, { useEffect, useMemo } from 'react';
 import type { Ingredient } from '@/common/types';
 import { IngredientRowView, Typography } from '@/client/components';
-import { useRecipeHandling } from '@/client/store';
+import { useRecipeHandling, useRecipeSelectionStore } from '@/client/store';
 import { scaleIngredientsToPortionSize } from '@/client/utils';
 
 //~---------------------------------------------------------------------------------------------~//
@@ -14,6 +16,8 @@ const classConfig = {
         'mobile': 'space-y-4'
     }
 };
+
+const EMPTY_SELECTION: readonly number[] = Object.freeze([]);
 
 //~---------------------------------------------------------------------------------------------~//
 //$                                          COMPONENT                                          $//
@@ -32,13 +36,31 @@ export const IngredientsListView: React.FC<IngredientsListViewProps> = ({
     isPreview = false,
     variant = 'desktop'
 }) => {
-    const {
-        recipe,
-        portionSize,
-        selectIngredient,
-        deselectIngredient,
-        selectedIngredients
-    } = useRecipeHandling();
+    const { recipe, portionSize } = useRecipeHandling();
+
+    const setActiveRecipe = useRecipeSelectionStore(
+        (state) => state.setActiveRecipe
+    );
+
+    const selectIngredient = useRecipeSelectionStore(
+        (state) => state.selectIngredient
+    );
+
+    const deselectIngredient = useRecipeSelectionStore(
+        (state) => state.deselectIngredient
+    );
+
+    const selectedIngredientIds = useRecipeSelectionStore((state) =>
+        state.activeRecipeId === recipe.id
+            ? state.selectedIngredientIds
+            : EMPTY_SELECTION
+    );
+
+    useEffect(() => {
+        if (!isPreview) {
+            setActiveRecipe(recipe.id);
+        }
+    }, [isPreview, recipe.id, setActiveRecipe]);
 
     const originalPortionSize = recipe.portionSize;
 
@@ -113,10 +135,7 @@ export const IngredientsListView: React.FC<IngredientsListViewProps> = ({
             onDeselected={deselectIngredient}
             onSelected={selectIngredient}
             variant={variant}
-            selected={selectedIngredients.some(
-                (selectedIngredient) =>
-                    selectedIngredient.name === ingredient.name
-            )}
+            selected={selectedIngredientIds.includes(ingredient.id)}
         />
     );
 

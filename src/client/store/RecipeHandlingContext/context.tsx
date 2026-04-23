@@ -8,8 +8,13 @@ import React, {
     useMemo,
     useState
 } from 'react';
-import type { Ingredient, RecipeDTO } from '@/common/types';
-import { useAuth, useLocale, useSnackbar } from '@/client/store';
+import type { RecipeDTO } from '@/common/types';
+import {
+    useAuth,
+    useLocale,
+    useRecipeSelectionStore,
+    useSnackbar
+} from '@/client/store';
 import { useShoppingList } from '@/client/hooks';
 import { scaleIngredientsToPortionSize } from '@/client/utils';
 import { chqc, QUERY_KEYS } from '@/client/request/queryClient';
@@ -41,24 +46,6 @@ type RecipeHandlingContextType = Readonly<{
      * Decrement the portion size by 1.
      */
     decrementPortionSize: () => void;
-    /**
-     * The currently selected ingredients.
-     */
-    selectedIngredients: Ingredient[];
-    /**
-     * Selects an ingredient.
-     * @param ingredient - The ingredient to select.
-     */
-    selectIngredient: (ingredient: Ingredient) => void;
-    /**
-     * Deselects an ingredient.
-     * @param ingredient - The ingredient to deselect.
-     */
-    deselectIngredient: (ingredient: Ingredient) => void;
-    /**
-     * Resets the selected ingredients.
-     */
-    resetSelectedIngredients: () => void;
     /**
      * Rate the recipe.
      * @param rating - The rating value.
@@ -108,9 +95,6 @@ export const RecipeHandlingProvider: React.FC<RecipeHandlingProviderProps> = ({
     const { createShoppingList } = useShoppingList();
 
     const [portionSize, setPortionSizeState] = useState(recipe.portionSize);
-    const [selectedIngredients, setSelectedIngredients] = useState<
-        Ingredient[]
-    >([]);
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
     //$                                    PORTION SIZE                                         $//
@@ -148,24 +132,6 @@ export const RecipeHandlingProvider: React.FC<RecipeHandlingProviderProps> = ({
     useEffect(() => {
         setPortionSizeState(recipe.portionSize);
     }, [recipe.portionSize]);
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-    //$                                 INGREDIENT SELECT                                       $//
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-
-    const selectIngredient = useCallback((ingredient: Ingredient) => {
-        setSelectedIngredients((current) => [...current, ingredient]);
-    }, []);
-
-    const deselectIngredient = useCallback((ingredient: Ingredient) => {
-        setSelectedIngredients((current) =>
-            current.filter((selected) => selected.id !== ingredient.id)
-        );
-    }, []);
-
-    const resetSelectedIngredients = useCallback(() => {
-        setSelectedIngredients([]);
-    }, []);
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
     //$                                   RECIPE ACTIONS                                        $//
@@ -212,11 +178,12 @@ export const RecipeHandlingProvider: React.FC<RecipeHandlingProviderProps> = ({
             portionSize
         );
 
+        const selectedIds = useRecipeSelectionStore
+            .getState()
+            .getSelectedForRecipe(recipe.id);
+
         const ingredientsToInclude = scaledIngredients
-            .filter(
-                (ingredient) =>
-                    !selectedIngredients.some((i) => i.id === ingredient.id)
-            )
+            .filter((ingredient) => !selectedIds.includes(ingredient.id))
             .map((ingredient) => ({
                 id: ingredient.id,
                 quantity: ingredient.quantity,
@@ -246,7 +213,6 @@ export const RecipeHandlingProvider: React.FC<RecipeHandlingProviderProps> = ({
         recipe.portionSize,
         recipe.id,
         portionSize,
-        selectedIngredients,
         createShoppingList,
         alert,
         t,
@@ -260,10 +226,6 @@ export const RecipeHandlingProvider: React.FC<RecipeHandlingProviderProps> = ({
             setPortionSize,
             incrementPortionSize,
             decrementPortionSize,
-            selectedIngredients,
-            selectIngredient,
-            deselectIngredient,
-            resetSelectedIngredients,
             rateRecipe,
             onShoppingListCreate
         }),
@@ -273,10 +235,6 @@ export const RecipeHandlingProvider: React.FC<RecipeHandlingProviderProps> = ({
             setPortionSize,
             incrementPortionSize,
             decrementPortionSize,
-            selectedIngredients,
-            selectIngredient,
-            deselectIngredient,
-            resetSelectedIngredients,
             rateRecipe,
             onShoppingListCreate
         ]
