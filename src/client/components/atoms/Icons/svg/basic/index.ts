@@ -17,6 +17,7 @@ import DragIcon from './drag.svg';
 import EditIcon from './edit.svg';
 import ErrorIcon from './error.svg';
 import ExitIcon from './exit.svg';
+import FlagIcon from './flag.svg';
 import HomeIcon from './home.svg';
 import InfoIcon from './info.svg';
 import LinkIcon from './link.svg';
@@ -52,6 +53,7 @@ export const basicSvg = {
     EditIcon,
     ErrorIcon,
     ExitIcon,
+    FlagIcon,
     HomeIcon,
     InfoIcon,
     LinkIcon,

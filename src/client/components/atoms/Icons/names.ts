@@ -22,6 +22,7 @@ export const icons = {
     error: iconsSvg.ErrorIcon,
     exit: iconsSvg.ExitIcon,
     facebook: iconsSvg.FacebookIcon,
+    flag: iconsSvg.FlagIcon,
     google: iconsSvg.GoogleIcon,
     home: iconsSvg.HomeIcon,
     info: iconsSvg.InfoIcon,
