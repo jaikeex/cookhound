@@ -1,4 +1,4 @@
-export const TERMS_VERSION = '2025-10-07';
+export const TERMS_VERSION = '2026-05-01';
 
 export type TERMS_CONTENT_TYPE = {
     title: string;
@@ -9,7 +9,7 @@ export type TERMS_CONTENT_TYPE = {
 };
 
 export const TERMS_TITLE = 'Všeobecné obchodní podmínky pro cookhound.com';
-export const TERMS_TIMESTAMP = 'Datum účinnosti: 7. října 2025';
+export const TERMS_TIMESTAMP = 'Datum účinnosti: 1. května 2026';
 
 export const TERMS_CONTENT = [
     {
@@ -78,7 +78,47 @@ export const TERMS_CONTENT = [
             },
             {
                 content:
-                    '3.5. Provozovatel si vyhrazuje právo, nikoli však povinnost, kontrolovat a odstraňovat uživatelský obsah, který je v rozporu s těmito podmínkami nebo platnými právními předpisy.'
+                    '3.4.1. obsahuje vulgární výrazy nebo jinak nevhodný jazyk neslučitelný s charakterem těchto stránek;'
+            },
+            {
+                content:
+                    '3.4.2. obsahuje jakoukoli formu nenávistných projevů namířených vůči jakékoli skupině osob, zejména na základě rasy, etnického původu, národnosti, náboženského vyznání, pohlaví, sexuální orientace, zdravotního stavu nebo jiného obdobného znaku;'
+            },
+            {
+                content:
+                    '3.4.3. obsahuje jakoukoli formu obtěžování, zastrašování nebo cíleného útoku vůči konkrétní osobě;'
+            },
+            {
+                content:
+                    '3.4.4. obsahuje popis násilného obsahu nebo jeho propagaci;'
+            },
+            {
+                content:
+                    '3.4.5. obsahuje popis, propagaci nebo návod k sebepoškozování;'
+            },
+            {
+                content:
+                    '3.4.6. popisuje, propaguje nebo navádí k činnosti, která je ve většině společností považována za nelegální;'
+            },
+            {
+                content:
+                    '3.4.7. obsahuje nebezpečné instrukce, jejichž dodržení by mohlo ohrozit zdraví nebo život uživatele či třetích osob (např. pokyny k požití toxických či nepoživatelných látek);'
+            },
+            {
+                content:
+                    '3.4.8. obsahuje osobní údaje umožňující identifikaci jakékoli fyzické osoby (jména, e-mailové adresy, telefonní čísla, poštovní adresy apod.), ať již se jedná o autora receptu nebo třetí osobu;'
+            },
+            {
+                content:
+                    '3.4.9. představuje spam, reklamu, propagaci komerčních produktů či služeb nebo jinou obdobnou formu obtěžujícího obsahu nesouvisejícího s vlastními recepty.'
+            },
+            {
+                content:
+                    '3.5. Uživatel bere na vědomí, že nahraný uživatelský obsah může být před zveřejněním nebo kdykoli po něm automatizovaně vyhodnocován (mimo jiné prostřednictvím služeb umělé inteligence uvedených v čl. 4.1) z hlediska souladu s pravidly stanovenými v čl. 3.4. Obsah, který těmto pravidlům neodpovídá, může být označen, skryt nebo odstraněn i bez předchozího upozornění.'
+            },
+            {
+                content:
+                    '3.6. Provozovatel si vyhrazuje právo, nikoli však povinnost, kontrolovat a odstraňovat uživatelský obsah, který je v rozporu s těmito podmínkami nebo platnými právními předpisy.'
             }
         ]
     },
