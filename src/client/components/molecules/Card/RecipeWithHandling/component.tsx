@@ -7,12 +7,13 @@ import {
     IconButton,
     RecipeCard
 } from '@/client/components';
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import type { RecipeCardProps } from '@/client/components/molecules/Card/types';
 import { chqc, QUERY_KEYS } from '@/client/request/queryClient';
 import { useQueryClient } from '@tanstack/react-query';
 import { useLocale, useModal, useSnackbar } from '@/client/store';
 import { useRouter } from 'next/navigation';
+import { classNames } from '@/client/utils';
 
 export const RecipeWithHandling: React.FC<RecipeCardProps> = ({
     id,
@@ -22,13 +23,19 @@ export const RecipeWithHandling: React.FC<RecipeCardProps> = ({
     rating,
     time,
     portionSize,
-    index = 0
+    index = 0,
+    flags
 }) => {
     const queryClient = useQueryClient();
     const { alert } = useSnackbar();
     const { t } = useLocale();
     const { openModal } = useModal();
     const router = useRouter();
+
+    const isFlagged = useMemo(
+        () => flags?.some((flag) => flag.active) ?? false,
+        [flags]
+    );
 
     const { mutate: deleteRecipe, isPending } = chqc.recipe.useDeleteRecipe({
         onSuccess: () => {
@@ -74,21 +81,39 @@ export const RecipeWithHandling: React.FC<RecipeCardProps> = ({
         });
     }, [openModal, getModalContent]);
 
-    const items: DropdownItem[] = [
-        {
-            icon: 'edit',
-            label: t('app.general.edit'),
-            onClick: () => {
-                router.push(`/recipe/${displayId}/edit`);
+    const items: DropdownItem[] = useMemo(() => {
+        const editAndDelete: DropdownItem[] = [
+            {
+                icon: 'edit',
+                label: t('app.general.edit'),
+                onClick: () => {
+                    router.push(`/recipe/${displayId}/edit`);
+                }
+            },
+            {
+                icon: 'cancel',
+                label: t('app.general.delete'),
+                onClick: handleOpenDeleteRecipeModal,
+                color: 'danger'
             }
-        },
-        {
-            icon: 'cancel',
-            label: t('app.general.delete'),
-            onClick: handleOpenDeleteRecipeModal,
-            color: 'danger'
+        ];
+
+        if (!isFlagged) {
+            return editAndDelete;
         }
-    ];
+
+        return [
+            {
+                icon: 'flag',
+                label: t('recipe.flag.menu.view-details'),
+                onClick: () => {
+                    router.push(`/recipe/${displayId}`);
+                },
+                color: 'danger'
+            },
+            ...editAndDelete
+        ];
+    }, [t, router, displayId, handleOpenDeleteRecipeModal, isFlagged]);
 
     return (
         <div className="relative">
@@ -106,12 +131,15 @@ export const RecipeWithHandling: React.FC<RecipeCardProps> = ({
                 items={items}
                 className="absolute! top-2 right-2"
                 position="left"
-                menuClassName="w-8"
+                menuClassName={isFlagged ? 'min-w-40' : ''}
             >
                 <IconButton
-                    icon={'threeDots'}
+                    icon={isFlagged ? 'flag' : 'threeDots'}
                     size={20}
-                    className="bg-white dark:bg-gray-800"
+                    className={classNames(
+                        'bg-white dark:bg-gray-800',
+                        isFlagged && 'text-danger'
+                    )}
                     loading={isPending}
                 />
             </Dropdown>

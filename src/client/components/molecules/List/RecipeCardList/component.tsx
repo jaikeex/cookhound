@@ -68,6 +68,7 @@ export const RecipeCardList: React.FC<RecipeCardListProps> = ({
                         time={recipe.time ?? 0}
                         portionSize={recipe.portionSize ?? 0}
                         index={index}
+                        flags={recipe.flags ?? null}
                     />
                 ))}
             </div>

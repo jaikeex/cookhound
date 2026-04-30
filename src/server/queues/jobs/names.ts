@@ -35,6 +35,7 @@ export const JOB_NAMES = Object.freeze({
     SEND_ACCOUNT_DELETION_CANCELLED: 'send-account-deletion-cancelled',
     SEND_ACCOUNT_DELETED: 'send-account-deleted',
     SEND_CONTACT_FORM: 'send-contact-form',
+    SEND_FLAG_APPEAL_NOTIFICATION: 'send-flag-appeal-notification',
 
     //|-------------------------------------------------------------------------------------|//
     //?                                      SEARCH                                         ?//

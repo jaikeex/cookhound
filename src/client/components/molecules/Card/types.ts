@@ -1,3 +1,5 @@
+import type { RecipeFlagDTO } from '@/common/types/flags/recipe-flag';
+
 export type RecipeCardProps = Readonly<{
     displayId: string;
     id: number;
@@ -8,4 +10,5 @@ export type RecipeCardProps = Readonly<{
     time: number | null;
     title: string;
     cookbookId?: number | null;
+    flags?: RecipeFlagDTO[] | null;
 }>;

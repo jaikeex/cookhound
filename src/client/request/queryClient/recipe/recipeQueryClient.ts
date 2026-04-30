@@ -23,7 +23,8 @@ import type {
     UpdateRecipeOptions,
     FilterRecipesOptions,
     FilterRecipesInfiniteOptions,
-    RecipeFilterParams
+    RecipeFilterParams,
+    SubmitFlagAppealOptions
 } from './types';
 import { RECIPE_QUERY_KEYS } from './types';
 import type { RecipeForCreatePayload } from '@/common/types/recipe';
@@ -484,6 +485,12 @@ class RecipeQueryClient {
                 apiClient.recipe.registerRecipeVisit(id, userId),
             options
         );
+
+    /**
+     * Submits an author appeal against an active recipe flag.
+     */
+    useSubmitAppeal = (options?: Partial<SubmitFlagAppealOptions>) =>
+        useAppMutation(apiClient.recipe.submitAppeal, options);
 }
 
 export const recipeQueryClient = new RecipeQueryClient();

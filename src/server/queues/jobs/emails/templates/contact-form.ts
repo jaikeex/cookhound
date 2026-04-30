@@ -1,4 +1,7 @@
-import type { MailTemplate } from '@/server/queues/jobs/emails/utils';
+import {
+    escapeHtml,
+    type MailTemplate
+} from '@/server/queues/jobs/emails/utils';
 
 /**
  * Template for contact form submissions.
@@ -20,12 +23,12 @@ export const contactFormTpl: MailTemplate<
     </head>
     <body>
         <h2>Contact Form Submission</h2>
-        <p><strong>Name:</strong> ${name}</p>
-        <p><strong>Email:</strong> ${email}</p>
-        <p><strong>Subject:</strong> ${subject}</p>
+        <p><strong>Name:</strong> ${escapeHtml(name)}</p>
+        <p><strong>Email:</strong> ${escapeHtml(email)}</p>
+        <p><strong>Subject:</strong> ${escapeHtml(subject)}</p>
         <hr />
         <p><strong>Message:</strong></p>
-        <p>${message.replace(/\n/g, '<br />')}</p>
+        <p>${escapeHtml(message).replace(/\n/g, '<br />')}</p>
     </body>
 </html>`,
         cs: (name, email, subject, message) => `
@@ -36,12 +39,12 @@ export const contactFormTpl: MailTemplate<
     </head>
     <body>
         <h2>Odeslaný kontaktní formulář</h2>
-        <p><strong>Jméno:</strong> ${name}</p>
-        <p><strong>Email:</strong> ${email}</p>
-        <p><strong>Předmět:</strong> ${subject}</p>
+        <p><strong>Jméno:</strong> ${escapeHtml(name)}</p>
+        <p><strong>Email:</strong> ${escapeHtml(email)}</p>
+        <p><strong>Předmět:</strong> ${escapeHtml(subject)}</p>
         <hr />
         <p><strong>Zpráva:</strong></p>
-        <p>${message.replace(/\n/g, '<br />')}</p>
+        <p>${escapeHtml(message).replace(/\n/g, '<br />')}</p>
     </body>
 </html>`
     }

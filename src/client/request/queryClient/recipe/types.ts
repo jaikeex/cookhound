@@ -8,6 +8,10 @@ import type {
     RecipeVisitPayload
 } from '@/common/types';
 import type {
+    RecipeFlagAppealDTO,
+    RecipeFlagAppealPayload
+} from '@/common/types/flags/recipe-flag-appeal';
+import type {
     UseQueryOptions,
     UseInfiniteQueryOptions,
     UseMutationOptions,
@@ -310,4 +314,10 @@ export type FilterRecipesInfiniteOptions = Omit<
         number
     >,
     'queryKey' | 'queryFn' | 'initialPageParam' | 'getNextPageParam'
+>;
+
+export type SubmitFlagAppealOptions = UseMutationOptions<
+    RecipeFlagAppealDTO,
+    RequestError,
+    { recipeId: number } & RecipeFlagAppealPayload
 >;

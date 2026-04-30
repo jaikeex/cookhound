@@ -230,6 +230,28 @@ class MailService {
             locale: RequestContext.getUserLocale() ?? DEFAULT_LOCALE
         });
     }
+
+    /**
+     * Enqueues an admin notification email for a recipe flag appeal.
+     *
+     * @param payload - Structured appeal context for the email body.
+     */
+    @LogServiceMethod({ names: ['payload'] })
+    async sendFlagAppealNotification(payload: {
+        appealId: number;
+        flagId: number;
+        flagReason: string;
+        recipeId: number;
+        recipeDisplayId: string;
+        recipeTitle: string;
+        authorId: number;
+        message: string;
+    }) {
+        await queueManager.addJob(JOB_NAMES.SEND_FLAG_APPEAL_NOTIFICATION, {
+            ...payload,
+            locale: RequestContext.getUserLocale() ?? DEFAULT_LOCALE
+        });
+    }
 }
 
 export const mailService = new MailService();

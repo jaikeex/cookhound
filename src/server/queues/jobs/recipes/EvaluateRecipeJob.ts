@@ -6,7 +6,7 @@ import { queueManager } from '@/server/queues/QueueManager';
 import type { Job } from 'bullmq';
 import { openaiClient } from '@/server/integrations';
 import { Logger } from '@/server/logger';
-import recipeModel from '@/server/db/model/recipe/model';
+import recipeFlagModel from '@/server/db/model/recipe-flag/model';
 import { InfrastructureError } from '@/server/error/server';
 import { InfrastructureErrorCode } from '@/server/error/codes';
 import { RecipeFlagReason } from '@/common/constants';
@@ -14,6 +14,7 @@ import { zodTextFormat } from '@/server/utils/openai';
 import { z } from 'zod';
 import { recipeSearchIndex } from '@/server/search-index/recipeIndex';
 import { revalidateRouteCache } from '@/server/utils/revalidateRouteCache';
+import { recipeService } from '@/server/services/recipe/service';
 
 const log = Logger.getInstance('recipe-evaluation-worker');
 
@@ -49,10 +50,39 @@ class EvaluateRecipeJob extends BaseJob<EvaluateRecipeJobData> {
             const evaluationResponse = await this.evaluateRecipeWithAI(recipe);
 
             if (evaluationResponse.accepted) {
-                log.notice('handle - recipe accepted', {
+                const cleared = await recipeFlagModel.clearActiveFlags(
                     recipeId,
-                    userId
-                });
+                    recipeDisplayId
+                );
+
+                if (cleared > 0) {
+                    // Recipe was previously flagged but is now accepted.
+                    // Re-add it to search and refresh the public route.
+                    try {
+                        const recipeDTO =
+                            await recipeService.getRecipeById(recipeId);
+
+                        await recipeSearchIndex.upsert(recipeDTO);
+                    } catch (error: unknown) {
+                        log.warn(
+                            'handle - failed to re-index accepted recipe',
+                            { error, recipeId }
+                        );
+                    }
+
+                    await revalidateRouteCache(`/recipe/${recipeDisplayId}`);
+
+                    log.notice('handle - recipe accepted, prior flag cleared', {
+                        recipeId,
+                        userId,
+                        clearedFlags: cleared
+                    });
+                } else {
+                    log.notice('handle - recipe accepted', {
+                        recipeId,
+                        userId
+                    });
+                }
 
                 return;
             }
@@ -68,7 +98,7 @@ class EvaluateRecipeJob extends BaseJob<EvaluateRecipeJobData> {
                 return;
             }
 
-            await recipeModel.flagRecipe(
+            await recipeFlagModel.flagRecipe(
                 recipeId,
                 recipeDisplayId,
                 userId,

@@ -8,3 +8,4 @@ export * from './account-deletion-reminder';
 export * from './account-deletion-cancelled';
 export * from './account-deleted';
 export * from './contact-form';
+export * from './flag-appeal-notification';

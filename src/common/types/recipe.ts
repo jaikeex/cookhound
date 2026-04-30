@@ -39,6 +39,7 @@ export type RecipeForDisplayDTO = {
     timesRated: number;
     time: number | null;
     portionSize: number | null;
+    flags?: RecipeFlagDTO[] | null;
 };
 
 export type Ingredient = {

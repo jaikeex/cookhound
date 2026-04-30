@@ -781,6 +781,15 @@ class UserModel {
                 where: { userId }
             });
 
+            // Appeals reference recipeFlag (RESTRICT) and the user row itself
+            // (RESTRICT for the author FK), so they must be cleared before the
+            // flag rows and before the user is removed.
+            await tx.recipeFlagAppeal.deleteMany({
+                where: {
+                    OR: [{ userId }, { flag: { userId } }]
+                }
+            });
+
             await tx.recipeFlag.deleteMany({
                 where: { userId }
             });

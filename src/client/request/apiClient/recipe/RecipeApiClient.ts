@@ -7,6 +7,10 @@ import type {
     RecipeForCreatePayload,
     RecipeForDisplayDTO
 } from '@/common/types';
+import type {
+    RecipeFlagAppealDTO,
+    RecipeFlagAppealPayload
+} from '@/common/types/flags/recipe-flag-appeal';
 import { reviveRecipeDates } from './utils';
 
 /**
@@ -260,6 +264,36 @@ class RecipeApiClient {
         return await apiRequestWrapper.post({
             url: `/recipes/${id}/ratings`,
             data: { rating },
+            ...config
+        });
+    }
+
+    /**
+     * Submits an author appeal against an active flag on their recipe by
+     * calling `POST /recipes/{recipeId}/appeal`.
+     *
+     * @param data - Recipe id (for routing) plus the flag id and message.
+     * @param config - The fetch request configuration.
+     *
+     * @returns The persisted appeal DTO.
+     *
+     * @throws {RequestError}
+     * - 400: Validation failed.
+     * - 401: Not authenticated.
+     * - 403: Caller is not the recipe author.
+     * - 404: Flag not found.
+     * - 409: Flag inactive or appeal already pending.
+     * - 429: Rate limit exceeded.
+     */
+    async submitAppeal(
+        data: { recipeId: number } & RecipeFlagAppealPayload,
+        config?: RequestConfig
+    ): Promise<RecipeFlagAppealDTO> {
+        const { recipeId, ...payload } = data;
+
+        return await apiRequestWrapper.post<RecipeFlagAppealDTO>({
+            url: `/recipes/${recipeId}/appeal`,
+            data: payload,
             ...config
         });
     }

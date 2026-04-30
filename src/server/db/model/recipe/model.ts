@@ -1,4 +1,3 @@
-import type { RecipeFlagReason } from '@/common/constants';
 import {
     CACHE_TTL,
     cachePrismaQuery,
@@ -782,32 +781,6 @@ class RecipeModel {
     }
 
     /**
-     * Flag a recipe with the provided reason.
-     *
-     * Write class -> W1
-     */
-    async flagRecipe(
-        recipeId: number,
-        recipeDisplayId: string,
-        userId: number,
-        reason: RecipeFlagReason
-    ): Promise<void> {
-        log.trace('Flagging a recipe', { recipeId, userId, reason });
-
-        await prisma.recipeFlag.create({
-            data: {
-                recipeId,
-                userId,
-                reason
-            }
-        });
-
-        await this.invalidateRecipeCache({
-            displayId: recipeDisplayId
-        });
-    }
-
-    /**
      * Delete a recipe by id
      *
      * Write class -> W1
@@ -818,6 +791,12 @@ class RecipeModel {
         // Use a transaction to ensure that all dependent records are removed
         // before the actual recipe is deleted, foreign key constraints will fail otherwise.
         await prisma.$transaction(async (tx) => {
+            // Appeals reference recipeFlag with ON DELETE RESTRICT, so they
+            // must be cleared before the flag rows themselves can be removed.
+            await tx.recipeFlagAppeal.deleteMany({
+                where: { flag: { recipeId: id } }
+            });
+
             await Promise.all([
                 tx.instruction.deleteMany({ where: { recipeId: id } }),
                 tx.recipeIngredient.deleteMany({ where: { recipeId: id } }),
