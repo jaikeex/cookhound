@@ -76,6 +76,18 @@ class RecipeFlagModel {
         });
     }
 
+    /**
+     * Count flags that are still open (active and not yet resolved).
+     * Query class -> C3
+     */
+    async countOpen(): Promise<number> {
+        log.trace('Counting open flags');
+
+        return prisma.recipeFlag.count({
+            where: { active: true, resolved: false }
+        });
+    }
+
     //~=========================================================================================~//
     //$                                         MUTATIONS                                       $//
     //~=========================================================================================~//

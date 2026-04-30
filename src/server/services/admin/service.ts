@@ -11,7 +11,8 @@ import {
 } from '@/common/constants';
 import { v4 as uuid } from 'uuid';
 import { createHash } from 'crypto';
-import db from '@/server/db/model';
+import db, { ADMIN_USER_DETAIL_SELECT } from '@/server/db/model';
+import type { Prisma } from '@/server/db/generated/prisma/client';
 import { Logger, LogServiceMethod } from '@/server/logger';
 import { assertAdmin, assertAdminAndNotSelf } from '@/server/utils/reqwest';
 import { RequestContext } from '@/server/utils/reqwest/context';
@@ -23,6 +24,10 @@ import { ApplicationErrorCode } from '@/server/error/codes';
 //|=============================================================================================|//
 
 const log = Logger.getInstance('admin-service');
+
+type AdminUserDetail = Prisma.UserGetPayload<{
+    select: typeof ADMIN_USER_DETAIL_SELECT;
+}>;
 
 //§—————————————————————————————————————————————————————————————————————————————————————————————§//
 //§                                         AUTH CHECKS                                         §//
@@ -68,14 +73,14 @@ class AdminService {
             recentRecipes,
             recentUsers
         ] = await Promise.all([
-            db.admin.getActiveUserCount(),
-            db.admin.getRecipeCount(),
-            db.admin.getOpenFlagCount(),
-            db.admin.getUserCountSince(thirtyDaysAgo),
-            db.admin.getRecipeCountSince(thirtyDaysAgo),
-            db.admin.getRatingCount(),
-            db.admin.getRecentRecipes(5),
-            db.admin.getRecentUsers(5)
+            db.user.countActive(),
+            db.recipe.countAll(),
+            db.recipeFlag.countOpen(),
+            db.user.countCreatedSince(thirtyDaysAgo),
+            db.recipe.countCreatedSince(thirtyDaysAgo),
+            db.rating.countAll(),
+            db.recipe.getRecent(5),
+            db.user.getRecentActive(5)
         ]);
 
         const counts = {
@@ -134,7 +139,7 @@ class AdminService {
     }): Promise<AdminUserListDTO> {
         assertAdmin();
 
-        const { users, total } = await db.admin.getUsers(options);
+        const { users, total } = await db.user.getMany(options);
 
         const usersDto = users.map((u) => ({
             id: u.id,
@@ -225,7 +230,7 @@ class AdminService {
 
         const oldRole = user.role;
 
-        await db.admin.updateUserById(targetUserId, { role: newRole });
+        await db.user.updateOneById(targetUserId, { role: newRole });
 
         await this.logAction(
             adminUserId,
@@ -287,7 +292,7 @@ class AdminService {
             await sessions.invalidateAllUserSessions(targetUserId);
         }
 
-        await db.admin.updateUserById(targetUserId, {
+        await db.user.updateOneById(targetUserId, {
             status: newStatus
         });
 
@@ -382,7 +387,7 @@ class AdminService {
             );
         }
 
-        await db.admin.updateUserById(targetUserId, {
+        await db.user.updateOneById(targetUserId, {
             emailVerified: true,
             emailVerificationToken: null
         });
@@ -506,10 +511,15 @@ class AdminService {
 
     /**
      * Fetches a user by ID or throws {@link NotFoundError}. Used internally
-     * as a guard before performing admin actions.
+     * as a guard before performing admin actions. The cache is bypassed
+     * (`ttl: 0`) so admin views always reflect live state.
      */
-    private async requireUser(userId: number) {
-        const user = await db.admin.getUserById(userId);
+    private async requireUser(userId: number): Promise<AdminUserDetail> {
+        const user = (await db.user.getOneById(
+            userId,
+            ADMIN_USER_DETAIL_SELECT,
+            0
+        )) as AdminUserDetail | null;
 
         if (!user) {
             throw new NotFoundError(

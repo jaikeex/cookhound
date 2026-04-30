@@ -58,6 +58,16 @@ class RatingModel {
         });
     }
 
+    /**
+     * Count all ratings in existence.
+     * Query class -> C3
+     */
+    async countAll(): Promise<number> {
+        log.trace('Counting ratings');
+
+        return prisma.rating.count();
+    }
+
     //~=========================================================================================~//
     //$                                         MUTATIONS                                       $//
     //~=========================================================================================~//

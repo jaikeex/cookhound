@@ -77,3 +77,52 @@ export function getUserSelect(groups: UserVisibilityGroup[]): UserSelect {
     if (groups.includes('self')) return USER_SELECT.self;
     return USER_SELECT.public;
 }
+
+//|---------------------------------------------------------------------------------------------|//
+//?                                ADMIN MANAGEMENT PROJECTIONS                                 ?//
+///
+//# These projections feed the admin user-management screens (list + detail). They expose
+//# moderation-relevant fields (emailVerified, deletion timestamps, content counts) and are
+//# distinct from USER_SELECT.admin, which is the shape used when an admin reads their own
+//# account-level data.
+//|---------------------------------------------------------------------------------------------|//
+
+export const ADMIN_USER_LIST_SELECT = {
+    id: true,
+    username: true,
+    email: true,
+    authType: true,
+    role: true,
+    status: true,
+    emailVerified: true,
+    avatarUrl: true,
+    createdAt: true,
+    lastLogin: true,
+    lastVisitedAt: true,
+    _count: { select: { recipes: true } }
+} satisfies UserSelect;
+
+export const ADMIN_USER_DETAIL_SELECT = {
+    id: true,
+    username: true,
+    email: true,
+    authType: true,
+    role: true,
+    status: true,
+    emailVerified: true,
+    avatarUrl: true,
+    createdAt: true,
+    updatedAt: true,
+    lastLogin: true,
+    lastVisitedAt: true,
+    lastPasswordReset: true,
+    deletedAt: true,
+    deletionScheduledFor: true,
+    _count: {
+        select: {
+            recipes: true,
+            ratings: true,
+            flags: true
+        }
+    }
+} satisfies UserSelect;

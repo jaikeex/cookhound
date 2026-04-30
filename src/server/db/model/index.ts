@@ -1,6 +1,5 @@
 import accountDeletionRequestModel from './account-deletion-request/model';
 import adminActionLogModel from './admin-action-log/model';
-import adminModel from './admin/model';
 import cookbookModel from './cookbook/model';
 import ingredientModel from './ingredient/model';
 import ratingModel from './rating/model';
@@ -17,7 +16,6 @@ import userModel from './user/model';
 const dbModel = {
     accountDeletionRequest: accountDeletionRequestModel,
     adminActionLog: adminActionLogModel,
-    admin: adminModel,
     cookbook: cookbookModel,
     ingredient: ingredientModel,
     rating: ratingModel,
@@ -34,6 +32,16 @@ export default dbModel;
 //?                                         PROJECTIONS                                         ?//
 //|---------------------------------------------------------------------------------------------|//
 
-import { USER_SELECT, getUserSelect } from './user/projections';
+import {
+    USER_SELECT,
+    getUserSelect,
+    ADMIN_USER_LIST_SELECT,
+    ADMIN_USER_DETAIL_SELECT
+} from './user/projections';
 
-export { USER_SELECT, getUserSelect };
+export {
+    USER_SELECT,
+    getUserSelect,
+    ADMIN_USER_LIST_SELECT,
+    ADMIN_USER_DETAIL_SELECT
+};

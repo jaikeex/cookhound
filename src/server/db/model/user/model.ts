@@ -20,10 +20,26 @@ import {
     getUserLastViewedRecipes,
     upsertUserPreference
 } from '@/server/db/generated/prisma/sql';
+import { ADMIN_USER_LIST_SELECT } from './projections';
 
 //|=============================================================================================|//
 
 const log = Logger.getInstance('user-model');
+
+//~=============================================================================================~//
+//$                                            TYPES                                            $//
+//~=============================================================================================~//
+
+export type GetUsersOptions = {
+    page: number;
+    pageSize: number;
+    search?: string;
+    role?: string;
+    status?: string;
+    authType?: string;
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
+};
 
 class UserModel {
     //~=========================================================================================~//
@@ -254,6 +270,120 @@ class UserModel {
         });
 
         return termsAcceptance;
+    }
+
+    //~=========================================================================================~//
+    //$                                  ADMIN-FACING AGGREGATES                                $//
+    ///
+    //# These read methods are intentionally uncached. They feed admin dashboards and user
+    //# management screens that must always reflect live state.
+    //~=========================================================================================~//
+
+    /**
+     * Count active users.
+     * Query class -> C3
+     */
+    async countActive(): Promise<number> {
+        log.trace('Counting active users');
+
+        return prisma.user.count({ where: { status: 'active' } });
+    }
+
+    /**
+     * Count active users created on or after the given timestamp.
+     * Query class -> C3
+     */
+    async countCreatedSince(since: Date): Promise<number> {
+        log.trace('Counting users created since', { since });
+
+        return prisma.user.count({
+            where: { createdAt: { gte: since }, status: 'active' }
+        });
+    }
+
+    /**
+     * Return the most recently created active users, newest first.
+     * Query class -> C3
+     */
+    async getRecentActive(limit = 5) {
+        log.trace('Getting recent active users', { limit });
+
+        return prisma.user.findMany({
+            select: {
+                id: true,
+                username: true,
+                email: true,
+                authType: true,
+                createdAt: true
+            },
+            where: { status: 'active' },
+            orderBy: { createdAt: 'desc' },
+            take: limit
+        });
+    }
+
+    /**
+     * Return a paginated, filtered, sorted list of users.
+     * Query class -> C3
+     */
+    async getMany(options: GetUsersOptions) {
+        const {
+            page,
+            pageSize,
+            search,
+            role,
+            status,
+            authType,
+            sortBy = 'createdAt',
+            sortOrder = 'desc'
+        } = options;
+
+        log.trace('Getting users', {
+            page,
+            pageSize,
+            search,
+            role,
+            status,
+            authType
+        });
+
+        const where: Prisma.UserWhereInput = {};
+
+        if (search) {
+            where.OR = [
+                { username: { contains: search, mode: 'insensitive' } },
+                { email: { contains: search, mode: 'insensitive' } }
+            ];
+        }
+
+        if (role) {
+            where.role = role;
+        }
+
+        if (status) {
+            where.status = status;
+        }
+
+        if (authType) {
+            where.authType = authType;
+        }
+
+        const orderBy: Prisma.UserOrderByWithRelationInput = {
+            [sortBy]: sortOrder
+        };
+
+        const [users, total] = await Promise.all([
+            prisma.user.findMany({
+                select: ADMIN_USER_LIST_SELECT,
+                where,
+                orderBy,
+                skip: (page - 1) * pageSize,
+                take: pageSize
+            }),
+            prisma.user.count({ where })
+        ]);
+
+        return { users, total };
     }
 
     //~=========================================================================================~//

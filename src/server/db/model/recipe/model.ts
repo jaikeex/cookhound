@@ -461,6 +461,56 @@ class RecipeModel {
     }
 
     //~=========================================================================================~//
+    //$                                  ADMIN-FACING AGGREGATES                                $//
+    ///
+    //# These read methods are intentionally uncached. They feed admin dashboards that must
+    //# always reflect live state.
+    //~=========================================================================================~//
+
+    /**
+     * Count all recipes.
+     * Query class -> C3
+     */
+    async countAll(): Promise<number> {
+        log.trace('Counting recipes');
+
+        return prisma.recipe.count();
+    }
+
+    /**
+     * Count recipes created on or after the given timestamp.
+     * Query class -> C3
+     */
+    async countCreatedSince(since: Date): Promise<number> {
+        log.trace('Counting recipes created since', { since });
+
+        return prisma.recipe.count({
+            where: { createdAt: { gte: since } }
+        });
+    }
+
+    /**
+     * Return the most recently created recipes (newest first).
+     * Query class -> C3
+     */
+    async getRecent(limit = 5) {
+        log.trace('Getting recent recipes', { limit });
+
+        return prisma.recipe.findMany({
+            select: {
+                id: true,
+                displayId: true,
+                title: true,
+                language: true,
+                createdAt: true,
+                author: { select: { username: true } }
+            },
+            orderBy: { createdAt: 'desc' },
+            take: limit
+        });
+    }
+
+    //~=========================================================================================~//
     //$                                         MUTATIONS                                       $//
     //~=========================================================================================~//
 
