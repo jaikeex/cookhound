@@ -26,7 +26,7 @@ import { SEARCH_QUERY_SEPARATOR } from '@/common/constants';
 import { queueManager } from '@/server/queues/QueueManager';
 import { JOB_NAMES } from '@/server/queues/jobs/names';
 import { ApplicationErrorCode } from '@/server/error/codes';
-import { openaiApiService } from '@/server/services/openai-api/service';
+import { openaiApiService } from '@/server/services';
 import type { RecipeFlagDTO } from '@/common/types/flags/recipe-flag';
 import { getFrontPageRecipes } from '@/server/db/generated/prisma/sql';
 

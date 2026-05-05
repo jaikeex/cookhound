@@ -13,7 +13,7 @@ import {
     registerRouteDocs,
     CookbookResponseSchema
 } from '@/server/utils/api-docs';
-import { cookbookService } from '@/server/services/cookbook/service';
+import { cookbookService } from '@/server/services';
 import { AuthLevel } from '@/common/types';
 
 //|=============================================================================================|//

@@ -9,7 +9,7 @@ import {
 import type { NextRequest } from 'next/server';
 import { withAuth } from '@/server/utils/reqwest';
 import { z } from 'zod';
-import { cookbookService } from '@/server/services/cookbook/service';
+import { cookbookService } from '@/server/services';
 import { withRateLimit } from '@/server/utils/rate-limit/wrapper';
 import { registerRouteDocs } from '@/server/utils/api-docs/registry';
 import { AuthLevel } from '@/common/types';

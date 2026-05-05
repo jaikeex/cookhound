@@ -7,7 +7,7 @@ import {
     makeHandler,
     withAuth
 } from '@/server/utils/reqwest';
-import { cookbookService } from '@/server/services/cookbook/service';
+import { cookbookService } from '@/server/services';
 import { z } from 'zod';
 import { withRateLimit } from '@/server/utils/rate-limit/wrapper';
 import { registerRouteDocs } from '@/server/utils/api-docs/registry';

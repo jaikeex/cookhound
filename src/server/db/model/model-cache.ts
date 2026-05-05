@@ -62,6 +62,10 @@ export async function cachePrismaQuery<T>(
     fetchFn: () => Promise<T>,
     ttl: number = Number(ENV_CONFIG_PRIVATE.REDIS_TTL)
 ): Promise<T> {
+    if (ttl <= 0) {
+        return fetchFn();
+    }
+
     try {
         const now = new Date();
         const cachedData = await redisClient.get<T>(key);

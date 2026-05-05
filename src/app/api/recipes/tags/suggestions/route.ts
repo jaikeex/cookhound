@@ -4,7 +4,7 @@ import {
     readJson,
     validatePayload
 } from '@/server/utils/reqwest';
-import { openaiApiService } from '@/server/services/openai-api/service';
+import { openaiApiService } from '@/server/services';
 import type { NextRequest } from 'next/server';
 import { withRateLimit } from '@/server/utils/rate-limit';
 import { z } from 'zod';

@@ -1,5 +1,5 @@
 import type { NextRequest } from 'next/server';
-import { recipeTagService } from '@/server/services/recipe-tag/service';
+import { recipeTagService } from '@/server/services';
 import { DEFAULT_LOCALE } from '@/common/constants';
 import { makeHandler, ok } from '@/server/utils/reqwest';
 import {

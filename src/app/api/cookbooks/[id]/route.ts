@@ -7,7 +7,7 @@ import {
 } from '@/server/utils/reqwest';
 import type { NextRequest } from 'next/server';
 import { z } from 'zod';
-import { cookbookService } from '@/server/services/cookbook/service';
+import { cookbookService } from '@/server/services';
 import {
     registerRouteDocs,
     CookbookResponseSchema

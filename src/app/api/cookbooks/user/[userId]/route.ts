@@ -1,6 +1,6 @@
 import { makeHandler, validateParams } from '@/server/utils/reqwest';
 import type { NextRequest } from 'next/server';
-import { cookbookService } from '@/server/services/cookbook/service';
+import { cookbookService } from '@/server/services';
 import { ok } from '@/server/utils/reqwest';
 import { z } from 'zod';
 import {
