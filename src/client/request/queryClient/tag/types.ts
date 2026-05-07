@@ -3,7 +3,7 @@ import type {
     UseQueryOptions
 } from '@tanstack/react-query';
 import type { RequestError } from '@/client/error';
-import type { RecipeDTO, RecipeTagDTO, TagListDTO } from '@/common/types';
+import type { Recipe, RecipeTagDTO, TagListDTO } from '@/common/types';
 
 //~---------------------------------------------------------------------------------------------~//
 //$                                            KEYS                                             $//
@@ -30,6 +30,6 @@ export type TagListOptions = Omit<
 >;
 
 export type TagSuggestionsOptions = Omit<
-    UseMutationOptions<RecipeTagDTO[], RequestError, RecipeDTO>,
+    UseMutationOptions<RecipeTagDTO[], RequestError, Recipe>,
     'mutationFn'
 >;

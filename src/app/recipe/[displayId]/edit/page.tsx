@@ -1,5 +1,6 @@
 import React from 'react';
 import { apiClient } from '@/client/request';
+import { reviveRecipeDates } from '@/client/request/apiClient/recipe/utils';
 import { RecipeEditTemplate } from '@/client/components';
 import { cookies } from 'next/headers';
 import { SESSION_COOKIE_NAME } from '@/common/constants';
@@ -44,17 +45,15 @@ export default async function Page({ params }: RecipePageParams) {
     const cookieStore = await cookies();
     const sessionId = cookieStore.get(SESSION_COOKIE_NAME)?.value;
 
-    const recipe = await apiClient.recipe.getRecipeByDisplayId(
-        recipeDisplayId,
-        {
-            cache: 'no-store',
-            ...(sessionId
-                ? {
-                      headers: { 'Cookie': `session=${sessionId}` }
-                  }
-                : {})
-        }
-    );
+    const wire = await apiClient.recipe.getRecipeByDisplayId(recipeDisplayId, {
+        cache: 'no-store',
+        ...(sessionId
+            ? {
+                  headers: { 'Cookie': `session=${sessionId}` }
+              }
+            : {})
+    });
+    const recipe = reviveRecipeDates(wire);
 
     if (recipe.authorId !== result.session.userId) {
         return <ClientRedirect url="/" />;

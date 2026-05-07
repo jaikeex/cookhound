@@ -1,7 +1,7 @@
 import type { Locale } from '@/common/types';
 import { apiRequestWrapper } from '@/client/request/apiClient/ApiRequestWrapper';
 import type { RequestConfig } from '@/client/request/apiClient/ApiRequestWrapper';
-import type { RecipeDTO, TagListDTO, RecipeTagDTO } from '@/common/types';
+import type { Recipe, TagListDTO, RecipeTagDTO } from '@/common/types';
 
 class TagApiClient {
     /**
@@ -36,7 +36,7 @@ class TagApiClient {
      * - 500: Internal Server Error, if there is an error during the request.
      */
     async getSuggestions(
-        recipe: RecipeDTO,
+        recipe: Recipe,
         config?: RequestConfig
     ): Promise<RecipeTagDTO[]> {
         return await apiRequestWrapper.post({

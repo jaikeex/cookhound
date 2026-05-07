@@ -25,6 +25,8 @@ export type RequestConfig = {
     /** Optional revalidation time for the request. */
     revalidate?: number;
     cache?: 'no-store' | 'force-cache' | 'only-if-cached';
+    /** Optional AbortSignal so callers (e.g. react-query) can cancel in-flight requests. */
+    signal?: AbortSignal;
 };
 
 /**
@@ -193,6 +195,10 @@ class ApiRequestWrapper {
 
         if (config.cache) {
             options.cache = config.cache;
+        }
+
+        if (config.signal) {
+            options.signal = config.signal;
         }
 
         if (

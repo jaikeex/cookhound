@@ -1,5 +1,5 @@
 import type { Locale } from '@/common/types';
-import type { RecipeDTO } from '@/common/types';
+import type { Recipe } from '@/common/types';
 
 /**
  * Produce a minimal placeholder recipe used while filling the recipe forms.
@@ -8,7 +8,7 @@ import type { RecipeDTO } from '@/common/types';
 export function createRecipePlaceholder(
     language: Locale,
     t: (key: string) => string
-): RecipeDTO {
+): Recipe {
     return {
         id: 0,
         displayId: '',
@@ -29,5 +29,5 @@ export function createRecipePlaceholder(
         authorId: 0,
         createdAt: new Date(),
         updatedAt: new Date()
-    } as RecipeDTO;
+    };
 }

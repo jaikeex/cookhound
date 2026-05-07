@@ -8,7 +8,7 @@ import React, {
     useMemo,
     useState
 } from 'react';
-import type { RecipeDTO } from '@/common/types';
+import type { Recipe } from '@/common/types';
 import {
     useAuth,
     useLocale,
@@ -29,7 +29,7 @@ type RecipeHandlingContextType = Readonly<{
     /**
      * The recipe being displayed.
      */
-    recipe: RecipeDTO;
+    recipe: Recipe;
     /**
      * The currently selected portion size.
      */
@@ -79,7 +79,7 @@ export const useRecipeHandling = () => {
 
 type RecipeHandlingProviderProps = React.PropsWithChildren<
     Readonly<{
-        recipe: RecipeDTO;
+        recipe: Recipe;
     }>
 >;
 

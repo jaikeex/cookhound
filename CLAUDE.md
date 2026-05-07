@@ -293,13 +293,17 @@ Error handling in API routes is automatic — `withRequestContext` catches all e
 ## State Management
 
 - **React Context** for global UI state: `AuthContext`, `I18nContext (LocaleProvider)`, `ThemeContext`, `SnackbarContext`, `ModalContext`
-- **Zustand** for complex feature state (e.g. `useCreateRecipeStore`)
+- **Zustand** for complex feature state (e.g. `useCreateRecipeStore`). See @src/client/store/app-store/SELECTORS.md for selector-scoping conventions; never destructure the whole store hook.
 - **@tanstack/react-query** for server state via typed wrappers `useAppQuery()` / `useAppMutation()` — domain query clients aggregated under `chqc` namespace
 - Keep server state separate from client state
 
 ### API Client Architecture
 
 Singleton `apiClient` (`src/client/request/apiClient/`) wraps `fetch` with domain-specific clients (auth, recipe, user, etc.). All requests use `credentials: 'include'`. Query clients in `src/client/request/queryClient/` wrap react-query with pre-typed error handling.
+
+### Data Access Layer (Ports + Adapters)
+
+The `recipe` domain is wired through a port-and-adapter seam organized **by-domain** under `src/client/data/recipe/` (port, adapter, hooks, query keys, chqc aggregator). Hooks depend on a `RecipeRepository` port injected via `DataProvider` / `useRepositories()` (the cross-domain aggregator lives in `src/client/data/`). The HTTP adapter handles DTO→domain mapping (date revival), and tests substitute fake repositories. New recipe endpoints follow a fixed five-file checklist (apiClient method → port method → adapter implementation → query key + options type → flat hook). See @src/client/data/recipe/README.md for the full contract, end-to-end flow, and the procedure for migrating other domains to this pattern.
 
 ### Event Bus
 

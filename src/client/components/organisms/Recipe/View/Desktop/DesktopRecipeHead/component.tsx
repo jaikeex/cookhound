@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import type { RecipeDTO } from '@/common/types';
+import type { Recipe } from '@/common/types';
 import {
     Typography,
     Tooltip,
@@ -16,7 +16,7 @@ import { useAuth, useLocale, useRecipeHandling } from '@/client/store';
 export type DesktopRecipeHeadProps = Readonly<{
     isPreview?: boolean;
     onRateRecipe?: (rating: number) => void;
-    recipe: RecipeDTO;
+    recipe: Recipe;
 }>;
 
 export const DesktopRecipeHead: React.FC<DesktopRecipeHeadProps> = ({

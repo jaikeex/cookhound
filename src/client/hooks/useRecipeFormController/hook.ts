@@ -16,7 +16,7 @@ import {
 } from '@/client/utils';
 import type {
     Ingredient,
-    RecipeDTO,
+    Recipe,
     RecipeForCreatePayload
 } from '@/common/types';
 import type { I18nMessage } from '@/client/locales';
@@ -26,7 +26,7 @@ import { DEFAULT_LOCALE } from '@/common/constants';
 
 export interface UseRecipeFormControllerProps {
     //When in edit mode, this existing recipe will pre-fill the form.
-    initialRecipe?: RecipeDTO | null;
+    initialRecipe?: Recipe | null;
     mode: RecipeFormMode;
 }
 
@@ -69,7 +69,7 @@ export const useRecipeFormController = ({
 
     const { mutate: createRecipe, isPending: isCreating } =
         chqc.recipe.useCreateRecipe({
-            onSuccess: (recipe) => handleSubmitSuccess(recipe as RecipeDTO),
+            onSuccess: (recipe) => handleSubmitSuccess(recipe),
             onError: (error) => {
                 setFormErrors({
                     server:
@@ -80,7 +80,7 @@ export const useRecipeFormController = ({
 
     const { mutate: updateRecipe, isPending: isUpdating } =
         chqc.recipe.useUpdateRecipe({
-            onSuccess: (recipe) => handleSubmitSuccess(recipe as RecipeDTO),
+            onSuccess: (recipe) => handleSubmitSuccess(recipe),
             onError: (error) => {
                 setFormErrors({
                     server:
@@ -137,7 +137,7 @@ export const useRecipeFormController = ({
     //~-----------------------------------------------------------------------------------------~//
 
     const handleSubmitSuccess = useCallback(
-        async (recipe: RecipeDTO) => {
+        async (recipe: Recipe) => {
             queryClient.invalidateQueries({
                 predicate: (query) =>
                     query.queryKey[0] === QUERY_KEYS.recipe.namespace

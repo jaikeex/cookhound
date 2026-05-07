@@ -2,7 +2,14 @@ import type { Locale } from '@/common/types';
 import type { RecipeFlagDTO } from './flags/recipe-flag';
 import type { RecipeTagDTO } from './tags';
 
-export type RecipeDTO = {
+/**
+ * Canonical in-memory recipe shape with real `Date` instances. Used by
+ * server code (services, jobs, search index) and by client code after
+ * `reviveRecipeDates` has converted the wire form. This is the type the
+ * application reasons about end-to-end; `RecipeDTO` is only the transient
+ * JSON form that crosses the network boundary.
+ */
+export type Recipe = {
     id: number;
     displayId: string;
     title: string;
@@ -24,10 +31,16 @@ export type RecipeDTO = {
     updatedAt: Date;
 };
 
-// Used on the client with real date objects
-export type Recipe = Omit<RecipeDTO, 'createdAt' | 'updatedAt'> & {
-    createdAt: Date;
-    updatedAt: Date;
+/**
+ * Shape as it arrives over the wire (JSON), with `createdAt` / `updatedAt`
+ * as ISO strings rather than `Date` instances. Use only at the apiClient
+ * seam: `RecipeApiClient` returns this, and `reviveRecipeDates` converts
+ * it into `Recipe`. Keeping this type distinct ensures forgetting to
+ * revive is a compile-time error rather than a runtime surprise.
+ */
+export type RecipeDTO = Omit<Recipe, 'createdAt' | 'updatedAt'> & {
+    createdAt: string;
+    updatedAt: string;
 };
 
 export type RecipeForDisplayDTO = {

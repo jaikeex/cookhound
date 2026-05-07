@@ -1,6 +1,6 @@
 import React from 'react';
 import { StructuredData } from '@/client/components';
-import type { RecipeDTO } from '@/common/types';
+import type { Recipe } from '@/common/types';
 import {
     generateBreadcrumbSchema,
     generateRecipeSchema
@@ -9,7 +9,7 @@ import { ENV_CONFIG_PUBLIC } from '@/common/constants';
 import { tServer } from '@/server/utils/locales';
 
 type RecipeStructuredDataProps = Readonly<{
-    recipePromise: Promise<RecipeDTO>;
+    recipePromise: Promise<Recipe>;
 }>;
 
 export const RecipeStructuredData: React.FC<

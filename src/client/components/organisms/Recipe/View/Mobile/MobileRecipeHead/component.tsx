@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import type { RecipeDTO } from '@/common/types';
+import type { Recipe } from '@/common/types';
 import {
     Rating,
     Tooltip,
@@ -16,7 +16,7 @@ import { classNames } from '@/client/utils';
 export type MobileRecipeHeadProps = Readonly<{
     isPreview?: boolean;
     onRateRecipe?: (rating: number) => void;
-    recipe: RecipeDTO;
+    recipe: Recipe;
 }>;
 
 export const MobileRecipeHead: React.FC<MobileRecipeHeadProps> = ({

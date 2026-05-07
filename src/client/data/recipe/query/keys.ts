@@ -1,6 +1,5 @@
 import type { Locale, Recipe } from '@/common/types';
 import type {
-    RecipeDTO,
     RecipeFilterParams,
     RecipeForCreatePayload,
     RecipeForDisplayDTO,
@@ -267,13 +266,13 @@ export type UserSearchRecipesInfiniteOptions = Omit<
 >;
 
 export type CreateRecipeOptions = Omit<
-    UseMutationOptions<RecipeDTO, RequestError, RecipeForCreatePayload>,
+    UseMutationOptions<Recipe, RequestError, RecipeForCreatePayload>,
     'mutationFn'
 >;
 
 export type UpdateRecipeOptions = Omit<
     UseMutationOptions<
-        RecipeDTO,
+        Recipe,
         RequestError,
         { id: string; recipe: Partial<RecipeForCreatePayload> }
     >,
@@ -316,8 +315,11 @@ export type FilterRecipesInfiniteOptions = Omit<
     'queryKey' | 'queryFn' | 'initialPageParam' | 'getNextPageParam'
 >;
 
-export type SubmitFlagAppealOptions = UseMutationOptions<
-    RecipeFlagAppealDTO,
-    RequestError,
-    { recipeId: number } & RecipeFlagAppealPayload
+export type SubmitFlagAppealOptions = Omit<
+    UseMutationOptions<
+        RecipeFlagAppealDTO,
+        RequestError,
+        { recipeId: number } & RecipeFlagAppealPayload
+    >,
+    'mutationFn'
 >;

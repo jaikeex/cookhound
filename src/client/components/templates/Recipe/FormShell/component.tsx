@@ -11,13 +11,13 @@ import {
     type RecipeFormErrors
 } from '@/client/components';
 import { classNames } from '@/client/utils';
-import type { RecipeDTO } from '@/common/types';
+import type { Recipe } from '@/common/types';
 import type { RecipeFormMode } from '@/client/types/core';
 import { useLocale, RecipeHandlingProvider } from '@/client/store';
 
 export type RecipeFormShellProps = Readonly<{
-    recipeObject: RecipeDTO | null;
-    defaultValues: RecipeDTO | null;
+    recipeObject: Recipe | null;
+    defaultValues: Recipe | null;
     isSidebarVisible: boolean;
     isMobile: boolean;
     isTablet: boolean;
@@ -56,7 +56,7 @@ export const RecipeFormShell: React.FC<RecipeFormShellProps> = ({
      * The main source of mounts are url changes, and there are two ways that can happen: TahSelectionModal
      * and preview Sidebar openings.
      */
-    const initialDefaultValuesRef = React.useRef<RecipeDTO | null>(null);
+    const initialDefaultValuesRef = React.useRef<Recipe | null>(null);
 
     if (initialDefaultValuesRef.current === null) {
         initialDefaultValuesRef.current =

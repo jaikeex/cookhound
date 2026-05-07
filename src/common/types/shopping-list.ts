@@ -1,4 +1,4 @@
-import type { RecipeDTO } from './recipe';
+import type { Recipe } from './recipe';
 
 export type ShoppingListIngredientDTO = {
     recipeId: number;
@@ -10,7 +10,7 @@ export type ShoppingListIngredientDTO = {
 };
 
 export type ShoppingListDTO = {
-    recipe: Pick<RecipeDTO, 'displayId' | 'title' | 'portionSize' | 'id'>;
+    recipe: Pick<Recipe, 'displayId' | 'title' | 'portionSize' | 'id'>;
     ingredients: ShoppingListIngredientDTO[];
 };
 

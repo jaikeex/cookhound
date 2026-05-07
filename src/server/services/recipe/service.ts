@@ -1,7 +1,7 @@
 import {
     UserRole,
     type Ingredient,
-    type RecipeDTO,
+    type Recipe,
     type RecipeForCreatePayload,
     type RecipeForDisplayDTO,
     type RecipeTagDTO
@@ -52,7 +52,7 @@ class RecipeService {
      * @throws {NotFoundError} If the recipe does not exist or is missing required fields.
      */
     @LogServiceMethod({ names: ['id'] })
-    async getRecipeById(id: number): Promise<RecipeDTO> {
+    async getRecipeById(id: number): Promise<Recipe> {
         const recipe = await db.recipe.getOneById(id);
 
         if (!recipe) {
@@ -76,7 +76,7 @@ class RecipeService {
             );
         }
 
-        const recipeDTO: RecipeDTO = {
+        const recipeDTO: Recipe = {
             id: recipe.id,
             displayId: recipe.displayId,
             title: recipe.title,
@@ -127,7 +127,7 @@ class RecipeService {
      * @throws {NotFoundError} If the recipe does not exist or is missing required fields.
      */
     @LogServiceMethod({ names: ['displayId'] })
-    async getRecipeByDisplayId(displayId: string): Promise<RecipeDTO> {
+    async getRecipeByDisplayId(displayId: string): Promise<Recipe> {
         const recipe = await db.recipe.getOneByDisplayId(displayId);
 
         if (!recipe) {
@@ -153,7 +153,7 @@ class RecipeService {
             );
         }
 
-        const recipeDTO: RecipeDTO = {
+        const recipeDTO: Recipe = {
             id: recipe.id,
             displayId: recipe.displayId,
             title: recipe.title,
@@ -209,7 +209,7 @@ class RecipeService {
      * @throws {AuthErrorUnauthorized} If the caller is not authenticated.
      */
     @LogServiceMethod({ success: 'notice', names: ['payload'] })
-    async createRecipe(payload: RecipeForCreatePayload): Promise<RecipeDTO> {
+    async createRecipe(payload: RecipeForCreatePayload): Promise<Recipe> {
         const authorId = RequestContext.getUserId();
 
         if (!authorId) {
@@ -285,7 +285,7 @@ class RecipeService {
     async updateRecipe(
         recipeId: number,
         payload: Partial<RecipeForCreatePayload>
-    ): Promise<RecipeDTO> {
+    ): Promise<Recipe> {
         const currentUserId = RequestContext.getUserId();
 
         if (!currentUserId) {

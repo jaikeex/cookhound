@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import type { RecipeDTO } from '@/common/types';
+import type { Recipe } from '@/common/types';
 import {
     Typography,
     ButtonBase,
@@ -16,7 +16,7 @@ import { classNames } from '@/client/utils';
 export type MobileRecipeBodyProps = Readonly<{
     isPreview?: boolean;
     onShoppingListCreate?: () => void;
-    recipe: RecipeDTO;
+    recipe: Recipe;
 }>;
 
 export const MobileRecipeBody: React.FC<MobileRecipeBodyProps> = ({

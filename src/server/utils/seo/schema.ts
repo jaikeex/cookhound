@@ -1,4 +1,4 @@
-import type { RecipeDTO, UserDTO, CookbookDTO } from '@/common/types';
+import type { Recipe, UserDTO, CookbookDTO } from '@/common/types';
 import { CATEGORY_IDS } from '@/common/constants';
 
 //?—————————————————————————————————————————————————————————————————————————————————————————————?//
@@ -16,7 +16,7 @@ import { CATEGORY_IDS } from '@/common/constants';
 ///
 //?—————————————————————————————————————————————————————————————————————————————————————————————?//
 
-export function generateRecipeSchema(recipe: RecipeDTO, baseUrl?: string) {
+export function generateRecipeSchema(recipe: Recipe, baseUrl?: string) {
     const schema: Record<string, unknown> = {
         '@context': 'https://schema.org',
         '@type': 'Recipe',

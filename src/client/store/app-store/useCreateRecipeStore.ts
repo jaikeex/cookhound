@@ -1,11 +1,11 @@
 import { MAX_SUGGESTIONS } from '@/common/constants';
-import type { RecipeDTO } from '@/common/types';
+import type { Recipe } from '@/common/types';
 import { create } from 'zustand';
 
 type CreateRecipeStore = Readonly<{
-    recipeObject: RecipeDTO | null;
+    recipeObject: Recipe | null;
     suggestionsUsed: number;
-    setRecipeObject: (recipeObject: RecipeDTO) => void;
+    setRecipeObject: (recipeObject: Recipe) => void;
     updateRecipeObject: (name: string, value: unknown) => void;
     incrementSuggestions: () => void;
     getRemainingsuggestions: () => number;
@@ -17,7 +17,7 @@ export const useCreateRecipeStore = create<CreateRecipeStore>()((set, get) => ({
     recipeObject: null,
     suggestionsUsed: 0,
 
-    setRecipeObject: (recipeObject: RecipeDTO) => set({ recipeObject }),
+    setRecipeObject: (recipeObject: Recipe) => set({ recipeObject }),
 
     updateRecipeObject: (name: string, value: unknown) =>
         set((state) => {

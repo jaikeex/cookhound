@@ -8,7 +8,7 @@ import { openaiApiService } from '@/server/services';
 import type { NextRequest } from 'next/server';
 import { withRateLimit } from '@/server/utils/rate-limit';
 import { z } from 'zod';
-import type { RecipeDTO } from '@/common/types';
+import type { Recipe } from '@/common/types';
 import { withAuth } from '@/server/utils/reqwest';
 import { SUPPORTED_LOCALES } from '@/common/constants';
 import {
@@ -47,7 +47,7 @@ async function postHandler(request: NextRequest) {
         rawPayload
     );
 
-    const tags = await openaiApiService.suggestRecipeTags(payload as RecipeDTO);
+    const tags = await openaiApiService.suggestRecipeTags(payload as Recipe);
 
     return ok(tags);
 }

@@ -3,10 +3,10 @@
 import React from 'react';
 import { RecipeFormShell } from '@/client/components';
 import { useRecipeFormController } from '@/client/hooks';
-import type { RecipeDTO } from '@/common/types';
+import type { Recipe } from '@/common/types';
 
 export type RecipeEditTemplateProps = Readonly<{
-    recipe: RecipeDTO;
+    recipe: Recipe;
 }>;
 
 export const RecipeEditTemplate: React.FC<RecipeEditTemplateProps> = ({

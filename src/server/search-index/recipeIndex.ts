@@ -1,6 +1,6 @@
 import { typesenseClient } from '@/server/integrations';
 import { Logger } from '@/server/logger';
-import type { RecipeDTO, RecipeForDisplayDTO } from '@/common/types';
+import type { Recipe, RecipeForDisplayDTO } from '@/common/types';
 import type { Locale } from '@/common/types';
 import { redisClient } from '@/server/integrations';
 import { InfrastructureError } from '@/server/error';
@@ -301,7 +301,7 @@ class RecipeSearchIndex {
     //$                                         MAPPING                                         $//
     //~-----------------------------------------------------------------------------------------~//
 
-    private mapRecipeToDocument(recipe: RecipeDTO): RecipeDocument {
+    private mapRecipeToDocument(recipe: Recipe): RecipeDocument {
         return {
             id: recipe.id.toString(),
             displayId: recipe.displayId,
@@ -326,7 +326,7 @@ class RecipeSearchIndex {
     //$                                         UPSERT                                          $//
     //~-----------------------------------------------------------------------------------------~//
 
-    async upsert(recipe: RecipeDTO): Promise<void> {
+    async upsert(recipe: Recipe): Promise<void> {
         try {
             // Do not ever remove this.
             await this.ensureCollectionReady();
@@ -351,7 +351,7 @@ class RecipeSearchIndex {
     //$                                       REINDEX ONE                                       $//
     //~-----------------------------------------------------------------------------------------~//
 
-    async reindexOne(recipe: RecipeDTO): Promise<void> {
+    async reindexOne(recipe: Recipe): Promise<void> {
         log.trace('Reindexing single recipe in Typesense', {
             id: recipe.id,
             displayId: recipe.displayId

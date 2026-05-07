@@ -2,6 +2,7 @@ import {
     useQuery as tanstackUseQuery,
     useMutation as tanstackUseMutation,
     type QueryKey,
+    type QueryFunctionContext,
     type UseQueryOptions,
     type UseQueryResult,
     type UseMutationOptions,
@@ -11,11 +12,13 @@ import type { RequestError } from '@/client/error';
 
 /**
  * Typed wrapper around {@link useQuery} that pre-fills the error type and infers the data type
- * from the provided queryFn.
+ * from the provided queryFn. The queryFn receives the react-query
+ * {@link QueryFunctionContext} (with `signal`) so callers can plumb cancellation
+ * through to fetch.
  */
 export function useAppQuery<
     TKey extends QueryKey,
-    TFn extends () => Promise<any>
+    TFn extends (ctx: QueryFunctionContext<TKey>) => Promise<any>
 >(
     queryKey: TKey,
     queryFn: TFn,

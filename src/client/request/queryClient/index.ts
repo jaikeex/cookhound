@@ -1,7 +1,7 @@
 import { adminQueryClient, ADMIN_QUERY_KEYS } from './admin';
 import { userQueryClient, USER_QUERY_KEYS } from './user';
 import { authQueryClient, AUTH_QUERY_KEYS } from './auth';
-import { recipeQueryClient, RECIPE_QUERY_KEYS } from './recipe';
+import { recipeQueryClient, RECIPE_QUERY_KEYS } from '@/client/data/recipe';
 import { tagQueryClient, TAG_QUERY_KEYS } from './tag';
 import { cookbookQueryClient, COOKBOOK_QUERY_KEYS } from './cookbook';
 import { fileQueryClient } from './file';

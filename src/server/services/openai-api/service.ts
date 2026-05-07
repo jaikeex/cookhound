@@ -1,5 +1,5 @@
 import { Logger, LogServiceMethod } from '@/server/logger';
-import type { RecipeDTO } from '@/common/types';
+import type { Recipe } from '@/common/types';
 import { queueManager } from '@/server/queues/QueueManager';
 import { JOB_NAMES } from '@/server/queues/jobs/names';
 import type { RecipeForEvaluation } from './types';
@@ -30,7 +30,7 @@ class OpenAIApiService {
      * @param recipe - The full recipe DTO to evaluate.
      */
     @LogServiceMethod({ names: ['recipe'] })
-    async evaluateRecipeContent(recipe: RecipeDTO) {
+    async evaluateRecipeContent(recipe: Recipe) {
         const ingredientsForEvaluation = recipe.ingredients.map((i) => ({
             name: i.name,
             quantity: i.quantity
@@ -70,7 +70,7 @@ class OpenAIApiService {
      * @returns Suggested tags as RecipeTagDTO[] (may be empty if no tags fit).
      */
     @LogServiceMethod({ names: ['recipe'] })
-    async suggestRecipeTags(recipe: RecipeDTO): Promise<RecipeTagDTO[]> {
+    async suggestRecipeTags(recipe: Recipe): Promise<RecipeTagDTO[]> {
         const prompt = this.buildTagSuggestionPrompt(recipe);
 
         const TagSuggestionResponse = z.object({
@@ -173,7 +173,7 @@ class OpenAIApiService {
      * Builds the JSON prompt payload for the tag suggestion model call,
      * including the recipe data, available tags, and category limits.
      */
-    private buildTagSuggestionPrompt(recipe: RecipeDTO): string {
+    private buildTagSuggestionPrompt(recipe: Recipe): string {
         return JSON.stringify({
             recipe: {
                 title: recipe.title,

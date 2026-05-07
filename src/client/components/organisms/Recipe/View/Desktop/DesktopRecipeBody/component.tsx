@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { useAuth, useLocale } from '@/client/store';
-import type { RecipeDTO } from '@/common/types/recipe';
+import type { Recipe } from '@/common/types/recipe';
 import {
     Typography,
     ButtonBase,
@@ -14,7 +14,7 @@ import { IngredientsListView } from '@/client/components/organisms/IngredientsLi
 export type DesktopRecipeBodyProps = Readonly<{
     isPreview?: boolean;
     onShoppingListCreate?: () => void;
-    recipe: RecipeDTO;
+    recipe: Recipe;
 }>;
 
 export const DesktopRecipeBody: React.FC<DesktopRecipeBodyProps> = ({

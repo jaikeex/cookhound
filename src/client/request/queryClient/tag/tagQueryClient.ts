@@ -8,7 +8,7 @@ import {
     type TagListOptions,
     type TagSuggestionsOptions
 } from './types';
-import type { RecipeDTO } from '@/common/types';
+import type { Recipe } from '@/common/types';
 import type { Locale } from '@/common/types';
 
 // This is fine (not a component, just declarations here).
@@ -27,7 +27,7 @@ class TagQueryClient {
 
     useSuggestions = (options?: Partial<TagSuggestionsOptions>) =>
         useAppMutation(
-            (recipe: RecipeDTO) => apiClient.tag.getSuggestions(recipe),
+            (recipe: Recipe) => apiClient.tag.getSuggestions(recipe),
             options
         );
 }

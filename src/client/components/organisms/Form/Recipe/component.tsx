@@ -15,14 +15,14 @@ import {
     Typography
 } from '@/client/components';
 import { useAuth, useLocale } from '@/client/store';
-import type { Ingredient, RecipeDTO, RecipeTagDTO } from '@/common/types';
+import type { Ingredient, Recipe, RecipeTagDTO } from '@/common/types';
 import type { I18nMessage } from '@/client/locales';
 import type { RecipeFormMode } from '@/client/types/core';
 // import { useFormStatus } from 'react-dom';
 
 type RecipeFormProps = Readonly<{
     className?: string;
-    defaultValues?: RecipeDTO | null;
+    defaultValues?: Recipe | null;
     errors?: RecipeFormErrors;
     mode: RecipeFormMode;
     onChange?: (name: string, value: unknown) => void;

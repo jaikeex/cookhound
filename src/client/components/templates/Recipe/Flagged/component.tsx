@@ -4,7 +4,7 @@ import React, { useCallback, useMemo } from 'react';
 import { ButtonBase, Icon, Typography } from '@/client/components';
 import { useLocale, useModal } from '@/client/store';
 import { useRouter } from 'next/navigation';
-import type { RecipeDTO } from '@/common/types';
+import type { Recipe } from '@/common/types';
 import type { RecipeFlagReason } from '@/common/constants';
 import { bucketForReason, RecipeFlagBucket } from '@/client/constants';
 import { DeleteRecipeConfirmationModal } from '@/client/components';
@@ -14,7 +14,7 @@ import { useSnackbar } from '@/client/store';
 import { RecipeFlagAppealModal } from '@/client/components';
 
 export type FlaggedAuthorTemplateProps = Readonly<{
-    recipe: RecipeDTO;
+    recipe: Recipe;
 }>;
 
 export const FlaggedAuthorTemplate: React.FC<FlaggedAuthorTemplateProps> = ({

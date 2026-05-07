@@ -1,17 +1,16 @@
-import type { Locale, Recipe } from '@/common/types';
+import type { Locale } from '@/common/types';
 import type { RequestConfig } from '@/client/request/apiClient/ApiRequestWrapper';
 import { apiRequestWrapper } from '@/client/request/apiClient/ApiRequestWrapper';
 import type {
-    RecipeDTO,
     RecipeFilterParams,
     RecipeForCreatePayload,
-    RecipeForDisplayDTO
+    RecipeForDisplayDTO,
+    RecipeDTO
 } from '@/common/types';
 import type {
     RecipeFlagAppealDTO,
     RecipeFlagAppealPayload
 } from '@/common/types/flags/recipe-flag-appeal';
-import { reviveRecipeDates } from './utils';
 
 /**
  * Service for recipe-related operations.
@@ -47,13 +46,11 @@ class RecipeApiClient {
     async getRecipeByDisplayId(
         displayId: string,
         config?: RequestConfig
-    ): Promise<Recipe> {
-        const recipeFromServer: RecipeDTO = await apiRequestWrapper.get({
+    ): Promise<RecipeDTO> {
+        return await apiRequestWrapper.get<RecipeDTO>({
             url: `/recipes/display/${displayId}`,
             ...config
         });
-
-        return reviveRecipeDates(recipeFromServer);
     }
 
     /**
@@ -69,12 +66,10 @@ class RecipeApiClient {
         id: string,
         config?: RequestConfig
     ): Promise<RecipeDTO> {
-        const recipeFromServer: RecipeDTO = await apiRequestWrapper.get({
+        return await apiRequestWrapper.get<RecipeDTO>({
             url: `/recipes/${id}`,
             ...config
         });
-
-        return reviveRecipeDates(recipeFromServer);
     }
 
     /**

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Typography, type TypographyVariant } from '@/client/components';
-import type { RecipeDTO } from '@/common/types';
+import type { Recipe } from '@/common/types';
 import type { ViewPortVariant } from '@/client/types';
 
 //~---------------------------------------------------------------------------------------------~//
@@ -25,7 +25,7 @@ const classConfig = {
 
 type InstructionsViewProps = Readonly<{
     className?: string;
-    recipe: RecipeDTO;
+    recipe: Recipe;
     variant: ViewPortVariant;
 }>;
 

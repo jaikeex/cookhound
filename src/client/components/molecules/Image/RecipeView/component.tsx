@@ -12,7 +12,7 @@ import dynamic from 'next/dynamic';
 import { useAuth, useLocale, useModal } from '@/client/store';
 import { chqc } from '@/client/request/queryClient';
 import { useScreenSize } from '@/client/hooks';
-import type { RecipeDTO } from '@/common/types';
+import type { Recipe } from '@/common/types';
 
 const AddRecipeToCookbookModal = dynamic(
     () =>
@@ -25,7 +25,7 @@ const AddRecipeToCookbookModal = dynamic(
 export type RecipeViewImageProps = Readonly<{
     className?: string;
     isPreview?: boolean;
-    recipe: RecipeDTO;
+    recipe: Recipe;
     priority?: boolean;
     wrapperClassName?: string;
 }>;

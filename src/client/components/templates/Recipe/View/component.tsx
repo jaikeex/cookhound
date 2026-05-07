@@ -3,7 +3,7 @@
 import React, { use } from 'react';
 import { DesktopRecipeViewTemplate } from './Desktop';
 import { MobileRecipeViewTemplate } from './Mobile';
-import type { RecipeDTO } from '@/common/types';
+import type { Recipe } from '@/common/types';
 import { useAuth, RecipeHandlingProvider } from '@/client/store';
 import { useRunOnce } from '@/client/hooks';
 import { chqc, QUERY_KEYS } from '@/client/request/queryClient';
@@ -12,7 +12,7 @@ import { FlaggedTemplate } from '@/client/components/templates/Error/Flagged';
 import { FlaggedAuthorTemplate } from '@/client/components/templates/Recipe/Flagged';
 
 export type RecipeViewProps = Readonly<{
-    recipe: Promise<RecipeDTO>;
+    recipe: Promise<Recipe>;
 }>;
 
 export const RecipeViewTemplate: React.FC<RecipeViewProps> = ({ recipe }) => {

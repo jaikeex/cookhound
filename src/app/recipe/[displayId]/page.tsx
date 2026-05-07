@@ -1,5 +1,6 @@
 import React from 'react';
 import { apiClient } from '@/client/request';
+import { reviveRecipeDates } from '@/client/request/apiClient/recipe/utils';
 import { RecipeStructuredData, RecipeViewTemplate } from '@/client/components';
 import type { Metadata } from 'next';
 import { cookies, headers } from 'next/headers';
@@ -23,12 +24,11 @@ export default async function Page({ params }: RecipePageParams) {
     const paramsResolved = await params;
     const recipeDisplayId = paramsResolved.displayId;
 
-    const recipePromise = apiClient.recipe.getRecipeByDisplayId(
-        recipeDisplayId,
-        {
+    const recipePromise = apiClient.recipe
+        .getRecipeByDisplayId(recipeDisplayId, {
             revalidate: 3600
-        }
-    );
+        })
+        .then(reviveRecipeDates);
 
     return (
         <React.Fragment>
@@ -57,12 +57,13 @@ export async function generateMetadata({
     const headerList = await headers();
 
     try {
-        const recipe = await apiClient.recipe.getRecipeByDisplayId(
+        const wire = await apiClient.recipe.getRecipeByDisplayId(
             recipeDisplayId,
             {
                 revalidate: 3600
             }
         );
+        const recipe = reviveRecipeDates(wire);
 
         const canonical = `${ENV_CONFIG_PUBLIC.ORIGIN}/recipe/${recipeDisplayId}`;
 

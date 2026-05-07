@@ -7,6 +7,7 @@ import {
     ModalProvider,
     ConsentProvider
 } from '@/client/store';
+import { DataProvider, repositories } from '@/client/data';
 import type { CookieConsent } from '@/common/types/cookie-consent';
 import type { Messages, Locale } from '@/client/locales';
 
@@ -33,7 +34,9 @@ export const AppProviders: React.FC<AppProvidersProps> = ({
                     defaultLocale={locale}
                 >
                     <ConsentProvider initialConsent={initialConsent}>
-                        <ModalProvider>{children}</ModalProvider>
+                        <DataProvider value={repositories}>
+                            <ModalProvider>{children}</ModalProvider>
+                        </DataProvider>
                     </ConsentProvider>
                 </LocaleProvider>
             </SnackbarProvider>
