@@ -10,6 +10,15 @@ export type TermsAcceptanceFromDb = {
     proofHash: string;
 };
 
+export type TermsAcceptanceDTO = Omit<
+    TermsAcceptanceFromDb,
+    'createdAt' | 'revokedAt' | 'updatedAt'
+> & {
+    createdAt: string;
+    revokedAt: string | null;
+    updatedAt: string;
+};
+
 export type TermsAcceptancePayload = {
     version: string;
     createdAt: Date;

@@ -513,6 +513,7 @@ class UserService {
                 version: latestConsent.version,
                 userIpAddress: latestConsent.userIpAddress ?? '',
                 userAgent: latestConsent.userAgent ?? '',
+                proofHash: latestConsent.proofHash,
                 createdAt: latestConsent.createdAt,
                 revokedAt: latestConsent.revokedAt ?? null,
                 updatedAt: latestConsent.updatedAt
@@ -558,6 +559,7 @@ class UserService {
             version: consent.version,
             userIpAddress: consent.userIpAddress ?? '',
             userAgent: consent.userAgent ?? '',
+            proofHash: consent.proofHash,
             createdAt: consent.createdAt,
             revokedAt: consent.revokedAt ?? null,
             updatedAt: consent.updatedAt

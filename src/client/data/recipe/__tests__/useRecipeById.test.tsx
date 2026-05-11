@@ -6,6 +6,8 @@ import { renderHook, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { DataProvider, type Repositories } from '@/client/data';
 import type { RecipeRepository } from '@/client/data/recipe/port';
+import type { UserRepository } from '@/client/data/user/port';
+import { buildEmptyRepository } from '@/client/data/__testing__/buildEmptyRepository';
 import type { Recipe } from '@/common/types';
 import { recipeQueryClient } from '@/client/data/recipe';
 
@@ -64,7 +66,10 @@ const buildWrapper = (repositories: Repositories) => {
 describe('useRecipeById', () => {
     it('returns the recipe from the injected repository', async () => {
         const repo = buildFakeRepository();
-        const wrapper = buildWrapper({ recipeRepository: repo });
+        const wrapper = buildWrapper({
+            recipeRepository: repo,
+            userRepository: buildEmptyRepository<UserRepository>()
+        });
 
         const { result } = renderHook(
             () => recipeQueryClient.useRecipeById('42'),
@@ -87,7 +92,10 @@ describe('useRecipeById', () => {
 
     it('does not fetch when id is falsy', () => {
         const repo = buildFakeRepository();
-        const wrapper = buildWrapper({ recipeRepository: repo });
+        const wrapper = buildWrapper({
+            recipeRepository: repo,
+            userRepository: buildEmptyRepository<UserRepository>()
+        });
 
         renderHook(() => recipeQueryClient.useRecipeById(''), { wrapper });
 

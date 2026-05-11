@@ -1,4 +1,24 @@
 import type { Locale } from '@/common/types';
+import type { CookieConsentDTO } from '@/common/types/cookie-consent';
+import type { TermsAcceptanceDTO } from '@/common/types/terms-acceptance';
+
+export type User = {
+    id: number;
+    username: string;
+    avatarUrl: string | null;
+    email?: string | null;
+    cookieConsent?: CookieConsentDTO[] | null;
+    termsAcceptance?: TermsAcceptanceDTO[] | null;
+    preferences?: UserPreferences;
+    role?: UserRole;
+    status?: Status;
+    authType?: AuthType;
+    createdAt?: Date | null;
+    lastLogin?: Date | null;
+    lastVisitedAt?: Date | null;
+    deletedAt?: Date | null;
+    deletionScheduledFor?: Date | null;
+};
 
 export type UserForCreatePayload = {
     username: string;

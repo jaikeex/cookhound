@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { type ProfileNavigationItem, ProfileTab } from '@/client/types/core';
 import { Menu } from '@/client/components/molecules';
 import { useParams, useSearchParams } from 'next/navigation';
-import type { UserDTO } from '@/common/types';
+import type { User } from '@/common/types';
 import { classNames } from '@/client/utils';
 import { ProfileHeadDesktop } from '@/client/components/organisms/Profile/Head/Desktop';
 import { useParamsChangeListener } from '@/client/hooks';
@@ -12,7 +12,7 @@ import { useParamsChangeListener } from '@/client/hooks';
 export type DesktopRecipeViewProps = Readonly<{
     className?: string;
     items: ProfileNavigationItem[];
-    user: UserDTO;
+    user: User;
     isCurrentUser: boolean;
     initialTab?: ProfileTab | null;
 }>;

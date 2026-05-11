@@ -2,13 +2,13 @@ import React from 'react';
 import type { ProfileNavigationItem } from '@/client/types/core';
 import type { TabContent } from '@/client/components';
 import { ProfileHeadMobile, Tabs } from '@/client/components';
-import type { UserDTO } from '@/common/types';
+import type { User } from '@/common/types';
 import { classNames } from '@/client/utils';
 
 export type MobileRecipeViewProps = Readonly<{
     className?: string;
     items: ProfileNavigationItem[];
-    user: UserDTO;
+    user: User;
     isCurrentUser: boolean;
 }>;
 

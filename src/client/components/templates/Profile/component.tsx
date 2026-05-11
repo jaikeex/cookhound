@@ -5,7 +5,7 @@ import React, { use } from 'react';
 import { DesktopProfileTemplate } from './Desktop';
 import { MobileProfileTemplate } from './Mobile';
 import { ProfileTab, type ProfileNavigationItem } from '@/client/types/core';
-import type { UserDTO } from '@/common/types';
+import type { User } from '@/common/types';
 import { Cookbooks, ProfileBodyInfo, Recipes } from '@/client/components';
 import { useRouter } from 'next/navigation';
 import { GRID_COLS } from '@/client/constants';
@@ -13,7 +13,7 @@ import { useRunOnce } from '@/client/hooks';
 
 type ProfileProps = Readonly<{
     initialTab?: ProfileTab | null;
-    user: Promise<UserDTO>;
+    user: Promise<User>;
 }>;
 
 export const ProfileTemplate: React.FC<ProfileProps> = ({

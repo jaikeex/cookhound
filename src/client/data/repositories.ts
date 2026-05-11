@@ -1,4 +1,5 @@
 import { recipeRepositoryAdapter } from './recipe';
+import { userRepositoryAdapter } from './user';
 
 //?—————————————————————————————————————————————————————————————————————————————————————————————?//
 //?                                       REPOSITORY LIST                                       ?//
@@ -12,5 +13,6 @@ import { recipeRepositoryAdapter } from './recipe';
 //?—————————————————————————————————————————————————————————————————————————————————————————————?//
 
 export const repositories = {
-    recipeRepository: recipeRepositoryAdapter
+    recipeRepository: recipeRepositoryAdapter,
+    userRepository: userRepositoryAdapter
 };

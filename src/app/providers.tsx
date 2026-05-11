@@ -33,11 +33,11 @@ export const AppProviders: React.FC<AppProvidersProps> = ({
                     defaultMessages={messages}
                     defaultLocale={locale}
                 >
-                    <ConsentProvider initialConsent={initialConsent}>
-                        <DataProvider value={repositories}>
+                    <DataProvider value={repositories}>
+                        <ConsentProvider initialConsent={initialConsent}>
                             <ModalProvider>{children}</ModalProvider>
-                        </DataProvider>
-                    </ConsentProvider>
+                        </ConsentProvider>
+                    </DataProvider>
                 </LocaleProvider>
             </SnackbarProvider>
         </AuthProvider>

@@ -1,12 +1,18 @@
 import React from 'react';
 
 export type TimeProps = Readonly<{
-    dateTime: string | Date;
+    dateTime: string | Date | null | undefined;
     className?: string;
     children: React.ReactNode;
 }>;
 
-const toIsoString = (value: string | Date): string | undefined => {
+const toIsoString = (
+    value: string | Date | null | undefined
+): string | undefined => {
+    if (!value) {
+        return undefined;
+    }
+
     const date = value instanceof Date ? value : new Date(value);
     return Number.isNaN(date.getTime()) ? undefined : date.toISOString();
 };

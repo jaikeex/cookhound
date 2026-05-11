@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import type { UserDTO } from '@/common/types';
+import type { User } from '@/common/types';
 import {
     Avatar,
     AvatarInput,
@@ -13,7 +13,7 @@ import { useLocale } from '@/client/store';
 import { getAgeString } from '@/client/utils';
 
 export type ProfileHeadPropsMobile = Readonly<{
-    user: UserDTO;
+    user: User;
     isCurrentUser: boolean;
 }>;
 

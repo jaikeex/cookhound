@@ -70,14 +70,20 @@ const languagePacks: Record<Locale, LanguagePack> = {
  * Calculates the difference between a timestamp and now, returning a readable,
  * localized string. This function is now language-agnostic.
  *
- * @param timestamp The timestamp to compare with the current time (in milliseconds).
+ * @param createdAt The timestamp to compare with the current time.
  * @param locale The locale to use for the output string.
  * @returns A localized string representing the time difference.
  */
-export function getAgeString(createdAt: string, locale: Locale): string {
+export function getAgeString(
+    createdAt: Date | string | null | undefined,
+    locale: Locale
+): string {
     if (!createdAt || !locale) return '';
 
-    const timestamp = new Date(createdAt).getTime();
+    const timestamp =
+        createdAt instanceof Date
+            ? createdAt.getTime()
+            : new Date(createdAt).getTime();
 
     const langPack = languagePacks[locale];
     if (!langPack) {

@@ -1,4 +1,4 @@
-import type { Recipe, UserDTO, CookbookDTO } from '@/common/types';
+import type { Recipe, User, CookbookDTO } from '@/common/types';
 import { CATEGORY_IDS } from '@/common/constants';
 
 //?—————————————————————————————————————————————————————————————————————————————————————————————?//
@@ -113,7 +113,7 @@ export function generateRecipeSchema(recipe: Recipe, baseUrl?: string) {
     return schema;
 }
 
-export function generatePersonSchema(user: UserDTO, baseUrl: string) {
+export function generatePersonSchema(user: User, baseUrl: string) {
     return {
         '@context': 'https://schema.org',
         '@type': 'Person',

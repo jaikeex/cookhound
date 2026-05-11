@@ -1,6 +1,6 @@
 import { StructuredData } from '@/client/components';
 import { ENV_CONFIG_PUBLIC } from '@/common/constants';
-import type { Locale, UserDTO } from '@/common/types';
+import type { Locale, User } from '@/common/types';
 import React from 'react';
 import {
     generateBreadcrumbSchema,
@@ -9,7 +9,7 @@ import {
 import { tServer } from '@/server/utils/locales';
 
 type UserStructuredDataProps = Readonly<{
-    userPromise: Promise<UserDTO>;
+    userPromise: Promise<User>;
     locale: Locale;
 }>;
 

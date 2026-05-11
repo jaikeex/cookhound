@@ -11,7 +11,7 @@ import type {
     ShoppingListDTO,
     ShoppingListPayload
 } from '@/common/types';
-import { USER_QUERY_KEYS } from '@/client/request/queryClient/user';
+import { USER_QUERY_KEYS } from '@/client/data/user';
 import { usePathname } from 'next/navigation';
 
 /**

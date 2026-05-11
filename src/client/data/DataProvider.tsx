@@ -2,16 +2,14 @@
 
 import React, { createContext, useContext } from 'react';
 import type { RecipeRepository } from '@/client/data/recipe/port';
+import type { UserRepository } from '@/client/data/user/port';
 
 /**
  * Aggregated set of domain repositories injected at the app root.
- *
- * Only the `recipe` slot is populated for now. Other domains will be added
- * here as they migrate to the port + adapter pattern. Until then, those
- * domains continue to import `apiClient` directly.
  */
 export type Repositories = Readonly<{
     recipeRepository: RecipeRepository;
+    userRepository: UserRepository;
 }>;
 
 const DataContext = createContext<Repositories | null>(null);

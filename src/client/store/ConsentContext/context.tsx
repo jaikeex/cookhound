@@ -331,11 +331,13 @@ export const ConsentProvider: React.FC<ConsentProviderProps> = ({
                 await setConsentCookie(userDbConsent);
             } else {
                 // Browser consent is newer - sync to DB and update cookie with userId
+                const consentCreatedAt = new Date(consent.createdAt);
+
                 const payloadForDb: CookieConsentPayload = {
                     consent: true,
                     version: consent.version,
                     accepted: consent.accepted,
-                    createdAt: consent.createdAt ?? new Date()
+                    createdAt: consentCreatedAt
                 };
 
                 await createUserCookieConsent(payloadForDb);
@@ -345,7 +347,7 @@ export const ConsentProvider: React.FC<ConsentProviderProps> = ({
                     consent: consent.consent,
                     version: consent.version,
                     accepted: consent.accepted,
-                    createdAt: consent.createdAt,
+                    createdAt: consentCreatedAt,
                     userId: newUser.id.toString()
                 };
 
@@ -354,11 +356,13 @@ export const ConsentProvider: React.FC<ConsentProviderProps> = ({
             }
         } else {
             // Case 2: No DB consent or revoked - sync browser to DB and update cookie with userId
+            const consentCreatedAt = new Date(consent.createdAt);
+
             const payloadForDb: CookieConsentPayload = {
                 consent: true,
                 version: consent.version,
                 accepted: consent.accepted,
-                createdAt: consent.createdAt ?? new Date()
+                createdAt: consentCreatedAt
             };
 
             await createUserCookieConsent(payloadForDb);
@@ -368,7 +372,7 @@ export const ConsentProvider: React.FC<ConsentProviderProps> = ({
                 consent: consent.consent,
                 version: consent.version,
                 accepted: consent.accepted,
-                createdAt: consent.createdAt,
+                createdAt: consentCreatedAt,
                 userId: newUser.id.toString()
             };
 
@@ -384,7 +388,7 @@ export const ConsentProvider: React.FC<ConsentProviderProps> = ({
                 consent: consent.consent,
                 version: consent.version,
                 accepted: consent.accepted,
-                createdAt: consent.createdAt,
+                createdAt: new Date(consent.createdAt),
                 userId: null
             };
 

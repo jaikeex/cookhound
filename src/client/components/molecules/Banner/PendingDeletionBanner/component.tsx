@@ -7,7 +7,7 @@ import { chqc } from '@/client/request/queryClient';
 import { classNames } from '@/client/utils';
 
 export type PendingDeletionBannerProps = Readonly<{
-    deletionScheduledFor: string;
+    deletionScheduledFor: Date | string;
 }>;
 
 export const PendingDeletionBanner: React.FC<PendingDeletionBannerProps> = ({
@@ -35,7 +35,11 @@ export const PendingDeletionBanner: React.FC<PendingDeletionBannerProps> = ({
         });
 
     const { daysRemaining, formattedDate, isLessThan24Hours } = useMemo(() => {
-        const scheduledDate = new Date(deletionScheduledFor);
+        const scheduledDate =
+            deletionScheduledFor instanceof Date
+                ? deletionScheduledFor
+                : new Date(deletionScheduledFor);
+
         const now = new Date();
         const diffMs = scheduledDate.getTime() - now.getTime();
         const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));

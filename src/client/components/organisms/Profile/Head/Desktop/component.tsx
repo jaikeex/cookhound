@@ -1,14 +1,14 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import type { UserDTO } from '@/common/types';
+import type { User } from '@/common/types';
 import { Avatar, AvatarInput, Time, Typography } from '@/client/components';
 import { useLocale } from '@/client/store';
 import { getAgeString } from '@/client/utils';
 
 export type ProfileHeadPropsDesktop = Readonly<{
     isCurrentUser: boolean;
-    user: UserDTO;
+    user: User;
 }>;
 
 export const ProfileHeadDesktop: React.FC<ProfileHeadPropsDesktop> = ({

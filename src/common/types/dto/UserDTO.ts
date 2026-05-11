@@ -5,8 +5,8 @@ import {
     type UserPreferences,
     UserRole
 } from '@/common/types';
-import type { CookieConsentFromDb } from '@/common/types/cookie-consent';
-import type { TermsAcceptanceFromDb } from '@/common/types/terms-acceptance';
+import type { CookieConsentDTO } from '@/common/types/cookie-consent';
+import type { TermsAcceptanceDTO } from '@/common/types/terms-acceptance';
 
 export class UserDTO {
     @Expose()
@@ -23,46 +23,46 @@ export class UserDTO {
     //|-------------------------------------------------------------------------------------|//
 
     @Expose({ groups: ['self', 'admin'] })
-    email: string | null = null;
+    email?: string | null;
 
     @Expose({ groups: ['self', 'admin'] })
-    cookieConsent: CookieConsentFromDb[] | null = null;
+    cookieConsent?: CookieConsentDTO[] | null;
 
     @Expose({ groups: ['self', 'admin'] })
-    termsAcceptance: TermsAcceptanceFromDb[] | null = null;
+    termsAcceptance?: TermsAcceptanceDTO[] | null;
 
     @Expose({ groups: ['self', 'admin'] })
-    preferences: UserPreferences = {};
+    preferences?: UserPreferences;
 
     //|-------------------------------------------------------------------------------------|//
     //?                                   ADMINISTRATIVE                                    ?//
     //|-------------------------------------------------------------------------------------|//
 
     @Expose({ groups: ['admin'] })
-    role: UserRole = UserRole.User;
+    role?: UserRole;
 
     @Expose({ groups: ['admin'] })
-    status: Status = Status.Active;
+    status?: Status;
 
     //|-------------------------------------------------------------------------------------|//
     //?                                    SEMI-PRIVATE                                     ?//
     //|-------------------------------------------------------------------------------------|//
 
     @Expose({ groups: ['self', 'admin'] })
-    authType: AuthType = AuthType.Local;
+    authType?: AuthType;
 
     @Expose({ groups: ['self', 'admin'] })
-    createdAt: string = '';
+    createdAt?: string;
 
     @Expose({ groups: ['self', 'admin'] })
-    lastLogin: string | null = null;
+    lastLogin?: string | null;
 
     @Expose({ groups: ['self', 'admin'] })
-    lastVisitedAt: string | null = null;
+    lastVisitedAt?: string | null;
 
     @Expose({ groups: ['self', 'admin'] })
-    deletedAt: string | null = null;
+    deletedAt?: string | null;
 
     @Expose({ groups: ['self', 'admin'] })
-    deletionScheduledFor: string | null = null;
+    deletionScheduledFor?: string | null;
 }

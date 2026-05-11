@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useCallback } from 'react';
-import { AuthType, type UserDTO } from '@/common/types';
+import { AuthType, type User } from '@/common/types';
 import {
     ButtonBase,
     ButtonRow,
@@ -21,7 +21,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useLogout } from '@/client/hooks';
 
 export type ProfileBodyInfoProps = Readonly<{
-    user: UserDTO;
+    user: User;
 }>;
 
 export const ProfileBodyInfo: React.FC<ProfileBodyInfoProps> = ({ user }) => {

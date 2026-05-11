@@ -26,7 +26,19 @@ export type CookieConsentFromDb = {
     accepted: ConsentCategory[];
 };
 
-export type CookieConsent = CookieConsentFromBrowser | CookieConsentFromDb;
+export type CookieConsentDTO = Omit<
+    CookieConsentFromDb,
+    'createdAt' | 'revokedAt' | 'updatedAt'
+> & {
+    createdAt: string;
+    revokedAt: string | null;
+    updatedAt: string;
+};
+
+export type CookieConsent =
+    | CookieConsentFromBrowser
+    | CookieConsentFromDb
+    | CookieConsentDTO;
 
 export type CookieConsentPayload = {
     consent: boolean;
