@@ -7,13 +7,13 @@ import {
     OAUTH_STATE_KEY
 } from '@/common/constants';
 import { useEventListener } from '@/client/hooks';
-import type { UserDTO } from '@/common/types';
+import type { User } from '@/common/types';
 import { chqc, QUERY_KEYS } from '@/client/request/queryClient';
 import { useQueryClient } from '@tanstack/react-query';
 import { generateUuid } from '@/client/utils';
 
 type UseGoogleSignInArgs = {
-    onSuccess?: (user: UserDTO) => void;
+    onSuccess?: (user: User) => void;
 };
 
 type UseGoogleSignInType = (options: UseGoogleSignInArgs) => {

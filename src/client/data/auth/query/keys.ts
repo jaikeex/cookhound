@@ -1,10 +1,9 @@
-import type { UserDTO, UserForLogin, AuthCodePayload } from '@/common/types';
+import type { AuthCodePayload, User, UserForLogin } from '@/common/types';
 import type {
     UseQueryOptions,
     UseMutationOptions
 } from '@tanstack/react-query';
 import type { RequestError } from '@/client/error';
-import type { RequestConfig } from '@/client/request/apiClient/ApiRequestWrapper';
 
 //~---------------------------------------------------------------------------------------------~//
 //$                                            KEYS                                             $//
@@ -18,30 +17,30 @@ export const AUTH_QUERY_KEYS = Object.freeze({
 });
 
 //~---------------------------------------------------------------------------------------------~//
-//$                                         TYPES                                             $//
+//$                                          TYPES                                              $//
 //~---------------------------------------------------------------------------------------------~//
 
 export type CurrentUserOptions = Omit<
     UseQueryOptions<
-        UserDTO,
+        User,
         RequestError,
-        UserDTO,
+        User,
         typeof AUTH_QUERY_KEYS.currentUser
     >,
     'queryKey' | 'queryFn'
 >;
 
 export type LoginOptions = Omit<
-    UseMutationOptions<UserDTO, RequestError, UserForLogin>,
+    UseMutationOptions<User, RequestError, UserForLogin>,
     'mutationFn'
 >;
 
 export type GoogleLoginOptions = Omit<
-    UseMutationOptions<UserDTO, RequestError, AuthCodePayload>,
+    UseMutationOptions<User, RequestError, AuthCodePayload>,
     'mutationFn'
 >;
 
 export type LogoutOptions = Omit<
-    UseMutationOptions<void, RequestError, RequestConfig | undefined>,
+    UseMutationOptions<void, RequestError, undefined>,
     'mutationFn'
 >;

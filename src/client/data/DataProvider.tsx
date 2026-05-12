@@ -3,11 +3,13 @@
 import React, { createContext, useContext } from 'react';
 import type { RecipeRepository } from '@/client/data/recipe/port';
 import type { UserRepository } from '@/client/data/user/port';
+import type { AuthRepository } from '@/client/data/auth/port';
 
 /**
  * Aggregated set of domain repositories injected at the app root.
  */
 export type Repositories = Readonly<{
+    authRepository: AuthRepository;
     recipeRepository: RecipeRepository;
     userRepository: UserRepository;
 }>;

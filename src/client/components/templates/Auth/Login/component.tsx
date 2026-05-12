@@ -8,7 +8,7 @@ import {
     LoginForm,
     Typography
 } from '@/client/components';
-import type { UserDTO, UserForLogin } from '@/common/types';
+import type { User, UserForLogin } from '@/common/types';
 import { z } from 'zod';
 import { validateFormData } from '@/client/utils/form';
 
@@ -76,7 +76,7 @@ export const LoginTemplate: React.FC<LoginTemplateProps> = ({
      * Cleans up the form and redirects the user to the home page after a successful login.
      */
     const cleanUpAndRedirectAfterLogin = useCallback(
-        (user: UserDTO) => {
+        (user: User) => {
             setUser(user);
 
             eventBus.emit(AppEvent.USER_LOGGED_IN, user);

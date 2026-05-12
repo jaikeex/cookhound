@@ -1,4 +1,4 @@
-import type { UserDTO } from '@/common/types';
+import type { User } from '@/common/types';
 import type { CookieConsent } from '@/common/types/cookie-consent';
 
 export enum AppEvent {
@@ -13,7 +13,7 @@ export interface AppEventMap {
     [AppEvent.NOT_FOUND_OPENED]: void;
     [AppEvent.NOT_FOUND_CLOSED]: void;
     [AppEvent.CONSENT_CHANGED]: CookieConsent | null;
-    [AppEvent.USER_LOGGED_IN]: UserDTO;
+    [AppEvent.USER_LOGGED_IN]: User;
     [AppEvent.USER_LOGGED_OUT]: void;
 }
 

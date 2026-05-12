@@ -7,6 +7,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { DataProvider, type Repositories } from '@/client/data';
 import type { RecipeRepository } from '@/client/data/recipe/port';
 import type { UserRepository } from '@/client/data/user/port';
+import type { AuthRepository } from '@/client/data/auth/port';
 import { buildEmptyRepository } from '@/client/data/__testing__/buildEmptyRepository';
 import type { Recipe } from '@/common/types';
 import { recipeQueryClient } from '@/client/data/recipe';
@@ -68,7 +69,8 @@ describe('useRecipeById', () => {
         const repo = buildFakeRepository();
         const wrapper = buildWrapper({
             recipeRepository: repo,
-            userRepository: buildEmptyRepository<UserRepository>()
+            userRepository: buildEmptyRepository<UserRepository>(),
+            authRepository: buildEmptyRepository<AuthRepository>()
         });
 
         const { result } = renderHook(
@@ -94,7 +96,8 @@ describe('useRecipeById', () => {
         const repo = buildFakeRepository();
         const wrapper = buildWrapper({
             recipeRepository: repo,
-            userRepository: buildEmptyRepository<UserRepository>()
+            userRepository: buildEmptyRepository<UserRepository>(),
+            authRepository: buildEmptyRepository<AuthRepository>()
         });
 
         renderHook(() => recipeQueryClient.useRecipeById(''), { wrapper });

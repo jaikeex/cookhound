@@ -27,20 +27,20 @@ export const AppProviders: React.FC<AppProvidersProps> = ({
     children
 }) => (
     <ThemeProvider defaultTheme={initialTheme}>
-        <AuthProvider>
-            <SnackbarProvider>
-                <LocaleProvider
-                    defaultMessages={messages}
-                    defaultLocale={locale}
-                >
-                    <DataProvider value={repositories}>
+        <DataProvider value={repositories}>
+            <AuthProvider>
+                <SnackbarProvider>
+                    <LocaleProvider
+                        defaultMessages={messages}
+                        defaultLocale={locale}
+                    >
                         <ConsentProvider initialConsent={initialConsent}>
                             <ModalProvider>{children}</ModalProvider>
                         </ConsentProvider>
-                    </DataProvider>
-                </LocaleProvider>
-            </SnackbarProvider>
-        </AuthProvider>
+                    </LocaleProvider>
+                </SnackbarProvider>
+            </AuthProvider>
+        </DataProvider>
     </ThemeProvider>
 );
 

@@ -8,12 +8,12 @@ import {
     ThemeSwitcher,
     Typography
 } from '@/client/components';
-import { UserRole, type UserDTO } from '@/common/types';
+import { UserRole, type User } from '@/common/types';
 import { useLocale } from '@/client/store/I18nContext';
 import Link from 'next/link';
 
 type LoggedInMenuContentProps = Readonly<{
-    user: UserDTO;
+    user: User;
 }>;
 
 export const LoggedInMenuContent: React.FC<LoggedInMenuContentProps> = ({

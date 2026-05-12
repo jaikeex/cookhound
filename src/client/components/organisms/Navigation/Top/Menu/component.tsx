@@ -3,12 +3,12 @@
 import React from 'react';
 import { AnonymousMenuContent } from './Anonymous';
 import { LoggedInMenuContent } from './LoggedIn';
-import type { UserDTO } from '@/common/types';
+import type { User } from '@/common/types';
 
 type NavMenuProps = Readonly<{
     className?: string;
     ref?: React.Ref<HTMLDivElement>;
-    user: UserDTO | null;
+    user: User | null;
 }>;
 
 export const NavMenu: React.FC<NavMenuProps> = ({ className, ref, user }) => {

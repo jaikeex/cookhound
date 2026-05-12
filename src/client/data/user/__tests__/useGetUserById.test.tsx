@@ -11,6 +11,7 @@ import type { User } from '@/common/types';
 import { AuthType, Status, UserRole } from '@/common/types';
 import { userQueryClient } from '@/client/data/user';
 import type { RecipeRepository } from '@/client/data/recipe/port';
+import type { AuthRepository } from '@/client/data/auth/port';
 
 const fixtureUser: User = {
     id: 42,
@@ -64,7 +65,8 @@ describe('useGetUserById', () => {
         const repo = buildFakeUserRepository();
         const wrapper = buildWrapper({
             userRepository: repo,
-            recipeRepository: buildEmptyRepository<RecipeRepository>()
+            recipeRepository: buildEmptyRepository<RecipeRepository>(),
+            authRepository: buildEmptyRepository<AuthRepository>()
         });
 
         const { result } = renderHook(
@@ -88,7 +90,8 @@ describe('useGetUserById', () => {
         const repo = buildFakeUserRepository();
         const wrapper = buildWrapper({
             userRepository: repo,
-            recipeRepository: buildEmptyRepository<RecipeRepository>()
+            recipeRepository: buildEmptyRepository<RecipeRepository>(),
+            authRepository: buildEmptyRepository<AuthRepository>()
         });
 
         renderHook(() => userQueryClient.useGetUserById(0), { wrapper });

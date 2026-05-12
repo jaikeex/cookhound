@@ -1,14 +1,14 @@
 'use client';
 
 import React, { createContext, useCallback, useContext, useMemo } from 'react';
-import type { UserDTO } from '@/common/types';
+import type { User } from '@/common/types';
 import { useQueryClient } from '@tanstack/react-query';
 import { chqc, QUERY_KEYS } from '@/client/request/queryClient';
 
 type AuthContextType = {
     authResolved: boolean;
-    user: UserDTO | null;
-    setUser: (user: UserDTO | null) => void;
+    user: User | null;
+    setUser: (user: User | null) => void;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -31,7 +31,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const { data: user = null, isLoading } = chqc.auth.useCurrentUser({});
 
     const setUser = useCallback(
-        (newUser: UserDTO | null) => {
+        (newUser: User | null) => {
             queryClient.setQueryData(QUERY_KEYS.auth.currentUser, newUser);
         },
         [queryClient]
