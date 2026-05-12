@@ -4,7 +4,7 @@ import { authQueryClient, AUTH_QUERY_KEYS } from '@/client/data/auth';
 import { recipeQueryClient, RECIPE_QUERY_KEYS } from '@/client/data/recipe';
 import { tagQueryClient, TAG_QUERY_KEYS } from './tag';
 import { cookbookQueryClient, COOKBOOK_QUERY_KEYS } from './cookbook';
-import { fileQueryClient } from './file';
+import { fileQueryClient, FILE_QUERY_KEYS } from '@/client/data/file';
 import { contactQueryClient, CONTACT_QUERY_KEYS } from './contact';
 import {
     ingredientQueryClient,
@@ -37,6 +37,7 @@ export const QUERY_KEYS = {
     recipe: RECIPE_QUERY_KEYS,
     tag: TAG_QUERY_KEYS,
     cookbook: COOKBOOK_QUERY_KEYS,
+    file: FILE_QUERY_KEYS,
     contact: CONTACT_QUERY_KEYS,
     ingredient: INGREDIENT_QUERY_KEYS
 };

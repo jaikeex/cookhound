@@ -8,6 +8,7 @@ import { DataProvider, type Repositories } from '@/client/data';
 import type { RecipeRepository } from '@/client/data/recipe/port';
 import type { UserRepository } from '@/client/data/user/port';
 import type { AuthRepository } from '@/client/data/auth/port';
+import type { FileRepository } from '@/client/data/file/port';
 import type { IngredientRepository } from '@/client/data/ingredient/port';
 import { buildEmptyRepository } from '@/client/data/__testing__/buildEmptyRepository';
 import type { Recipe } from '@/common/types';
@@ -72,6 +73,7 @@ describe('useRecipeById', () => {
             recipeRepository: repo,
             userRepository: buildEmptyRepository<UserRepository>(),
             authRepository: buildEmptyRepository<AuthRepository>(),
+            fileRepository: buildEmptyRepository<FileRepository>(),
             ingredientRepository: buildEmptyRepository<IngredientRepository>()
         });
 
@@ -100,6 +102,7 @@ describe('useRecipeById', () => {
             recipeRepository: repo,
             userRepository: buildEmptyRepository<UserRepository>(),
             authRepository: buildEmptyRepository<AuthRepository>(),
+            fileRepository: buildEmptyRepository<FileRepository>(),
             ingredientRepository: buildEmptyRepository<IngredientRepository>()
         });
 

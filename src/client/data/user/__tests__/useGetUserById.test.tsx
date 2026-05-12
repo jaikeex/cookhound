@@ -12,6 +12,7 @@ import { AuthType, Status, UserRole } from '@/common/types';
 import { userQueryClient } from '@/client/data/user';
 import type { RecipeRepository } from '@/client/data/recipe/port';
 import type { AuthRepository } from '@/client/data/auth/port';
+import type { FileRepository } from '@/client/data/file/port';
 import type { IngredientRepository } from '@/client/data/ingredient/port';
 
 const fixtureUser: User = {
@@ -68,6 +69,7 @@ describe('useGetUserById', () => {
             userRepository: repo,
             recipeRepository: buildEmptyRepository<RecipeRepository>(),
             authRepository: buildEmptyRepository<AuthRepository>(),
+            fileRepository: buildEmptyRepository<FileRepository>(),
             ingredientRepository: buildEmptyRepository<IngredientRepository>()
         });
 
@@ -94,6 +96,7 @@ describe('useGetUserById', () => {
             userRepository: repo,
             recipeRepository: buildEmptyRepository<RecipeRepository>(),
             authRepository: buildEmptyRepository<AuthRepository>(),
+            fileRepository: buildEmptyRepository<FileRepository>(),
             ingredientRepository: buildEmptyRepository<IngredientRepository>()
         });
 

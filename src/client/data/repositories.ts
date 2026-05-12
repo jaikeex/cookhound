@@ -1,4 +1,5 @@
 import { authRepositoryAdapter } from './auth';
+import { fileRepositoryAdapter } from './file';
 import { ingredientRepositoryAdapter } from './ingredient';
 import { recipeRepositoryAdapter } from './recipe';
 import { userRepositoryAdapter } from './user';
@@ -16,6 +17,7 @@ import { userRepositoryAdapter } from './user';
 
 export const repositories = {
     authRepository: authRepositoryAdapter,
+    fileRepository: fileRepositoryAdapter,
     ingredientRepository: ingredientRepositoryAdapter,
     recipeRepository: recipeRepositoryAdapter,
     userRepository: userRepositoryAdapter

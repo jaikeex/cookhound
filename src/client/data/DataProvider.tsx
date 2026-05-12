@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext } from 'react';
 import type { AuthRepository } from '@/client/data/auth/port';
+import type { FileRepository } from '@/client/data/file/port';
 import type { IngredientRepository } from '@/client/data/ingredient/port';
 import type { RecipeRepository } from '@/client/data/recipe/port';
 import type { UserRepository } from '@/client/data/user/port';
@@ -11,6 +12,7 @@ import type { UserRepository } from '@/client/data/user/port';
  */
 export type Repositories = Readonly<{
     authRepository: AuthRepository;
+    fileRepository: FileRepository;
     ingredientRepository: IngredientRepository;
     recipeRepository: RecipeRepository;
     userRepository: UserRepository;

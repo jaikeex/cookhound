@@ -6,6 +6,7 @@ import { renderHook, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { DataProvider, type Repositories } from '@/client/data';
 import type { AuthRepository } from '@/client/data/auth/port';
+import type { FileRepository } from '@/client/data/file/port';
 import type { UserRepository } from '@/client/data/user/port';
 import type { RecipeRepository } from '@/client/data/recipe/port';
 import type { IngredientRepository } from '@/client/data/ingredient/port';
@@ -53,6 +54,7 @@ describe('useCurrentUser', () => {
         const repo = buildFakeAuthRepository();
         const wrapper = buildWrapper({
             authRepository: repo,
+            fileRepository: buildEmptyRepository<FileRepository>(),
             userRepository: buildEmptyRepository<UserRepository>(),
             recipeRepository: buildEmptyRepository<RecipeRepository>(),
             ingredientRepository: buildEmptyRepository<IngredientRepository>()
@@ -77,6 +79,7 @@ describe('useCurrentUser', () => {
         const repo = buildFakeAuthRepository();
         const wrapper = buildWrapper({
             authRepository: repo,
+            fileRepository: buildEmptyRepository<FileRepository>(),
             userRepository: buildEmptyRepository<UserRepository>(),
             recipeRepository: buildEmptyRepository<RecipeRepository>(),
             ingredientRepository: buildEmptyRepository<IngredientRepository>()
@@ -92,7 +95,9 @@ describe('useCurrentUser', () => {
             keepLoggedIn: true
         });
 
-        expect(repo.login).toHaveBeenCalledWith({
+        // react-query v5 passes a second context arg to the mutationFn spy
+        // ({ client, meta, mutationKey }). Assert only the variables.
+        expect(vi.mocked(repo.login).mock.calls[0]?.[0]).toEqual({
             email: 'tester@example.com',
             password: 'pw',
             keepLoggedIn: true
