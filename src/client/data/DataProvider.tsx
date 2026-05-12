@@ -1,15 +1,17 @@
 'use client';
 
 import React, { createContext, useContext } from 'react';
+import type { AuthRepository } from '@/client/data/auth/port';
+import type { IngredientRepository } from '@/client/data/ingredient/port';
 import type { RecipeRepository } from '@/client/data/recipe/port';
 import type { UserRepository } from '@/client/data/user/port';
-import type { AuthRepository } from '@/client/data/auth/port';
 
 /**
  * Aggregated set of domain repositories injected at the app root.
  */
 export type Repositories = Readonly<{
     authRepository: AuthRepository;
+    ingredientRepository: IngredientRepository;
     recipeRepository: RecipeRepository;
     userRepository: UserRepository;
 }>;

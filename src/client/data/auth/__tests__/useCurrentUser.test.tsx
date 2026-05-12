@@ -8,6 +8,7 @@ import { DataProvider, type Repositories } from '@/client/data';
 import type { AuthRepository } from '@/client/data/auth/port';
 import type { UserRepository } from '@/client/data/user/port';
 import type { RecipeRepository } from '@/client/data/recipe/port';
+import type { IngredientRepository } from '@/client/data/ingredient/port';
 import { buildEmptyRepository } from '@/client/data/__testing__/buildEmptyRepository';
 import type { User } from '@/common/types';
 import { AuthType, Status, UserRole } from '@/common/types';
@@ -53,7 +54,8 @@ describe('useCurrentUser', () => {
         const wrapper = buildWrapper({
             authRepository: repo,
             userRepository: buildEmptyRepository<UserRepository>(),
-            recipeRepository: buildEmptyRepository<RecipeRepository>()
+            recipeRepository: buildEmptyRepository<RecipeRepository>(),
+            ingredientRepository: buildEmptyRepository<IngredientRepository>()
         });
 
         const { result } = renderHook(() => authQueryClient.useCurrentUser(), {
@@ -76,7 +78,8 @@ describe('useCurrentUser', () => {
         const wrapper = buildWrapper({
             authRepository: repo,
             userRepository: buildEmptyRepository<UserRepository>(),
-            recipeRepository: buildEmptyRepository<RecipeRepository>()
+            recipeRepository: buildEmptyRepository<RecipeRepository>(),
+            ingredientRepository: buildEmptyRepository<IngredientRepository>()
         });
 
         const { result } = renderHook(() => authQueryClient.useLogin(), {

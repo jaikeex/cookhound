@@ -6,7 +6,10 @@ import { tagQueryClient, TAG_QUERY_KEYS } from './tag';
 import { cookbookQueryClient, COOKBOOK_QUERY_KEYS } from './cookbook';
 import { fileQueryClient } from './file';
 import { contactQueryClient, CONTACT_QUERY_KEYS } from './contact';
-import { ingredientQueryClient, INGREDIENT_QUERY_KEYS } from './ingredient';
+import {
+    ingredientQueryClient,
+    INGREDIENT_QUERY_KEYS
+} from '@/client/data/ingredient';
 
 /**
  * Unfortunately, this is the best name i came up with to differentiate it enought from the default

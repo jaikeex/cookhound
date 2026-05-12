@@ -8,6 +8,7 @@ import { DataProvider, type Repositories } from '@/client/data';
 import type { RecipeRepository } from '@/client/data/recipe/port';
 import type { UserRepository } from '@/client/data/user/port';
 import type { AuthRepository } from '@/client/data/auth/port';
+import type { IngredientRepository } from '@/client/data/ingredient/port';
 import { buildEmptyRepository } from '@/client/data/__testing__/buildEmptyRepository';
 import type { Recipe } from '@/common/types';
 import { recipeQueryClient } from '@/client/data/recipe';
@@ -70,7 +71,8 @@ describe('useRecipeById', () => {
         const wrapper = buildWrapper({
             recipeRepository: repo,
             userRepository: buildEmptyRepository<UserRepository>(),
-            authRepository: buildEmptyRepository<AuthRepository>()
+            authRepository: buildEmptyRepository<AuthRepository>(),
+            ingredientRepository: buildEmptyRepository<IngredientRepository>()
         });
 
         const { result } = renderHook(
@@ -97,7 +99,8 @@ describe('useRecipeById', () => {
         const wrapper = buildWrapper({
             recipeRepository: repo,
             userRepository: buildEmptyRepository<UserRepository>(),
-            authRepository: buildEmptyRepository<AuthRepository>()
+            authRepository: buildEmptyRepository<AuthRepository>(),
+            ingredientRepository: buildEmptyRepository<IngredientRepository>()
         });
 
         renderHook(() => recipeQueryClient.useRecipeById(''), { wrapper });
