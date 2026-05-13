@@ -1,6 +1,7 @@
 import { adminRepositoryAdapter } from './admin';
 import { authRepositoryAdapter } from './auth';
 import { contactRepositoryAdapter } from './contact';
+import { cookbookRepositoryAdapter } from './cookbook';
 import { fileRepositoryAdapter } from './file';
 import { ingredientRepositoryAdapter } from './ingredient';
 import { recipeRepositoryAdapter } from './recipe';
@@ -22,6 +23,7 @@ export const repositories = {
     adminRepository: adminRepositoryAdapter,
     authRepository: authRepositoryAdapter,
     contactRepository: contactRepositoryAdapter,
+    cookbookRepository: cookbookRepositoryAdapter,
     fileRepository: fileRepositoryAdapter,
     ingredientRepository: ingredientRepositoryAdapter,
     recipeRepository: recipeRepositoryAdapter,

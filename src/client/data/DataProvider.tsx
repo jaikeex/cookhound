@@ -4,6 +4,7 @@ import React, { createContext, useContext } from 'react';
 import type { AdminRepository } from '@/client/data/admin/port';
 import type { AuthRepository } from '@/client/data/auth/port';
 import type { ContactRepository } from '@/client/data/contact/port';
+import type { CookbookRepository } from '@/client/data/cookbook/port';
 import type { FileRepository } from '@/client/data/file/port';
 import type { IngredientRepository } from '@/client/data/ingredient/port';
 import type { RecipeRepository } from '@/client/data/recipe/port';
@@ -17,6 +18,7 @@ export type Repositories = Readonly<{
     adminRepository: AdminRepository;
     authRepository: AuthRepository;
     contactRepository: ContactRepository;
+    cookbookRepository: CookbookRepository;
     fileRepository: FileRepository;
     ingredientRepository: IngredientRepository;
     recipeRepository: RecipeRepository;

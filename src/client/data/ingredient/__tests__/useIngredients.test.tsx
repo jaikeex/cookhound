@@ -6,6 +6,7 @@ import { renderHook, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { DataProvider, type Repositories } from '@/client/data';
 import type { AdminRepository } from '@/client/data/admin/port';
+import type { CookbookRepository } from '@/client/data/cookbook/port';
 import type { IngredientRepository } from '@/client/data/ingredient/port';
 import type { RecipeRepository } from '@/client/data/recipe/port';
 import type { UserRepository } from '@/client/data/user/port';
@@ -51,7 +52,8 @@ describe('useIngredients', () => {
             fileRepository: buildEmptyRepository<FileRepository>(),
             tagRepository: buildEmptyRepository<TagRepository>(),
             contactRepository: buildEmptyRepository<ContactRepository>(),
-            adminRepository: buildEmptyRepository<AdminRepository>()
+            adminRepository: buildEmptyRepository<AdminRepository>(),
+            cookbookRepository: buildEmptyRepository<CookbookRepository>()
         });
 
         const { result } = renderHook(
@@ -81,7 +83,8 @@ describe('useIngredients', () => {
             fileRepository: buildEmptyRepository<FileRepository>(),
             tagRepository: buildEmptyRepository<TagRepository>(),
             contactRepository: buildEmptyRepository<ContactRepository>(),
-            adminRepository: buildEmptyRepository<AdminRepository>()
+            adminRepository: buildEmptyRepository<AdminRepository>(),
+            cookbookRepository: buildEmptyRepository<CookbookRepository>()
         });
 
         renderHook(() => ingredientQueryClient.useIngredients('' as never), {

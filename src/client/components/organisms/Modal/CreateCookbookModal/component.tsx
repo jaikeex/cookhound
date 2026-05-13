@@ -114,7 +114,7 @@ export const CreateCookbookModal: React.FC<CreateCookbookModalProps> = ({
                 visibility: formData.visibility as CookbookVisibility
             };
 
-            await createCookbook(payload);
+            await createCookbook({ input: payload });
         },
         [createCookbook]
     );

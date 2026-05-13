@@ -5,6 +5,10 @@ import type {
 } from '@tanstack/react-query';
 import type { RequestError } from '@/client/error';
 
+//~---------------------------------------------------------------------------------------------~//
+//$                                            KEYS                                             $//
+//~---------------------------------------------------------------------------------------------~//
+
 const COOKBOOK_NAMESPACE_QUERY_KEY = 'cookbook';
 
 export const COOKBOOK_QUERY_KEYS = Object.freeze({
@@ -19,6 +23,10 @@ export const COOKBOOK_QUERY_KEYS = Object.freeze({
     byUser: (userId: string | number) =>
         [COOKBOOK_NAMESPACE_QUERY_KEY, 'user', userId] as const
 });
+
+//~---------------------------------------------------------------------------------------------~//
+//$                                            TYPES                                            $//
+//~---------------------------------------------------------------------------------------------~//
 
 export type CookbookByIdOptions = Omit<
     UseQueryOptions<
@@ -51,17 +59,21 @@ export type UserCookbooksOptions = Omit<
 >;
 
 export type CreateCookbookOptions = Omit<
-    UseMutationOptions<CookbookDTO, RequestError, CookbookForCreatePayload>,
+    UseMutationOptions<
+        CookbookDTO,
+        RequestError,
+        { input: CookbookForCreatePayload }
+    >,
     'mutationFn'
 >;
 
 export type DeleteCookbookOptions = Omit<
-    UseMutationOptions<void, RequestError, number | string>,
+    UseMutationOptions<void, RequestError, { id: number | string }>,
     'mutationFn'
 >;
 
 export type ReorderOwnCookbooksOptions = Omit<
-    UseMutationOptions<void, RequestError, number[]>,
+    UseMutationOptions<void, RequestError, { orderedCookbookIds: number[] }>,
     'mutationFn'
 >;
 
