@@ -10,6 +10,8 @@ import type { IngredientRepository } from '@/client/data/ingredient/port';
 import type { RecipeRepository } from '@/client/data/recipe/port';
 import type { UserRepository } from '@/client/data/user/port';
 import type { AuthRepository } from '@/client/data/auth/port';
+import type { TagRepository } from '@/client/data/tag/port';
+import type { ContactRepository } from '@/client/data/contact/port';
 import { buildEmptyRepository } from '@/client/data/__testing__/buildEmptyRepository';
 import type { FileForUpload, FileUploadResponse } from '@/common/types';
 import { fileQueryClient } from '@/client/data/file';
@@ -50,7 +52,9 @@ describe('fileQueryClient', () => {
             ingredientRepository: buildEmptyRepository<IngredientRepository>(),
             recipeRepository: buildEmptyRepository<RecipeRepository>(),
             userRepository: buildEmptyRepository<UserRepository>(),
-            authRepository: buildEmptyRepository<AuthRepository>()
+            authRepository: buildEmptyRepository<AuthRepository>(),
+            tagRepository: buildEmptyRepository<TagRepository>(),
+            contactRepository: buildEmptyRepository<ContactRepository>()
         });
 
         const { result } = renderHook(
@@ -79,7 +83,9 @@ describe('fileQueryClient', () => {
             ingredientRepository: buildEmptyRepository<IngredientRepository>(),
             recipeRepository: buildEmptyRepository<RecipeRepository>(),
             userRepository: buildEmptyRepository<UserRepository>(),
-            authRepository: buildEmptyRepository<AuthRepository>()
+            authRepository: buildEmptyRepository<AuthRepository>(),
+            tagRepository: buildEmptyRepository<TagRepository>(),
+            contactRepository: buildEmptyRepository<ContactRepository>()
         });
 
         const { result } = renderHook(

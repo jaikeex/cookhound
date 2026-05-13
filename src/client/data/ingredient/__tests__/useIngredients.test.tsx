@@ -10,6 +10,8 @@ import type { RecipeRepository } from '@/client/data/recipe/port';
 import type { UserRepository } from '@/client/data/user/port';
 import type { AuthRepository } from '@/client/data/auth/port';
 import type { FileRepository } from '@/client/data/file/port';
+import type { TagRepository } from '@/client/data/tag/port';
+import type { ContactRepository } from '@/client/data/contact/port';
 import { buildEmptyRepository } from '@/client/data/__testing__/buildEmptyRepository';
 import type { IngredientDTO } from '@/common/types';
 import { ingredientQueryClient } from '@/client/data/ingredient';
@@ -45,7 +47,9 @@ describe('useIngredients', () => {
             recipeRepository: buildEmptyRepository<RecipeRepository>(),
             userRepository: buildEmptyRepository<UserRepository>(),
             authRepository: buildEmptyRepository<AuthRepository>(),
-            fileRepository: buildEmptyRepository<FileRepository>()
+            fileRepository: buildEmptyRepository<FileRepository>(),
+            tagRepository: buildEmptyRepository<TagRepository>(),
+            contactRepository: buildEmptyRepository<ContactRepository>()
         });
 
         const { result } = renderHook(
@@ -72,7 +76,9 @@ describe('useIngredients', () => {
             recipeRepository: buildEmptyRepository<RecipeRepository>(),
             userRepository: buildEmptyRepository<UserRepository>(),
             authRepository: buildEmptyRepository<AuthRepository>(),
-            fileRepository: buildEmptyRepository<FileRepository>()
+            fileRepository: buildEmptyRepository<FileRepository>(),
+            tagRepository: buildEmptyRepository<TagRepository>(),
+            contactRepository: buildEmptyRepository<ContactRepository>()
         });
 
         renderHook(() => ingredientQueryClient.useIngredients('' as never), {

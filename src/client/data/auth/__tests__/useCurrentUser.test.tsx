@@ -6,10 +6,12 @@ import { renderHook, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { DataProvider, type Repositories } from '@/client/data';
 import type { AuthRepository } from '@/client/data/auth/port';
+import type { ContactRepository } from '@/client/data/contact/port';
 import type { FileRepository } from '@/client/data/file/port';
 import type { UserRepository } from '@/client/data/user/port';
 import type { RecipeRepository } from '@/client/data/recipe/port';
 import type { IngredientRepository } from '@/client/data/ingredient/port';
+import type { TagRepository } from '@/client/data/tag/port';
 import { buildEmptyRepository } from '@/client/data/__testing__/buildEmptyRepository';
 import type { User } from '@/common/types';
 import { AuthType, Status, UserRole } from '@/common/types';
@@ -57,7 +59,9 @@ describe('useCurrentUser', () => {
             fileRepository: buildEmptyRepository<FileRepository>(),
             userRepository: buildEmptyRepository<UserRepository>(),
             recipeRepository: buildEmptyRepository<RecipeRepository>(),
-            ingredientRepository: buildEmptyRepository<IngredientRepository>()
+            ingredientRepository: buildEmptyRepository<IngredientRepository>(),
+            tagRepository: buildEmptyRepository<TagRepository>(),
+            contactRepository: buildEmptyRepository<ContactRepository>()
         });
 
         const { result } = renderHook(() => authQueryClient.useCurrentUser(), {
@@ -82,7 +86,9 @@ describe('useCurrentUser', () => {
             fileRepository: buildEmptyRepository<FileRepository>(),
             userRepository: buildEmptyRepository<UserRepository>(),
             recipeRepository: buildEmptyRepository<RecipeRepository>(),
-            ingredientRepository: buildEmptyRepository<IngredientRepository>()
+            ingredientRepository: buildEmptyRepository<IngredientRepository>(),
+            tagRepository: buildEmptyRepository<TagRepository>(),
+            contactRepository: buildEmptyRepository<ContactRepository>()
         });
 
         const { result } = renderHook(() => authQueryClient.useLogin(), {

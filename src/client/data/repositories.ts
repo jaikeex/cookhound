@@ -1,7 +1,9 @@
 import { authRepositoryAdapter } from './auth';
+import { contactRepositoryAdapter } from './contact';
 import { fileRepositoryAdapter } from './file';
 import { ingredientRepositoryAdapter } from './ingredient';
 import { recipeRepositoryAdapter } from './recipe';
+import { tagRepositoryAdapter } from './tag';
 import { userRepositoryAdapter } from './user';
 
 //?—————————————————————————————————————————————————————————————————————————————————————————————?//
@@ -17,8 +19,10 @@ import { userRepositoryAdapter } from './user';
 
 export const repositories = {
     authRepository: authRepositoryAdapter,
+    contactRepository: contactRepositoryAdapter,
     fileRepository: fileRepositoryAdapter,
     ingredientRepository: ingredientRepositoryAdapter,
     recipeRepository: recipeRepositoryAdapter,
+    tagRepository: tagRepositoryAdapter,
     userRepository: userRepositoryAdapter
 };

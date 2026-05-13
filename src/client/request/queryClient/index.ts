@@ -2,10 +2,10 @@ import { adminQueryClient, ADMIN_QUERY_KEYS } from './admin';
 import { userQueryClient, USER_QUERY_KEYS } from '@/client/data/user';
 import { authQueryClient, AUTH_QUERY_KEYS } from '@/client/data/auth';
 import { recipeQueryClient, RECIPE_QUERY_KEYS } from '@/client/data/recipe';
-import { tagQueryClient, TAG_QUERY_KEYS } from './tag';
+import { tagQueryClient, TAG_QUERY_KEYS } from '@/client/data/tag';
 import { cookbookQueryClient, COOKBOOK_QUERY_KEYS } from './cookbook';
 import { fileQueryClient, FILE_QUERY_KEYS } from '@/client/data/file';
-import { contactQueryClient, CONTACT_QUERY_KEYS } from './contact';
+import { contactQueryClient, CONTACT_QUERY_KEYS } from '@/client/data/contact';
 import {
     ingredientQueryClient,
     INGREDIENT_QUERY_KEYS

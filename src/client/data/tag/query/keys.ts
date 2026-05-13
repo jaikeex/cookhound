@@ -2,8 +2,8 @@ import type {
     UseMutationOptions,
     UseQueryOptions
 } from '@tanstack/react-query';
-import type { RequestError } from '@/client/error';
 import type { Recipe, RecipeTagDTO, TagListDTO } from '@/common/types';
+import type { RequestError } from '@/client/error';
 
 //~---------------------------------------------------------------------------------------------~//
 //$                                            KEYS                                             $//
@@ -12,11 +12,12 @@ import type { Recipe, RecipeTagDTO, TagListDTO } from '@/common/types';
 const TAG_NAMESPACE_QUERY_KEY = 'tag';
 
 export const TAG_QUERY_KEYS = Object.freeze({
+    namespace: TAG_NAMESPACE_QUERY_KEY,
     list: () => [TAG_NAMESPACE_QUERY_KEY, 'list'] as const
 });
 
 //~---------------------------------------------------------------------------------------------~//
-//$                                         TYPES                                              $//
+//$                                          TYPES                                              $//
 //~---------------------------------------------------------------------------------------------~//
 
 export type TagListOptions = Omit<
