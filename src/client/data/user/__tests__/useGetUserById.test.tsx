@@ -16,6 +16,7 @@ import type { FileRepository } from '@/client/data/file/port';
 import type { IngredientRepository } from '@/client/data/ingredient/port';
 import type { TagRepository } from '@/client/data/tag/port';
 import type { ContactRepository } from '@/client/data/contact/port';
+import type { AdminRepository } from '@/client/data/admin/port';
 
 const fixtureUser: User = {
     id: 42,
@@ -74,7 +75,8 @@ describe('useGetUserById', () => {
             fileRepository: buildEmptyRepository<FileRepository>(),
             ingredientRepository: buildEmptyRepository<IngredientRepository>(),
             tagRepository: buildEmptyRepository<TagRepository>(),
-            contactRepository: buildEmptyRepository<ContactRepository>()
+            contactRepository: buildEmptyRepository<ContactRepository>(),
+            adminRepository: buildEmptyRepository<AdminRepository>()
         });
 
         const { result } = renderHook(
@@ -103,7 +105,8 @@ describe('useGetUserById', () => {
             fileRepository: buildEmptyRepository<FileRepository>(),
             ingredientRepository: buildEmptyRepository<IngredientRepository>(),
             tagRepository: buildEmptyRepository<TagRepository>(),
-            contactRepository: buildEmptyRepository<ContactRepository>()
+            contactRepository: buildEmptyRepository<ContactRepository>(),
+            adminRepository: buildEmptyRepository<AdminRepository>()
         });
 
         renderHook(() => userQueryClient.useGetUserById(0), { wrapper });

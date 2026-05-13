@@ -7,7 +7,7 @@ import { AdminActionConfirmModal } from '@/client/components/organisms/Modal/Adm
 import { useLocale, useSnackbar, useModal } from '@/client/store';
 import { chqc } from '@/client/request/queryClient';
 import { useQueryClient } from '@tanstack/react-query';
-import { ADMIN_QUERY_KEYS } from '@/client/request/queryClient/admin/types';
+import { ADMIN_QUERY_KEYS } from '@/client/data/admin';
 import { formatDate } from '@/client/utils';
 import { AuthType, Status, UserRole } from '@/common/types';
 
@@ -181,10 +181,10 @@ export const AdminUserDetailModal: React.FC<AdminUserDetailModalProps> = ({
 
     const invalidateQueries = useCallback(() => {
         void queryClient.invalidateQueries({
-            queryKey: ADMIN_QUERY_KEYS.users
+            queryKey: [ADMIN_QUERY_KEYS.namespace, 'users']
         });
         void queryClient.invalidateQueries({
-            queryKey: [...ADMIN_QUERY_KEYS.userDetail, userId]
+            queryKey: ADMIN_QUERY_KEYS.userDetail(userId)
         });
     }, [queryClient, userId]);
 
@@ -210,17 +210,17 @@ export const AdminUserDetailModal: React.FC<AdminUserDetailModalProps> = ({
     );
 
     const confirmForceLogout = useCallback(
-        () => forceLogout(userId),
+        () => forceLogout({ userId }),
         [forceLogout, userId]
     );
 
     const confirmForcePasswordReset = useCallback(
-        () => forcePasswordReset(userId),
+        () => forcePasswordReset({ userId }),
         [forcePasswordReset, userId]
     );
 
     const confirmVerifyEmail = useCallback(
-        () => verifyEmail(userId),
+        () => verifyEmail({ userId }),
         [verifyEmail, userId]
     );
 
@@ -230,7 +230,7 @@ export const AdminUserDetailModal: React.FC<AdminUserDetailModalProps> = ({
     );
 
     const confirmCancelDeletion = useCallback(
-        () => cancelDeletion(userId),
+        () => cancelDeletion({ userId }),
         [cancelDeletion, userId]
     );
 

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { createContext, useContext } from 'react';
+import type { AdminRepository } from '@/client/data/admin/port';
 import type { AuthRepository } from '@/client/data/auth/port';
 import type { ContactRepository } from '@/client/data/contact/port';
 import type { FileRepository } from '@/client/data/file/port';
@@ -13,6 +14,7 @@ import type { UserRepository } from '@/client/data/user/port';
  * Aggregated set of domain repositories injected at the app root.
  */
 export type Repositories = Readonly<{
+    adminRepository: AdminRepository;
     authRepository: AuthRepository;
     contactRepository: ContactRepository;
     fileRepository: FileRepository;

@@ -1,3 +1,4 @@
+import { adminRepositoryAdapter } from './admin';
 import { authRepositoryAdapter } from './auth';
 import { contactRepositoryAdapter } from './contact';
 import { fileRepositoryAdapter } from './file';
@@ -18,6 +19,7 @@ import { userRepositoryAdapter } from './user';
 //?—————————————————————————————————————————————————————————————————————————————————————————————?//
 
 export const repositories = {
+    adminRepository: adminRepositoryAdapter,
     authRepository: authRepositoryAdapter,
     contactRepository: contactRepositoryAdapter,
     fileRepository: fileRepositoryAdapter,

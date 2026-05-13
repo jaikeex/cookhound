@@ -1,4 +1,4 @@
-import { adminQueryClient, ADMIN_QUERY_KEYS } from './admin';
+import { adminQueryClient, ADMIN_QUERY_KEYS } from '@/client/data/admin';
 import { userQueryClient, USER_QUERY_KEYS } from '@/client/data/user';
 import { authQueryClient, AUTH_QUERY_KEYS } from '@/client/data/auth';
 import { recipeQueryClient, RECIPE_QUERY_KEYS } from '@/client/data/recipe';
