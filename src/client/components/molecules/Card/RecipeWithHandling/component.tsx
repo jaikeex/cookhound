@@ -9,7 +9,7 @@ import {
 } from '@/client/components';
 import React, { useCallback, useMemo } from 'react';
 import type { RecipeCardProps } from '@/client/components/molecules/Card/types';
-import { chqc, QUERY_KEYS } from '@/client/request/queryClient';
+import { chqc, QUERY_KEYS } from '@/client/data';
 import { useQueryClient } from '@tanstack/react-query';
 import { useLocale, useModal, useSnackbar } from '@/client/store';
 import { useRouter } from 'next/navigation';

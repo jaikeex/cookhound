@@ -10,7 +10,7 @@ import {
 } from '@/client/components';
 import { useLocale, useSnackbar } from '@/client/store';
 import type { I18nMessage } from '@/client/locales';
-import { chqc, QUERY_KEYS } from '@/client/request/queryClient';
+import { chqc, QUERY_KEYS } from '@/client/data';
 import {
     type CookbookForCreatePayload,
     CookbookVisibility

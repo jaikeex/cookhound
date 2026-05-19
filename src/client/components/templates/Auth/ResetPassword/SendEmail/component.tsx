@@ -16,7 +16,7 @@ import { useLocale } from '@/client/store';
 import { useCaptcha } from '@/client/hooks';
 import { validateFormData, executeCaptcha } from '@/client/utils';
 import type { I18nMessage } from '@/client/locales';
-import { chqc } from '@/client/request/queryClient';
+import { chqc } from '@/client/data';
 
 export type SendResetPasswordEmailTemplateProps = Readonly<{
     email: string;

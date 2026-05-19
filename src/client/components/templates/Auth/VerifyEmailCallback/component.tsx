@@ -4,7 +4,7 @@ import React, { useEffect } from 'react';
 import { ButtonBase, Loader, Typography } from '@/client/components';
 import { useLocale } from '@/client/store';
 import Link from 'next/link';
-import { chqc, QUERY_KEYS } from '@/client/request/queryClient';
+import { chqc, QUERY_KEYS } from '@/client/data';
 import type { RequestError } from '@/client/error';
 import { useQueryClient } from '@tanstack/react-query';
 import type { I18nMessage } from '@/client/locales';

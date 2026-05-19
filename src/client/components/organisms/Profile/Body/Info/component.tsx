@@ -16,7 +16,7 @@ import { useLocale, useSnackbar } from '@/client/store';
 import { useModal } from '@/client/store';
 import { ConsentSettingsModal } from '@/client/components';
 import { LogoutAllConfirmModal } from '@/client/components';
-import { chqc, QUERY_KEYS } from '@/client/request/queryClient';
+import { chqc, QUERY_KEYS } from '@/client/data';
 import { useQueryClient } from '@tanstack/react-query';
 import { useLogout } from '@/client/hooks';
 

@@ -28,7 +28,7 @@ import { classNames } from '@/client/utils';
 import { tServer } from '@/server/utils/locales';
 import { getCurrentUser } from './actions';
 import { pickMostRecentConsent, getUserLocale } from '@/common/utils';
-import { QUERY_KEYS } from '@/client/request/queryClient';
+import { QUERY_KEYS } from '@/client/data';
 import type { CookieConsent } from '@/common/types/cookie-consent';
 import { ENV_CONFIG_PUBLIC, CONSENT_VERSION } from '@/common/constants';
 

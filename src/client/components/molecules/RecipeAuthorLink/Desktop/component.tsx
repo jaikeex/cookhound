@@ -4,7 +4,7 @@ import { Avatar, Time, Typography } from '@/client/components';
 import { classNames, getAgeString } from '@/client/utils';
 import React from 'react';
 import { useLocale } from '@/client/store';
-import { chqc } from '@/client/request/queryClient';
+import { chqc } from '@/client/data';
 import Link from 'next/link';
 
 export type RecipeAuthorLinkDesktopProps = Readonly<{

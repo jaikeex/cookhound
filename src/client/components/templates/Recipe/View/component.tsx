@@ -6,7 +6,7 @@ import { MobileRecipeViewTemplate } from './Mobile';
 import type { Recipe } from '@/common/types';
 import { useAuth, RecipeHandlingProvider } from '@/client/store';
 import { useRunOnce } from '@/client/hooks';
-import { chqc, QUERY_KEYS } from '@/client/request/queryClient';
+import { chqc, QUERY_KEYS } from '@/client/data';
 import { useQueryClient } from '@tanstack/react-query';
 import { FlaggedTemplate } from '@/client/components/templates/Error/Flagged';
 import { FlaggedAuthorTemplate } from '@/client/components/templates/Recipe/Flagged';

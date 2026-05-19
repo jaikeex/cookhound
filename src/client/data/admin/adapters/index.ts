@@ -1,1 +1,1 @@
-export { httpAdminRepository as default } from './adapter';
+export { httpAdminRepository as default } from './httpAdapter';

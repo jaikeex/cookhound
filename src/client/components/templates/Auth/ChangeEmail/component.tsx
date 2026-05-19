@@ -6,7 +6,7 @@ import { ChangeEmailForm } from '@/client/components';
 import { useLocale, useSnackbar } from '@/client/store';
 import { validateFormData } from '@/client/utils/form';
 import { z } from 'zod';
-import { chqc } from '@/client/request/queryClient';
+import { chqc } from '@/client/data';
 import type { I18nMessage } from '@/client/locales';
 import { useRouter } from 'next/navigation';
 

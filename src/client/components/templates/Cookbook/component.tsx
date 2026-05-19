@@ -1,13 +1,13 @@
 'use client';
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import type { CookbookDTO } from '@/common/types';
+import type { Cookbook } from '@/common/types';
 import { DraggableGrid } from '@/client/components/molecules/List/DraggableGrid';
 import {
     CookbookRecipeCard,
     RecipeCardList
 } from '@/client/components/molecules';
-import { chqc, QUERY_KEYS } from '@/client/request/queryClient';
+import { chqc, QUERY_KEYS } from '@/client/data';
 import { useDebounce } from '@/client/hooks';
 import { useQueryClient } from '@tanstack/react-query';
 import { GRID_COLS } from '@/client/constants';
@@ -15,7 +15,7 @@ import { useAuth } from '@/client/store';
 import { Divider, Typography } from '@/client/components';
 
 export type CookbookTemplateProps = Readonly<{
-    cookbook: CookbookDTO;
+    cookbook: Cookbook;
 }>;
 
 export const CookbookTemplate: React.FC<CookbookTemplateProps> = ({

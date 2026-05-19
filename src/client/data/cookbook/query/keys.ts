@@ -1,4 +1,4 @@
-import type { CookbookDTO, CookbookForCreatePayload } from '@/common/types';
+import type { Cookbook, CookbookForCreatePayload } from '@/common/types';
 import type {
     UseQueryOptions,
     UseMutationOptions
@@ -30,9 +30,9 @@ export const COOKBOOK_QUERY_KEYS = Object.freeze({
 
 export type CookbookByIdOptions = Omit<
     UseQueryOptions<
-        CookbookDTO,
+        Cookbook,
         RequestError,
-        CookbookDTO,
+        Cookbook,
         ReturnType<typeof COOKBOOK_QUERY_KEYS.byId>
     >,
     'queryKey' | 'queryFn'
@@ -40,9 +40,9 @@ export type CookbookByIdOptions = Omit<
 
 export type CookbookByDisplayIdOptions = Omit<
     UseQueryOptions<
-        CookbookDTO,
+        Cookbook,
         RequestError,
-        CookbookDTO,
+        Cookbook,
         ReturnType<typeof COOKBOOK_QUERY_KEYS.byDisplayId>
     >,
     'queryKey' | 'queryFn'
@@ -50,9 +50,9 @@ export type CookbookByDisplayIdOptions = Omit<
 
 export type UserCookbooksOptions = Omit<
     UseQueryOptions<
-        CookbookDTO[],
+        Cookbook[],
         RequestError,
-        CookbookDTO[],
+        Cookbook[],
         ReturnType<typeof COOKBOOK_QUERY_KEYS.byUser>
     >,
     'queryKey' | 'queryFn'
@@ -60,7 +60,7 @@ export type UserCookbooksOptions = Omit<
 
 export type CreateCookbookOptions = Omit<
     UseMutationOptions<
-        CookbookDTO,
+        Cookbook,
         RequestError,
         { input: CookbookForCreatePayload }
     >,

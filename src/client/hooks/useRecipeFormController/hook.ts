@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { chqc, QUERY_KEYS } from '@/client/request/queryClient';
+import { chqc, QUERY_KEYS } from '@/client/data';
 import { useQueryClient } from '@tanstack/react-query';
 import { useScreenSize, useUnsavedChangesWarning } from '@/client/hooks';
 import { useSnackbar, useLocale, useCreateRecipeStore } from '@/client/store';

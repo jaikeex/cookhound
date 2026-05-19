@@ -1,1 +1,1 @@
-export { httpFileRepository as default } from './adapter';
+export { httpFileRepository as default } from './httpAdapter';

@@ -3,7 +3,7 @@
 import { useCallback } from 'react';
 import { useTheme, useConsent } from '@/client/store';
 import { THEME_STORAGE_KEY } from '@/client/constants';
-import { chqc } from '@/client/request/queryClient';
+import { chqc } from '@/client/data';
 import type { UserPreferences } from '@/common/types';
 import { useSettingPersistence } from '@/client/hooks/settingsPersistence';
 

@@ -8,7 +8,7 @@ import {
 } from '@/common/constants';
 import { useEventListener } from '@/client/hooks';
 import type { User } from '@/common/types';
-import { chqc, QUERY_KEYS } from '@/client/request/queryClient';
+import { chqc, QUERY_KEYS } from '@/client/data';
 import { useQueryClient } from '@tanstack/react-query';
 import { generateUuid } from '@/client/utils';
 

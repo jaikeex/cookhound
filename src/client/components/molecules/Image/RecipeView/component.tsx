@@ -10,7 +10,7 @@ import { classNames } from '@/client/utils';
 import React, { useCallback, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import { useAuth, useLocale, useModal } from '@/client/store';
-import { chqc } from '@/client/request/queryClient';
+import { chqc } from '@/client/data';
 import { useScreenSize } from '@/client/hooks';
 import type { Recipe } from '@/common/types';
 

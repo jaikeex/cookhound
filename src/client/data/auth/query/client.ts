@@ -1,7 +1,4 @@
-import {
-    useAppQuery,
-    useAppMutation
-} from '@/client/request/queryClient/queryFactories';
+import { useAppQuery, useAppMutation } from '@/client/data/queryFactories';
 import { useRepositories } from '@/client/data';
 import {
     AUTH_QUERY_KEYS,

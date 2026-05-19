@@ -1,1 +1,1 @@
-export { httpAuthRepository as default } from './adapter';
+export { httpAuthRepository as default } from './httpAdapter';

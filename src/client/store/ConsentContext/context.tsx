@@ -20,7 +20,7 @@ import type { UserDTO } from '@/common/types';
 import { getCookie } from '@/client/utils';
 import { eventBus } from '@/client/events';
 import { AppEvent } from '@/client/events';
-import { chqc, QUERY_KEYS } from '@/client/request/queryClient';
+import { chqc, QUERY_KEYS } from '@/client/data';
 import { CONSENT_VERSION, CONSENT_COOKIE_NAME } from '@/common/constants';
 import { setConsentCookie } from '@/app/actions';
 import { useAppEventListener } from '@/client/hooks';

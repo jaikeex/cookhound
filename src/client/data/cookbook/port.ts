@@ -1,4 +1,4 @@
-import type { CookbookDTO, CookbookForCreatePayload } from '@/common/types';
+import type { Cookbook, CookbookForCreatePayload } from '@/common/types';
 
 /**
  * Domain port for cookbook operations.
@@ -11,23 +11,23 @@ export interface CookbookRepository {
     getById(args: {
         id: string | number;
         signal?: AbortSignal;
-    }): Promise<CookbookDTO>;
+    }): Promise<Cookbook>;
 
     getByDisplayId(args: {
         displayId: string;
         signal?: AbortSignal;
-    }): Promise<CookbookDTO>;
+    }): Promise<Cookbook>;
 
     listByUser(args: {
         userId: string | number;
         signal?: AbortSignal;
-    }): Promise<CookbookDTO[]>;
+    }): Promise<Cookbook[]>;
 
     //~=========================================================================================~//
     //$                                        MUTATIONS                                        $//
     //~=========================================================================================~//
 
-    create(args: { input: CookbookForCreatePayload }): Promise<CookbookDTO>;
+    create(args: { input: CookbookForCreatePayload }): Promise<Cookbook>;
 
     delete(args: { id: number | string }): Promise<void>;
 

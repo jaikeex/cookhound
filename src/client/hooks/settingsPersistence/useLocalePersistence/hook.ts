@@ -3,7 +3,7 @@
 import { useCallback } from 'react';
 import { useLocale } from '@/client/store';
 import { useConsent } from '@/client/store';
-import { chqc } from '@/client/request/queryClient';
+import { chqc } from '@/client/data';
 import type { UserPreferences } from '@/common/types';
 import { useSettingPersistence } from '@/client/hooks/settingsPersistence';
 import { LOCALE_STORAGE_KEY } from '@/client/constants';

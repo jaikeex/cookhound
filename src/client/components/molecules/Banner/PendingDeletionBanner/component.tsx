@@ -3,7 +3,7 @@
 import React, { useCallback, useMemo } from 'react';
 import { Typography, ButtonBase } from '@/client/components';
 import { useLocale, useSnackbar } from '@/client/store';
-import { chqc } from '@/client/request/queryClient';
+import { chqc } from '@/client/data';
 import { classNames } from '@/client/utils';
 
 export type PendingDeletionBannerProps = Readonly<{

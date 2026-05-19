@@ -1,6 +1,6 @@
 import React from 'react';
 import { apiClient } from '@/client/request';
-import { reviveRecipeDates } from '@/client/request/apiClient/recipe/utils';
+import { reviveRecipeDates } from '@/client/data/recipe/revive';
 import { RecipeStructuredData, RecipeViewTemplate } from '@/client/components';
 import type { Metadata } from 'next';
 import { cookies, headers } from 'next/headers';

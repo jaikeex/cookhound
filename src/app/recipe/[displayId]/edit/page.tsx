@@ -1,6 +1,6 @@
 import React from 'react';
 import { apiClient } from '@/client/request';
-import { reviveRecipeDates } from '@/client/request/apiClient/recipe/utils';
+import { reviveRecipeDates } from '@/client/data/recipe/revive';
 import { RecipeEditTemplate } from '@/client/components';
 import { cookies } from 'next/headers';
 import { SESSION_COOKIE_NAME } from '@/common/constants';

@@ -39,5 +39,11 @@ export function getCookbookDataPermissionGroups(
 export function createCookbookDTO(cookbook: CookbookFromDb): CookbookDTO {
     const accessGroups = getCookbookDataPermissionGroups(cookbook.ownerId);
 
-    return serializeToPlain(CookbookDTO, cookbook, accessGroups);
+    const normalized = {
+        ...cookbook,
+        createdAt: cookbook.createdAt?.toISOString(),
+        updatedAt: cookbook.updatedAt?.toISOString()
+    };
+
+    return serializeToPlain(CookbookDTO, normalized, accessGroups);
 }

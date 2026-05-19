@@ -1,7 +1,7 @@
 'use client';
 
 import { authApiClient } from '@/client/request/apiClient/auth';
-import { reviveUserDates } from '@/client/request/apiClient/user/utils';
+import { reviveUserDates } from '@/client/data/user/revive';
 import type { AuthRepository } from '@/client/data/auth/port';
 
 /**

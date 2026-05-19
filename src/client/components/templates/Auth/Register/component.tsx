@@ -18,7 +18,7 @@ import type { I18nMessage } from '@/client/locales';
 import Link from 'next/link';
 import type { User } from '@/common/types';
 import { z } from 'zod';
-import { chqc } from '@/client/request/queryClient';
+import { chqc } from '@/client/data';
 
 //~---------------------------------------------------------------------------------------------~//
 //$                                          VALIDATION                                         $//

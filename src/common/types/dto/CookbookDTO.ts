@@ -38,8 +38,8 @@ export class CookbookDTO {
     recipes: RecipeForDisplayDTO[] = [];
 
     @Expose({ groups: ['self', 'admin'] })
-    createdAt: Date = new Date();
+    createdAt?: string;
 
     @Expose({ groups: ['self', 'admin'] })
-    updatedAt: Date = new Date();
+    updatedAt?: string;
 }

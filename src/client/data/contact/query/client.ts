@@ -1,4 +1,4 @@
-import { useAppMutation } from '@/client/request/queryClient/queryFactories';
+import { useAppMutation } from '@/client/data/queryFactories';
 import { useRepositories } from '@/client/data';
 import type { SubmitContactFormOptions } from './keys';
 

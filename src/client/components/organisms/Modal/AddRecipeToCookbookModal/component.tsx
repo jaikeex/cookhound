@@ -9,7 +9,7 @@ import {
     type SelectOption
 } from '@/client/components';
 import { useLocale, useModal, useSnackbar } from '@/client/store';
-import { chqc, QUERY_KEYS } from '@/client/request/queryClient';
+import { chqc, QUERY_KEYS } from '@/client/data';
 import { useQueryClient } from '@tanstack/react-query';
 import dynamic from 'next/dynamic';
 

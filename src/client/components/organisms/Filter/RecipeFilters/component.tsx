@@ -9,7 +9,7 @@ import {
     FormCheckbox,
     IngredientFilterInput
 } from '@/client/components';
-import { chqc } from '@/client/request/queryClient';
+import { chqc } from '@/client/data';
 import { useLocale, useModal, useSnackbar } from '@/client/store';
 import { generateRandomId } from '@/client/utils';
 import type {

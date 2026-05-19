@@ -10,8 +10,8 @@ import {
     Typography
 } from '@/client/components';
 import { CookbookRecipeLinkList } from '@/client/components';
-import { chqc } from '@/client/request/queryClient';
-import type { CookbookDTO } from '@/common/types';
+import { chqc } from '@/client/data';
+import type { Cookbook } from '@/common/types';
 import Link from 'next/link';
 import { useLocale } from '@/client/store';
 import { useModal } from '@/client/store/ModalContext';
@@ -49,7 +49,7 @@ export const Cookbooks: React.FC<CookbooksProps> = ({
 
     const isEmpty = cookbooks?.length === 0;
 
-    const renderContent = (cookbook: CookbookDTO) => {
+    const renderContent = (cookbook: Cookbook) => {
         const isEmpty = !cookbook.recipes || cookbook.recipes.length === 0;
 
         return (

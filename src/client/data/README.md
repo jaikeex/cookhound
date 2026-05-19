@@ -1,32 +1,18 @@
-# Recipe Domain — Ports, Adapters, and Hooks
+# Client Data Layer - Ports, Adapters, and Hooks
+> Drafted by claude, edited by me
 
-> The conventions here apply to all domains, current and future. The
-> `recipe` domain is the worked example; once a second domain migrates,
-> the same shape applies inside its own folder.
+> [!NOTE] Note on complexity
+> This approach is wildly overengineered for an app of this size. 
+> Originally the query client simply called the api client directly (which is actually not a bad thing on its own) but it made the layers too tightly coupled together, and after expreciencing the mess of mixing providers without a proper infrastructure on another project, i decided to future proof this by decoupling the clients altogether. Also, it looked like an interesting refactor. <br> None of this is really needed, and it arguably makes to code much more complex than it needs to be for a simple cookbook app... And it took more than two weeks to do this...
 
-This folder is the by-domain home for everything client code needs to talk
-to recipes: the **port** the query layer depends on, the HTTP **adapter**
-that implements it, the **query keys** that index react-query's cache, and
-the **query client** (`recipeQueryClient`) — an object whose properties are
-the react-query hooks consumers call. That same object is re-exposed under
-the legacy `chqc.recipe.*` namespace from
-`src/client/request/queryClient/index.ts`.
 
-The cross-domain glue lives in `src/client/data/`:
 
-- `DataProvider.tsx` — the React context, the `Repositories` type, and
-  `useRepositories()`.
-- `repositories.ts` — the default `repositories` object that aggregates one
-  adapter per domain. The app root passes this object as the provider's
-  `value`. Tests pass their own object instead.
+This folder is the client-side data access layer. Every domain follows the same layout.
 
-The raw HTTP transport (`recipeApiClient`) lives in
-`src/client/request/apiClient/recipe/`. It returns DTOs and is unaware of
-this folder. The adapter is the single point where DTO→domain mapping
-happens for client code.
-
-This document is a reference for anyone — human or agent — adding new
-recipe endpoints or migrating another domain to the same pattern.
+The raw HTTP transport (`apiClient`) lives under
+`src/client/request/apiClient/`. It returns DTOs and is unaware of this
+folder. Each domain's adapter is the single point where DTO→domain
+mapping happens for client code.
 
 ---
 
@@ -34,137 +20,115 @@ recipe endpoints or migrating another domain to the same pattern.
 
 ```
 src/client/data/
-├── DataProvider.tsx           # React context, Repositories type, useRepositories()
-├── repositories.ts            # default `repositories` object (one adapter per domain)
-├── index.ts                   # barrel: re-exports the provider, the type, and `repositories`
-└── recipe/
-    ├── port.ts                # the domain interface (RecipeRepository)
+├── DataProvider.tsx           # context, Repositories type, useRepositories()
+├── repositories.ts            # default repositories object (one adapter per domain)
+├── queryClient.ts             # chqc + QUERY_KEYS aggregators
+├── queryFactories.ts          # useAppQuery / useAppMutation typed wrappers
+└── <domain>/                  # same shape for every domain
+    ├── port.ts                # the domain interface (e.g. RecipeRepository)
+    ├── revive.ts              # DTO→domain mapper (not every domain needs this)
     ├── adapters/
-    │   ├── adapter.ts         # HTTP-backed implementation (httpRecipeRepository)
+    │   ├── <adapter.ts>       # various implementations
     │   └── index.ts           # re-exports the chosen default adapter
-    ├── query/
-    │   ├── client.ts          # `recipeQueryClient` — react-query hooks as object properties
-    │   └── keys.ts            # RECIPE_QUERY_KEYS + per-hook *Options types
-    ├── index.ts               # barrel
-    ├── README.md              # you are here
-    └── __tests__/
-        └── useRecipeById.test.tsx
+    └── query/
+        ├── client.ts          # <domain>QueryClient — react-query hooks
+        └── keys.ts            # <DOMAIN>_QUERY_KEYS + per-hook *Options types
 ```
 
-Four roles per domain:
+### Four roles per domain
 
 - **Port** (`port.ts`) — an interface in domain terms. The query client
   knows only this.
-- **Adapter** (`adapters/adapter.ts`) — implements the port. Holds
-  DTO→domain mapping and any HTTP-specific glue. `adapters/index.ts`
-  picks which concrete adapter is the default and re-exports it (so a
-  domain can grow more adapters — fakes, in-memory variants — without
-  touching the wiring above).
-- **Query client** (`query/client.ts`) — the `recipeQueryClient` object
-  whose properties are the react-query hooks. Each hook calls
-  `useRepositories()` to obtain the port and never imports `apiClient`.
-  This is the single object exposed as `chqc.recipe.*`.
-- **Query keys** (`query/keys.ts`) — `RECIPE_QUERY_KEYS` and the `*Options`
-  types that keep react-query generics tidy.
+- **Adapter** (`adapters/httpAdapter.ts`) — implements the port. Holds
+  DTO→domain mapping and any HTTP-specific code. `adapters/index.ts`
+  picks the default, so a domain can grow more adapters (fakes,
+  in-memory variants) without touching the wiring above.
+- **Query client** (`query/client.ts`) — an object whose properties are
+  the react-query hooks. Each hook calls `useRepositories()` to obtain
+  the port and never imports `apiClient`. Re-exposed as
+  `chqc.<domain>.*`.
+- **Query keys** (`query/keys.ts`) — the `<DOMAIN>_QUERY_KEYS` factory
+  plus the `*Options` types.
 
-The recipe barrel (`recipe/index.ts`) re-exports:
+`revive.ts` is optional — only when output types carry `Date` fields.
+The adapter (and Server Components directly) call it; consumers never
+see it.
 
-- everything from `query/keys.ts` (so `RECIPE_QUERY_KEYS` and the option
-  types are reachable),
-- `recipeRepositoryAdapter` (default export of `adapters/index.ts`) — the
-  adapter that gets registered in `repositories.ts`,
-- `recipeQueryClient` (from `query/client.ts`),
-- the `RecipeRepository` type.
-
-`recipeApiClient` is an adapter implementation detail. New code should
-not import it directly from hooks or components.
+The barrel exports the keys, the default adapter, the query client, and
+the port type. The raw `<domain>ApiClient` is an adapter implementation
+detail — new code should not import it from hooks or components.
 
 ---
 
-## 2. The shape of the layer
+## 2. Shape of the layer
 
 ```
 component
-   │
-   │ uses chqc.recipe.useFoo() / recipeQueryClient.useFoo()
+   │  uses chqc.<domain>.useFoo()
    ▼
-hook (property on recipeQueryClient in recipe/query/client.ts)
-   │
-   │ const { recipeRepository } = useRepositories();
+hook (<domain>QueryClient property)
+   │  const { <domain>Repository } = useRepositories();
    ▼
-RecipeRepository  ◄── port (recipe/port.ts)
+<Domain>Repository  ◄── port
    │
-   ├── httpRecipeRepository  ◄── HTTP adapter (recipe/adapters/adapter.ts)
-   │       │
-   │       │ delegates to recipeApiClient
-   │       │ applies reviveRecipeDates uniformly
+   ├── http<Domain>Repository  ◄── HTTP adapter
+   │       │  delegates to <domain>ApiClient, applies revive
    │       ▼
    │   ApiRequestWrapper → fetch
    │
-   └── any fake implementation  ◄── tests, Storybook, etc.
+   └── any fake implementation  ◄── tests, Storybook
 ```
+
+> **What "seam" means here.** From Michael Feathers' *Working Effectively
+> with Legacy Code*: a seam is a place where you can alter behavior
+> without editing in that place. Here it's the port interface + the
+> `DataProvider` injection point. Hooks call
+> `useRepositories().<domain>Repository.*` — they only know the port. In
+> production we hand them the HTTP adapter; in tests, a `vi.fn()`-backed
+> fake. The hook code does not change between the two.
 
 ---
 
-## 3. The contract the port enforces
+## 3. Port contract
 
-`RecipeRepository` is the canonical reference for what every recipe-data
-implementation must satisfy. Four conventions apply across all methods:
+Four conventions apply to all ports:
 
-### (a) Single-object payloads
+**(a) Single-object payloads.** `useAppMutation` infers its variables
+type from `Parameters<TFn>[0]`, so a single-object payload means
+`useAppMutation(repo.method, opts)` works with no inline
+`({ a, b }) => ...` wrapper. The underlying `apiClient` methods stay
+positional; the adapter is where the shape changes.
 
 ```ts
-// Port
 update(args: { id: string; patch: Partial<RecipeForCreatePayload> }): Promise<Recipe>;
-
-// Adapter
-update: ({ id, patch }) => recipeApiClient.updateRecipe(id, patch).then(reviveRecipeDates)
 ```
 
-`useAppMutation` infers its variables type from `Parameters<TFn>[0]`. A
-single-object payload means `useAppMutation(repo.update, opts)` works with
-no inline `({ a, b }) => ...` wrapper. The legacy `recipeApiClient` methods
-are still positional; the adapter is where the shape changes.
-
-### (b) Reads accept `signal?: AbortSignal`
+**(b) Reads accept `signal?: AbortSignal`.** Flows hook ⇒ port ⇒ adapter
+⇒ `RequestConfig.signal` ⇒ `fetch`. React-query supplies it on the
+`queryFn` arg and aborts in-flight requests on unmount/key-change.
+Mutations do not take a signal.
 
 ```ts
 getById(args: { id: string; signal?: AbortSignal }): Promise<Recipe>;
 ```
 
-The signal flows: hook ⇒ port ⇒ adapter ⇒ `RequestConfig.signal` ⇒ `fetch`.
-React-query supplies the signal on the `queryFn` arg and aborts in-flight
-requests when the query unmounts or its key changes. Mutations do not take
-a signal.
+**(c) Domain types out, never DTOs.** Ports return domain types (with
+real `Date` instances). DTOs (string timestamps) live only inside the
+adapter and apiClient. Hooks and components never see a DTO. The two
+types are deliberately distinct: any consumer that tries to use a
+wire-fetched value as the domain type without revival fails in the type
+checker.
 
-### (c) Domain types out, never DTOs
-
-```ts
-getById(...): Promise<Recipe>;  // not RecipeDTO
-```
-
-The port returns domain types (`Recipe`, with real `Date` instances). DTOs
-(`RecipeDTO`, with `string` timestamps) live only inside the adapter and
-the `apiClient` underneath it. Hooks and components never see a DTO.
-
-The `Recipe` and `RecipeDTO` types are deliberately distinct: any consumer
-that tries to use a wire-fetched recipe as `Recipe` without revival fails
-in the type checker.
-
-### (d) Errors are `RequestError`
-
-Every method's documented failure mode is a thrown
-`RequestError` (`src/client/error/request.ts`), carrying HTTP status, code,
-and request id. Adapters and consumers can rely on this without unwrapping
-transport-specific shapes.
+**(d) Errors are `RequestError`** (`src/client/error/request.ts`),
+carrying HTTP status, code, and request id. Consumers rely on this
+without unwrapping transport-specific shapes.
 
 ---
 
-## 4. DTO → domain mapping in the adapter
+## 4. DTO → domain mapping
 
-The adapter is the single place where `reviveRecipeDates` is called. Every
-method that should produce a `Recipe` (as opposed to a
-`RecipeForDisplayDTO` list) wraps its result with revival:
+The adapter is the single place where the revive helper is called for
+client code. Every method that produces a domain type wraps its result:
 
 ```ts
 getById: async ({ id, signal }) => {
@@ -173,274 +137,149 @@ getById: async ({ id, signal }) => {
 }
 ```
 
-Rules of the road for adapter authors:
+Rules:
 
-- `recipeApiClient` methods return DTOs. Annotate them as such.
-- If the port method returns `Recipe` (or `Recipe[]`), revive in the
-  adapter. If it returns `RecipeForDisplayDTO[]`, no revival is needed.
-- `reviveRecipeDates` throws when a required timestamp is missing. Do not
-  guard around it — let it propagate so backend bugs surface as failures
-  rather than as `new Date()` placeholders rendered to users.
+- apiClient methods return DTOs — annotate them as such.
+- If the port returns a domain type, revive in the adapter. If it
+  returns a DTO-shaped value (e.g. `*ForDisplayDTO[]`), no revival.
+- Revive helpers throw when required timestamps are missing. Don't
+  guard around them — let backend bugs surface as failures rather than
+  as `new Date()` placeholders rendered to users.
 
 ---
 
-## 5. `DataProvider`, `repositories`, and `useRepositories`
+## 5. `DataProvider`, `repositories`, `useRepositories`
 
 Mounted at the app root in `src/app/providers.tsx`:
 
 ```tsx
 import { DataProvider, repositories } from '@/client/data';
 
-<DataProvider value={repositories}>
-    <ModalProvider>{children}</ModalProvider>
-</DataProvider>
+<DataProvider value={repositories}>{children}</DataProvider>
 ```
 
-The `value` is the default `repositories` object from
-`src/client/data/repositories.ts`. That file is the centralized list of
-adapters used in production:
+The `value` is the default `repositories` object — the centralized list
+of adapters used in production, one slot per domain:
 
 ```ts
-// src/client/data/repositories.ts
-import { recipeRepositoryAdapter } from './recipe';
-
 export const repositories = {
-    recipeRepository: recipeRepositoryAdapter
+    adminRepository: adminRepositoryAdapter,
+    // …one entry per domain
+    userRepository: userRepositoryAdapter
 };
 ```
 
-Each domain exports exactly one default adapter through its barrel; the
-`repositories` object aggregates them. Keeping the adapter list out of
-`providers.tsx` means tests can build their own `Repositories` and hand it
-to `DataProvider` without touching app wiring.
-
-Consumed by hooks via `useRepositories()`:
-
-```ts
-export const useRepositories = (): Repositories => {
-    const ctx = useContext(DataContext);
-
-    if (!ctx) {
-        throw new Error('useRepositories must be used inside a DataProvider');
-    }
-
-    return ctx;
-};
-```
-
-Notes:
-
-- `useRepositories()` throws if no provider is mounted. A misconfigured
-  tree fails immediately with a clear message rather than limping along
-  until something downstream blows up.
-- The `Repositories` type currently has a single slot, `recipeRepository`.
-  Adding a domain means adding a slot to the type **and** adding an entry
-  to `repositories.ts`.
+Keeping the list out of `providers.tsx` means tests can build their own
+`Repositories` and hand it to `DataProvider` without touching app
+wiring. `useRepositories()` throws if no provider is mounted — a
+misconfigured tree fails immediately with a clear message.
 
 ### Server Components
 
 `DataProvider` is React context — only Client Components can read it.
-Server Components that need a recipe call `apiClient.recipe.*` directly
-and apply `reviveRecipeDates` themselves. The wire types (`RecipeDTO` with
-string timestamps) make this contract compile-time-enforced: a server page
-that forgets to revive cannot type-check its result as a `Recipe`.
+Server Components call `apiClient.<domain>.*` directly and apply the
+revive helper (imported from `@/client/data/<domain>/revive`)
+themselves. The wire types make this compile-time-enforced: a server
+page that forgets to revive cannot type-check its result as the domain
+type.
 
 ---
 
-## 6. End-to-end flow of a request
-
-A component calls a hook from `chqc.recipe.*` (or directly from
-`recipeQueryClient`). The chain looks like this:
+## 6. End-to-end flow
 
 ```ts
 // component
 const { data } = chqc.recipe.useRecipeById('42');
-```
 
-```ts
-// recipe/query/client.ts — property on recipeQueryClient
+// recipe/query/client.ts
 useRecipeById: (id, options?) => {
-    const { recipeRepository } = useRepositories();   // ← injected port
+    const { recipeRepository } = useRepositories();
     return useAppQuery(
         RECIPE_QUERY_KEYS.byId(id),
         ({ signal }) => recipeRepository.getById({ id: String(id), signal }),
         { enabled: Boolean(id), retry: 1, ...options }
     );
 },
-```
 
-```ts
-// recipe/adapters/adapter.ts
+// recipe/adapters/httpAdapter.ts
 getById: async ({ id, signal }) => {
     const dto = await recipeApiClient.getRecipeById(id, { signal });
     return reviveRecipeDates(dto);
 }
 ```
 
-```ts
-// apiClient/recipe/RecipeApiClient.ts
-async getRecipeById(id, config?) {
-    return apiRequestWrapper.get<RecipeDTO>({ url: `/recipes/${id}`, ...config });
-}
-```
-
-```ts
-// apiClient/ApiRequestWrapper.ts
-if (config.signal) options.signal = config.signal;   // ← passed to fetch
-return await fetch(url.toString(), options);
-```
-
 Each layer minds its own business: hooks know nothing about HTTP, the
-adapter knows nothing about react-query, the transport knows nothing about
-`Recipe`. The seam between hooks and the port is the single point at
-which behavior can be substituted.
-
-> **Aside — what "seam" means here.** The term comes from Michael Feathers'
-> *Working Effectively with Legacy Code*: a seam is a place where you can
-> alter behavior in your program without editing in that place. In this
-> folder, the seam is the `RecipeRepository` interface combined with the
-> `DataProvider` injection point. Hooks call `useRepositories().recipeRepository.*` —
-> they only know the port. In production we hand them `httpRecipeRepository`;
-> in tests we hand them a `vi.fn()`-backed fake. The hook code does not
-> change between the two. Whenever this README says "the seam," it means
-> that port-plus-DI boundary, not the adapter or the transport.
+adapter knows nothing about react-query, the transport knows nothing
+about domain types.
 
 ---
 
-## 7. Adding a new recipe endpoint (query)
+## 7. Adding a new endpoint
 
-Five files to edit, in this order. Treat the example (`getTopByTag` —
-most-favorited recipes for a tag) as a template.
-
-### Step 1 — Add the API method to the apiClient
+Five files, in order. For a **query** (`getTopByTag`):
 
 ```ts
-// src/client/request/apiClient/recipe/RecipeApiClient.ts
+// 1. apiClient/<domain>/<Domain>ApiClient.ts — positional, DTO-shaped
 async getTopByTag(tagId: number, config?: RequestConfig): Promise<RecipeForDisplayDTO[]> {
     return apiRequestWrapper.get({ url: `/recipes/tag/${tagId}/top`, ...config });
 }
-```
 
-`apiClient` methods stay positional and DTO-shaped.
+// 2. <domain>/port.ts — single-object payload, signal for reads
+topByTag(args: { tagId: number; signal?: AbortSignal }): Promise<RecipeForDisplayDTO[]>;
 
-### Step 2 — Add the method to the port
+// 3. <domain>/adapters/httpAdapter.ts — revive here iff the result is a domain type
+topByTag: ({ tagId, signal }) => recipeApiClient.getTopByTag(tagId, { signal })
 
-```ts
-// src/client/data/recipe/port.ts
-topByTag(args: {
-    tagId: number;
-    signal?: AbortSignal;
-}): Promise<RecipeForDisplayDTO[]>;
-```
-
-Single-object payload; include `signal` because it's a read.
-
-### Step 3 — Implement it in the adapter
-
-```ts
-// src/client/data/recipe/adapters/adapter.ts
-topByTag: ({ tagId, signal }) =>
-    recipeApiClient.getTopByTag(tagId, { signal })
-```
-
-If the new endpoint returns `Recipe` (not `RecipeForDisplayDTO`), wrap
-with `reviveRecipeDates` here — never anywhere else.
-
-### Step 4 — Add a query key and an options type
-
-```ts
-// src/client/data/recipe/query/keys.ts
-export const RECIPE_QUERY_KEYS = Object.freeze({
-    ...,
-    topByTag: (tagId: number) =>
-        [RECIPE_NAMESPACE_QUERY_KEY, 'topByTag', tagId] as const,
-});
+// 4. <domain>/query/keys.ts
+topByTag: (tagId: number) => [RECIPE_NAMESPACE_QUERY_KEY, 'topByTag', tagId] as const,
 
 export type TopByTagOptions = Omit<
     UseQueryOptions<
-        RecipeForDisplayDTO[], RequestError,
-        RecipeForDisplayDTO[],
+        RecipeForDisplayDTO[], RequestError, RecipeForDisplayDTO[],
         ReturnType<typeof RECIPE_QUERY_KEYS.topByTag>
     >, 'queryKey' | 'queryFn'
 >;
+
+// 5. <domain>/query/client.ts
+useTopRecipesByTag: (tagId: number, options?: Partial<TopByTagOptions>) => {
+    const { recipeRepository } = useRepositories();
+    return useAppQuery(
+        RECIPE_QUERY_KEYS.topByTag(tagId),
+        ({ signal }) => recipeRepository.topByTag({ tagId, signal }),
+        { enabled: Boolean(tagId), retry: 1, ...options }
+    );
+},
 ```
 
-### Step 5 — Add the hook to `recipeQueryClient`
+The hook is automatically reachable as
+`chqc.<domain>.useTopRecipesByTag(...)`.
+
+For a **mutation** the differences are: port omits `signal`, options
+type uses `UseMutationOptions`, and the hook can pass the port method to
+`useAppMutation` directly (callers do `mutate({ id: '42' })`):
 
 ```ts
-// src/client/data/recipe/query/client.ts
-export const recipeQueryClient = {
-    ...,
-    useTopRecipesByTag: (
-        tagId: number,
-        options?: Partial<TopByTagOptions>
-    ) => {
-        const { recipeRepository } = useRepositories();
-        return useAppQuery(
-            RECIPE_QUERY_KEYS.topByTag(tagId),
-            ({ signal }) => recipeRepository.topByTag({ tagId, signal }),
-            {
-                enabled: Boolean(tagId),
-                retry: 1,
-                ...options
-            }
-        );
-    },
-};
-```
-
-Because `recipeQueryClient` is re-exported as `chqc.recipe` from
-`src/client/request/queryClient/index.ts`, the new hook is automatically
-reachable as `chqc.recipe.useTopRecipesByTag(...)` with no further wiring.
-
-The chain you've built is: **apiClient method ⇒ port method ⇒ adapter
-implementation ⇒ query key + options type ⇒ hook on `recipeQueryClient`.**
-
----
-
-## 8. Adding a new endpoint (mutation)
-
-Same five steps. The differences are in steps 2, 4, and 5:
-
-```ts
-// Port — no signal on mutations
 archive(args: { id: string }): Promise<void>;
-```
 
-```ts
-// query/keys.ts
 export type ArchiveRecipeOptions = Omit<
     UseMutationOptions<void, RequestError, { id: string }>,
     'mutationFn'
 >;
-```
 
-```ts
-// query/client.ts — property on recipeQueryClient
 useArchiveRecipe: (options?: Partial<ArchiveRecipeOptions>) => {
     const { recipeRepository } = useRepositories();
     return useAppMutation(recipeRepository.archive, options);
 },
 ```
 
-Because the port method takes `{ id }` (single-object payload),
-`useAppMutation(recipeRepository.archive, options)` accepts the port method
-directly. Callers do `mutate({ id: '42' })`.
-
 ---
 
-## 9. Testing a hook
+## 8. Testing a hook
 
-The seam exists so hooks can be tested without `fetch`. The reference test
-lives at `src/client/data/recipe/__tests__/useRecipeById.test.tsx` — copy
-from there.
-
-Shape:
+The seam exists so hooks can be tested without `fetch`. Reference:
+`recipe/__tests__/useRecipeById.test.tsx`.
 
 ```tsx
-import { recipeQueryClient } from '@/client/data/recipe';
-import { DataProvider, type Repositories } from '@/client/data';
-
 const repo: RecipeRepository = buildFakeRepository({
     getById: vi.fn().mockResolvedValue(fixtureRecipe)
 });
@@ -451,100 +290,40 @@ const wrapper = ({ children }) => (
     </QueryClientProvider>
 );
 
-const { result } = renderHook(
-    () => recipeQueryClient.useRecipeById('42'),
-    { wrapper }
-);
+const { result } = renderHook(() => recipeQueryClient.useRecipeById('42'), { wrapper });
 await waitFor(() => expect(result.current.isSuccess).toBe(true));
 ```
 
 Operational notes:
 
-- Add `// @vitest-environment jsdom` at the top of the file. Vitest
-  defaults to a Node environment; `renderHook` needs a DOM. Don't change
-  the global config — the per-file directive is enough.
-- Set `retry: false` on the `QueryClient` in the wrapper. Otherwise
-  rejected fakes retry three times and a failing test takes 30 seconds.
-- Build a complete fake repository with `vi.fn()` for every method, then
-  override only what the test needs. This avoids "method is undefined"
-  errors when react-query schedules a background refetch.
-- Pass the fake to `DataProvider` directly (`value={{ recipeRepository: repo }}`).
-  Do not import the production `repositories` object from
-  `@/client/data` in tests — the whole point of the seam is that the
-  test composes its own.
+- Add `// @vitest-environment jsdom` at the top — `renderHook` needs a
+  DOM, Vitest defaults to Node.
+- Set `retry: false`, or rejected fakes retry three times and a failing
+  test takes 30 seconds.
+- Build a complete fake with `vi.fn()` for every method; override only
+  what the test needs. Avoids "method is undefined" when react-query
+  schedules a background refetch.
+- Pass the fake to `DataProvider` directly. Don't import the production
+  `repositories` object — the point of the seam is that the test
+  composes its own.
 
-What this kind of test covers: hook-level behavior (the `enabled` gate,
-signal wiring through to the port). It does not cover URL shape or JSON
-parsing — those are the adapter's responsibility and would be tested with
-MSW once a second domain migrates.
+This covers hook-level behavior (the `enabled` gate, signal wiring). It
+does not cover URL shape or JSON parsing — those are the adapter's
+responsibility and would be tested with MSW.
 
 ---
+> [!IMPORTANT]  
+>**No server-side `useRepositories()` exists.** Server Components
+  must call `apiClient.<domain>.*` directly and apply the revive helper
+  themselves. The wire types make forgetting to revive a compile error,
+  but the ergonomics are somewhat unfinished.
 
-## 10. Adding a new domain
-
-The `recipe` domain is the worked example; other domains (`cookbook`,
-`tag`, `user`, etc.) still use the legacy `chqc.foo.*` pattern with direct
-`apiClient` imports. To migrate one to the by-domain pattern:
-
-1. Create `src/client/data/<domain>/` mirroring the recipe layout:
-   `port.ts`, `adapters/adapter.ts`, `adapters/index.ts`,
-   `query/client.ts`, `query/keys.ts`, plus a barrel `index.ts`. Keep the
-   file names identical across domains so the pattern is greppable.
-2. Add a slot to the `Repositories` type in
-   `src/client/data/DataProvider.tsx`:
-   `<domain>Repository: <Domain>Repository;`.
-3. Register the default adapter in `src/client/data/repositories.ts`:
-   `<domain>Repository: <domain>RepositoryAdapter`. (No edit to
-   `providers.tsx` is needed — it already passes the aggregated
-   `repositories` object.)
-4. Update `src/client/request/queryClient/index.ts` to import
-   `<domain>QueryClient` and `<DOMAIN>_QUERY_KEYS` from
-   `@/client/data/<domain>` instead of `./<domain>`. Delete the now-empty
-   `request/queryClient/<domain>/` folder.
-5. Move the existing class-with-arrow-property-hooks query client into
-   `<domain>/query/client.ts`. The object-of-hooks shape is preserved —
-   what changes is the file's location and that each hook now obtains its
-   port via `useRepositories()` instead of importing `apiClient`. Drop
-   any `react-hooks/rules-of-hooks` eslint-disable that was needed for
-   the legacy nested-class form.
-
-The two patterns coexist; there is no flag day. Existing `chqc.<domain>.*`
-call sites keep working because `chqc.<domain>` is just `<domain>QueryClient`
-re-exported from a different folder.
-
----
-
-## 11. Scope of this layer
-
-What this layer is:
-
-- A dependency-inversion seam at the hook/transport boundary.
-- A single place where DTO→domain mapping happens for recipe reads.
-- A substitution point for tests and (future) Storybook.
-
-What this layer is not:
-
-- It is not hexagonal architecture, a use-case layer, or an attempt to
-  make the codebase swappable between REST and GraphQL.
-- It does not replace `apiClient`. It sits on top of it.
-- It does not provide server-side dependency injection. Server Components
-  still call `apiClient` directly.
-
----
-
-## 12. Known limitations
-
-- **Transport-level navigation side effects.** `ApiRequestWrapper.ts`
+> [!NOTE]  
+> **Transport-level navigation side effects.** `ApiRequestWrapper.ts`
   performs `window.location.href = '/error/too-many-requests'` on a 429
-  (client-side) and `notFound()` on a 404 (server-side) before throwing
-  the resulting `RequestError`. Every consumer — adapter or otherwise —
-  inherits these behaviors. The seam makes moving them to a hook,
-  adapter, or route-level error boundary tractable (the
-  `RequestError.status` is already there to dispatch on), but the move is
-  not yet done.
-- **No server-side `useRepositories()` equivalent.** Server Components
-  must call `apiClient.recipe.*` directly and revive dates by hand. The
-  wire types make forgetting to revive a compile error, but the
-  ergonomics are unfinished.
-- **Only `recipe` is wired.** All other domains still resolve through the
-  legacy `chqc.*` query clients with direct `apiClient` imports.
+  (client-side) and `notFound()` on a 404 (server-side) before throwing.
+  Every consumer inherits these behaviors. The seam makes moving them to
+  a hook, adapter, or route-level error boundary tractable
+  (`RequestError.status` is there to dispatch on), but the move is not
+  yet done.
+

@@ -1,7 +1,7 @@
 'use client';
 
 import { recipeApiClient } from '@/client/request/apiClient/recipe/RecipeApiClient';
-import { reviveRecipeDates } from '@/client/request/apiClient/recipe/utils';
+import { reviveRecipeDates } from '@/client/data/recipe/revive';
 import type { RecipeRepository } from '@/client/data/recipe/port';
 
 /**

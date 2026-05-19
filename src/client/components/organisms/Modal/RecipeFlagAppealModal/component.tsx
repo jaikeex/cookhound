@@ -9,7 +9,7 @@ import {
     Typography
 } from '@/client/components';
 import { useLocale, useSnackbar } from '@/client/store';
-import { chqc } from '@/client/request/queryClient';
+import { chqc } from '@/client/data';
 import type { ModalProps } from '@/client/components/organisms/Modal/types';
 
 const APPEAL_ERROR_CODE = {

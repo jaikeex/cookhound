@@ -1,1 +1,1 @@
-export { httpUserRepository as default } from './adapter';
+export { httpUserRepository as default } from './httpAdapter';

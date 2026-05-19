@@ -4,7 +4,7 @@ import { useCallback, useMemo, useState } from 'react';
 import type { RecipeForDisplayDTO } from '@/common/types';
 import { useLocale } from '@/client/store/I18nContext';
 import { SEARCH_QUERY_SEPARATOR } from '@/common/constants';
-import { chqc } from '@/client/request/queryClient';
+import { chqc } from '@/client/data';
 import type { InfiniteData } from '@tanstack/react-query';
 
 //?—————————————————————————————————————————————————————————————————————————————————————————————?//

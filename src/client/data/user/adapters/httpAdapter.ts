@@ -1,7 +1,7 @@
 'use client';
 
 import { userApiClient } from '@/client/request/apiClient/user/UserApiClient';
-import { reviveUserDates } from '@/client/request/apiClient/user/utils';
+import { reviveUserDates } from '@/client/data/user/revive';
 import type { UserRepository } from '@/client/data/user/port';
 
 /**

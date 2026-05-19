@@ -7,7 +7,7 @@ import { useLocale, useSnackbar, useAuth } from '@/client/store';
 import { AuthType } from '@/common/types';
 import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
-import { chqc } from '@/client/request/queryClient';
+import { chqc } from '@/client/data';
 import { eventBus, AppEvent } from '@/client/events';
 
 export type LogoutAllConfirmModalProps = Readonly<{

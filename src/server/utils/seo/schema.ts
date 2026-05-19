@@ -1,4 +1,4 @@
-import type { Recipe, User, CookbookDTO } from '@/common/types';
+import type { Recipe, User, Cookbook } from '@/common/types';
 import { CATEGORY_IDS } from '@/common/constants';
 
 //?—————————————————————————————————————————————————————————————————————————————————————————————?//
@@ -184,7 +184,7 @@ export function generateItemListSchema(
     };
 }
 
-export function generateCookbookSchema(cookbook: CookbookDTO, baseUrl: string) {
+export function generateCookbookSchema(cookbook: Cookbook, baseUrl: string) {
     return {
         '@context': 'https://schema.org',
         '@type': 'CollectionPage',
@@ -192,8 +192,8 @@ export function generateCookbookSchema(cookbook: CookbookDTO, baseUrl: string) {
         description: cookbook.description || `View ${cookbook.title} cookbook`,
         image: cookbook.coverImageUrl,
         url: `${baseUrl}/cookbooks/${cookbook.displayId}`,
-        dateCreated: cookbook.createdAt,
-        dateModified: cookbook.updatedAt || cookbook.createdAt
+        dateCreated: cookbook.createdAt?.toISOString(),
+        dateModified: (cookbook.updatedAt ?? cookbook.createdAt)?.toISOString()
     };
 }
 

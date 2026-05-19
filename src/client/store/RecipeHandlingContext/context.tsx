@@ -17,7 +17,7 @@ import {
 } from '@/client/store';
 import { useShoppingList } from '@/client/hooks';
 import { scaleIngredientsToPortionSize } from '@/client/utils';
-import { chqc, QUERY_KEYS } from '@/client/request/queryClient';
+import { chqc, QUERY_KEYS } from '@/client/data';
 import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 

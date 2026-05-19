@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { ProfileTemplate } from '@/client/components/templates/Profile';
 import { apiClient } from '@/client/request';
-import { reviveUserDates } from '@/client/request/apiClient/user/utils';
+import { reviveUserDates } from '@/client/data/user/revive';
 import { ProfileTab } from '@/client/types/core';
 import { SESSION_COOKIE_NAME, ENV_CONFIG_PUBLIC } from '@/common/constants';
 import { cookies, headers } from 'next/headers';

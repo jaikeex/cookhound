@@ -1,1 +1,1 @@
-export { httpContactRepository as default } from './adapter';
+export { httpContactRepository as default } from './httpAdapter';

@@ -27,7 +27,8 @@ cookhound-mk3/
 │   │   ├── events/            # Events bus
 │   │   ├── hooks/             # Custom React hooks
 │   │   ├── store/             # State management (contexts, stores)
-│   │   ├── request/           # API client and react-query wrappers
+│   │   ├── data/              # Client data layer (ports, adapters, query hooks)
+│   │   ├── request/           # API client (HTTP transport) and react-query wrappers
 │   │   ├── styles/            # Tailwind CSS v4 theme (colors, animations, utilities)
 │   │   ├── types/             # Client-specific types
 │   │   ├── utils/             # Client utilities
@@ -303,7 +304,7 @@ Singleton `apiClient` (`src/client/request/apiClient/`) wraps `fetch` with domai
 
 ### Data Access Layer (Ports + Adapters)
 
-The `recipe` domain is wired through a port-and-adapter seam organized **by-domain** under `src/client/data/recipe/` (port, adapter, hooks, query keys, chqc aggregator). Hooks depend on a `RecipeRepository` port injected via `DataProvider` / `useRepositories()` (the cross-domain aggregator lives in `src/client/data/`). The HTTP adapter handles DTO→domain mapping (date revival), and tests substitute fake repositories. New recipe endpoints follow a fixed five-file checklist (apiClient method → port method → adapter implementation → query key + options type → flat hook). See @src/client/data/recipe/README.md for the full contract, end-to-end flow, and the procedure for migrating other domains to this pattern.
+All client data access is organized **by-domain** under `src/client/data/<domain>/` (`admin`, `auth`, `contact`, `cookbook`, `file`, `ingredient`, `recipe`, `tag`, `user`). Every domain follows the same four-role layout: **port** (`port.ts`), **adapter** (`adapters/httpAdapter.ts`), **query client** (`query/client.ts`), and **query keys** (`query/keys.ts`), plus an optional `revive.ts` for domains with `Date` fields. Hooks depend on the port (e.g. `RecipeRepository`) injected via `DataProvider` / `useRepositories()`; the cross-domain aggregator lives at `src/client/data/` and exposes every domain under the `chqc.<domain>.*` namespace. HTTP adapters handle DTO→domain mapping (date revival) and delegate to `apiClient` underneath; tests substitute fake repositories through the same provider. New endpoints follow a fixed five-file checklist (apiClient method → port method → adapter implementation → query key + options type → hook on `<domain>QueryClient`). See @src/client/data/README.md for the full contract, end-to-end flow, testing pattern, and the procedure for adding a new domain.
 
 ### Event Bus
 

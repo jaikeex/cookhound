@@ -5,7 +5,7 @@ import type { RecipeForDisplayDTO } from '@/common/types';
 import type { RecipeFilterParams } from '@/common/types/recipe';
 import { useLocale } from '@/client/store/I18nContext';
 import { useDebounce } from '@/client/hooks/useDebounce';
-import { chqc } from '@/client/request/queryClient';
+import { chqc } from '@/client/data';
 import type { InfiniteData } from '@tanstack/react-query';
 
 //§—————————————————————————————————————————————————————————————————————————————————————————————§//

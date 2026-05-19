@@ -1,1 +1,1 @@
-export { httpCookbookRepository as default } from './adapter';
+export { httpCookbookRepository as default } from './httpAdapter';

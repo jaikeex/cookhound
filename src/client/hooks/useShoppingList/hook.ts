@@ -3,7 +3,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 
-import { chqc } from '@/client/request/queryClient';
+import { chqc } from '@/client/data';
 import { deepClone } from '@/client/utils';
 import { useAuth } from '@/client/store';
 import type {

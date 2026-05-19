@@ -8,7 +8,7 @@ import { useAuth, useLocale } from '@/client/store';
 import { SEARCH_QUERY_SEPARATOR } from '@/common/constants';
 import type { SearchInputProps } from '@/client/components/molecules/Form/SearchInput/component';
 import { Chip, Typography, SearchInput } from '@/client/components';
-import { chqc } from '@/client/request/queryClient';
+import { chqc } from '@/client/data';
 import Link from 'next/link';
 
 export type RecipeSearchInputProps = Readonly<{

@@ -13,7 +13,7 @@ import { useLocale } from '@/client/store';
 import { validateFormData } from '@/client/utils';
 import Link from 'next/link';
 import type { I18nMessage } from '@/client/locales';
-import { chqc } from '@/client/request/queryClient';
+import { chqc } from '@/client/data';
 
 //~---------------------------------------------------------------------------------------------~//
 //$                                          VALIDATION                                         $//

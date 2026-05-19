@@ -1,5 +1,5 @@
 import type { Locale } from '@/common/types';
-import { useAppQuery } from '@/client/request/queryClient/queryFactories';
+import { useAppQuery } from '@/client/data/queryFactories';
 import { useRepositories } from '@/client/data';
 import { INGREDIENT_QUERY_KEYS, type IngredientListOptions } from './keys';
 

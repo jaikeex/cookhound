@@ -1,7 +1,4 @@
-import {
-    useAppMutation,
-    useAppQuery
-} from '@/client/request/queryClient/queryFactories';
+import { useAppMutation, useAppQuery } from '@/client/data/queryFactories';
 import { useRepositories } from '@/client/data';
 import {
     COOKBOOK_QUERY_KEYS,

@@ -2,7 +2,7 @@
 
 import React, { useCallback } from 'react';
 import { ImageInput } from '@/client/components';
-import { chqc, QUERY_KEYS } from '@/client/request/queryClient';
+import { chqc, QUERY_KEYS } from '@/client/data';
 import { useAuth, useLocale, useSnackbar } from '@/client/store';
 import { generateUuid } from '@/client/utils';
 import { useQueryClient } from '@tanstack/react-query';

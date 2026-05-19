@@ -5,7 +5,7 @@ import type { ModalProps } from '@/client/components/organisms/Modal/types';
 import { ButtonBase, Chip, Typography } from '@/client/components';
 import { AdminActionConfirmModal } from '@/client/components/organisms/Modal/AdminActionConfirmModal';
 import { useLocale, useSnackbar, useModal } from '@/client/store';
-import { chqc } from '@/client/request/queryClient';
+import { chqc } from '@/client/data';
 import { useQueryClient } from '@tanstack/react-query';
 import { ADMIN_QUERY_KEYS } from '@/client/data/admin';
 import { formatDate } from '@/client/utils';

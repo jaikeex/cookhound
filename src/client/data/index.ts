@@ -6,3 +6,5 @@ export {
 } from './DataProvider';
 
 export * from './repositories';
+
+export { chqc, QUERY_KEYS } from './queryClient';

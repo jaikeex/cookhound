@@ -8,7 +8,7 @@ import type { Recipe } from '@/common/types';
 import type { RecipeFlagReason } from '@/common/constants';
 import { bucketForReason, RecipeFlagBucket } from '@/client/constants';
 import { DeleteRecipeConfirmationModal } from '@/client/components';
-import { chqc, QUERY_KEYS } from '@/client/request/queryClient';
+import { chqc, QUERY_KEYS } from '@/client/data';
 import { useQueryClient } from '@tanstack/react-query';
 import { useSnackbar } from '@/client/store';
 import { RecipeFlagAppealModal } from '@/client/components';

@@ -11,7 +11,7 @@ import {
 } from '@/client/components';
 import { useLocale, useSnackbar, useAuth } from '@/client/store';
 import { AuthType } from '@/common/types';
-import { chqc } from '@/client/request/queryClient';
+import { chqc } from '@/client/data';
 
 export type DeleteAccountModalProps = Readonly<{
     onClose?: () => void;

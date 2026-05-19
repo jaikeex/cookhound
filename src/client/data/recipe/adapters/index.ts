@@ -1,1 +1,1 @@
-export { httpRecipeRepository as default } from './adapter';
+export { httpRecipeRepository as default } from './httpAdapter';

@@ -2,7 +2,7 @@
 
 import { Avatar } from '@/client/components';
 import React from 'react';
-import { chqc } from '@/client/request/queryClient';
+import { chqc } from '@/client/data';
 import Link from 'next/link';
 
 export type RecipeAuthorLinkMobileProps = Readonly<{

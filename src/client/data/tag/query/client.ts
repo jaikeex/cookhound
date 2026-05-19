@@ -1,8 +1,5 @@
 import type { Locale } from '@/common/types';
-import {
-    useAppMutation,
-    useAppQuery
-} from '@/client/request/queryClient/queryFactories';
+import { useAppMutation, useAppQuery } from '@/client/data/queryFactories';
 import { useRepositories } from '@/client/data';
 import {
     TAG_QUERY_KEYS,

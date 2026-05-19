@@ -3,7 +3,7 @@
 import React, { createContext, useCallback, useContext, useMemo } from 'react';
 import type { User } from '@/common/types';
 import { useQueryClient } from '@tanstack/react-query';
-import { chqc, QUERY_KEYS } from '@/client/request/queryClient';
+import { chqc, QUERY_KEYS } from '@/client/data';
 
 type AuthContextType = {
     authResolved: boolean;

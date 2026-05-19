@@ -1,7 +1,7 @@
 'use client';
 
 import { ButtonBase, TagList, TagSelectionModal } from '@/client/components';
-import { chqc } from '@/client/request/queryClient';
+import { chqc } from '@/client/data';
 import { useLocale, useModal } from '@/client/store';
 import { classNames } from '@/client/utils';
 import type { RecipeTagDTO } from '@/common/types';

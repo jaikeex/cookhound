@@ -12,7 +12,7 @@ import {
 import { useCreateRecipeStore, useLocale, useSnackbar } from '@/client/store';
 import type { RequestError } from '@/client/error';
 import { MAX_TAGS, RECIPE_TAG_CATEGORY_LIMITS_BY_ID } from '@/common/constants';
-import { chqc } from '@/client/request/queryClient';
+import { chqc } from '@/client/data';
 
 type TagSelectionModalProps = Readonly<{
     error?: RequestError | null;

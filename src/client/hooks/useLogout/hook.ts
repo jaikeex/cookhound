@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
-import { chqc } from '@/client/request/queryClient';
+import { chqc } from '@/client/data';
 import { useAuth, useLocale, useSnackbar } from '@/client/store';
 import { AppEvent, eventBus } from '@/client/events';
 

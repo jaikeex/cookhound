@@ -12,7 +12,7 @@ import type { SelectOption } from '@/client/components';
 import type { TableColumn } from '@/client/components';
 import { AdminUserDetailModal } from '@/client/components/organisms/Modal/AdminUserDetailModal';
 import { useLocale, useModal } from '@/client/store';
-import { chqc } from '@/client/request/queryClient';
+import { chqc } from '@/client/data';
 import { formatDate } from '@/client/utils';
 import { Status, UserRole } from '@/common/types';
 import type { AdminUserListItemDTO } from '@/common/types';

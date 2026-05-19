@@ -1,9 +1,6 @@
 import type { Locale } from '@/common/types';
 import { useInfiniteQuery, keepPreviousData } from '@tanstack/react-query';
-import {
-    useAppQuery,
-    useAppMutation
-} from '@/client/request/queryClient/queryFactories';
+import { useAppQuery, useAppMutation } from '@/client/data/queryFactories';
 import { useRepositories } from '@/client/data';
 import {
     RECIPE_QUERY_KEYS,

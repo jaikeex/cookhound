@@ -5,7 +5,7 @@ import { notFound } from 'next/navigation';
 import { getCurrentUser } from '@/app/actions';
 import { CookbookTemplate, StructuredData } from '@/client/components';
 import type { Metadata } from 'next';
-import type { CookbookDTO } from '@/common/types';
+import { reviveCookbookDates } from '@/client/data/cookbook/revive';
 import { cookies, headers } from 'next/headers';
 import { ENV_CONFIG_PUBLIC } from '@/common/constants';
 import {
@@ -32,9 +32,11 @@ export default async function Page({ params }: CookbookPageParams) {
 
     const [user, cookbook] = await Promise.all([
         getCurrentUser(),
-        apiClient.cookbook.getCookbookByDisplayId(cookbookDisplayId, {
-            revalidate: 3600
-        })
+        apiClient.cookbook
+            .getCookbookByDisplayId(cookbookDisplayId, {
+                revalidate: 3600
+            })
+            .then(reviveCookbookDates)
     ]);
 
     const cookieStore = await cookies();
@@ -100,10 +102,11 @@ export async function generateMetadata({
     const headerList = await headers();
 
     try {
-        const cookbook: CookbookDTO =
-            await apiClient.cookbook.getCookbookByDisplayId(displayId, {
+        const cookbook = await apiClient.cookbook
+            .getCookbookByDisplayId(displayId, {
                 revalidate: 3600
-            });
+            })
+            .then(reviveCookbookDates);
 
         const canonical = `${ENV_CONFIG_PUBLIC.ORIGIN}/cookbooks/${displayId}`;
 
@@ -115,10 +118,10 @@ export async function generateMetadata({
             params: { cookbookTitle: cookbook.title },
             canonical,
             type: 'article',
-            publishedTime: cookbook.createdAt.toISOString(),
+            publishedTime: cookbook.createdAt?.toISOString(),
             modifiedTime:
                 cookbook.updatedAt?.toISOString() ??
-                cookbook.createdAt.toISOString(),
+                cookbook.createdAt?.toISOString(),
             authors: [cookbook.ownerId?.toString() ?? 'Cookhound User']
         });
 
