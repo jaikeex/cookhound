@@ -32,27 +32,6 @@ Cookhound is a full-stack web application built on a modern stack.
 
 Guiding principles: strict type-safety, clear separation of concerns, minimal runtime dependencies and, above all, realiability.
 
-### LOC count (as of 1.1.1)
-
-Total : 964 files, 45211 codes, 6991 comments, 8564 blanks, all 60766 lines
-
-| language           | files |   code | comment | blank |  total |
-| :----------------- | ----: | -----: | ------: | ----: | -----: |
-| TypeScript         |   645 | 23,002 |   5,461 | 5,201 | 33,664 |
-| TypeScript JSX     |   213 | 16,863 |   1,049 | 2,718 | 20,630 |
-| JSON               |     9 |  1,383 |       0 |     9 |  1,392 |
-| JavaScript         |    13 |  1,328 |     208 |   186 |  1,722 |
-| PostCSS            |    10 |    857 |       9 |   127 |    993 |
-| MS SQL             |    22 |    840 |     244 |   155 |  1,239 |
-| Markdown           |     2 |    323 |       0 |   108 |    431 |
-| XML                |    41 |    288 |       0 |    23 |    311 |
-| YAML               |     4 |    199 |       0 |    23 |    222 |
-| Docker             |     1 |     74 |      15 |     8 |     97 |
-| JSON with Comments |     1 |     45 |       0 |     1 |     46 |
-| Shell Script       |     1 |      6 |       3 |     3 |     12 |
-| Ignore             |     1 |      2 |       0 |     1 |      3 |
-| TOML               |     1 |      1 |       2 |     1 |      4 |
-
 ## Getting Started
 
 ### Prerequisites
@@ -89,6 +68,18 @@ You can start everything at once by running the compose config in `docker-compos
 - `yarn seed` to seed the db
 - `yarn setup-typesense` copy the returned api key into .env
 - `yarn dev`
+
+#### Markdown styling
+
+Some md files in this project use github specific markdown styles, in order to display them correctly, use the github markdown extension package in vscode. I am not sure if alternatives exist for other ides.
+
+I use these:
+- Markdown Preview Github Styling
+- GitHub Markdown Preview
+- Markdown Alert
+
+The markdowns are readable fine without these, but some syntax will not work properly.
+
 
 ## Important commands I might forget
 
