@@ -6,11 +6,6 @@ import type { AuthRepository } from '@/client/data/auth/port';
 
 /**
  * HTTP-backed implementation of {@link AuthRepository}.
- *
- * The adapter is the single place where DTO→domain mapping happens for
- * auth-shaped reads/writes (date revival via {@link reviveUserDates}). It
- * also adapts the legacy positional API on `authApiClient` into the
- * object-shaped port.
  */
 export const httpAuthRepository: AuthRepository = {
     getCurrentUser: async ({ signal }) => {

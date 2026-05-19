@@ -6,12 +6,6 @@ const toDate = (value: string | null | undefined): Date | null | undefined => {
     return new Date(value);
 };
 
-/**
- * Convert a `UserDTO` (timestamps as JSON strings) into a runtime `User`
- * with real `Date` instances. Optional fields (gated by group-scoped
- * `@Expose` on the server) propagate as `undefined` so callers can
- * distinguish "field withheld" from "field explicitly null".
- */
 export const reviveUserDates = (dto: UserDTO): User => ({
     ...dto,
     createdAt: toDate(dto.createdAt),

@@ -6,10 +6,6 @@ import type { RecipeRepository } from '@/client/data/recipe/port';
 
 /**
  * HTTP-backed implementation of {@link RecipeRepository}.
- *
- * The adapter is the single place where DTO→domain mapping happens for
- * recipe reads (date revival via {@link reviveRecipeDates}). It also adapts
- * the legacy positional API on `recipeApiClient` into the object-shaped port.
  */
 export const httpRecipeRepository: RecipeRepository = {
     getById: async ({ id, signal }) => {

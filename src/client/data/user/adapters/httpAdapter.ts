@@ -6,10 +6,6 @@ import type { UserRepository } from '@/client/data/user/port';
 
 /**
  * HTTP-backed implementation of {@link UserRepository}.
- *
- * The adapter is the single place where DTO→domain mapping happens for user
- * reads (date revival via {@link reviveUserDates}). It also adapts the legacy
- * positional API on `userApiClient` into the object-shaped port.
  */
 export const httpUserRepository: UserRepository = {
     getById: async ({ id, signal }) => {

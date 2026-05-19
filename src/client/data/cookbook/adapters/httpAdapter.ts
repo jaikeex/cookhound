@@ -6,11 +6,6 @@ import type { CookbookRepository } from '@/client/data/cookbook/port';
 
 /**
  * HTTP-backed implementation of {@link CookbookRepository}.
- *
- * The adapter is the single place where DTO→domain mapping happens for
- * cookbook reads (date revival via {@link reviveCookbookDates}). It also
- * adapts the legacy positional API on `cookbookApiClient` into the
- * object-shaped port.
  */
 export const httpCookbookRepository: CookbookRepository = {
     getById: async ({ id, signal }) => {
