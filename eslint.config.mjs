@@ -147,6 +147,7 @@ export default [
             // Custom rules
             'cookhound/require-make-handler': 'error',
             'cookhound/no-raw-request-json': 'error',
+            'cookhound/no-raw-cookie-mutation': 'error',
 
             // General rules
             'prefer-const': 'error',
