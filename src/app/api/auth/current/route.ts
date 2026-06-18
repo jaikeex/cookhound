@@ -1,4 +1,6 @@
 import { authService } from '@/server/services/auth/service';
+import { userService } from '@/server/services/user/service';
+import { AuthErrorUnauthorized } from '@/server/error';
 import { makeHandler, ok } from '@/server/utils/reqwest';
 import { registerRouteDocs, UserResponseSchema } from '@/server/utils/api-docs';
 import { AuthLevel } from '@/common/types';
@@ -8,6 +10,9 @@ import { AuthLevel } from '@/common/types';
 /**
  * Handles GET requests to `/api/auth/current` to fetch the current user.
  *
+ * Composes the auth-domain pieces for a live session access: read the user,
+ * record the visit, and reconcile the session if its subject is gone.
+ *
  * @returns A JSON response with the user object on success, or an error
  * response on failure.
  *
@@ -16,12 +21,23 @@ import { AuthLevel } from '@/common/types';
  * - 404: Not Found, if user from session does not exist.
  */
 async function getHandler() {
-    const user = await authService.getCurrentUser();
+    let user;
+
+    try {
+        user = await authService.getAuthenticatedUser();
+    } catch (error) {
+        if (error instanceof AuthErrorUnauthorized) {
+            await authService.invalidateStaleSession();
+        }
+        throw error;
+    }
+
+    void userService.registerVisit(user.id);
 
     return ok(user);
 }
 
-// Not using withAuth here on purpose. @see AuthService.getCurrentUser
+// Not using withAuth here on purpose. @see AuthService.getAuthenticatedUser
 export const GET = makeHandler(getHandler);
 
 //|=============================================================================================|//

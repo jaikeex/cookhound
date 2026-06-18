@@ -80,7 +80,7 @@ export default async function RootLayout({
 
     await qc.prefetchQuery({
         queryKey: QUERY_KEYS.auth.currentUser,
-        staleTime: 5 * 60 * 1000,
+        staleTime: 0, // intentional, see the query client for more info.
         queryFn: async () => {
             try {
                 if (typeof window !== 'undefined') {

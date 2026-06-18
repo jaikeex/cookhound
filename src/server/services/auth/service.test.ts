@@ -522,10 +522,10 @@ describe('AuthService', () => {
     });
 
     //~=========================================================================================~//
-    //$                                      GET CURRENT USER                                   $//
+    //$                                   GET AUTHENTICATED USER                                $//
     //~=========================================================================================~//
 
-    describe('getCurrentUser', () => {
+    describe('getAuthenticatedUser', () => {
         beforeEach(() => {
             mockAssertAuthenticated.mockReturnValue(validUser.id);
         });
@@ -533,7 +533,7 @@ describe('AuthService', () => {
         it('should return authenticated user data', async () => {
             mockDbUser.getOneById.mockResolvedValue(validUser);
 
-            const result = await authService.getCurrentUser();
+            const result = await authService.getAuthenticatedUser();
 
             expect(result).toHaveProperty('id', validUser.id);
             expect(result).toHaveProperty('email', validUser.email);
@@ -544,22 +544,11 @@ describe('AuthService', () => {
             mockDbUser.getOneById.mockResolvedValue(null);
 
             await expectToThrowWithCode(
-                authService.getCurrentUser(),
+                authService.getAuthenticatedUser(),
                 AuthErrorUnauthorized,
                 ApplicationErrorCode.USER_NOT_FOUND,
                 'auth.error.user-not-found'
             );
-        });
-
-        it('should invalidate sessions when user not found', async () => {
-            mockDbUser.getOneById.mockResolvedValue(null);
-
-            await expect(authService.getCurrentUser()).rejects.toThrow();
-
-            expect(mockSessions.invalidateAllUserSessions).toHaveBeenCalledWith(
-                validUser.id
-            );
-            expect(mockDeleteSessionCookie).toHaveBeenCalled();
         });
 
         it('should throw AuthErrorUnauthorized when email not verified', async () => {
@@ -567,29 +556,17 @@ describe('AuthService', () => {
             mockAssertAuthenticated.mockReturnValue(unverifiedUser.id);
 
             await expectToThrowWithCode(
-                authService.getCurrentUser(),
+                authService.getAuthenticatedUser(),
                 AuthErrorUnauthorized,
                 ApplicationErrorCode.EMAIL_NOT_VERIFIED,
                 'auth.error.email-not-verified'
             );
         });
 
-        it('should invalidate sessions when email not verified', async () => {
-            mockDbUser.getOneById.mockResolvedValue(unverifiedUser);
-            mockAssertAuthenticated.mockReturnValue(unverifiedUser.id);
-
-            await expect(authService.getCurrentUser()).rejects.toThrow();
-
-            expect(mockSessions.invalidateAllUserSessions).toHaveBeenCalledWith(
-                unverifiedUser.id
-            );
-            expect(mockDeleteSessionCookie).toHaveBeenCalled();
-        });
-
         it('should return DTO without sensitive fields', async () => {
             mockDbUser.getOneById.mockResolvedValue(validUser);
 
-            const result = await authService.getCurrentUser();
+            const result = await authService.getAuthenticatedUser();
 
             expectNoSensitiveFields(result);
 
@@ -601,6 +578,52 @@ describe('AuthService', () => {
 
             expect(result).not.toHaveProperty('role');
             expect(result).not.toHaveProperty('status');
+        });
+
+        it('is side-effect free on both success and failure (render-safe CQS guarantee)', async () => {
+            // success path
+            mockDbUser.getOneById.mockResolvedValue(validUser);
+            await authService.getAuthenticatedUser();
+
+            // failure path
+            mockDbUser.getOneById.mockResolvedValue(null);
+            await expect(authService.getAuthenticatedUser()).rejects.toThrow();
+
+            // No visit tracking, no session invalidation, no cookie mutation -
+            // those are the route handler's job, never the read's.
+            expect(mockDbUser.registerUserVisit).not.toHaveBeenCalled();
+            expect(
+                mockSessions.invalidateAllUserSessions
+            ).not.toHaveBeenCalled();
+            expect(mockDeleteSessionCookie).not.toHaveBeenCalled();
+        });
+    });
+
+    //~=========================================================================================~//
+    //$                                  INVALIDATE STALE SESSION                               $//
+    //~=========================================================================================~//
+
+    describe('invalidateStaleSession', () => {
+        it('tears down all sessions and clears the cookie when a subject is in context', async () => {
+            mockRequestContext.getUserId.mockReturnValue(validUser.id);
+
+            await authService.invalidateStaleSession();
+
+            expect(mockSessions.invalidateAllUserSessions).toHaveBeenCalledWith(
+                validUser.id
+            );
+            expect(mockDeleteSessionCookie).toHaveBeenCalled();
+        });
+
+        it('no-ops when there is no live session in context', async () => {
+            mockRequestContext.getUserId.mockReturnValue(null);
+
+            await authService.invalidateStaleSession();
+
+            expect(
+                mockSessions.invalidateAllUserSessions
+            ).not.toHaveBeenCalled();
+            expect(mockDeleteSessionCookie).not.toHaveBeenCalled();
         });
     });
 });

@@ -1,7 +1,7 @@
 import { UserRole } from '@/common/types';
 import { AsyncLocalStorage } from 'async_hooks';
 import { randomUUID } from 'crypto';
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 import { sessions } from '@/server/utils/session/manager';
 import { setLoggerContextReader } from '@/server/logger/context-reader';
 import {
@@ -15,11 +15,23 @@ export const REQUEST_ID_FIELD_NAME = 'requestId';
 export const REQUEST_PATH_FIELD_NAME = 'path';
 
 /**
+ * Where the context was created.
+ *
+ * route  - an API route handler (withRequestContext pipe). Cookie
+ *          mutations and write side effects are allowed.
+ * render - React server component / metadata render (runFromHeaders).
+ *          cookies() calls throw mid-render, render-unsafe side
+ *          effects must be skipped.
+ */
+export type RequestContextOrigin = 'route' | 'render';
+
+/**
  * Shape of data carried inside the async context during the lifetime of a single request.
  * Extend this interface with more optional properties as required.
  */
 export interface RequestContextShape {
     requestId: string;
+    origin: RequestContextOrigin;
     requestPath?: string;
     requestMethod?: string;
     sessionId?: string | null;
@@ -30,7 +42,113 @@ export interface RequestContextShape {
     ip?: string | null;
 }
 
+interface HeaderReader {
+    get(name: string): string | null;
+}
+
+/**
+ * Minimal source the context builder needs.
+ */
+interface ContextSource {
+    origin: RequestContextOrigin;
+    method: string;
+    url?: string;
+    headers: HeaderReader;
+}
+
 const asyncLocalStorage = new AsyncLocalStorage<RequestContextShape>();
+
+/**
+ * Build a fresh context from an abstract source.
+ *
+ * § The initialization of the context values can absolutely never throw an error.
+ * § Leave the context blank if something goes wrong. The services will know what to do.
+ */
+async function buildContext(
+    source: ContextSource
+): Promise<RequestContextShape> {
+    const ctx: RequestContextShape = {
+        origin: source.origin
+    } as RequestContextShape;
+
+    try {
+        ///---------------------------------------------------------------------------------///
+        ///                                  IP AND METHOD                                  ///
+        ///---------------------------------------------------------------------------------///
+
+        ctx.requestId = randomUUID();
+        ctx.requestMethod = source.method;
+
+        // Do not read these from the session when setting the context up.
+        ctx.userAgent = source.headers.get('user-agent') || null;
+        ctx.ip =
+            source.headers.get('x-forwarded-for') ||
+            source.headers.get('x-real-ip') ||
+            null;
+
+        ///---------------------------------------------------------------------------------///
+        ///                                     PATH                                        ///
+        ///---------------------------------------------------------------------------------///
+
+        if (source.url) {
+            try {
+                const url = new URL(source.url);
+                ctx.requestPath = url.pathname + url.search;
+            } catch {
+                // If the URL parsing fails, provide a placeholder, do nothing more.
+                ctx.requestPath = 'PATH UNKNOWN';
+            }
+        }
+
+        ///---------------------------------------------------------------------------------///
+        ///                                  COOKIES                                       ///
+        ///---------------------------------------------------------------------------------///
+
+        const cookieStore = await cookies();
+
+        ///---------------------------------------------------------------------------------///
+        ///                                     LOCALE                                      ///
+        ///---------------------------------------------------------------------------------///
+
+        try {
+            const locale = await getUserLocale(cookieStore, source.headers);
+
+            ctx.userLocale = locale;
+        } catch {
+            // If the locale fetching fails, provide a placeholder, do nothing more.
+            ctx.userLocale = DEFAULT_LOCALE;
+        }
+
+        ///---------------------------------------------------------------------------------///
+        ///                                     SESSION                                     ///
+        ///---------------------------------------------------------------------------------///
+
+        const session = cookieStore.get(SESSION_COOKIE_NAME)?.value;
+
+        if (session) {
+            const serverSession = await sessions.validateSession(session);
+
+            if (serverSession) {
+                ctx.userId = serverSession.userId;
+                ctx.userRole = serverSession.userRole;
+                ctx.sessionId = serverSession.sessionId;
+            } else {
+                ctx.userRole = UserRole.Guest;
+            }
+        } else {
+            ctx.userRole = UserRole.Guest;
+        }
+    } catch {
+        /**
+         *!DO NOTHING HERE
+         * Under no circumstances can an error here fail the entire request. It should simply continue
+         * with the values that did not fail, or empty if none of them were set. That is not
+         * a big isssue, services should still do all the needed checks themselves where appropriate.
+         */
+    }
+
+    return ctx;
+}
 
 export const RequestContext = {
     //~-----------------------------------------------------------------------------------------~//
@@ -38,91 +156,48 @@ export const RequestContext = {
     //~-----------------------------------------------------------------------------------------~//
 
     /**
-     * Start a fresh context for the current request and execute the provided
-     * function within that context.
-     *
-     * § The initialization of the context values can absolutely never throw an error.
-     * § Leave the context blank if something goes wrong. The services will know what to do.
+     * Start a fresh context for an API route handler and execute the provided
+     * function within it. Side effects (cookie mutation, etc.) are allowed.
      */
     async run<T>(req: Request, fn: () => T): Promise<T> {
-        const ctx: RequestContextShape = {} as RequestContextShape;
-
-        try {
-            ///---------------------------------------------------------------------------------///
-            ///                                  IP AND METHOD                                  ///
-            ///---------------------------------------------------------------------------------///
-
-            ctx.requestId = randomUUID();
-            ctx.requestMethod = req.method;
-
-            // Do not read these from the session when setting the context up.
-            ctx.userAgent = req.headers.get('user-agent') || null;
-            ctx.ip =
-                req?.headers?.get('x-forwarded-for') ||
-                req?.headers?.get('x-real-ip') ||
-                null;
-
-            ///---------------------------------------------------------------------------------///
-            ///                                     PATH                                        ///
-            ///---------------------------------------------------------------------------------///
-
-            try {
-                const url = new URL(req.url);
-                const requestPath = url.pathname + url.search;
-
-                ctx.requestPath = requestPath;
-            } catch {
-                // If the URL parsing fails, provide a placeholder, do nothing more.
-                ctx.requestPath = 'PATH UNKNOWN';
-            }
-            ///---------------------------------------------------------------------------------///
-            ///                                  COOKIES                                       ///
-            ///---------------------------------------------------------------------------------///
-
-            const cookieStore = await cookies();
-
-            ///---------------------------------------------------------------------------------///
-            ///                                     LOCALE                                      ///
-            ///---------------------------------------------------------------------------------///
-
-            try {
-                const locale = await getUserLocale(cookieStore, req.headers);
-                ctx.userLocale = locale;
-            } catch {
-                // If the locale fetching fails, provide a placeholder, do nothing more.
-                ctx.userLocale = DEFAULT_LOCALE;
-            }
-
-            ///---------------------------------------------------------------------------------///
-            ///                                     SESSION                                     ///
-            ///---------------------------------------------------------------------------------///
-
-            const session = cookieStore.get(SESSION_COOKIE_NAME)?.value;
-
-            if (session) {
-                const serverSession = await sessions.validateSession(session);
-
-                if (serverSession) {
-                    ctx.userId = serverSession.userId;
-                    ctx.userRole = serverSession.userRole;
-                    ctx.sessionId = serverSession.sessionId;
-                } else {
-                    ctx.userRole = UserRole.Guest;
-                }
-            } else {
-                ctx.userRole = UserRole.Guest;
-            }
-        } catch {
-            /**
-             *!DO NOTHING HERE
-             * Under no circumstances can an error here fail the entire request. It should simply continue
-             * with the values that did not fail, or empty if none of them were set. That is not
-             * a big isssue, services should still do all the needed checks themselves where appropriate.
-             */
-        }
+        const ctx = await buildContext({
+            origin: 'route',
+            method: req.method,
+            url: req.url,
+            headers: req.headers
+        });
 
         // The AsyncLocalStorage instance takes care of propagating the store
         // across every async boundary that happens while 'fn' is running.
+        return asyncLocalStorage.run(ctx, fn);
+    },
+
+    /**
+     * Start a fresh context from next/headers and execute the provided function within it.
+     *
+     * Reads request data from next/headers, so it can be called from any
+     * server execution that lacks a Request object but still needs a context.
+     */
+    async runFromHeaders<T>(
+        fn: () => T,
+        origin: RequestContextOrigin = 'render'
+    ): Promise<T> {
+        let headerList: HeaderReader;
+
+        try {
+            headerList = await headers();
+        } catch {
+            // If headers() is somehow unavailable, fall back to an empty reader
+            // so context creation still proceeds (cookies are read separately).
+            headerList = { get: () => null };
+        }
+
+        const ctx = await buildContext({
+            origin,
+            method: 'GET',
+            headers: headerList
+        });
+
         return asyncLocalStorage.run(ctx, fn);
     },
 
@@ -170,6 +245,21 @@ export const RequestContext = {
 
     getIp(): string | null {
         return this.get('ip') ?? null;
+    },
+
+    //?—————————————————————————————————————————————————————————————————————————————————————————?//
+    //?                              ORIGIN OF THE ACTIVE CONTEXT                               ?//
+    ///
+    //# Defaults to route when NO context is active. This is deliberate: server actions
+    //# run without a context yet must be allowed to mutate cookies / run side effects,
+    //# so absence of context is treated as route-like. The flip side is that plain rsc render
+    //# code with no context is also reported as 'route' - see mutableCookies for why
+    //# render-safe cookie mutation must go through ensureRenderContext, not bare renders.
+    ///
+    //?—————————————————————————————————————————————————————————————————————————————————————————?//
+
+    getOrigin(): RequestContextOrigin {
+        return this.get('origin') ?? 'route';
     },
 
     //~-----------------------------------------------------------------------------------------~//

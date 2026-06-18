@@ -13,8 +13,13 @@ const mockCookieStore = {
     delete: vi.fn()
 };
 
+const mockHeaderStore = {
+    get: vi.fn()
+};
+
 vi.mock('next/headers', () => ({
-    cookies: vi.fn(() => Promise.resolve(mockCookieStore))
+    cookies: vi.fn(() => Promise.resolve(mockCookieStore)),
+    headers: vi.fn(() => Promise.resolve(mockHeaderStore))
 }));
 
 vi.mock('@/server/utils/session/manager', () => ({
@@ -49,6 +54,7 @@ describe('RequestContext', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         mockCookieStore.get.mockReturnValue(undefined);
+        mockHeaderStore.get.mockReturnValue(null);
         mockGetUserLocale.mockResolvedValue('en');
     });
 
@@ -369,6 +375,82 @@ describe('RequestContext', () => {
                 await Promise.resolve();
 
                 expect(RequestContext.getUserId()).toBe(42);
+            });
+        });
+    });
+
+    //~=========================================================================================~//
+    //$                                 RUN FROM HEADERS (RSC)                                  $//
+    //~=========================================================================================~//
+
+    describe('runFromHeaders', () => {
+        it('should set origin to render', async () => {
+            await RequestContext.runFromHeaders(() => {
+                expect(RequestContext.getOrigin()).toBe('render');
+            });
+        });
+
+        it('should populate session data from cookies during render', async () => {
+            const mockSession = createMockSession({
+                userId: 7,
+                userRole: UserRole.User
+            });
+            mockCookieStore.get.mockReturnValue({ value: 'session-token' });
+            mockSessions.validateSession.mockResolvedValue(mockSession);
+
+            await RequestContext.runFromHeaders(() => {
+                expect(RequestContext.getUserId()).toBe(7);
+                expect(RequestContext.getUserRole()).toBe(UserRole.User);
+                expect(RequestContext.getSessionId()).toBe('test-session-id');
+                expect(RequestContext.getRequestId()).toBeTruthy();
+            });
+        });
+
+        it('should read user agent and ip from headers()', async () => {
+            mockHeaderStore.get.mockImplementation((name: string) => {
+                if (name === 'user-agent') return 'RSC Agent';
+                if (name === 'x-forwarded-for') return '10.1.2.3';
+                return null;
+            });
+
+            await RequestContext.runFromHeaders(() => {
+                expect(RequestContext.getUserAgent()).toBe('RSC Agent');
+                expect(RequestContext.getIp()).toBe('10.1.2.3');
+            });
+        });
+
+        it('should set Guest role when there is no session', async () => {
+            mockCookieStore.get.mockReturnValue(undefined);
+
+            await RequestContext.runFromHeaders(() => {
+                expect(RequestContext.getUserRole()).toBe(UserRole.Guest);
+                expect(RequestContext.getUserId()).toBeNull();
+            });
+        });
+
+        it('should preserve the context across async boundaries', async () => {
+            await RequestContext.runFromHeaders(async () => {
+                const idBefore = RequestContext.getRequestId();
+                await new Promise((resolve) => setTimeout(resolve, 5));
+                expect(RequestContext.getRequestId()).toBe(idBefore);
+                expect(RequestContext.getOrigin()).toBe('render');
+            });
+        });
+    });
+
+    //~=========================================================================================~//
+    //$                                          ORIGIN                                         $//
+    //~=========================================================================================~//
+
+    describe('getOrigin', () => {
+        it('should default to route when no context is active', () => {
+            expect(RequestContext.getOrigin()).toBe('route');
+        });
+
+        it('should be route inside run()', async () => {
+            const mockRequest = new Request('http://localhost:3000/');
+            await RequestContext.run(mockRequest, () => {
+                expect(RequestContext.getOrigin()).toBe('route');
             });
         });
     });

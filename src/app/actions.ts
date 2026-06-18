@@ -10,10 +10,11 @@ import {
 } from '@/common/constants';
 import type { CookieConsent } from '@/common/types/cookie-consent';
 import { cache } from 'react';
-import apiClient from '@/client/request/apiClient';
+import { userServerData } from '@/server/data/user/server';
+import { mutableCookies } from '@/server/utils/reqwest/cookies';
 
 export const setLocaleCookie = async (locale: string): Promise<void> => {
-    const cookieStore = await cookies();
+    const cookieStore = await mutableCookies();
 
     cookieStore.set(LOCALE_COOKIE_NAME, locale, {
         path: '/',
@@ -27,7 +28,7 @@ export const setLocaleCookie = async (locale: string): Promise<void> => {
 export const setConsentCookie = async (
     consent: CookieConsent
 ): Promise<void> => {
-    const cookieStore = await cookies();
+    const cookieStore = await mutableCookies();
 
     cookieStore.set(
         'cookie_consent',
@@ -51,7 +52,5 @@ export const getCurrentUser = cache(async () => {
     const session = cookieStore.get(SESSION_COOKIE_NAME)?.value;
     if (!session) return null;
 
-    return apiClient.auth.getCurrentUser({
-        headers: { Cookie: `session=${session}` }
-    });
+    return userServerData.getCurrent();
 });

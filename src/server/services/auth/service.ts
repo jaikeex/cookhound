@@ -291,35 +291,24 @@ class AuthService {
     }
 
     //~-----------------------------------------------------------------------------------------~//
-    //$                                       GET CURRENT                                       $//
+    //$                                        GET CURRENT                                      $//
     //~-----------------------------------------------------------------------------------------~//
 
     /**
-     * Resolves the currently authenticated user from the request context.
-     * If the user no longer exists or their email is unverified, all sessions
-     * are invalidated and an unauthorized error is thrown. Registers a user
-     * visit on success.
+     * Pure read of the currently authenticated user. Side-effect free, so it is
+     * safe to call from an RSC render - this is the auth method `serverData` uses.
      *
      * @returns The authenticated user DTO with self-visibility fields.
      * @throws {AuthErrorUnauthorized} If not authenticated, user not found, or email unverified.
      */
-    @LogServiceMethod({ names: ['userId'] })
-    async getCurrentUser(): Promise<UserDTO> {
+    @LogServiceMethod()
+    async getAuthenticatedUser(): Promise<UserDTO> {
         const userId = assertAuthenticated();
 
-        // This is true by definition
-        const groups = ['self'] as UserVisibilityGroup[];
-        const select = getUserSelect(groups);
-
-        const user = await db.user.getOneById(Number(userId), select);
+        const user = await db.user.getOneById(Number(userId), AUTH_USER_SELECT);
 
         if (!user) {
-            log.warn('getCurrentUser - user not found', {
-                id: userId
-            });
-
-            sessions.invalidateAllUserSessions(userId);
-            deleteSessionCookie();
+            log.warn('getAuthenticatedUser - user not found', { id: userId });
 
             throw new AuthErrorUnauthorized(
                 'auth.error.user-not-found',
@@ -328,12 +317,9 @@ class AuthService {
         }
 
         if (!user.emailVerified) {
-            log.trace('getCurrentUser - email not verified', {
+            log.trace('getAuthenticatedUser - email not verified', {
                 id: userId
             });
-
-            sessions.invalidateAllUserSessions(userId);
-            deleteSessionCookie();
 
             throw new AuthErrorUnauthorized(
                 'auth.error.email-not-verified',
@@ -341,15 +327,38 @@ class AuthService {
             );
         }
 
-        db.user.registerUserVisit(user.id);
+        return createUserDTO(user);
+    }
 
-        const userResponse = createUserDTO(user);
+    /**
+     * Invalidate all user sessions and clear the cookie. Reads the subject
+     * from the request context and no-ops when there is no live session, so it
+     * is safe to fire on any auth failure.
+     */
+    @LogServiceMethod()
+    async invalidateStaleSession(): Promise<void> {
+        const userId = RequestContext.getUserId();
 
-        return userResponse;
+        if (!userId) {
+            return;
+        }
+
+        await sessions.invalidateAllUserSessions(userId);
+        await deleteSessionCookie();
     }
 }
 
+/**
+ * Render-safe subset of AuthService. serverData access points and rsc render paths
+ * depends on this so that only allowed methods are in scope, and side effects
+ * cannot be called by mistake.
+ */
+export interface AuthReads {
+    getAuthenticatedUser(): Promise<UserDTO>;
+}
+
 export const authService = new AuthService();
+export const authReads: AuthReads = authService;
 
 type UserFromGoogle = {
     email: string;

@@ -63,14 +63,14 @@ export function isSupportedLocale(locale: string): locale is Locale {
  *
  * @async
  * @param {ReadonlyRequestCookies} cookies - The cookies associated with the request.
- * @param {Headers} headers - The headers of the incoming request.
+ * @param headers - The headers of the incoming request.
  * @returns {Promise<string>} A promise that resolves to the determined locale string, falling back to the default
  *                            locale if not supported.
  */
 export async function getUserLocale(
     cookies: ReadonlyRequestCookies,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    headers: Headers
+    headers: Pick<Headers, 'get'>
 ): Promise<Locale> {
     let localeString;
 

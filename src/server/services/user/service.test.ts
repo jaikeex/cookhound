@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import type * as ServerIntegrations from '@/server/integrations';
 import { userService } from './service';
 import {
     validUser,
@@ -34,6 +35,7 @@ vi.mock('@/server/db/model', () => ({
             getOneByEmail: vi.fn(),
             getOneByEmailOrUsername: vi.fn(),
             getOneById: vi.fn(),
+            registerUserVisit: vi.fn(),
             getOneByEmailVerificationToken: vi.fn(),
             getOneByPasswordResetToken: vi.fn(),
             createOne: vi.fn(),
@@ -98,6 +100,13 @@ vi.mock('uuid', () => ({
     v4: vi.fn(() => 'mock-uuid-token')
 }));
 
+vi.mock('@/server/integrations', async (importOriginal) => ({
+    ...(await importOriginal<typeof ServerIntegrations>()),
+    redisClient: {
+        setIfAbsent: vi.fn()
+    }
+}));
+
 //|=============================================================================================|//
 //$                                          IMPORTS                                            $//
 //|=============================================================================================|//
@@ -111,8 +120,10 @@ import {
     needsRehash
 } from '@/server/utils/crypto';
 import { RequestContext } from '@/server/utils/reqwest/context';
+import { redisClient } from '@/server/integrations';
 import { v4 as uuid } from 'uuid';
 
+const mockRedis = vi.mocked(redisClient);
 const mockDbUser = vi.mocked(db.user);
 const mockMailService = vi.mocked(mailService);
 const mockVerifyPassword = vi.mocked(verifyPassword);
@@ -354,6 +365,53 @@ describe('UserService', () => {
                 ApplicationErrorCode.USER_NOT_FOUND,
                 'app.error.not-found'
             );
+        });
+    });
+
+    //~=========================================================================================~//
+    //$                                       REGISTER VISIT                                    $//
+    //~=========================================================================================~//
+
+    describe('registerVisit', () => {
+        it('writes the visit when it is the first in the throttle window', async () => {
+            mockRedis.setIfAbsent.mockResolvedValue(true);
+            mockDbUser.registerUserVisit.mockResolvedValue(undefined);
+
+            await userService.registerVisit(validUser.id);
+
+            expect(mockDbUser.registerUserVisit).toHaveBeenCalledWith(
+                validUser.id
+            );
+        });
+
+        it('skips the DB write when the throttle gate is already held', async () => {
+            mockRedis.setIfAbsent.mockResolvedValue(false);
+
+            await userService.registerVisit(validUser.id);
+
+            expect(mockDbUser.registerUserVisit).not.toHaveBeenCalled();
+        });
+
+        it('fails open and writes when the throttle gate errors', async () => {
+            mockRedis.setIfAbsent.mockRejectedValue(new Error('redis down'));
+            mockDbUser.registerUserVisit.mockResolvedValue(undefined);
+
+            await userService.registerVisit(validUser.id);
+
+            expect(mockDbUser.registerUserVisit).toHaveBeenCalledWith(
+                validUser.id
+            );
+        });
+
+        it('swallows a failed visit write so it never rejects', async () => {
+            mockRedis.setIfAbsent.mockResolvedValue(true);
+            mockDbUser.registerUserVisit.mockRejectedValue(
+                new Error('db down')
+            );
+
+            await expect(
+                userService.registerVisit(validUser.id)
+            ).resolves.toBeUndefined();
         });
     });
 

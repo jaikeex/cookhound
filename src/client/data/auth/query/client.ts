@@ -13,9 +13,19 @@ export const authQueryClient = {
      * Returns the currently logged-in user.
      *
      * Key: AUTH_QUERY_KEYS.currentUser
-     * Stale time: 5 minutes
+     * Stale time: 0 (see below)
      * Retry: 1
      * refetchOnMount: true
+     *
+     * staleTime is 0 on purpose. The server prefetch (layout.tsx) hydrates
+     * this query from a side-effect-free read and never records a user visit.
+     * Keeping the hydrated data immediately stale is what makes refetchOnMount
+     * actually refetch on mount, hitting that route on every page load so the
+     * visit gets tracked. Raising staleTime would mark the hydrated data fresh,
+     * skip the mount refetch, and silently stop tracking visits on load.
+     *
+     * The per-load route hit is intentional; the DB cost is contained by a throttle,
+     * and all reads go through redis anyway.
      */
     useCurrentUser: (options?: Partial<CurrentUserOptions>) => {
         const { authRepository } = useRepositories();
@@ -24,7 +34,7 @@ export const authQueryClient = {
             AUTH_QUERY_KEYS.currentUser,
             ({ signal }) => authRepository.getCurrentUser({ signal }),
             {
-                staleTime: 5 * 60 * 1000, // 5 minutes
+                staleTime: 0,
                 retry: 1,
                 refetchOnMount: true,
                 ...options

@@ -42,10 +42,21 @@ import {
 import { serializeTermsContent } from '@/server/utils/terms';
 import { serializeConsentContent } from '@/server/utils/consent';
 import { RequestContext } from '@/server/utils/reqwest/context';
+import { redisClient } from '@/server/integrations';
+import { ONE_MINUTE_IN_SECONDS } from '@/common/constants/time';
 
 //|=============================================================================================|//
 
 const log = Logger.getInstance('user-service');
+
+/**
+ * Window during which at most one visit write is performed per user. Page
+ * loads call registerVisit constantly, but lastVisitedAt only needs coarse
+ * accuracy, so writes are coalesced into this window to keep load off the
+ * users table.
+ */
+const VISIT_THROTTLE_WINDOW_IN_SECONDS = 5 * ONE_MINUTE_IN_SECONDS;
+const VISIT_THROTTLE_KEY_PREFIX = 'user-visit:';
 
 /**
  * Manages user lifecycle operations including registration, authentication,
@@ -206,6 +217,49 @@ class UserService {
         const userResponse = createUserDTO(user);
 
         return userResponse;
+    }
+
+    //~-----------------------------------------------------------------------------------------~//
+    //$                                       REGISTER VISIT                                    $//
+    //~-----------------------------------------------------------------------------------------~//
+
+    /**
+     * Record that the user was active just now.
+     *
+     * Per-user Redis gate collapses the burst of calls produced by
+     * frequent page loads into a single DB write per  window.
+     *
+     * Fails open: if the gate cannot be evaluated (e.g. Redis is unavailable)
+     * the write proceeds anyway, trading some DB load for not silently dropping
+     * visits, consistent with how rate limiting degrades here.
+     *
+     * @param userId - Database ID of the user to mark as visited.
+     */
+    @LogServiceMethod({ names: ['userId'] })
+    async registerVisit(userId: number): Promise<void> {
+        try {
+            const isFirstVisitInWindow = await redisClient.setIfAbsent(
+                `${VISIT_THROTTLE_KEY_PREFIX}${userId}`,
+                1,
+                VISIT_THROTTLE_WINDOW_IN_SECONDS
+            );
+
+            if (!isFirstVisitInWindow) {
+                return;
+            }
+        } catch (error: unknown) {
+            log.warn('registerVisit - throttle gate unavailable, writing', {
+                error,
+                userId
+            });
+        }
+
+        try {
+            await db.user.registerUserVisit(userId);
+        } catch (error: unknown) {
+            // Do nothing here, visit tracking should never block or fail the request flow.
+            log.warn('registerVisit - visit write failed', { error, userId });
+        }
     }
 
     //~-----------------------------------------------------------------------------------------~//
@@ -1618,4 +1672,14 @@ class UserService {
     }
 }
 
+/**
+ * Render-safe subset of UserService. serverData access points and rsc render paths
+ * depends on this so that only allowed methods are in scope, and side effects
+ * cannot be called by mistake.
+ */
+export interface UserReads {
+    getUserById(id: number): Promise<UserDTO>;
+}
+
 export const userService = new UserService();
+export const userReads: UserReads = userService;

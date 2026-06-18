@@ -86,6 +86,35 @@ class RedisClient {
         await this.client.del(key);
     }
 
+    /**
+     * Atomically set a key only if it does not already exist (SET NX EX).
+     *
+     * Useful as a throttle/lock gate: the first caller within the TTL window
+     * sets the key and gets true; every subsequent caller sees the existing
+     * key and gets false until it expires. The check-and-set is a single
+     * atomic command, so concurrent callers race for the slot cleanly with no
+     * read-then-write window.
+     *
+     * @returns true if the key was newly set, false if it already existed.
+     */
+    async setIfAbsent(
+        key: string,
+        value: unknown,
+        ttlInSeconds: number = Number(ENV_CONFIG_PRIVATE.REDIS_TTL)
+    ): Promise<boolean> {
+        await this.connect();
+
+        const result = await this.client.set(
+            key,
+            JSON.stringify(value),
+            'EX',
+            ttlInSeconds,
+            'NX'
+        );
+
+        return result === 'OK';
+    }
+
     //~-----------------------------------------------------------------------------------------~//
     //$                                     SET OPERATIONS                                      $//
     //~-----------------------------------------------------------------------------------------~//
