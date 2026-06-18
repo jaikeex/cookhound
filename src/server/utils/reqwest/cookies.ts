@@ -1,59 +1,76 @@
 import 'server-only';
 import { cookies } from 'next/headers';
-import { RequestContext } from '@/server/utils/reqwest/context';
-
-type CookieStore = Awaited<ReturnType<typeof cookies>>;
-
-// The store methods that mutate and therefore throw during an RSC render.
-const MUTATION_METHODS = new Set<PropertyKey>(['set', 'delete', 'clear']);
-
-//§—————————————————————————————————————————————————————————————————————————————————————————————§//
-//§                                        PRECONDITION                                         §//
-///
-//§ This is NOT a blanket "safe to mutate cookies anywhere in a render" helper.
-//§ The render no-op only engages when a RequestContext with origin 'render' is active.
-//§ When NO context is active, getOrigin() defaults to 'route' and the REAL store is returned.
-//§
-//§ This default is deliberate and load-bearing: server actions carry no context
-//§ yet must be allowed to mutate, so "no context = route = mutations apply" is exactly what
-//§ keeps them working.
-//§
-//§ The consequence: calling this from a plain RSC render that did NOT establish
-//§ a context falls through to the real store, and the subsequent set/delete
-//§ throws the very Next.js error this helper exists to avoid. That throw is
-//§ loud and immediate (good), but it means the safety only holds for route or
-//§ action origins and for renders wrapped in ensureRenderContext; not for arbitrary
-//§ render code. Mutate cookies only from those places.
-///
-//§—————————————————————————————————————————————————————————————————————————————————————————————§//
+import { ENV_CONFIG_PUBLIC } from '@/common/constants';
 
 /**
- * Return the request's cookie store with its mutating methods guaranteed safe to call.
- *
- * Next.js throws if cookies().set/delete/clear is called during an rsc
- * render. Instead of every call site repeating an origin check, the guard exists:
- *
- * - On a route origin, the real store is returned untouched and mutations apply.
- * - On a render origin, a proxy is returned whose mutating methods are
- *   chainable no-ops while reads stay live. The stale value is reconciled on
- *   the next route-origin request.
+ * The cookie attributes this app sets - a subset of next/headers'
+ * ResponseCookie options.
  */
-export async function mutableCookies(): Promise<CookieStore> {
+export interface CookieOptions {
+    path?: string;
+    domain?: string;
+    maxAge?: number;
+    expires?: Date;
+    secure?: boolean;
+    httpOnly?: boolean;
+    sameSite?: boolean | 'lax' | 'strict' | 'none';
+}
+
+//§—————————————————————————————————————————————————————————————————————————————————————————————§//
+//§                                     SINGLE COOKIE SEAM                                      §//
+///
+//§ Cookie mutation lives here and only here (enforced by the
+//§ cookhound/no-raw-cookie-mutation ESLint rule). Centralising it gives one place
+//§ to own the attributes shared by every cookie (path / secure / domain) so call
+//§ sites only specify what differs (name, value, max-age, same-site).
+//§
+//§ There is deliberately NO render-origin guard. Cookie mutation is illegal during
+//§ an RSC render and Next throws if attempted - that throw is correct and loud. The
+//§ read/write split keeps writes at the route/action edge, so a mutation reaching
+//§ here during a render is a bug we WANT surfaced, not silently swallowed.
+///
+//§—————————————————————————————————————————————————————————————————————————————————————————————§//
+
+/** Attributes shared by every cookie this app sets. */
+const SHARED_COOKIE_OPTIONS: CookieOptions = {
+    path: '/',
+    secure: ENV_CONFIG_PUBLIC.ENV === 'production',
+    domain: ENV_CONFIG_PUBLIC.COOKIE_DOMAIN
+};
+
+/**
+ * Set a cookie on the current request's store, merging the app-wide shared
+ * attributes with the per-call options (per-call values win).
+ *
+ * @param name - Cookie name.
+ * @param value - Cookie value (already encoded/serialized by the caller).
+ * @param options - Per-cookie attributes (max-age, same-site, ...).
+ */
+export async function setCookie(
+    name: string,
+    value: string,
+    options?: CookieOptions
+): Promise<void> {
     const store = await cookies();
 
-    if (RequestContext.getOrigin() !== 'render') {
-        return store;
-    }
+    store.set(name, value, { ...SHARED_COOKIE_OPTIONS, ...options });
+}
 
-    return new Proxy(store, {
-        get(target, prop, receiver) {
-            if (MUTATION_METHODS.has(prop)) {
-                return () => receiver;
-            }
+/**
+ * Delete a cookie from the current request's store.
+ *
+ * The shared path/domain attributes are applied on the way out: a browser only
+ * clears a cookie when the expiring Set-Cookie matches the original's path and
+ * domain, so deletion has to mirror what setCookie() does.
+ *
+ * @param name - Cookie name to remove.
+ */
+export async function deleteCookie(name: string): Promise<void> {
+    const store = await cookies();
 
-            const value = Reflect.get(target, prop, target);
-
-            return typeof value === 'function' ? value.bind(target) : value;
-        }
+    store.delete({
+        name,
+        path: SHARED_COOKIE_OPTIONS.path,
+        domain: SHARED_COOKIE_OPTIONS.domain
     });
 }

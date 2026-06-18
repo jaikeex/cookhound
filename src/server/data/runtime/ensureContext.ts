@@ -14,6 +14,4 @@ import { RequestContext } from '@/server/utils/reqwest/context';
 export const ensureRenderContext = async <T>(
     fn: () => Promise<T>
 ): Promise<T> =>
-    RequestContext.getRequestId()
-        ? fn()
-        : RequestContext.runFromHeaders(fn, 'render');
+    RequestContext.getRequestId() ? fn() : RequestContext.runFromHeaders(fn);

@@ -15,23 +15,11 @@ export const REQUEST_ID_FIELD_NAME = 'requestId';
 export const REQUEST_PATH_FIELD_NAME = 'path';
 
 /**
- * Where the context was created.
- *
- * route  - an API route handler (withRequestContext pipe). Cookie
- *          mutations and write side effects are allowed.
- * render - React server component / metadata render (runFromHeaders).
- *          cookies() calls throw mid-render, render-unsafe side
- *          effects must be skipped.
- */
-export type RequestContextOrigin = 'route' | 'render';
-
-/**
  * Shape of data carried inside the async context during the lifetime of a single request.
  * Extend this interface with more optional properties as required.
  */
 export interface RequestContextShape {
     requestId: string;
-    origin: RequestContextOrigin;
     requestPath?: string;
     requestMethod?: string;
     sessionId?: string | null;
@@ -50,7 +38,6 @@ interface HeaderReader {
  * Minimal source the context builder needs.
  */
 interface ContextSource {
-    origin: RequestContextOrigin;
     method: string;
     url?: string;
     headers: HeaderReader;
@@ -67,9 +54,7 @@ const asyncLocalStorage = new AsyncLocalStorage<RequestContextShape>();
 async function buildContext(
     source: ContextSource
 ): Promise<RequestContextShape> {
-    const ctx: RequestContextShape = {
-        origin: source.origin
-    } as RequestContextShape;
+    const ctx: RequestContextShape = {} as RequestContextShape;
 
     try {
         ///---------------------------------------------------------------------------------///
@@ -161,7 +146,6 @@ export const RequestContext = {
      */
     async run<T>(req: Request, fn: () => T): Promise<T> {
         const ctx = await buildContext({
-            origin: 'route',
             method: req.method,
             url: req.url,
             headers: req.headers
@@ -178,10 +162,7 @@ export const RequestContext = {
      * Reads request data from next/headers, so it can be called from any
      * server execution that lacks a Request object but still needs a context.
      */
-    async runFromHeaders<T>(
-        fn: () => T,
-        origin: RequestContextOrigin = 'render'
-    ): Promise<T> {
+    async runFromHeaders<T>(fn: () => T): Promise<T> {
         let headerList: HeaderReader;
 
         try {
@@ -193,7 +174,6 @@ export const RequestContext = {
         }
 
         const ctx = await buildContext({
-            origin,
             method: 'GET',
             headers: headerList
         });
@@ -245,21 +225,6 @@ export const RequestContext = {
 
     getIp(): string | null {
         return this.get('ip') ?? null;
-    },
-
-    //?—————————————————————————————————————————————————————————————————————————————————————————?//
-    //?                              ORIGIN OF THE ACTIVE CONTEXT                               ?//
-    ///
-    //# Defaults to route when NO context is active. This is deliberate: server actions
-    //# run without a context yet must be allowed to mutate cookies / run side effects,
-    //# so absence of context is treated as route-like. The flip side is that plain rsc render
-    //# code with no context is also reported as 'route' - see mutableCookies for why
-    //# render-safe cookie mutation must go through ensureRenderContext, not bare renders.
-    ///
-    //?—————————————————————————————————————————————————————————————————————————————————————————?//
-
-    getOrigin(): RequestContextOrigin {
-        return this.get('origin') ?? 'route';
     },
 
     //~-----------------------------------------------------------------------------------------~//

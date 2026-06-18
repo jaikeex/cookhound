@@ -62,14 +62,13 @@ describe('ensureRenderContext', () => {
         expect(result).toBe(42);
     });
 
-    it('stamps a freshly built context with the render origin', async () => {
+    it('builds the context via runFromHeaders with just the work fn', async () => {
         mockCtx.getRequestId.mockReturnValue(null);
 
         await ensureRenderContext(async () => 'x');
 
         expect(mockCtx.runFromHeaders).toHaveBeenCalledWith(
-            expect.any(Function),
-            'render'
+            expect.any(Function)
         );
     });
 });

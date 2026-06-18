@@ -384,12 +384,6 @@ describe('RequestContext', () => {
     //~=========================================================================================~//
 
     describe('runFromHeaders', () => {
-        it('should set origin to render', async () => {
-            await RequestContext.runFromHeaders(() => {
-                expect(RequestContext.getOrigin()).toBe('render');
-            });
-        });
-
         it('should populate session data from cookies during render', async () => {
             const mockSession = createMockSession({
                 userId: 7,
@@ -433,24 +427,6 @@ describe('RequestContext', () => {
                 const idBefore = RequestContext.getRequestId();
                 await new Promise((resolve) => setTimeout(resolve, 5));
                 expect(RequestContext.getRequestId()).toBe(idBefore);
-                expect(RequestContext.getOrigin()).toBe('render');
-            });
-        });
-    });
-
-    //~=========================================================================================~//
-    //$                                          ORIGIN                                         $//
-    //~=========================================================================================~//
-
-    describe('getOrigin', () => {
-        it('should default to route when no context is active', () => {
-            expect(RequestContext.getOrigin()).toBe('route');
-        });
-
-        it('should be route inside run()', async () => {
-            const mockRequest = new Request('http://localhost:3000/');
-            await RequestContext.run(mockRequest, () => {
-                expect(RequestContext.getOrigin()).toBe('route');
             });
         });
     });

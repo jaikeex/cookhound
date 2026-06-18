@@ -15,20 +15,11 @@ vi.mock('next/headers', () => ({
     cookies: vi.fn(() => Promise.resolve(mockCookieStore))
 }));
 
-vi.mock('@/server/utils/reqwest/context', () => ({
-    RequestContext: {
-        getOrigin: vi.fn()
-    }
-}));
-
 //|=============================================================================================|//
 //$                                          IMPORTS                                            $//
 //|=============================================================================================|//
 
 import { deleteSessionCookie } from './cookie';
-import { RequestContext } from '@/server/utils/reqwest/context';
-
-const mockCtx = vi.mocked(RequestContext);
 
 //|=============================================================================================|//
 //$                                           TESTS                                             $//
@@ -39,21 +30,11 @@ describe('deleteSessionCookie', () => {
         vi.clearAllMocks();
     });
 
-    it('deletes the session cookie when origin is route', async () => {
-        mockCtx.getOrigin.mockReturnValue('route');
-
+    it('deletes the session cookie from the store', async () => {
         await deleteSessionCookie();
 
         expect(mockCookieStore.delete).toHaveBeenCalledWith(
-            SESSION_COOKIE_NAME
+            expect.objectContaining({ name: SESSION_COOKIE_NAME })
         );
-    });
-
-    it('skips cookie mutation during an RSC render', async () => {
-        mockCtx.getOrigin.mockReturnValue('render');
-
-        await deleteSessionCookie();
-
-        expect(mockCookieStore.delete).not.toHaveBeenCalled();
     });
 });

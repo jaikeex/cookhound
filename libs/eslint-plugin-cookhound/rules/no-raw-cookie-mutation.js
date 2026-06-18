@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
 const path = require('node:path');
 
-// Mutating methods on the next/headers cookie store. These throw during an RSC
-// render; mutableCookies() turns them into no-ops there instead.
+// Mutating methods on the next/headers cookie store. All cookie mutation must
+// go through setCookie()/deleteCookie() so cookie attributes stay centralized.
 const MUTATION_METHODS = new Set(['set', 'delete', 'clear']);
 
-// The single module allowed to wrap cookies() and expose a guarded store.
+// The single module allowed to wrap cookies() and expose the mutation helpers.
 const isAccessorModule = (filename = '') => {
     const normalized = path.normalize(filename).split(path.sep).join('/');
     return normalized.endsWith('src/server/utils/reqwest/cookies.ts');
@@ -19,12 +19,12 @@ const rule = {
         type: 'problem',
         docs: {
             description:
-                'Disallow mutating the next/headers cookies() store directly. Use mutableCookies() so render-origin mutations are safely skipped instead of throwing.',
+                'Disallow mutating the next/headers cookies() store directly. Use setCookie()/deleteCookie() so cookie attributes (path/secure/domain) stay centralized in one place.',
             recommended: 'error'
         },
         messages: {
             noRawCookieMutation:
-                'Do not call .{{method}}() on the next/headers cookies() store directly. Use mutableCookies() from @/server/utils/reqwest/cookies so render-origin cookie mutations are skipped instead of throwing.'
+                'Do not call .{{method}}() on the next/headers cookies() store directly. Use setCookie()/deleteCookie() from @/server/utils/reqwest/cookies so the shared cookie attributes are applied in one place.'
         },
         schema: []
     },

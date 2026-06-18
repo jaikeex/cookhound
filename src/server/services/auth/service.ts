@@ -109,7 +109,7 @@ class AuthService {
 
         await db.user.updateOneById(user.id, { lastLogin: new Date() });
 
-        deleteSessionCookie();
+        await deleteSessionCookie();
 
         const token = await sessions.createSession(user.id, {
             ipAddress: RequestContext.getIp(),
@@ -261,7 +261,7 @@ class AuthService {
     @LogServiceMethod({ names: ['sessionId'] })
     async logout(sessionId: string): Promise<void> {
         await sessions.invalidateSession(sessionId);
-        deleteSessionCookie();
+        await deleteSessionCookie();
 
         return;
     }
@@ -287,7 +287,7 @@ class AuthService {
 
         await sessions.invalidateAllUserSessions(userId);
 
-        deleteSessionCookie();
+        await deleteSessionCookie();
     }
 
     //~-----------------------------------------------------------------------------------------~//

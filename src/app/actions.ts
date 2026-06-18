@@ -3,7 +3,6 @@
 import { cookies } from 'next/headers';
 import {
     CONSENT_COOKIE_MAX_AGE,
-    ENV_CONFIG_PUBLIC,
     LOCALE_COOKIE_NAME,
     ONE_YEAR_IN_SECONDS,
     SESSION_COOKIE_NAME
@@ -11,34 +10,25 @@ import {
 import type { CookieConsent } from '@/common/types/cookie-consent';
 import { cache } from 'react';
 import { userServerData } from '@/server/data/user/server';
-import { mutableCookies } from '@/server/utils/reqwest/cookies';
+import { setCookie } from '@/server/utils/reqwest/cookies';
 
 export const setLocaleCookie = async (locale: string): Promise<void> => {
-    const cookieStore = await mutableCookies();
-
-    cookieStore.set(LOCALE_COOKIE_NAME, locale, {
-        path: '/',
+    // Shared attributes (path / secure / domain) are applied by setCookie.
+    await setCookie(LOCALE_COOKIE_NAME, locale, {
         maxAge: ONE_YEAR_IN_SECONDS,
-        secure: ENV_CONFIG_PUBLIC.ENV === 'production',
-        sameSite: 'strict',
-        domain: ENV_CONFIG_PUBLIC.COOKIE_DOMAIN
+        sameSite: 'strict'
     });
 };
 
 export const setConsentCookie = async (
     consent: CookieConsent
 ): Promise<void> => {
-    const cookieStore = await mutableCookies();
-
-    cookieStore.set(
+    await setCookie(
         'cookie_consent',
         encodeURIComponent(JSON.stringify(consent)),
         {
-            path: '/',
             maxAge: CONSENT_COOKIE_MAX_AGE,
-            secure: ENV_CONFIG_PUBLIC.ENV === 'production',
-            sameSite: 'lax',
-            domain: ENV_CONFIG_PUBLIC.COOKIE_DOMAIN
+            sameSite: 'lax'
         }
     );
 };

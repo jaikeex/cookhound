@@ -17,79 +17,73 @@ vi.mock('next/headers', () => ({
     cookies: vi.fn(() => Promise.resolve(mockCookieStore))
 }));
 
-vi.mock('@/server/utils/reqwest/context', () => ({
-    RequestContext: {
-        getOrigin: vi.fn()
-    }
-}));
-
 //|=============================================================================================|//
 //$                                          IMPORTS                                            $//
 //|=============================================================================================|//
 
-import { mutableCookies } from './cookies';
-import { RequestContext } from '@/server/utils/reqwest/context';
-
-const mockCtx = vi.mocked(RequestContext);
+import { setCookie, deleteCookie } from './cookies';
 
 //|=============================================================================================|//
 //$                                           TESTS                                             $//
 //|=============================================================================================|//
 
-describe('mutableCookies', () => {
+describe('setCookie', () => {
     beforeEach(() => {
         vi.clearAllMocks();
     });
 
-    describe('route origin', () => {
-        beforeEach(() => {
-            mockCtx.getOrigin.mockReturnValue('route');
-        });
+    it('merges the shared attributes with the per-call options', async () => {
+        await setCookie('locale', 'en', { maxAge: 100, sameSite: 'strict' });
 
-        it('returns the real store so mutations apply', async () => {
-            const store = await mutableCookies();
+        expect(mockCookieStore.set).toHaveBeenCalledWith(
+            'locale',
+            'en',
+            expect.objectContaining({
+                path: '/',
+                maxAge: 100,
+                sameSite: 'strict'
+            })
+        );
 
-            store.set('a', 'b');
-            store.delete('a');
-
-            expect(mockCookieStore.set).toHaveBeenCalledWith('a', 'b');
-            expect(mockCookieStore.delete).toHaveBeenCalledWith('a');
-        });
-
-        it('passes reads straight through', async () => {
-            mockCookieStore.get.mockReturnValue({ value: 'x' });
-
-            const store = await mutableCookies();
-
-            expect(store.get('session')).toEqual({ value: 'x' });
-            expect(mockCookieStore.get).toHaveBeenCalledWith('session');
-        });
+        // The app-wide shared attributes are always applied.
+        const options = mockCookieStore.set.mock.calls[0]![2];
+        expect(options).toHaveProperty('secure');
+        expect(options).toHaveProperty('domain');
     });
 
-    describe('render origin', () => {
-        beforeEach(() => {
-            mockCtx.getOrigin.mockReturnValue('render');
-        });
+    it('lets per-call options override a shared default', async () => {
+        await setCookie('x', 'y', { path: '/scoped' });
 
-        it('turns mutations into no-ops instead of throwing', async () => {
-            const store = await mutableCookies();
+        const options = mockCookieStore.set.mock.calls[0]![2];
+        expect(options.path).toBe('/scoped');
+    });
 
-            expect(() => {
-                store.set('a', 'b');
-                store.delete('a');
-            }).not.toThrow();
+    it('applies the shared defaults when no per-call options are given', async () => {
+        await setCookie('x', 'y');
 
-            expect(mockCookieStore.set).not.toHaveBeenCalled();
-            expect(mockCookieStore.delete).not.toHaveBeenCalled();
-        });
+        expect(mockCookieStore.set).toHaveBeenCalledWith(
+            'x',
+            'y',
+            expect.objectContaining({ path: '/' })
+        );
+    });
+});
 
-        it('keeps reads live during a render', async () => {
-            mockCookieStore.get.mockReturnValue({ value: 'live' });
+describe('deleteCookie', () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
+    });
 
-            const store = await mutableCookies();
+    it('delegates to the store delete with the shared path/domain so the cookie actually clears', async () => {
+        await deleteCookie('session');
 
-            expect(store.get('session')).toEqual({ value: 'live' });
-            expect(mockCookieStore.get).toHaveBeenCalledWith('session');
-        });
+        expect(mockCookieStore.delete).toHaveBeenCalledWith(
+            expect.objectContaining({ name: 'session', path: '/' })
+        );
+
+        // The shared domain must be mirrored on deletion or a domain-scoped
+        // cookie would survive in the browser.
+        const arg = mockCookieStore.delete.mock.calls[0]![0];
+        expect(arg).toHaveProperty('domain');
     });
 });
