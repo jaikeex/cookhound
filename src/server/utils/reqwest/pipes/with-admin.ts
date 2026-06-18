@@ -1,8 +1,9 @@
 import type { NextRequest } from 'next/server';
-import { AuthErrorUnauthorized, AuthErrorForbidden } from '@/server/error';
+import { AuthErrorForbidden } from '@/server/error';
 import { UserRole } from '@/common/types';
 import { RequestContext } from '@/server/utils/reqwest/context';
 import { handleServerError } from '@/server/utils/reqwest/handleApiError';
+import { rejectUnauthenticated } from '@/server/utils/reqwest/pipes/rejectUnauthenticated';
 
 /**
  * hoc to guard route handlers and allow access only to admin users.
@@ -18,9 +19,7 @@ export function withAdmin<
         const userRole = RequestContext.getUserRole();
 
         if (!userId || userRole === UserRole.Guest) {
-            return handleServerError(new AuthErrorUnauthorized()) as Awaited<
-                ReturnType<T>
-            >;
+            return (await rejectUnauthenticated()) as Awaited<ReturnType<T>>;
         }
 
         if (userRole !== UserRole.Admin) {

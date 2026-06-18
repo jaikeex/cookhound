@@ -1,8 +1,7 @@
 import type { NextRequest } from 'next/server';
 import { RequestContext } from '@/server/utils/reqwest/context';
-import { AuthErrorUnauthorized } from '@/server/error';
 import { UserRole } from '@/common/types';
-import { handleServerError } from '@/server/utils/reqwest/handleApiError';
+import { rejectUnauthenticated } from '@/server/utils/reqwest/pipes/rejectUnauthenticated';
 
 /**
  * hoc to guard route handlers and allow access only to authenticated users.
@@ -18,9 +17,7 @@ export function withAuth<
         const userRole = RequestContext.getUserRole();
 
         if (!userId || userRole === UserRole.Guest) {
-            return handleServerError(new AuthErrorUnauthorized()) as Awaited<
-                ReturnType<T>
-            >;
+            return (await rejectUnauthenticated()) as Awaited<ReturnType<T>>;
         }
 
         // Forward the original arguments to the wrapped handler

@@ -19,19 +19,13 @@ vi.mock('@/server/utils/reqwest/context', () => ({
     }
 }));
 
-vi.mock('@/server/utils/session', () => ({
-    deleteSessionCookie: vi.fn()
-}));
-
 //|=============================================================================================|//
 //$                                          IMPORTS                                            $//
 //|=============================================================================================|//
 
 import { RequestContext } from '@/server/utils/reqwest/context';
-import { deleteSessionCookie } from '@/server/utils/session';
 
 const mockRequestContext = vi.mocked(RequestContext);
-const mockDeleteSessionCookie = vi.mocked(deleteSessionCookie);
 
 //|=============================================================================================|//
 //$                                           TESTS                                             $//
@@ -57,33 +51,18 @@ describe('Authorization Guards', () => {
             const result = assertAuthenticated();
 
             expect(result).toBe(1);
-            expect(mockDeleteSessionCookie).not.toHaveBeenCalled();
         });
 
         it('should throw AuthErrorUnauthorized for null userId', () => {
             mockRequestContext.getUserId.mockReturnValue(null);
 
             expect(() => assertAuthenticated()).toThrow(AuthErrorUnauthorized);
-            expect(mockDeleteSessionCookie).toHaveBeenCalled();
         });
 
         it('should throw AuthErrorUnauthorized for undefined userId', () => {
             mockRequestContext.getUserId.mockReturnValue(undefined as any);
 
             expect(() => assertAuthenticated()).toThrow(AuthErrorUnauthorized);
-            expect(mockDeleteSessionCookie).toHaveBeenCalled();
-        });
-
-        it('should delete session cookie when not authenticated', () => {
-            mockRequestContext.getUserId.mockReturnValue(null);
-
-            try {
-                assertAuthenticated();
-            } catch {
-                // Expected error
-            }
-
-            expect(mockDeleteSessionCookie).toHaveBeenCalledTimes(1);
         });
 
         it('should accept custom error parameter', () => {

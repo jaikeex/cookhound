@@ -2,7 +2,6 @@ import type { ClientError } from '@/server/error';
 import { RequestContext } from '@/server/utils/reqwest/context';
 import { UserRole } from '@/common/types';
 import { AuthErrorUnauthorized, AuthErrorForbidden } from '@/server/error';
-import { deleteSessionCookie } from '@/server/utils/session';
 
 /**
  * Asserts that the caller is anonymous (there is no userId present in the RequestContext).
@@ -27,7 +26,6 @@ export function assertAuthenticated(error?: ClientError): number {
     const userId = RequestContext.getUserId();
 
     if (!userId) {
-        deleteSessionCookie();
         throw error ?? new AuthErrorUnauthorized();
     }
 
