@@ -161,7 +161,7 @@ export const PUT = makeHandler(
     putHandler,
     withAuth,
     withRateLimit({
-        maxRequests: 10,
+        maxRequests: 20,
         windowSizeInSeconds: 60
     })
 );
