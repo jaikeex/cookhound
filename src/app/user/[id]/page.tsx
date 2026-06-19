@@ -1,8 +1,7 @@
 import type { Metadata } from 'next';
 import { ProfileTemplate } from '@/client/components/templates/Profile';
-import { userServerData } from '@/server/data/user/server';
+import { serverData } from '@/server/data';
 import { mapServiceErrorForRsc } from '@/server/data/runtime/mapError';
-import { reviveUserDates } from '@/client/data/user/revive';
 import { ProfileTab } from '@/client/types/core';
 import { SESSION_COOKIE_NAME, ENV_CONFIG_PUBLIC } from '@/common/constants';
 import { cookies, headers } from 'next/headers';
@@ -72,9 +71,8 @@ export default async function UserProfilePage({
         redirect(`/user/${id}?tab=${resolvedTab}`);
     }
 
-    const user = userServerData
+    const user = serverData.user
         .getById(id)
-        .then(reviveUserDates)
         .catch((error) => mapServiceErrorForRsc(error, `/user/${id}`));
 
     return (
@@ -104,7 +102,7 @@ export async function generateMetadata({
     }
 
     try {
-        const user = await userServerData.getById(numericId);
+        const user = await serverData.user.getById(numericId);
 
         return await getLocalizedMetadata(cookieStore, headerList, {
             titleKey: 'meta.user.title',

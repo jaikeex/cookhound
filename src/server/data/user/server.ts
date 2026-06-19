@@ -1,7 +1,8 @@
 import 'server-only';
 import { cache } from 'react';
 import { authReads, userReads } from '@/server/services';
-import type { UserDTO } from '@/common/types';
+import type { User } from '@/common/types';
+import { reviveUserDates } from '@/client/data/user/revive';
 import { ensureRenderContext } from '@/server/data/runtime/ensureContext';
 
 /**
@@ -11,17 +12,21 @@ import { ensureRenderContext } from '@/server/data/runtime/ensureContext';
  * guarantees a populated RequestContext so visibility groups and auth guards behave
  * correctly during a render.
  *
- * Methods are intended to be as raw as possible: they return the service's return
- * and rethrow the service's erros. Render call sites are responsible for handling everything relevant.
+ * Beyond date revival, methods stay raw: they rethrow the service's errors and leave
+ * render call sites to handle them.
  */
 export const userServerData = {
     getById: cache(
-        (id: number): Promise<UserDTO> =>
-            ensureRenderContext(() => userReads.getUserById(id))
+        (id: number): Promise<User> =>
+            ensureRenderContext(() => userReads.getUserById(id)).then(
+                reviveUserDates
+            )
     ),
 
     getCurrent: cache(
-        (): Promise<UserDTO> =>
-            ensureRenderContext(() => authReads.getAuthenticatedUser())
+        (): Promise<User> =>
+            ensureRenderContext(() => authReads.getAuthenticatedUser()).then(
+                reviveUserDates
+            )
     )
 };

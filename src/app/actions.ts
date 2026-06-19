@@ -9,7 +9,7 @@ import {
 } from '@/common/constants';
 import type { CookieConsent } from '@/common/types/cookie-consent';
 import { cache } from 'react';
-import { userServerData } from '@/server/data/user/server';
+import { serverData } from '@/server/data';
 import { setCookie } from '@/server/utils/reqwest/cookies';
 
 export const setLocaleCookie = async (locale: string): Promise<void> => {
@@ -42,5 +42,5 @@ export const getCurrentUser = cache(async () => {
     const session = cookieStore.get(SESSION_COOKIE_NAME)?.value;
     if (!session) return null;
 
-    return userServerData.getCurrent();
+    return serverData.user.getCurrent();
 });
