@@ -1,9 +1,7 @@
 import React from 'react';
-import { apiClient } from '@/client/request';
-import { reviveRecipeDates } from '@/client/data/recipe/revive';
+import { serverData } from '@/server/data';
+import { mapServiceErrorForRsc } from '@/server/data/runtime/mapError';
 import { RecipeEditTemplate } from '@/client/components';
-import { cookies } from 'next/headers';
-import { SESSION_COOKIE_NAME } from '@/common/constants';
 import { verifySessionFromCookie } from '@/server/utils/session';
 import { ClientRedirect } from '@/client/components';
 import type { Metadata } from 'next';
@@ -42,18 +40,13 @@ export default async function Page({ params }: RecipePageParams) {
         );
     }
 
-    const cookieStore = await cookies();
-    const sessionId = cookieStore.get(SESSION_COOKIE_NAME)?.value;
-
-    const wire = await apiClient.recipe.getRecipeByDisplayId(recipeDisplayId, {
-        cache: 'no-store',
-        ...(sessionId
-            ? {
-                  headers: { 'Cookie': `session=${sessionId}` }
-              }
-            : {})
-    });
-    const recipe = reviveRecipeDates(wire);
+    // Always use fresh read, the author edits and saves over this, so it must
+    // reflect the current recipe.
+    const recipe = await serverData.recipe
+        .getByDisplayIdFresh(recipeDisplayId)
+        .catch((error) =>
+            mapServiceErrorForRsc(error, `/recipe/${recipeDisplayId}/edit`)
+        );
 
     if (recipe.authorId !== result.session.userId) {
         return <ClientRedirect url="/" />;

@@ -6,6 +6,7 @@ export const reviveRecipeDates = (dto: RecipeDTO): Recipe => {
             'reviveRecipeDates: recipe DTO is missing createdAt/updatedAt'
         );
     }
+
     return {
         ...dto,
         createdAt: new Date(dto.createdAt),

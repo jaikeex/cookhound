@@ -1,10 +1,10 @@
 import type { Metadata } from 'next';
 import { SearchTemplate } from '@/client/components/templates/Dashboard/Search';
-import { apiClient } from '@/client/request';
+import { serverData } from '@/server/data';
 import { getUserLocale } from '@/common/utils';
 import { cookies, headers } from 'next/headers';
 import React from 'react';
-import { SESSION_COOKIE_NAME, ENV_CONFIG_PUBLIC } from '@/common/constants';
+import { ENV_CONFIG_PUBLIC } from '@/common/constants';
 import {
     generateBreadcrumbSchema,
     getLocalizedMetadata
@@ -27,16 +27,9 @@ export default async function SearchPage({
     const headerList = await headers();
 
     const locale = await getUserLocale(cookieStore, headerList);
-    const sessionId = cookieStore.get(SESSION_COOKIE_NAME)?.value;
 
     const recipesForDisplay = searchQuery
-        ? apiClient.recipe.searchRecipes(searchQuery, locale, 1, 24, {
-              ...(sessionId
-                  ? {
-                        headers: { 'Cookie': `session=${sessionId}` }
-                    }
-                  : {})
-          })
+        ? serverData.recipe.search(searchQuery, locale, 1, 24)
         : Promise.resolve([]);
 
     const breadcrumbItems = [

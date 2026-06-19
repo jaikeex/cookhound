@@ -1,10 +1,9 @@
 import type { Metadata } from 'next';
 import { FrontPageTemplate } from '@/client/components/templates/Dashboard/FrontPage';
-import { apiClient } from '@/client/request';
+import { serverData } from '@/server/data';
 import { getUserLocale } from '@/common/utils';
 import { cookies, headers } from 'next/headers';
 import React from 'react';
-import { SESSION_COOKIE_NAME } from '@/common/constants/general';
 import {
     generateWebSiteSchema,
     generateOrganizationSchema,
@@ -12,6 +11,7 @@ import {
 } from '@/server/utils/seo';
 import { StructuredData } from '@/client/components';
 import { ENV_CONFIG_PUBLIC } from '@/common/constants';
+import { mapServiceErrorForRsc } from '@/server/data/runtime/mapError';
 
 //|=============================================================================================|//
 
@@ -20,15 +20,10 @@ export default async function Home() {
     const headerList = await headers();
 
     const locale = await getUserLocale(cookieStore, headerList);
-    const sessionId = cookieStore.get(SESSION_COOKIE_NAME)?.value;
 
-    const recipesForDisplay = apiClient.recipe.getRecipeList(locale, 1, 24, {
-        ...(sessionId
-            ? {
-                  headers: { 'Cookie': `session=${sessionId}` }
-              }
-            : {})
-    });
+    const recipesForDisplay = serverData.recipe
+        .list(locale, 1, 24)
+        .catch((error) => mapServiceErrorForRsc(error, `/`));
 
     const websiteSchema = generateWebSiteSchema(ENV_CONFIG_PUBLIC.ORIGIN);
     const organizationSchema = generateOrganizationSchema(

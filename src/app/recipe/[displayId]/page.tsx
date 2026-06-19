@@ -1,11 +1,10 @@
 import React from 'react';
-import { apiClient } from '@/client/request';
-import { reviveRecipeDates } from '@/client/data/recipe/revive';
+import { serverData } from '@/server/data';
+import { mapServiceErrorForRsc } from '@/server/data/runtime/mapError';
 import { RecipeStructuredData, RecipeViewTemplate } from '@/client/components';
 import type { Metadata } from 'next';
-import { cookies, headers } from 'next/headers';
-import { getLocalizedMetadata } from '@/server/utils/seo';
-import { ENV_CONFIG_PUBLIC } from '@/common/constants';
+import { buildLocalizedMetadata } from '@/server/utils/seo';
+import { ENV_CONFIG_PUBLIC, DEFAULT_LOCALE } from '@/common/constants';
 import db from '@/server/db/model';
 
 export const revalidate = 3600;
@@ -24,11 +23,11 @@ export default async function Page({ params }: RecipePageParams) {
     const paramsResolved = await params;
     const recipeDisplayId = paramsResolved.displayId;
 
-    const recipePromise = apiClient.recipe
-        .getRecipeByDisplayId(recipeDisplayId, {
-            revalidate: 3600
-        })
-        .then(reviveRecipeDates);
+    const recipePromise = serverData.recipe
+        .getByDisplayId(recipeDisplayId)
+        .catch((error) =>
+            mapServiceErrorForRsc(error, `/recipe/${recipeDisplayId}`)
+        );
 
     return (
         <React.Fragment>
@@ -53,23 +52,19 @@ export async function generateMetadata({
 }: RecipePageParams): Promise<Metadata> {
     const paramsResolved = await params;
     const recipeDisplayId = paramsResolved.displayId;
-    const cookieStore = await cookies();
-    const headerList = await headers();
 
     try {
-        const wire = await apiClient.recipe.getRecipeByDisplayId(
-            recipeDisplayId,
-            {
-                revalidate: 3600
-            }
-        );
-        const recipe = reviveRecipeDates(wire);
+        const recipe = await serverData.recipe.getByDisplayId(recipeDisplayId);
 
         const canonical = `${ENV_CONFIG_PUBLIC.ORIGIN}/recipe/${recipeDisplayId}`;
 
         const recipeDescription = recipe.description?.trim() || undefined;
 
-        return getLocalizedMetadata(cookieStore, headerList, {
+        // The metadata language is an intrinsic property of the recipe (its
+        // own content language), not of the visitor. Sourcing it from the
+        // record rather than from cookies()/headers() keeps this route
+        // statically renderable / ISR-eligible.
+        return buildLocalizedMetadata(recipe.language, {
             titleKey: 'meta.recipe.title',
             descriptionKey: 'meta.recipe.description',
             ogTitleKey: 'meta.recipe.title',
@@ -87,7 +82,10 @@ export async function generateMetadata({
             tags: recipe.tags?.map((tag) => tag.name) ?? []
         });
     } catch {
-        return getLocalizedMetadata(cookieStore, headerList, {
+        // Recipe could not be fetched (e.g. not found): we have no record to
+        // read a language from, so fall back to the default locale. Still no
+        // dynamic request APIs, so the route stays statically renderable.
+        return buildLocalizedMetadata(DEFAULT_LOCALE, {
             titleKey: 'meta.recipe.fallback.title',
             descriptionKey: 'meta.recipe.fallback.description',
             canonical: `${ENV_CONFIG_PUBLIC.ORIGIN}/recipe/${recipeDisplayId}`

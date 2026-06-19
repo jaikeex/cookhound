@@ -54,7 +54,7 @@ class RecipeModel {
             ttl ?? CACHE_TTL.TTL_2
         );
 
-        return recipe[0] ?? null;
+        return this.reviveRecipeDates(recipe[0] ?? null);
     }
 
     /**
@@ -82,7 +82,7 @@ class RecipeModel {
             ttl ?? CACHE_TTL.TTL_2
         );
 
-        return recipe[0] ?? null;
+        return this.reviveRecipeDates(recipe[0] ?? null);
     }
 
     /**
@@ -891,6 +891,26 @@ class RecipeModel {
         await invalidateCacheByPattern('prisma:recipe:search:*');
         await invalidateCacheByPattern('prisma:recipe:filterMany:*');
         await invalidateCacheByPattern('prisma:recipe:findManyFrontPage:*');
+    }
+
+    /**
+     * Re-instantiates the recipe's Date fields after a cache round-trip.
+     *
+     * NOT a no-op, despite the types claiming otherwise: cachePrismaQuery serializes
+     * results to JSON in redis, so on a cache hit these come back as strings,
+     * not Date instances. Callers that do recipe.createdAt.toISOString() would
+     * throw on those hits without this. Do NOT remove it.
+     */
+    private reviveRecipeDates(
+        recipe: getRecipeById.Result | null
+    ): getRecipeById.Result | null {
+        if (!recipe) return null;
+
+        return {
+            ...recipe,
+            createdAt: new Date(recipe.createdAt),
+            updatedAt: new Date(recipe.updatedAt)
+        };
     }
 
     /**

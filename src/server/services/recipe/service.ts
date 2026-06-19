@@ -121,14 +121,37 @@ class RecipeService {
 
     /**
      * Retrieves a full recipe by its public-facing display ID.
+     * Served from model cache
      *
      * @param displayId - Public UUID used in recipe URLs.
-     * @returns The complete recipe DTO with an incremented view count.
+     * @returns The complete recipe DTO.
      * @throws {NotFoundError} If the recipe does not exist or is missing required fields.
      */
     @LogServiceMethod({ names: ['displayId'] })
     async getRecipeByDisplayId(displayId: string): Promise<Recipe> {
-        const recipe = await db.recipe.getOneByDisplayId(displayId);
+        return this.resolveRecipeByDisplayId(displayId);
+    }
+
+    /**
+     * Bypasses the cache and returns the currently saved recipe.
+     *
+     * @param displayId - Public UUID used in recipe URLs.
+     * @returns The complete recipe DTO, read past the cache.
+     * @throws {NotFoundError} If the recipe does not exist or is missing required fields.
+     */
+    @LogServiceMethod({ names: ['displayId'] })
+    async getFreshRecipeByDisplayId(displayId: string): Promise<Recipe> {
+        return this.resolveRecipeByDisplayId(displayId, 0);
+    }
+
+    /**
+     * Shared body for the display-ID reads.
+     */
+    private async resolveRecipeByDisplayId(
+        displayId: string,
+        ttl?: number
+    ): Promise<Recipe> {
+        const recipe = await db.recipe.getOneByDisplayId(displayId, ttl);
 
         if (!recipe) {
             log.info('getRecipeByDisplayId - recipe not found', { displayId });
@@ -924,4 +947,27 @@ class RecipeService {
     }
 }
 
+/**
+ * Render-safe subset of RecipeService. serverData access points and rsc render paths
+ * depends on this so that only allowed methods are in scope, and side effects
+ * cannot be called by mistake.
+ */
+export interface RecipeReads {
+    getRecipeById(id: number): Promise<Recipe>;
+    getRecipeByDisplayId(displayId: string): Promise<Recipe>;
+    getFreshRecipeByDisplayId(displayId: string): Promise<Recipe>;
+    getFrontPageRecipes(
+        language: Locale,
+        batch: number,
+        perPage: number
+    ): Promise<RecipeForDisplayDTO[]>;
+    searchRecipes(
+        query: string,
+        language: Locale,
+        batch: number,
+        perPage: number
+    ): Promise<RecipeForDisplayDTO[]>;
+}
+
 export const recipeService = new RecipeService();
+export const recipeReads: RecipeReads = recipeService;

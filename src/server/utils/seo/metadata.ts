@@ -4,6 +4,7 @@ import { getUserLocale } from '@/common/utils';
 import { tServer } from '@/server/utils/locales';
 import type { I18nMessage } from '@/client/locales';
 import { ENV_CONFIG_PUBLIC } from '@/common/constants';
+import type { Locale } from '@/common/types';
 
 type MetadataConfig = {
     titleKey: I18nMessage;
@@ -38,7 +39,14 @@ function validateDescription(description: string, maxLength = 160): string {
 }
 
 /**
- * Generates localized metadata for Next.js pages with SEO optimizations
+ * Generates localized metadata for Next.js pages with SEO optimizations.
+ *
+ * Resolves the locale from the request (cookie/header). This reads dynamic
+ * request data and therefore opts the calling route into dynamic rendering;
+ * use it for pages that are dynamic anyway. For statically rendered / ISR
+ * pages whose language is an intrinsic property of the content (e.g. a recipe
+ * record's own language), call {@link buildLocalizedMetadata} with an explicit
+ * locale instead, so the route stays statically renderable.
  *
  * @param cookies - The request cookies
  * @param headers - The request headers
@@ -50,11 +58,26 @@ export async function getLocalizedMetadata(
     headers: Headers,
     config: MetadataConfig
 ): Promise<Metadata> {
+    const locale = await getUserLocale(cookies, headers);
+    return buildLocalizedMetadata(locale, config);
+}
+
+/**
+ * Builds localized metadata from an explicit locale, without touching any
+ * dynamic request APIs. Safe to call from statically rendered / ISR routes.
+ *
+ * @param locale - The locale to render the metadata strings in
+ * @param config - Configuration object for metadata
+ * @returns - The localized metadata object
+ */
+export async function buildLocalizedMetadata(
+    locale: Locale,
+    config: MetadataConfig
+): Promise<Metadata> {
     //|-----------------------------------------------------------------------------------------|//
     //?                                      BASIC METADATA                                     ?//
     //|-----------------------------------------------------------------------------------------|//
 
-    const locale = await getUserLocale(cookies, headers);
     const baseUrl = ENV_CONFIG_PUBLIC.ORIGIN;
 
     const canonicalUrl = config.canonical || baseUrl;
