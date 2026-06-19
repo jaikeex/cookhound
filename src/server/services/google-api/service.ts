@@ -3,13 +3,16 @@ import { googleApiClient } from '@/server/integrations/google';
 import type { LogEntry } from '@/server/integrations/google';
 import { Logger, LogServiceMethod } from '@/server/logger';
 
+const LOG_CONTEXT = 'google-api-service';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const log = Logger.getInstance('google-api-service');
+const log = Logger.getInstance(LOG_CONTEXT);
 
 /**
  * Wraps Google Cloud Platform APIs.
  */
 class GoogleApiService {
+    static readonly LOG_CONTEXT = LOG_CONTEXT;
+
     /**
      * Uploads a recipe image to the dedicated Cloud Storage bucket.
      *

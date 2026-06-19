@@ -31,7 +31,8 @@ import {
 
 //|=============================================================================================|//
 
-const log = Logger.getInstance('auth-service');
+const LOG_CONTEXT = 'auth-service';
+const log = Logger.getInstance(LOG_CONTEXT);
 
 // This is true by definition for all methods in this service
 const AUTH_USER_GROUPS = ['self'] as UserVisibilityGroup[];
@@ -42,6 +43,8 @@ const AUTH_USER_SELECT = getUserSelect(AUTH_USER_GROUPS);
  * session lifecycle, and current-user resolution.
  */
 class AuthService {
+    static readonly LOG_CONTEXT = LOG_CONTEXT;
+
     //~-----------------------------------------------------------------------------------------~//
     //$                                          LOGIN                                          $//
     //~-----------------------------------------------------------------------------------------~//

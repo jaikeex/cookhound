@@ -16,12 +16,15 @@ import type { RecipeFlagReason } from '@/common/constants';
 
 //|=============================================================================================|//
 
-const log = Logger.getInstance('recipe-flag-service');
+const LOG_CONTEXT = 'recipe-flag-service';
+const log = Logger.getInstance(LOG_CONTEXT);
 
 /**
  * Manages recipe content flags and the user-submitted appeals filed against them.
  */
 class RecipeFlagService {
+    static readonly LOG_CONTEXT = LOG_CONTEXT;
+
     /**
      * Create a new appeal for an active recipe flag. Enforces three invariants
      * at the service layer:

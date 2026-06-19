@@ -6,6 +6,11 @@ export interface LogOptions {
     success?: LogLevel;
     names?: string[];
     excludeArgs?: boolean;
+    context?: string;
+}
+
+interface HasLogContext {
+    LOG_CONTEXT?: string;
 }
 
 /**
@@ -50,6 +55,11 @@ export function LogServiceMethod(
             ? (arg1.excludeArgs ?? false)
             : false;
 
+    const explicitContext: string | undefined =
+        typeof arg1 === 'object' && !Array.isArray(arg1)
+            ? arg1.context
+            : undefined;
+
     return (
         target: object,
         propertyKey: string | symbol,
@@ -59,9 +69,28 @@ export function LogServiceMethod(
 
         if (typeof original !== 'function') return descriptor;
 
-        const className = target.constructor.name;
-
         descriptor.value = function (...args: unknown[]) {
+            //?—————————————————————————————————————————————————————————————————————————————————?//
+            //?                                 LOGGER CONTEXT                                  ?//
+            ///
+            //# There needs to be a way to explicitly declare the logger context.
+            //# Previously, it was inferred from the caller's constructor name, but,
+            //# as it turns out, the bundler changes class identifiers
+            //# ("minifies" officially...), into an unrecongizable ones, often single letters.
+            //#
+            //# Also, Resolving the context at call time ensures the LOG_CONTEXT
+            //# field to be assigned. With legacy decorators the ordering of
+            //# static field initialization vs method-decorator application
+            //# cannot be guaranteed.
+            ///
+            //?—————————————————————————————————————————————————————————————————————————————————?//
+
+            const ctor = target.constructor as HasLogContext & {
+                name: string;
+            };
+
+            const className = explicitContext ?? ctor.LOG_CONTEXT ?? ctor.name;
+
             const log = Logger.getInstance(className);
 
             let payload: Record<string, unknown> = {};

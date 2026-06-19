@@ -4,13 +4,16 @@ import { Logger, LogServiceMethod } from '@/server/logger';
 
 //|=============================================================================================|//
 
+const LOG_CONTEXT = 'ingredient-service';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const log = Logger.getInstance('ingredient-service');
+const log = Logger.getInstance(LOG_CONTEXT);
 
 /**
  * Provides read access to the ingredient catalogue.
  */
 class IngredientService {
+    static readonly LOG_CONTEXT = LOG_CONTEXT;
+
     /**
      * Returns all ingredients for a given locale, sorted alphabetically.
      *

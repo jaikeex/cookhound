@@ -13,13 +13,16 @@ import { createCookbookDTO, verifyCookbookOwnership } from './utils';
 
 //|=============================================================================================|//
 
-const log = Logger.getInstance('cookbook-service');
+const LOG_CONTEXT = 'cookbook-service';
+const log = Logger.getInstance(LOG_CONTEXT);
 
 /**
  * Manages cookbook operations and recipe-to-cookbook associations,
  * including ordering of both recipes within a cookbook and the cookbooks themselves.
  */
 class CookbookService {
+    static readonly LOG_CONTEXT = LOG_CONTEXT;
+
     /**
      * Retrieves a single cookbook by its database ID.
      *

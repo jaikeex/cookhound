@@ -6,8 +6,9 @@ import { JOB_NAMES } from '@/server/queues/jobs/names';
 
 //|=============================================================================================|//
 
+const LOG_CONTEXT = 'mail-service';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const log = Logger.getInstance('mail-service');
+const log = Logger.getInstance(LOG_CONTEXT);
 
 /**
  * Enqueues transactional emails via BullMQ. All methods are fire-and-forget
@@ -15,6 +16,8 @@ const log = Logger.getInstance('mail-service');
  * The recipient's locale is resolved from {@link RequestContext}.
  */
 class MailService {
+    static readonly LOG_CONTEXT = LOG_CONTEXT;
+
     /**
      * Enqueues an email verification link for a newly registered user.
      *

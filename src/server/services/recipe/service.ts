@@ -32,7 +32,8 @@ import { getFrontPageRecipes } from '@/server/db/generated/prisma/sql';
 
 //|=============================================================================================|//
 
-const log = Logger.getInstance('recipe-service');
+const LOG_CONTEXT = 'recipe-service';
+const log = Logger.getInstance(LOG_CONTEXT);
 
 /**
  * Manages recipe lifecycle operations including creation, updates, deletion,
@@ -40,6 +41,8 @@ const log = Logger.getInstance('recipe-service');
  * search index and content evaluation.
  */
 class RecipeService {
+    static readonly LOG_CONTEXT = LOG_CONTEXT;
+
     //~-----------------------------------------------------------------------------------------~//
     //$                                        GET BY ID                                        $//
     //~-----------------------------------------------------------------------------------------~//

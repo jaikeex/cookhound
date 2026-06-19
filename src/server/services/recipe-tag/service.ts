@@ -3,13 +3,16 @@ import { Logger, LogServiceMethod } from '@/server/logger';
 
 //|=============================================================================================|//
 
+const LOG_CONTEXT = 'recipe-tag-service';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const log = Logger.getInstance('recipe-tag-service');
+const log = Logger.getInstance(LOG_CONTEXT);
 
 /**
  * Provides read access to the recipe tag catalogue.
  */
 class RecipeTagService {
+    static readonly LOG_CONTEXT = LOG_CONTEXT;
+
     /**
      * Returns all recipe tags for a given locale.
      *

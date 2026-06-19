@@ -47,7 +47,8 @@ import { ONE_MINUTE_IN_SECONDS } from '@/common/constants/time';
 
 //|=============================================================================================|//
 
-const log = Logger.getInstance('user-service');
+const LOG_CONTEXT = 'user-service';
+const log = Logger.getInstance(LOG_CONTEXT);
 
 /**
  * Window during which at most one visit write is performed per user. Page
@@ -65,6 +66,8 @@ const VISIT_THROTTLE_KEY_PREFIX = 'user-visit:';
  * @see {@link RequestContext} for authenticated user resolution
  */
 class UserService {
+    static readonly LOG_CONTEXT = LOG_CONTEXT;
+
     //~-----------------------------------------------------------------------------------------~//
     //$                                         CREATE                                          $//
     //~-----------------------------------------------------------------------------------------~//

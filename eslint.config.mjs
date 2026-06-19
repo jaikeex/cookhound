@@ -148,6 +148,7 @@ export default [
             'cookhound/require-make-handler': 'error',
             'cookhound/no-raw-request-json': 'error',
             'cookhound/no-raw-cookie-mutation': 'error',
+            'cookhound/require-log-context': 'error',
 
             // General rules
             'prefer-const': 'error',
@@ -159,6 +160,15 @@ export default [
                     patterns: ['../']
                 }
             ]
+        }
+    },
+
+    {
+        files: ['libs/**/*.{js,cjs,mjs}'],
+        languageOptions: {
+            parserOptions: {
+                project: false
+            }
         }
     },
 

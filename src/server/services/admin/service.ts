@@ -23,7 +23,8 @@ import { ApplicationErrorCode } from '@/server/error/codes';
 
 //|=============================================================================================|//
 
-const log = Logger.getInstance('admin-service');
+const LOG_CONTEXT = 'admin-service';
+const log = Logger.getInstance(LOG_CONTEXT);
 
 type AdminUserDetail = Prisma.UserGetPayload<{
     select: typeof ADMIN_USER_DETAIL_SELECT;
@@ -46,6 +47,8 @@ const ACCOUNT_DELETION_GRACE_PERIOD_DAYS = 30;
  * and account lifecycle actions.
  */
 class AdminService {
+    static readonly LOG_CONTEXT = LOG_CONTEXT;
+
     //~=========================================================================================~//
     //$                                       DASHBOARD                                         $//
     //~=========================================================================================~//

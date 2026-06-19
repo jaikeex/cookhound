@@ -10,12 +10,15 @@ import { Logger, LogServiceMethod } from '@/server/logger';
 
 //|=============================================================================================|//
 
-const log = Logger.getInstance('recipe-filter-service');
+const LOG_CONTEXT = 'recipe-filter-service';
+const log = Logger.getInstance(LOG_CONTEXT);
 
 /**
  * Provides multi-dimensional recipe filtering with pagination.
  */
 class RecipeFilterService {
+    static readonly LOG_CONTEXT = LOG_CONTEXT;
+
     private readonly MAX_BATCHES = 20;
 
     /**

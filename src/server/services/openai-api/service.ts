@@ -15,13 +15,16 @@ import recipeTagModel from '@/server/db/model/recipe-tag/model';
 
 //|=============================================================================================|//
 
+const LOG_CONTEXT = 'openai-api-service';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const log = Logger.getInstance('openai-api-service');
+const log = Logger.getInstance(LOG_CONTEXT);
 
 /**
  * Integrates cookhound with OpenAI APIs.
  */
 class OpenAIApiService {
+    static readonly LOG_CONTEXT = LOG_CONTEXT;
+
     /**
      * Enqueues an asynchronous content evaluation job for a recipe.
      * The evaluation runs in the worker process and may flag the recipe
