@@ -9,6 +9,7 @@ import { BOTTOM_NAVBAR_ID } from '@/client/constants';
 import { usePathname } from 'next/navigation';
 import { AppEvent } from '@/client/events';
 import { useAppEventListener } from '@/client/hooks';
+import { BottomNavigationSkeleton } from './skeleton';
 
 const DISABLED_FOR_ROUTES = ['/recipe/create'];
 
@@ -46,20 +47,24 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = () => {
     useAppEventListener(AppEvent.NOT_FOUND_OPENED, () => setIsNotfound(true));
     useAppEventListener(AppEvent.NOT_FOUND_CLOSED, () => setIsNotfound(false));
 
-    if (!authResolved || isDisabled || isNotfound) return null;
+    if (isDisabled || isNotfound) return null;
+
+    if (!authResolved) {
+        return <BottomNavigationSkeleton />;
+    }
 
     return (
         <div
             id={BOTTOM_NAVBAR_ID}
             className={classNames(
                 `block md:hidden z-20 fixed bottom-0 left-0 right-0 h-14 px-2 py-4 bg-[#f0fdf4] dark:bg-[#021812]`,
-                `flex *:w-full items-center justify-between border-t border-gray-300 dark:border-gray-800`,
-                isNotfound ? 'hidden' : ''
+                `flex *:w-full items-center justify-between border-t border-gray-300 dark:border-gray-800`
             )}
         >
             <Link href={'/'} aria-label={t('app.general.home')}>
                 <Icon name="home" label={t('app.general.home')} />
             </Link>
+
             <Link
                 href={`/user/${user?.id}?tab=cookbooks`}
                 aria-label={t('app.general.cookbooks')}

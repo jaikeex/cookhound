@@ -1,9 +1,7 @@
 import React from 'react';
 import '@/client/globals.css';
 import type { Metadata, Viewport } from 'next';
-import { cookies, headers } from 'next/headers';
 import { Kalam, Open_Sans } from 'next/font/google';
-import { QueryClient, dehydrate } from '@tanstack/react-query';
 
 import { QueryProvider } from '@/client/store';
 import { AppProviders } from './providers';
@@ -17,20 +15,11 @@ import {
     ConsentBanner
 } from '@/client/components';
 
-import type { UserDTO } from '@/common/types';
-import {
-    CONTENT_WRAPPER_ID,
-    MAIN_PAGE_ID,
-    THEME_STORAGE_KEY
-} from '@/client/constants';
+import { CONTENT_WRAPPER_ID, MAIN_PAGE_ID } from '@/client/constants';
 import { locales } from '@/client/locales';
 import { classNames } from '@/client/utils';
 import { tServer } from '@/server/utils/locales';
-import { getCurrentUser } from './actions';
-import { pickMostRecentConsent, getUserLocale } from '@/common/utils';
-import { QUERY_KEYS } from '@/client/data';
-import type { CookieConsent } from '@/common/types/cookie-consent';
-import { ENV_CONFIG_PUBLIC, CONSENT_VERSION } from '@/common/constants';
+import { DEFAULT_LOCALE, ENV_CONFIG_PUBLIC } from '@/common/constants';
 
 const openSans = Open_Sans({
     subsets: ['latin'],
@@ -55,113 +44,35 @@ export const viewport: Viewport = {
     viewportFit: 'cover'
 };
 
-export default async function RootLayout({
+//?—————————————————————————————————————————————————————————————————————————————————————————————?//
+//?                                     STATIC ROOT LAYOUT                                      ?//
+///
+//# The root layout intentionally reads NO dynamic request APIs (cookies()/headers()).
+//# Doing so would put the entire route subtree into dynamic rendering and break ISR
+//# everywhere. (Yes, I made this mistake and did not realize for quite some time...)
+//#
+//# The values passed below are therefore static defaults, not request-derived state.
+///
+//?—————————————————————————————————————————————————————————————————————————————————————————————?//
+
+export default function RootLayout({
     children
 }: Readonly<{
     children: React.ReactNode;
 }>) {
-    const qc = new QueryClient();
-
-    //|-----------------------------------------------------------------------------------------|//
-    //?                                          LOCALE                                         ?//
-    //|-----------------------------------------------------------------------------------------|//
-
-    const cookieStore = await cookies();
-    const headerList = await headers();
-
-    const locale = await getUserLocale(cookieStore, headerList);
+    const locale = DEFAULT_LOCALE;
 
     // This is required to pass the messages down the tree as the default export from .json files is not serializable
     const messages = { ...locales[locale] };
-
-    //|-----------------------------------------------------------------------------------------|//
-    //?                                      AUTHENTICATION                                     ?//
-    //|-----------------------------------------------------------------------------------------|//
-
-    await qc.prefetchQuery({
-        queryKey: QUERY_KEYS.auth.currentUser,
-        staleTime: 0, // intentional, see the query client for more info.
-        queryFn: async () => {
-            try {
-                if (typeof window !== 'undefined') {
-                    return null;
-                }
-                return await getCurrentUser();
-            } catch (error: unknown) {
-                return null;
-            }
-        }
-    });
-
-    const user = qc.getQueryData<UserDTO | null>(QUERY_KEYS.auth.currentUser);
-
-    //|-----------------------------------------------------------------------------------------|//
-    //?                                      COOKIE CONSENT                                     ?//
-    //|-----------------------------------------------------------------------------------------|//
-
-    let cookieConsent: CookieConsent | null = null;
-
-    const rawConsent = cookieStore.get('cookie_consent')?.value;
-
-    //The user consent should never be fetched from db if revoked, but just to make sure not to mess gdpr up...
-    const dbConsent = user?.cookieConsent?.[0]?.revokedAt
-        ? null
-        : (user?.cookieConsent?.[0] ?? null);
-
-    if (rawConsent) {
-        try {
-            const parsed = JSON.parse(decodeURIComponent(rawConsent));
-            // Validate version - discard if outdated
-            cookieConsent = parsed?.version === CONSENT_VERSION ? parsed : null;
-        } catch {
-            cookieConsent = null;
-        }
-    }
-
-    // Validate DB consent version - discard if outdated
-    const validDbConsent =
-        dbConsent?.version === CONSENT_VERSION ? dbConsent : null;
-
-    const validCookieConsent =
-        cookieConsent?.version === CONSENT_VERSION ? cookieConsent : null;
-
-    const initialConsent = cookieConsent
-        ? pickMostRecentConsent(validCookieConsent, validDbConsent)
-        : null;
-
-    //|-----------------------------------------------------------------------------------------|//
-    //?                                          THEME                                          ?//
-    //|-----------------------------------------------------------------------------------------|//
-
-    const themeFromCookie = initialConsent?.accepted?.includes('preferences')
-        ? (cookieStore.get(THEME_STORAGE_KEY)?.value ?? null)
-        : null;
-
-    const canUsePreferences =
-        initialConsent?.accepted?.includes('preferences') ?? false;
-
-    const themeFromPreferences = user?.preferences?.theme ?? null;
-
-    const initialTheme = canUsePreferences
-        ? ((themeFromCookie ?? themeFromPreferences ?? 'dark') as
-              | 'light'
-              | 'dark')
-        : 'dark';
-
-    //|-----------------------------------------------------------------------------------------|//
-    //?                                          RENDER                                         ?//
-    //|-----------------------------------------------------------------------------------------|//
-
-    const dehydratedState = dehydrate(qc);
 
     return (
         <html lang={locale} suppressHydrationWarning>
             <Head />
             <body className={`${kalam.variable} ${openSans.variable}`}>
-                <QueryProvider dehydratedState={dehydratedState}>
+                <QueryProvider>
                     <AppProviders
-                        initialTheme={initialTheme}
-                        initialConsent={initialConsent}
+                        initialTheme="dark"
+                        initialConsent={null}
                         messages={messages}
                         locale={locale}
                     >
@@ -197,9 +108,7 @@ export default async function RootLayout({
 //|=============================================================================================|//
 
 export async function generateMetadata(): Promise<Metadata> {
-    const cookieStore = await cookies();
-    const headerList = await headers();
-    const locale = await getUserLocale(cookieStore, headerList);
+    const locale = DEFAULT_LOCALE;
 
     const title = tServer(locale, 'meta.site.title');
     const description = tServer(locale, 'meta.site.description');

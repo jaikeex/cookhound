@@ -86,7 +86,7 @@ export async function getUserLocale(
         // const acceptLanguageHeaderContent = headers.get('accept-language');
         // localeString = extractPreferredLanguage(acceptLanguageHeaderContent);
 
-        //? Default to czech for now, after i get a new job this can be changed
+        //? Default to czech for now, once i am confident enough in other localizations, this can be changed
         localeString = DEFAULT_LOCALE;
     }
 

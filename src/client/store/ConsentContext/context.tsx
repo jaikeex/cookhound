@@ -397,6 +397,40 @@ export const ConsentProvider: React.FC<ConsentProviderProps> = ({
         }
     });
 
+    //|-----------------------------------------------------------------------------------------|//
+    //?                              DB CONSENT REHYDRATION                                     ?//
+    ///
+    //# When an authenticated user resolves but this browser carries no local consent signal
+    //# (fresh device, or a cleared/expired consent cookie), adopt the account's valid DB
+    //# consent and write it back to the cookie.
+    //#
+    //# This restores what the server-side pickMostRecentConsent(cookie, db) used to provide
+    //# on every render, which was dropped when the root layout became static/ISR. It runs on
+    //# plain page loads too; USER_LOGGED_IN only fires on an interactive login, not on
+    //# session rehydration. Safe because a rejection is persisted as a non-null consent
+    //# object, so `consent === null` genuinely means "no signal here", not "opted out".
+    //#
+    //# The version guard is essential: an outdated DB consent must NOT be adopted, otherwise a
+    //# CONSENT_VERSION bump would never force the re-consent dialog for logged-in users (and
+    //# the stale consent would be written back to the cookie, pinning them to it).
+    ///
+    //|-----------------------------------------------------------------------------------------|//
+
+    useEffect(() => {
+        if (consent || !user?.id) return;
+
+        const dbConsent = user.cookieConsent?.[0];
+
+        if (
+            dbConsent &&
+            !dbConsent.revokedAt &&
+            dbConsent.version === CONSENT_VERSION
+        ) {
+            setConsentAndEmit(dbConsent);
+            void setConsentCookie(dbConsent).catch(() => {});
+        }
+    }, [user, consent, setConsentAndEmit]);
+
     useEffect(() => {
         consentRef.current = consent;
     }, [consent]);

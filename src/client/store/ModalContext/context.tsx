@@ -2,6 +2,7 @@
 
 import React, {
     createContext,
+    Suspense,
     useCallback,
     useContext,
     useMemo,
@@ -14,7 +15,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { classNames } from '@/client/utils';
 import { IconButton } from '@/client/components';
 import { generateRandomId } from '@/client/utils';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useParamsChangeListener } from '@/client/hooks';
 
 const MODAL_PARAM_KEY = 'modal';
@@ -66,7 +67,6 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
     const [_, startTransition] = useTransition();
 
     const router = useRouter();
-    const searchParams = useSearchParams();
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
     //$                                        ROUTER                                           $//
@@ -75,8 +75,21 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
     //# the sidebar uses. Opening a modal pushes new query params into the url, in order for
     //# the browser back navigation to simply close the modal without changing the page.
     //# This (unlike sidebar's version) is enabled for both mobile and desktop screens.
+    //#
+    //? NOTE THIS: query params are read imperatively from window.location inside the callbacks
+    //? below rather than through render-time useSearchParams() subscription. Subscribing here
+    //? would put the entire app subtree (this provider wraps everything) into client-side
+    //? rendering and break ISR.
     ///
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+
+    const readSearchParams = useCallback(
+        (): URLSearchParams =>
+            new URLSearchParams(
+                typeof window !== 'undefined' ? window.location.search : ''
+            ),
+        []
+    );
 
     /**
      * This ref is used as a lock to ensure router.back() is only called ONCE per
@@ -94,7 +107,7 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
                 // If this was the last open modal, navigate back to clear the query param state
                 if (
                     newModals.length === 0 &&
-                    searchParams.get(MODAL_PARAM_KEY) &&
+                    readSearchParams().get(MODAL_PARAM_KEY) &&
                     !isNavigatingBackRef.current
                 ) {
                     isNavigatingBackRef.current = true;
@@ -104,17 +117,20 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
                 return newModals;
             });
         },
-        [router, searchParams]
+        [router, readSearchParams]
     );
 
     const closeAll = useCallback(() => {
         setModals([]);
 
-        if (searchParams.get(MODAL_PARAM_KEY) && !isNavigatingBackRef.current) {
+        if (
+            readSearchParams().get(MODAL_PARAM_KEY) &&
+            !isNavigatingBackRef.current
+        ) {
             isNavigatingBackRef.current = true;
             router.back();
         }
-    }, [router, searchParams]);
+    }, [router, readSearchParams]);
 
     const openModal = useCallback(
         (content: React.ReactNode | ModalRenderer, options?: ModalOptions) => {
@@ -127,8 +143,9 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
 
             setModals((current) => [...current, { id, renderer, options }]);
 
-            if (!searchParams.get(MODAL_PARAM_KEY)) {
-                const params = new URLSearchParams(searchParams);
+            const params = readSearchParams();
+
+            if (!params.get(MODAL_PARAM_KEY)) {
                 params.set(MODAL_PARAM_KEY, id);
 
                 startTransition(() => {
@@ -138,7 +155,7 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
 
             return id;
         },
-        [router, searchParams, startTransition]
+        [router, readSearchParams, startTransition]
     );
 
     const handleClose = useCallback(
@@ -151,7 +168,7 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 
     const handleParamsChange = useCallback(() => {
-        const hasParam = searchParams.get(MODAL_PARAM_KEY);
+        const hasParam = readSearchParams().get(MODAL_PARAM_KEY);
 
         // Case 1: URL contains the param but no modal is open → remove the param.
         if (hasParam && modals.length === 0) {
@@ -169,13 +186,7 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
         if (!hasParam) {
             isNavigatingBackRef.current = false;
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [modals, searchParams]);
-
-    useParamsChangeListener({
-        key: MODAL_PARAM_KEY,
-        onChange: handleParamsChange
-    });
+    }, [modals, readSearchParams, router, closeAll]);
 
     const value = useMemo(
         () => ({ openModal, closeModal, closeAll }),
@@ -185,6 +196,9 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
     return (
         <ModalContext.Provider value={value}>
             {children}
+            <Suspense fallback={null}>
+                <ModalParamsSync onChange={handleParamsChange} />
+            </Suspense>
             {typeof window !== 'undefined' &&
                 ReactDOM.createPortal(
                     <AnimatePresence initial={false}>
@@ -202,6 +216,24 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
                 )}
         </ModalContext.Provider>
     );
+};
+
+//~=============================================================================================~//
+//$                                     MODAL PARAMS SYNC                                       $//
+///
+//# Isolated subscriber for the modal query param. Must be placed behind a Suspense
+//# boundary in the provider so that useSearchParams() does not force the surrounding
+//# page into client-side rendering.
+///
+//~=============================================================================================~//
+
+type ModalParamsSyncProps = Readonly<{
+    onChange: () => void;
+}>;
+
+const ModalParamsSync: React.FC<ModalParamsSyncProps> = ({ onChange }) => {
+    useParamsChangeListener({ key: MODAL_PARAM_KEY, onChange });
+    return null;
 };
 
 //~=============================================================================================~//

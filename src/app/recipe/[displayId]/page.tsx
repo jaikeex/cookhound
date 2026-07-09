@@ -60,10 +60,8 @@ export async function generateMetadata({
 
         const recipeDescription = recipe.description?.trim() || undefined;
 
-        // The metadata language is an intrinsic property of the recipe (its
-        // own content language), not of the visitor. Sourcing it from the
-        // record rather than from cookies()/headers() keeps this route
-        // statically renderable / ISR-eligible.
+        // The metadata language is an intrinsic property of the recipe, not of the visitor.
+        // Getting it from the record keeps this route ISR-eligible.
         return buildLocalizedMetadata(recipe.language, {
             titleKey: 'meta.recipe.title',
             descriptionKey: 'meta.recipe.description',
