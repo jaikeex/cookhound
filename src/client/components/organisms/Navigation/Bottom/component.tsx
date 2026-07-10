@@ -35,7 +35,7 @@ type BottomNavigationProps = Readonly<NonNullable<unknown>>;
 
 export const BottomNavigation: React.FC<BottomNavigationProps> = () => {
     const { authResolved, user } = useAuth();
-    const { t } = useLocale();
+    const { t, localeResolved } = useLocale();
     const pathname = usePathname();
 
     const [isNotfound, setIsNotfound] = useState<boolean>(false);
@@ -49,7 +49,7 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = () => {
 
     if (isDisabled || isNotfound) return null;
 
-    if (!authResolved) {
+    if (!authResolved || !localeResolved) {
         return <BottomNavigationSkeleton />;
     }
 

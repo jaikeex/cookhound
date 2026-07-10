@@ -7,6 +7,7 @@ import { RecipeSearchInput } from '@/client/components';
 import { type ChangeEvent } from 'react';
 import { Typography } from '@/client/components';
 import { useLocale } from '@/client/store/I18nContext';
+import { BannerSkeleton } from './skeleton';
 import Link from 'next/link';
 
 type BannerProps = Readonly<{
@@ -28,7 +29,9 @@ export const Banner: React.FC<BannerProps> = ({
     onSearch,
     searchValue
 }) => {
-    const { t } = useLocale();
+    const { t, localeResolved } = useLocale();
+
+    if (!localeResolved) return <BannerSkeleton />;
 
     return (
         <React.Fragment>
@@ -47,12 +50,13 @@ export const Banner: React.FC<BannerProps> = ({
                     height={296}
                     priority
                 />
-                <div className="relative z-20 flex flex-col items-center justify-start h-full px-4 text-center">
+                <div className="relative z-20 flex flex-col items-center justify-start h-full px-4 mt-6 text-center">
                     <div className="flex flex-col gap-4 mt-12 mb-3 md:mt-16 md:mb-6">
                         <Typography variant="body-sm" className="max-w-md">
                             <span className="font-bold">
                                 {t('app.general.banner.bold')}
-                            </span>{' '}
+                            </span>
+                            &nbsp;
                             {t('app.general.banner.normal')}
                         </Typography>
                     </div>

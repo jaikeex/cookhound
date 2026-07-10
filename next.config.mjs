@@ -2,7 +2,7 @@
 const nextConfig = {
     output: 'standalone',
 
-    serverExternalPackages: ['@prisma/client', '@prisma/adapter-pg'],
+    serverExternalPackages: ['@prisma/client', '@prisma/adapter-pg', 'bullmq'],
 
     allowedDevOrigins: [
         '192.168.0.143',

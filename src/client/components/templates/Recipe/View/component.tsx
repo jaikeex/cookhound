@@ -1,10 +1,10 @@
 'use client';
 
-import React, { use } from 'react';
+import React, { use, useEffect } from 'react';
 import { DesktopRecipeViewTemplate } from './Desktop';
 import { MobileRecipeViewTemplate } from './Mobile';
 import type { Recipe } from '@/common/types';
-import { useAuth, RecipeHandlingProvider } from '@/client/store';
+import { useAuth, useLocale, RecipeHandlingProvider } from '@/client/store';
 import { useRunOnce } from '@/client/hooks';
 import { chqc, QUERY_KEYS } from '@/client/data';
 import { useQueryClient } from '@tanstack/react-query';
@@ -19,8 +19,21 @@ export const RecipeViewTemplate: React.FC<RecipeViewProps> = ({ recipe }) => {
     const recipeResolved = use(recipe);
     const queryClient = useQueryClient();
     const { user } = useAuth();
+    const { locale } = useLocale();
 
     const isFlagged = recipeResolved.flags?.some((flag) => flag.active);
+
+    // A recipe is single-language by record, so the document language reflects the recipe's
+    // own language (the metadata already does).
+    const recipeLanguage = recipeResolved.language;
+
+    useEffect(() => {
+        document.documentElement.lang = recipeLanguage;
+
+        return () => {
+            document.documentElement.lang = locale;
+        };
+    }, [recipeLanguage, locale]);
 
     const { mutate: registerRecipeVisit } = chqc.recipe.useRegisterRecipeVisit({
         onSuccess: () => {

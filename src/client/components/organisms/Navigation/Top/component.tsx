@@ -14,6 +14,7 @@ import Link from 'next/link';
 import { useAuth, useLocale } from '@/client/store';
 import { Sidebar } from '@/client/components/molecules/Sidebar';
 import { NavMenu } from './Menu';
+import { TopNavigationSkeleton } from './skeleton';
 import { TOP_NAVBAR_ID } from '@/client/constants';
 import { classNames } from '@/client/utils';
 import { usePathname } from 'next/navigation';
@@ -23,7 +24,7 @@ import { useAppEventListener } from '@/client/hooks';
 type TopNavigationProps = Readonly<NonNullable<unknown>>;
 
 export const TopNavigation: React.FC<TopNavigationProps> = () => {
-    const { t } = useLocale();
+    const { t, localeResolved } = useLocale();
     const { authResolved, user } = useAuth();
     const pathname = usePathname();
 
@@ -44,6 +45,8 @@ export const TopNavigation: React.FC<TopNavigationProps> = () => {
         pathname === '/' || pathname === '/search' || pathname === '/filter';
 
     if (isNotfound) return null;
+
+    if (!localeResolved) return <TopNavigationSkeleton />;
 
     return (
         <div

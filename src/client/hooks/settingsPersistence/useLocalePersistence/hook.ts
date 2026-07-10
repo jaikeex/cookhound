@@ -2,26 +2,24 @@
 
 import { useCallback } from 'react';
 import { useLocale } from '@/client/store';
-import { useConsent } from '@/client/store';
 import { chqc } from '@/client/data';
 import type { UserPreferences } from '@/common/types';
 import { useSettingPersistence } from '@/client/hooks/settingsPersistence';
 import { LOCALE_STORAGE_KEY } from '@/client/constants';
 
 /**
- * Persist and restore the user's selected locale if the user granted consent.
+ * Persists the user's selected locale.
+ *
+ * The locale is treated as a strictly-necessary / functional setting: it is
+ * persisted (cookie + localStorage, and the user's DB preferences when logged
+ * in) regardless of cookie-consent state, so an anonymous visitor's explicit
+ * language choice is remembered.
  */
 export const useLocalePersistence = (userId?: number): void => {
-    const { locale, setLocale } = useLocale();
-    const { canUsePreferences } = useConsent();
+    const { locale, localeResolved } = useLocale();
 
     const { mutate: updateUserPreferences } =
         chqc.user.useUpdateUserPreferences();
-
-    const handleRestore = useCallback(
-        (loc: string) => setLocale(loc as Parameters<typeof setLocale>[0]),
-        [setLocale]
-    );
 
     const handlePersist = useCallback(
         (loc: string) => {
@@ -37,10 +35,13 @@ export const useLocalePersistence = (userId?: number): void => {
 
     useSettingPersistence<string>({
         storageKey: LOCALE_STORAGE_KEY,
-        currentValue: locale,
-        canPersist: canUsePreferences,
+        // Withhold the value until LocaleProvider has resolved the locale from
+        // the cookie. useSettingPersistence skips persistence while currentValue
+        // is undefined, so the first render's default can never clobber a
+        // returning visitor's saved choice.
+        currentValue: localeResolved ? locale : undefined,
+        canPersist: true,
         allowedValues: ['en', 'cs'] as const,
-        onRestore: handleRestore,
         onPersist: handlePersist,
         serialize: (value: string) => value,
         deserialize: (raw: string) => raw

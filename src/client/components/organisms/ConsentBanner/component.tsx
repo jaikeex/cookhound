@@ -11,7 +11,7 @@ import { ConsentSettingsModal } from '@/client/components';
 export const ConsentBanner: React.FC = () => {
     const { consent, acceptAll, rejectAll } = useConsent();
     const { openModal } = useModal();
-    const { t } = useLocale();
+    const { t, localeResolved } = useLocale();
 
     //?—————————————————————————————————————————————————————————————————————————————————————————?//
     //?                                        SEO FAIL                                         ?//
@@ -37,7 +37,7 @@ export const ConsentBanner: React.FC = () => {
         });
     }, [openModal]);
 
-    if (!isHydrated || consent) return null;
+    if (!isHydrated || !localeResolved || consent) return null;
 
     return (
         <div
