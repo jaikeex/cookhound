@@ -98,8 +98,11 @@ jobs:
                   username: ${{ secrets.DO_SSH_USER }}
                   key: ${{ secrets.DO_SSH_KEY }}
                   port: 22
+                  envs: GHCR_ACTOR,GHCR_TOKEN
                   script: |
                       set -e
+
+                      echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_ACTOR" --password-stdin
 
                       if [ ! -d /cookhound/.git ]; then
                         git clone --depth=1 git@github.com:jaikeex/cookhound.git /cookhound
@@ -111,3 +114,6 @@ jobs:
                       docker compose pull
                       docker compose up -d --remove-orphans
                       docker image prune -af --filter "until=24h"
+              env:
+                  GHCR_ACTOR: ${{ github.actor }}
+                  GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
