@@ -1,10 +1,11 @@
 import { prisma } from '@/server/integrations';
 import { Logger } from '@/server/logger';
 import {
+    CACHE_TAGS,
     CACHE_TTL,
     cachePrismaQuery,
     generateCacheKey,
-    invalidateModelCache
+    invalidateTags
 } from '@/server/db/model/model-cache';
 import type { CookbookBookmark } from '@/server/db/generated/prisma/client';
 import { reorderBookmarks as reorderBookmarksSql } from '@/server/db/generated/prisma/sql';
@@ -34,7 +35,8 @@ class BookmarkModel {
                     where: { userId },
                     orderBy: { bookmarkOrder: 'asc' }
                 }),
-            ttl ?? CACHE_TTL.TTL_2
+            ttl ?? CACHE_TTL.TTL_2,
+            [CACHE_TAGS.bookmark.ownedBy(userId)]
         );
     }
 
@@ -78,7 +80,7 @@ class BookmarkModel {
             });
         });
 
-        await this.invalidateBookmarkCache({ userId });
+        await invalidateTags([CACHE_TAGS.bookmark.ownedBy(userId)]);
     }
 
     async removeBookmark(userId: number, cookbookId: number): Promise<void> {
@@ -96,7 +98,7 @@ class BookmarkModel {
             });
         });
 
-        await this.invalidateBookmarkCache({ userId });
+        await invalidateTags([CACHE_TAGS.bookmark.ownedBy(userId)]);
     }
 
     async reorderBookmarks(
@@ -112,18 +114,7 @@ class BookmarkModel {
             );
         });
 
-        await this.invalidateBookmarkCache({ userId });
-    }
-
-    //~=========================================================================================~//
-    //$                                      PRIVATE METHODS                                    $//
-    //~=========================================================================================~//
-
-    private async invalidateBookmarkCache(
-        changed: Partial<CookbookBookmark>,
-        original?: Partial<CookbookBookmark>
-    ) {
-        await invalidateModelCache('bookmark', changed, original ?? undefined);
+        await invalidateTags([CACHE_TAGS.bookmark.ownedBy(userId)]);
     }
 }
 

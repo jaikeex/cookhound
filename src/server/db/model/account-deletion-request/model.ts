@@ -1,8 +1,9 @@
 import {
+    CACHE_TAGS,
     CACHE_TTL,
     cachePrismaQuery,
     generateCacheKey,
-    invalidateModelCache
+    invalidateTags
 } from '@/server/db/model/model-cache';
 import { prisma } from '@/server/integrations';
 import { Logger } from '@/server/logger';
@@ -56,7 +57,8 @@ class AccountDeletionRequestModel {
                     select: ACCOUNT_DELETION_REQUEST_SELECT
                 });
             },
-            ttl ?? CACHE_TTL.TTL_2
+            ttl ?? CACHE_TTL.TTL_2,
+            [CACHE_TAGS.accountDeletionRequest.ownedBy(userId)]
         );
 
         return this.reviveDates(request);
@@ -92,7 +94,8 @@ class AccountDeletionRequestModel {
                     select: ACCOUNT_DELETION_REQUEST_SELECT
                 });
             },
-            ttl ?? CACHE_TTL.TTL_2
+            ttl ?? CACHE_TTL.TTL_2,
+            [CACHE_TAGS.accountDeletionRequest.entity(id)]
         );
 
         return this.reviveDates(request);
@@ -173,14 +176,21 @@ class AccountDeletionRequestModel {
     //~=========================================================================================~//
 
     private async invalidateCache(
-        changed: Partial<AccountDeletionRequest>,
-        original?: Partial<AccountDeletionRequest>
-    ) {
-        await invalidateModelCache(
-            'accountDeletionRequest',
-            changed,
-            original ?? undefined
-        );
+        changed: Partial<AccountDeletionRequest>
+    ): Promise<void> {
+        const tags: string[] = [];
+
+        if (typeof changed.userId === 'number') {
+            tags.push(
+                CACHE_TAGS.accountDeletionRequest.ownedBy(changed.userId)
+            );
+        }
+
+        if (typeof changed.id === 'number') {
+            tags.push(CACHE_TAGS.accountDeletionRequest.entity(changed.id));
+        }
+
+        await invalidateTags(tags);
     }
 
     /**

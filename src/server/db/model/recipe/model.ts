@@ -1,9 +1,9 @@
 import {
+    CACHE_TAGS,
     CACHE_TTL,
     cachePrismaQuery,
     generateCacheKey,
-    invalidateCacheByPattern,
-    invalidateModelCache
+    invalidateTags
 } from '@/server/db/model/model-cache';
 import { NotFoundError } from '@/server/error';
 import { ApplicationErrorCode } from '@/server/error/codes';
@@ -51,7 +51,8 @@ class RecipeModel {
                 log.trace('Fetching recipe from db by id', { id });
                 return prisma.$queryRawTyped(getRecipeById(id));
             },
-            ttl ?? CACHE_TTL.TTL_2
+            ttl ?? CACHE_TTL.TTL_2,
+            [CACHE_TAGS.recipe.entity(id)]
         );
 
         return this.reviveRecipeDates(recipe[0] ?? null);
@@ -79,7 +80,8 @@ class RecipeModel {
                 });
                 return prisma.$queryRawTyped(getRecipeByDisplayId(displayId));
             },
-            ttl ?? CACHE_TTL.TTL_2
+            ttl ?? CACHE_TTL.TTL_2,
+            [CACHE_TAGS.recipe.byDisplayId(displayId)]
         );
 
         return this.reviveRecipeDates(recipe[0] ?? null);
@@ -194,7 +196,8 @@ class RecipeModel {
                     getUserRecipes(userId, language, limit, offset)
                 );
             },
-            ttl ?? CACHE_TTL.TTL_1
+            ttl ?? CACHE_TTL.TTL_1,
+            [CACHE_TAGS.recipe.ownedBy(userId)]
         );
 
         return recipes;
@@ -346,7 +349,8 @@ class RecipeModel {
                     )
                 );
             },
-            ttl ?? CACHE_TTL.TTL_1
+            ttl ?? CACHE_TTL.TTL_1,
+            [CACHE_TAGS.recipe.ownedBy(userId)]
         );
 
         return recipes;
@@ -639,9 +643,7 @@ class RecipeModel {
                 recipeId: recipe.id
             });
 
-            await this.invalidateUserRecipeCache(data.authorId);
-
-            await this.invalidateRecipeListCaches();
+            await invalidateTags([CACHE_TAGS.recipe.ownedBy(data.authorId)]);
 
             return (await tx.recipe.findUnique({
                 where: { id: recipe.id },
@@ -802,13 +804,11 @@ class RecipeModel {
             })) as Recipe;
         });
 
-        await this.invalidateUserRecipeCache(originalRecipe.authorId);
-
-        await this.invalidateRecipeCache({
-            displayId: originalRecipe.displayId
-        });
-
-        await this.invalidateRecipeListCaches();
+        await invalidateTags([
+            CACHE_TAGS.recipe.entity(id),
+            CACHE_TAGS.recipe.byDisplayId(originalRecipe.displayId),
+            CACHE_TAGS.recipe.ownedBy(originalRecipe.authorId)
+        ]);
 
         return updatedRecipe;
     }
@@ -838,6 +838,15 @@ class RecipeModel {
     async deleteOneById(id: number): Promise<void> {
         log.trace('Deleting recipe by id', { id });
 
+        // Capture the identity needed for targeted invalidation before the row
+        // is gone: the two single-recipe lookups plus the author's collections.
+        // Global lists are C1 (60s ttl) and left to expire — a deleted recipe
+        // can only linger there briefly, and its detail page is cleared here.
+        const identity = await prisma.recipe.findUnique({
+            where: { id },
+            select: { displayId: true, authorId: true }
+        });
+
         // Use a transaction to ensure that all dependent records are removed
         // before the actual recipe is deleted, foreign key constraints will fail otherwise.
         await prisma.$transaction(async (tx) => {
@@ -862,36 +871,20 @@ class RecipeModel {
             await tx.recipe.delete({ where: { id } });
         });
 
-        await this.invalidateRecipeCacheAll();
+        await invalidateTags([
+            CACHE_TAGS.recipe.entity(id),
+            ...(identity
+                ? [
+                      CACHE_TAGS.recipe.byDisplayId(identity.displayId),
+                      CACHE_TAGS.recipe.ownedBy(identity.authorId)
+                  ]
+                : [])
+        ]);
     }
 
     //~=========================================================================================~//
     //$                                      PRIVATE METHODS                                    $//
     //~=========================================================================================~//
-
-    private async invalidateRecipeCache(
-        changed: Partial<Recipe>,
-        original?: Partial<Recipe>
-    ) {
-        await invalidateModelCache('recipe', changed, original ?? undefined);
-    }
-
-    private async invalidateRecipeCacheAll() {
-        await invalidateCacheByPattern('prisma:recipe:*');
-    }
-
-    private async invalidateUserRecipeCache(userId: number) {
-        await invalidateCacheByPattern(
-            `prisma:recipe:findManyForUser:*"userId":${userId}*`
-        );
-    }
-
-    private async invalidateRecipeListCaches() {
-        await invalidateCacheByPattern('prisma:recipe:findMany:*');
-        await invalidateCacheByPattern('prisma:recipe:search:*');
-        await invalidateCacheByPattern('prisma:recipe:filterMany:*');
-        await invalidateCacheByPattern('prisma:recipe:findManyFrontPage:*');
-    }
 
     /**
      * Re-instantiates the recipe's Date fields after a cache round-trip.

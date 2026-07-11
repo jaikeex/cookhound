@@ -6,7 +6,7 @@ import { prisma } from '@/server/integrations';
 import { Logger } from '@/server/logger';
 import { RecipeFlagAppealStatus } from '@/common/types/flags/recipe-flag-appeal';
 import type { RecipeFlagReason } from '@/common/constants';
-import { invalidateModelCache } from '@/server/db/model/model-cache';
+import { CACHE_TAGS, invalidateTags } from '@/server/db/model/model-cache';
 
 //|=============================================================================================|//
 
@@ -145,7 +145,10 @@ class RecipeFlagModel {
             });
         });
 
-        await invalidateModelCache('recipe', { displayId: recipeDisplayId });
+        await invalidateTags([
+            CACHE_TAGS.recipe.entity(recipeId),
+            CACHE_TAGS.recipe.byDisplayId(recipeDisplayId)
+        ]);
     }
 
     /**
@@ -168,9 +171,10 @@ class RecipeFlagModel {
         });
 
         if (result.count > 0) {
-            await invalidateModelCache('recipe', {
-                displayId: recipeDisplayId
-            });
+            await invalidateTags([
+                CACHE_TAGS.recipe.entity(recipeId),
+                CACHE_TAGS.recipe.byDisplayId(recipeDisplayId)
+            ]);
         }
 
         return result.count;

@@ -147,6 +147,76 @@ class RedisClient {
         return this.client.smembers(key);
     }
 
+    /**
+     * Register a single key as a member of one or more tag sets in one round
+     * trip, refreshing each tag set's TTL.
+     *
+     * Used by the model cache to make tag-based invalidation possible: when an
+     * entry is cached, its key is added to every tag it belongs to. Later, a
+     * write drops the tag to evict exactly the entries that tag covers.
+     */
+    async addKeyToTags(
+        key: string,
+        tags: readonly string[],
+        tagTtlInSeconds: number
+    ): Promise<void> {
+        if (tags.length === 0) {
+            return;
+        }
+
+        await this.connect();
+
+        const pipeline = this.client.pipeline();
+
+        for (const tag of tags) {
+            pipeline.sadd(tag, key);
+            pipeline.expire(tag, tagTtlInSeconds);
+        }
+
+        await pipeline.exec();
+    }
+
+    /**
+     * Evict every cache key tracked by the given tag sets, then remove the tag
+     * sets themselves. Two phases: read all members (SMEMBERS) across the tags,
+     * then UNLINK the union of member keys plus the tag keys.
+     *
+     * @returns the number of distinct member keys that were dropped.
+     */
+    async dropTags(tags: readonly string[]): Promise<number> {
+        if (tags.length === 0) {
+            return 0;
+        }
+
+        await this.connect();
+
+        // Collect the union of member keys across every tag.
+        const readPipeline = this.client.pipeline();
+
+        tags.forEach((tag) => readPipeline.smembers(tag));
+        const readResults = await readPipeline.exec();
+
+        const keysToDelete = new Set<string>();
+
+        readResults?.forEach(([err, members]) => {
+            if (!err && Array.isArray(members)) {
+                (members as string[]).forEach((member) =>
+                    keysToDelete.add(member)
+                );
+            }
+        });
+
+        // Drop the member keys and the tag sets in one round trip.
+        const deletePipeline = this.client.pipeline();
+
+        keysToDelete.forEach((key) => deletePipeline.unlink(key));
+        tags.forEach((tag) => deletePipeline.unlink(tag));
+
+        await deletePipeline.exec();
+
+        return keysToDelete.size;
+    }
+
     //~-----------------------------------------------------------------------------------------~//
     //$                                   COUNTER OPERATIONS                                    $//
     //~-----------------------------------------------------------------------------------------~//

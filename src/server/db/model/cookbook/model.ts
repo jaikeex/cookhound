@@ -3,11 +3,11 @@ import { Logger } from '@/server/logger';
 import type { CookbookForCreate } from '@/server/services/cookbook/types';
 import type { Cookbook } from '@/server/db/generated/prisma/client';
 import {
+    CACHE_TAGS,
     CACHE_TTL,
     cachePrismaQuery,
     generateCacheKey,
-    invalidateCacheByPattern,
-    invalidateModelCache
+    invalidateTags
 } from '@/server/db/model/model-cache';
 import {
     getCookbookById,
@@ -42,7 +42,8 @@ class CookbookModel {
                 log.trace('Fetching cookbook from db by id', { id });
                 return prisma.$queryRawTyped(getCookbookById(id));
             },
-            ttl ?? CACHE_TTL.TTL_2
+            ttl ?? CACHE_TTL.TTL_2,
+            [CACHE_TAGS.cookbook.entity(id)]
         );
 
         return cookbook[0] ?? null;
@@ -81,7 +82,8 @@ class CookbookModel {
 
                 return prisma.$queryRawTyped(getCookbooksByOwnerId(ownerId));
             },
-            ttl ?? CACHE_TTL.TTL_1
+            ttl ?? CACHE_TTL.TTL_1,
+            [CACHE_TAGS.cookbook.ownedBy(ownerId)]
         );
         return cookbooks;
     }
@@ -96,7 +98,7 @@ class CookbookModel {
             ownerId: data.ownerId
         });
 
-        await this.invalidateUserCookbookCache(data.ownerId);
+        await invalidateTags([CACHE_TAGS.cookbook.ownedBy(data.ownerId)]);
 
         return await prisma.$transaction(async (tx) => {
             const { _max } = (await tx.cookbook.aggregate({
@@ -119,13 +121,25 @@ class CookbookModel {
 
     async deleteOne(id: number): Promise<void> {
         log.trace('Deleting cookbook', { id });
+
+        // Capture the owner before the row is gone so their cookbook collection
+        // (getManyByOwnerId) can also be cleared from the cache, otherwise the
+        // owner's list would show the deleted cookbook until its ttl elapses.
+        const cookbook = await prisma.cookbook.findUnique({
+            where: { id },
+            select: { ownerId: true }
+        });
+
         await prisma.$transaction(async (tx) => {
             await tx.cookbookBookmark.deleteMany({ where: { cookbookId: id } });
             await tx.cookbookRecipe.deleteMany({ where: { cookbookId: id } });
             await tx.cookbook.delete({ where: { id } });
         });
 
-        await this.invalidateCookbookCache({ id });
+        await invalidateTags([
+            CACHE_TAGS.cookbook.entity(id),
+            ...(cookbook ? [CACHE_TAGS.cookbook.ownedBy(cookbook.ownerId)] : [])
+        ]);
     }
 
     /**
@@ -185,8 +199,10 @@ class CookbookModel {
             });
         });
 
-        await this.invalidateCookbookCache({ id: cookbookId });
-        await this.invalidateUserCookbookCache(userId);
+        await invalidateTags([
+            CACHE_TAGS.cookbook.entity(cookbookId),
+            CACHE_TAGS.cookbook.ownedBy(userId)
+        ]);
     }
 
     /**
@@ -229,8 +245,10 @@ class CookbookModel {
             });
         });
 
-        await this.invalidateCookbookCache({ id: cookbookId });
-        await this.invalidateUserCookbookCache(userId);
+        await invalidateTags([
+            CACHE_TAGS.cookbook.entity(cookbookId),
+            CACHE_TAGS.cookbook.ownedBy(userId)
+        ]);
     }
 
     /**
@@ -257,8 +275,10 @@ class CookbookModel {
             );
         });
 
-        await this.invalidateCookbookCache({ id: cookbookId });
-        await this.invalidateUserCookbookCache(userId);
+        await invalidateTags([
+            CACHE_TAGS.cookbook.entity(cookbookId),
+            CACHE_TAGS.cookbook.ownedBy(userId)
+        ]);
     }
 
     /**
@@ -284,26 +304,7 @@ class CookbookModel {
             );
         });
 
-        await this.invalidateUserCookbookCache(ownerId);
-    }
-
-    //~=========================================================================================~//
-    //$                                      PRIVATE METHODS                                    $//
-    //~=========================================================================================~//
-
-    private async invalidateCookbookCache(
-        changed: Partial<Cookbook>,
-        original?: Partial<Cookbook>
-    ) {
-        await invalidateModelCache('cookbook', changed, original ?? undefined);
-    }
-
-    private async invalidateUserCookbookCache(userId: number) {
-        const cacheKey = generateCacheKey('cookbook', 'findManyByOwnerId', {
-            where: { ownerId: userId }
-        });
-
-        await invalidateCacheByPattern(cacheKey);
+        await invalidateTags([CACHE_TAGS.cookbook.ownedBy(ownerId)]);
     }
 }
 

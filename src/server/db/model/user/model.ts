@@ -1,8 +1,9 @@
 import {
+    CACHE_TAGS,
     CACHE_TTL,
     cachePrismaQuery,
     generateCacheKey,
-    invalidateModelCache
+    invalidateTags
 } from '@/server/db/model/model-cache';
 import { ServerError } from '@/server/error';
 import { ApplicationErrorCode } from '@/server/error/codes';
@@ -68,7 +69,8 @@ class UserModel {
                 log.trace('Fetching user from db by email', { email });
                 return prisma.user.findUnique({ where: { email }, select });
             },
-            ttl ?? CACHE_TTL.TTL_2
+            ttl ?? CACHE_TTL.TTL_2,
+            (result) => this.userTagsFor(result)
         );
 
         return this.reviveUserDates(user as User | null);
@@ -97,7 +99,8 @@ class UserModel {
 
                 return prisma.user.findUnique({ where: { id }, select });
             },
-            ttl ?? CACHE_TTL.TTL_2
+            ttl ?? CACHE_TTL.TTL_2,
+            [CACHE_TAGS.user.entity(id)]
         );
 
         return this.reviveUserDates(user as User | null);
@@ -124,7 +127,8 @@ class UserModel {
 
                 return prisma.user.findUnique({ where: { username } });
             },
-            ttl ?? CACHE_TTL.TTL_2
+            ttl ?? CACHE_TTL.TTL_2,
+            (result) => this.userTagsFor(result)
         );
 
         return this.reviveUserDates(user);
@@ -157,7 +161,8 @@ class UserModel {
                     where: { OR: [{ email }, { username }] }
                 });
             },
-            ttl ?? CACHE_TTL.TTL_2
+            ttl ?? CACHE_TTL.TTL_2,
+            (result) => this.userTagsFor(result)
         );
 
         return this.reviveUserDates(user);
@@ -203,7 +208,8 @@ class UserModel {
                     where: { emailVerificationToken: token }
                 });
             },
-            ttl ?? CACHE_TTL.TTL_1
+            ttl ?? CACHE_TTL.TTL_1,
+            (result) => this.userTagsFor(result)
         );
 
         return this.reviveUserDates(user);
@@ -232,7 +238,8 @@ class UserModel {
                     where: { passwordResetToken: token }
                 });
             },
-            ttl ?? CACHE_TTL.TTL_1
+            ttl ?? CACHE_TTL.TTL_1,
+            (result) => this.userTagsFor(result)
         );
 
         return this.reviveUserDates(user);
@@ -454,7 +461,8 @@ class UserModel {
                     where: { token }
                 });
             },
-            ttl ?? CACHE_TTL.TTL_1
+            ttl ?? CACHE_TTL.TTL_1,
+            [CACHE_TAGS.emailChangeRequest.byToken(token)]
         );
 
         if (!request) return null;
@@ -481,6 +489,9 @@ class UserModel {
             });
 
             await this.invalidateUserCache({ id: deleted.userId });
+            await invalidateTags([
+                CACHE_TAGS.emailChangeRequest.byToken(token)
+            ]);
 
             return deleted;
         } catch (error: unknown) {
@@ -520,6 +531,7 @@ class UserModel {
 
         // Invalidate cache for the affected user so subsequent reads get fresh data
         await this.invalidateUserCache({ id: userId });
+        await invalidateTags([CACHE_TAGS.emailChangeRequest.byToken(token)]);
     }
 
     //~=========================================================================================~//
@@ -967,14 +979,42 @@ class UserModel {
     //~=========================================================================================~//
 
     /**
-     * Invalidate all cache entries for a specific user using pattern-based invalidation
-     * This automatically handles all current and future cache keys without manual maintenance
+     * Build the tag list for a cached user lookup result. Every user entry,
+     * regardless of whether it was fetched by email, username, token etc
+     * is tagged with the user id, so a single invalidation clears all of them.
+     *
+     * Every user projection includes id, so a non-null
+     * result always returns a tag; a null not-found result returns none.
+     */
+    private userTagsFor(result: unknown): readonly string[] {
+        const id = (result as { id?: number } | null)?.id;
+        return typeof id === 'number' ? [CACHE_TAGS.user.entity(id)] : [];
+    }
+
+    /**
+     * Invalidate every cache entry for a specific user.
      */
     private async invalidateUserCache(
         changed: Partial<User>,
         original?: Partial<User>
     ) {
-        await invalidateModelCache('user', changed, original ?? undefined);
+        const ids = new Set<number>();
+
+        if (typeof changed.id === 'number') {
+            ids.add(changed.id);
+        }
+
+        if (original && typeof original.id === 'number') {
+            ids.add(original.id);
+        }
+
+        if (ids.size === 0) {
+            return;
+        }
+
+        await invalidateTags(
+            Array.from(ids, (id) => CACHE_TAGS.user.entity(id))
+        );
     }
 
     private reviveUserDates(user: User | null) {
