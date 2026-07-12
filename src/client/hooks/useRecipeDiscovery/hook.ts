@@ -54,6 +54,37 @@ export const useRecipeDiscovery = (
     const isSearchMode = queries.length > 0;
 
     //~-----------------------------------------------------------------------------------------~//
+    //$                                     SSR CACHE SEED                                      $//
+    //
+    // The server already fetched page 1 (list or search results) and streamed it in as
+    // initialRecipes. Seed it into react-query as the first page of the active infinite query
+    // so the client does NOT refetch page 1 over HTTP on mount. initialDataUpdatedAt stamps the
+    // seed as freshly fetched, so it stays within the global staleTime and refetchOnMount is a
+    // no-op for the seeded page.
+    //
+    // Only the query that is active on the INITIAL mount is seeded (mode can change later as the
+    // user types), and only when the server actually provided data.
+    //~-----------------------------------------------------------------------------------------~//
+
+    const [seededAt] = useState(() => Date.now());
+    const [initialIsSearch] = useState(
+        () => normaliseToArray(initialQuery).length > 0
+    );
+
+    const seed = useMemo<
+        InfiniteData<RecipeForDisplayDTO[], number> | undefined
+    >(
+        () =>
+            initialRecipes.length > 0
+                ? { pages: [initialRecipes], pageParams: [1] }
+                : undefined,
+        [initialRecipes]
+    );
+
+    const listSeed = !initialIsSearch ? seed : undefined;
+    const searchSeed = initialIsSearch ? seed : undefined;
+
+    //~-----------------------------------------------------------------------------------------~//
     //$                                         QUERIES                                         $//
     //~-----------------------------------------------------------------------------------------~//
 
@@ -64,11 +95,15 @@ export const useRecipeDiscovery = (
               PER_PAGE,
               MAX_BATCHES,
               {
-                  enabled: !isSearchMode && Boolean(userId)
+                  enabled: !isSearchMode && Boolean(userId),
+                  initialData: listSeed,
+                  initialDataUpdatedAt: listSeed ? seededAt : undefined
               }
           )
         : chqc.recipe.useRecipeListInfinite(locale, PER_PAGE, MAX_BATCHES, {
-              enabled: !isSearchMode
+              enabled: !isSearchMode,
+              initialData: listSeed,
+              initialDataUpdatedAt: listSeed ? seededAt : undefined
           });
 
     const searchInfiniteQuery = userId
@@ -79,7 +114,9 @@ export const useRecipeDiscovery = (
               PER_PAGE,
               MAX_BATCHES,
               {
-                  enabled: isSearchMode && Boolean(userId)
+                  enabled: isSearchMode && Boolean(userId),
+                  initialData: searchSeed,
+                  initialDataUpdatedAt: searchSeed ? seededAt : undefined
               }
           )
         : chqc.recipe.useSearchRecipesInfinite(
@@ -88,7 +125,9 @@ export const useRecipeDiscovery = (
               PER_PAGE,
               MAX_BATCHES,
               {
-                  enabled: isSearchMode
+                  enabled: isSearchMode,
+                  initialData: searchSeed,
+                  initialDataUpdatedAt: searchSeed ? seededAt : undefined
               }
           );
 
@@ -111,8 +150,7 @@ export const useRecipeDiscovery = (
         const pages =
             (
                 activeQuery.data as
-                    | InfiniteData<RecipeForDisplayDTO[]>
-                    | undefined
+                    InfiniteData<RecipeForDisplayDTO[]> | undefined
             )?.pages ?? [];
 
         if (pages.length === 0) return initialRecipes;

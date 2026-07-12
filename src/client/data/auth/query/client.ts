@@ -17,11 +17,15 @@ export const authQueryClient = {
      * Retry: 1
      * refetchOnMount: true
      *
-     * staleTime is 0 on purpose. The server prefetch (layout.tsx) hydrates
-     * this query from a side-effect-free read and never records a user visit.
-     * Keeping the hydrated data immediately stale is what makes refetchOnMount
-     * actually refetch on mount, hitting that route on every page load so the
-     * visit gets tracked. Raising staleTime would mark the hydrated data fresh,
+     * This query is NOT hydrated from the server. The root layout is
+     * static, so it cannot prefetch a cookie-scoped current user.
+     * Consequently the first paint on a full page load renders anonymous and
+     * this query resolves the real user client-side on mount.
+     *
+     * staleTime is 0 on purpose. Every mount hits /api/auth/current, which
+     * records a user visit as a side effect. Keeping the data immediately stale
+     * is what makes refetchOnMount actually refetch on mount, so the visit gets
+     * tracked on every page load. Raising staleTime would mark the data fresh,
      * skip the mount refetch, and silently stop tracking visits on load.
      *
      * The per-load route hit is intentional; the DB cost is contained by a throttle,

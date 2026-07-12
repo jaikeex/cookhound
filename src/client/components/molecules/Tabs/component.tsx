@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useCallback, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import React, { Suspense, useCallback, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { classNames } from '@/client/utils';
 import { TabButton } from '@/client/components';
 import { useParamsChangeListener } from '@/client/hooks/routingListeners';
@@ -23,6 +23,68 @@ export type TabsProps = Readonly<{
 }> &
     React.PropsWithChildren;
 
+/**
+ * Resolves a tab index from a raw url param value.
+ *
+ * @param urlParam - The raw value of the tab url param (or null when absent)
+ * @param tabs - The tab definitions to match the param against
+ * @param fallbackTab - The index to fall back to when the param cannot be resolved
+ */
+const resolveTabFromParam = (
+    urlParam: string | null,
+    tabs: TabContent[],
+    fallbackTab: number
+): number => {
+    if (!urlParam) {
+        return fallbackTab;
+    }
+
+    const tabIndex = tabs.findIndex((tab) => tab.param === urlParam);
+
+    if (tabIndex !== -1) {
+        return tabIndex;
+    }
+
+    /**
+     * This should never be invoked, but seemed correct to try and handle and should also somewhat guard against
+     * potential misuse later.
+     */
+    const parsedIndex = parseInt(urlParam, 10);
+
+    if (!isNaN(parsedIndex) && parsedIndex >= 0 && parsedIndex < tabs.length) {
+        return parsedIndex;
+    }
+
+    return fallbackTab;
+};
+
+type TabsParamSyncProps = Readonly<{
+    paramKey: string;
+    onParamChange: () => void;
+}>;
+
+/**
+ * Renders nothing - exists only to subscribe to url param changes.
+ *
+ * useSearchParams() (called inside useParamsChangeListener) forces statically
+ * rendered pages to bail out to client-side rendering up to the nearest
+ * Suspense boundary. When Tabs itself subscribed, that bailout climbed to the
+ * route-level boundary and wiped the entire recipe page body from the
+ * prerendered HTML. Confining the subscription to this null-rendering child -
+ * mounted only when enableNavigation is set and wrapped in its own Suspense -
+ * keeps the tab content in the server-rendered document.
+ *
+ * The listener also fires once on mount, which is what corrects the initially
+ * server-rendered default tab to the one from the url param.
+ */
+const TabsParamSync: React.FC<TabsParamSyncProps> = ({
+    paramKey,
+    onParamChange
+}) => {
+    useParamsChangeListener({ key: paramKey, onChange: onParamChange });
+    return null;
+};
+
 export const Tabs: React.FC<TabsProps> = ({
     activeTab = 0,
     buttonRowClassName,
@@ -33,47 +95,10 @@ export const Tabs: React.FC<TabsProps> = ({
     tabs
 }) => {
     const router = useRouter();
-    const searchParams = useSearchParams();
 
     const tabWidth = 100 / tabs.length;
 
-    const resolveTabFromParam = useCallback(
-        (urlParam: string | null): number => {
-            if (!urlParam || !enableNavigation) return activeTab;
-
-            const tabIndex = tabs.findIndex((tab) => tab.param === urlParam);
-            if (!isNaN(tabIndex) && tabIndex !== -1) return tabIndex;
-
-            /**
-             * This should never be invoked, but seemed correct to try and handle and should also somewhat guard against
-             * potential misuse later.
-             */
-            const parsedIndex = parseInt(urlParam, 10);
-            if (
-                !isNaN(parsedIndex) &&
-                parsedIndex >= 0 &&
-                parsedIndex < tabs.length
-            ) {
-                return parsedIndex;
-            }
-
-            return activeTab;
-        },
-        [tabs, activeTab, enableNavigation]
-    );
-
-    const getInitialTab = useCallback(() => {
-        if (!enableNavigation) return activeTab;
-        return resolveTabFromParam(searchParams.get(paramKey));
-    }, [
-        enableNavigation,
-        activeTab,
-        resolveTabFromParam,
-        searchParams,
-        paramKey
-    ]);
-
-    const [currentTab, setCurrentTab] = useState<number>(getInitialTab);
+    const [currentTab, setCurrentTab] = useState<number>(activeTab);
 
     const updateUrlParam = useCallback(
         (index: number) => {
@@ -107,29 +132,27 @@ export const Tabs: React.FC<TabsProps> = ({
     );
 
     const handleParamChange = useCallback(() => {
-        if (!enableNavigation) return;
+        // Read the param imperatively, subscribing through useSearchParams()
+        // in this component would opt every statically rendered page that
+        // uses Tabs out of prerendering.
+        const urlParam = new URLSearchParams(window.location.search).get(
+            paramKey
+        );
 
-        const urlParam = searchParams.get(paramKey);
-        const newTabIndex = resolveTabFromParam(urlParam);
-
-        if (newTabIndex !== currentTab) {
-            setCurrentTab(newTabIndex);
-        }
-    }, [
-        enableNavigation,
-        searchParams,
-        paramKey,
-        resolveTabFromParam,
-        currentTab
-    ]);
-
-    useParamsChangeListener({
-        key: paramKey,
-        onChange: enableNavigation ? handleParamChange : undefined
-    });
+        setCurrentTab(resolveTabFromParam(urlParam, tabs, activeTab));
+    }, [paramKey, tabs, activeTab]);
 
     return (
         <div className={classNames(className)}>
+            {enableNavigation && (
+                <Suspense fallback={null}>
+                    <TabsParamSync
+                        paramKey={paramKey}
+                        onParamChange={handleParamChange}
+                    />
+                </Suspense>
+            )}
+
             <div
                 className={classNames(
                     'relative flex flex-row items-center w-full rounded-md',

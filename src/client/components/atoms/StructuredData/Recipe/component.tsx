@@ -10,13 +10,22 @@ import { tServer } from '@/server/utils/locales';
 
 type RecipeStructuredDataProps = Readonly<{
     recipePromise: Promise<Recipe>;
+    authorNamePromise?: Promise<string | undefined>;
 }>;
 
 export const RecipeStructuredData: React.FC<
     RecipeStructuredDataProps
-> = async ({ recipePromise }) => {
-    const recipe = await recipePromise;
-    const recipeSchema = generateRecipeSchema(recipe, ENV_CONFIG_PUBLIC.ORIGIN);
+> = async ({ recipePromise, authorNamePromise }) => {
+    const [recipe, authorName] = await Promise.all([
+        recipePromise,
+        authorNamePromise
+    ]);
+
+    const recipeSchema = generateRecipeSchema(
+        recipe,
+        ENV_CONFIG_PUBLIC.ORIGIN,
+        authorName
+    );
 
     const breadcrumbSchema = generateBreadcrumbSchema([
         {

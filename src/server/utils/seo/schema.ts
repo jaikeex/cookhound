@@ -16,7 +16,11 @@ import { CATEGORY_IDS } from '@/common/constants';
 ///
 //?—————————————————————————————————————————————————————————————————————————————————————————————?//
 
-export function generateRecipeSchema(recipe: Recipe, baseUrl?: string) {
+export function generateRecipeSchema(
+    recipe: Recipe,
+    baseUrl?: string,
+    authorName?: string
+) {
     const schema: Record<string, unknown> = {
         '@context': 'https://schema.org',
         '@type': 'Recipe',
@@ -52,6 +56,7 @@ export function generateRecipeSchema(recipe: Recipe, baseUrl?: string) {
     if (recipe.authorId && baseUrl) {
         schema.author = {
             '@type': 'Person',
+            ...(authorName ? { name: authorName } : {}),
             url: `${baseUrl}/user/${recipe.authorId}`
         };
     }

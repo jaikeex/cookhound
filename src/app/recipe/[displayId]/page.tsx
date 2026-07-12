@@ -29,10 +29,24 @@ export default async function Page({ params }: RecipePageParams) {
             mapServiceErrorForRsc(error, `/recipe/${recipeDisplayId}`)
         );
 
+    // A missing author must not break the schema block
+    const authorNamePromise = recipePromise
+        .then((recipe) => serverData.user.getById(recipe.authorId))
+        .then((author) => author.username)
+        .catch(() => undefined);
+
+    // Resolve the recipe BEFORE returning any JSX. If it only rejected later,
+    // deep inside the render, the response status would already be committed
+    // as 200 and a missing recipe would be served as a soft 404.
+    await recipePromise;
+
     return (
         <React.Fragment>
             <RecipeViewTemplate recipe={recipePromise} />
-            <RecipeStructuredData recipePromise={recipePromise} />
+            <RecipeStructuredData
+                recipePromise={recipePromise}
+                authorNamePromise={authorNamePromise}
+            />
         </React.Fragment>
     );
 }
@@ -56,6 +70,10 @@ export async function generateMetadata({
     try {
         const recipe = await serverData.recipe.getByDisplayId(recipeDisplayId);
 
+        const author = await serverData.user
+            .getById(recipe.authorId)
+            .catch(() => null);
+
         const canonical = `${ENV_CONFIG_PUBLIC.ORIGIN}/recipe/${recipeDisplayId}`;
 
         const recipeDescription = recipe.description?.trim() || undefined;
@@ -76,7 +94,7 @@ export async function generateMetadata({
             type: 'article',
             publishedTime: recipe.createdAt.toISOString(),
             modifiedTime: recipe.updatedAt.toISOString(),
-            authors: [recipe.authorId?.toString() ?? 'Cookhound User'],
+            authors: [author?.username ?? 'Cookhound User'],
             tags: recipe.tags?.map((tag) => tag.name) ?? []
         });
     } catch {
@@ -86,7 +104,8 @@ export async function generateMetadata({
         return buildLocalizedMetadata(DEFAULT_LOCALE, {
             titleKey: 'meta.recipe.fallback.title',
             descriptionKey: 'meta.recipe.fallback.description',
-            canonical: `${ENV_CONFIG_PUBLIC.ORIGIN}/recipe/${recipeDisplayId}`
+            canonical: `${ENV_CONFIG_PUBLIC.ORIGIN}/recipe/${recipeDisplayId}`,
+            noindex: true
         });
     }
 }

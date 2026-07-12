@@ -1,19 +1,13 @@
 'use client';
 
 import React, { useState, type ReactNode } from 'react';
-import {
-    QueryClientProvider,
-    HydrationBoundary,
-    QueryClient,
-    type DehydratedState
-} from '@tanstack/react-query';
+import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
 
 export const QueryProvider: React.FC<
     Readonly<{
         children: ReactNode;
-        dehydratedState?: DehydratedState;
     }>
-> = ({ children, dehydratedState }) => {
+> = ({ children }) => {
     /**
      * If the query cache is to work on the server (for prefetching), this needs to be done here.
      * This cannot be done on a module level, as the cache will become shared between requests
@@ -34,10 +28,6 @@ export const QueryProvider: React.FC<
     );
 
     return (
-        <QueryClientProvider client={client}>
-            <HydrationBoundary state={dehydratedState}>
-                {children}
-            </HydrationBoundary>
-        </QueryClientProvider>
+        <QueryClientProvider client={client}>{children}</QueryClientProvider>
     );
 };
