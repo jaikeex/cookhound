@@ -9,7 +9,12 @@ import { RequestContext } from '@/server/utils/reqwest/context';
 import db from '@/server/db/model';
 import { NotFoundError, ServerError } from '@/server/error';
 import { InfrastructureErrorCode } from '@/server/error/codes';
-import { createCookbookDTO, verifyCookbookOwnership } from './utils';
+import {
+    canListCookbook,
+    canViewCookbook,
+    createCookbookDTO,
+    verifyCookbookOwnership
+} from './utils';
 
 //|=============================================================================================|//
 
@@ -39,6 +44,13 @@ class CookbookService {
             throw new NotFoundError();
         }
 
+        if (!canViewCookbook(cookbook)) {
+            log.warn('getCookbookById - forbidden, treating as not found', {
+                id
+            });
+            throw new NotFoundError();
+        }
+
         const cookbookDTO = createCookbookDTO(cookbook);
 
         return cookbookDTO;
@@ -59,6 +71,10 @@ class CookbookService {
             throw new NotFoundError();
         }
 
+        if (!canViewCookbook(cookbook)) {
+            throw new NotFoundError();
+        }
+
         return createCookbookDTO(cookbook);
     }
 
@@ -72,7 +88,9 @@ class CookbookService {
     async getCookbooksByOwnerId(ownerId: number): Promise<CookbookDTO[]> {
         const cookbooks = await db.cookbook.getManyByOwnerId(ownerId);
 
-        return cookbooks.map((cookbook) => createCookbookDTO(cookbook));
+        return cookbooks
+            .filter((cookbook) => canListCookbook(cookbook))
+            .map((cookbook) => createCookbookDTO(cookbook));
     }
 
     /**
