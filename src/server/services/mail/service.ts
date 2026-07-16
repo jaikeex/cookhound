@@ -55,6 +55,39 @@ class MailService {
     }
 
     /**
+     * Enqueues a notice sent when a password reset is requested for a
+     * Google-authenticated account.
+     *
+     * @param email - Recipient email address.
+     * @param username - Recipient username (used in the email greeting).
+     */
+    @LogServiceMethod({ names: ['email', 'username'] })
+    async sendPasswordResetGoogleNotice(email: string, username: string) {
+        await queueManager.addJob(JOB_NAMES.SEND_PASSWORD_RESET_GOOGLE_NOTICE, {
+            to: { name: username, address: email },
+            locale: RequestContext.getUserLocale() ?? DEFAULT_LOCALE
+        });
+    }
+
+    /**
+     * Enqueues a notice sent when a password reset is requested for an account
+     * whose email is not yet verified.
+     *
+     * @param email - Recipient email address.
+     * @param username - Recipient username (used in the email greeting).
+     */
+    @LogServiceMethod({ names: ['email', 'username'] })
+    async sendPasswordResetUnverifiedNotice(email: string, username: string) {
+        await queueManager.addJob(
+            JOB_NAMES.SEND_PASSWORD_RESET_UNVERIFIED_NOTICE,
+            {
+                to: { name: username, address: email },
+                locale: RequestContext.getUserLocale() ?? DEFAULT_LOCALE
+            }
+        );
+    }
+
+    /**
      * Enqueues a confirmation link email sent to the new email address
      * during an email change flow.
      *

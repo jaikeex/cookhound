@@ -26,6 +26,9 @@ export const JOB_NAMES = Object.freeze({
 
     SEND_VERIFICATION_EMAIL: 'send-verification-email',
     SEND_PASSWORD_RESET_EMAIL: 'send-password-reset-email',
+    SEND_PASSWORD_RESET_GOOGLE_NOTICE: 'send-password-reset-google-notice',
+    SEND_PASSWORD_RESET_UNVERIFIED_NOTICE:
+        'send-password-reset-unverified-notice',
     SEND_EMAIL_CHANGE_CONFIRMATION: 'send-email-change-confirmation',
     SEND_EMAIL_CHANGE_NOTICE: 'send-email-change-notice',
     SEND_EMAIL_CHANGED_AUDIT: 'send-email-changed-audit',

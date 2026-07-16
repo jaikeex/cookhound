@@ -69,6 +69,8 @@ vi.mock('@/server/services/mail/service', () => ({
     mailService: {
         sendEmailVerification: vi.fn(),
         sendPasswordReset: vi.fn(),
+        sendPasswordResetGoogleNotice: vi.fn(),
+        sendPasswordResetUnverifiedNotice: vi.fn(),
         sendEmailChangeConfirmation: vi.fn(),
         sendEmailChangeNotice: vi.fn(),
         sendEmailChangedAudit: vi.fn(),
@@ -536,15 +538,30 @@ describe('UserService', () => {
             expect(mockDbUser.getOneByEmail).not.toHaveBeenCalled();
         });
 
-        it('should throw NotFoundError when user not found', async () => {
+        it('should resolve silently without sending when user not found (anti-enumeration)', async () => {
             mockDbUser.getOneByEmail.mockResolvedValue(null);
 
-            await expectToThrowWithCode(
-                userService.resendVerificationEmail('nonexistent@example.com'),
-                NotFoundError,
-                ApplicationErrorCode.USER_NOT_FOUND,
-                'auth.error.user-not-found'
-            );
+            await expect(
+                userService.resendVerificationEmail('nonexistent@example.com')
+            ).resolves.toBeUndefined();
+
+            expect(mockDbUser.updateOneById).not.toHaveBeenCalled();
+            expect(
+                mockMailService.sendEmailVerification
+            ).not.toHaveBeenCalled();
+        });
+
+        it('should resolve silently without sending when email already verified (anti-enumeration)', async () => {
+            mockDbUser.getOneByEmail.mockResolvedValue(validUser);
+
+            await expect(
+                userService.resendVerificationEmail(validUser.email)
+            ).resolves.toBeUndefined();
+
+            expect(mockDbUser.updateOneById).not.toHaveBeenCalled();
+            expect(
+                mockMailService.sendEmailVerification
+            ).not.toHaveBeenCalled();
         });
     });
 
@@ -593,41 +610,54 @@ describe('UserService', () => {
             expect(mockDbUser.getOneByEmail).not.toHaveBeenCalled();
         });
 
-        it('should throw NotFoundError when user not found', async () => {
+        it('should resolve without sending anything when user not found (anti-enumeration)', async () => {
             mockDbUser.getOneByEmail.mockResolvedValue(null);
 
-            await expectToThrowWithCode(
-                userService.sendPasswordResetEmail('nonexistent@example.com'),
-                NotFoundError,
-                ApplicationErrorCode.USER_NOT_FOUND,
-                'auth.error.user-not-found'
-            );
+            await expect(
+                userService.sendPasswordResetEmail('nonexistent@example.com')
+            ).resolves.toBeUndefined();
+
+            // Unknown email is a pure no-op: no token write, no reset link, and
+            // no notice (we must not email an address we have no relationship with).
+            expect(mockDbUser.updateOneById).not.toHaveBeenCalled();
+            expect(mockMailService.sendPasswordReset).not.toHaveBeenCalled();
+            expect(
+                mockMailService.sendPasswordResetUnverifiedNotice
+            ).not.toHaveBeenCalled();
+            expect(
+                mockMailService.sendPasswordResetGoogleNotice
+            ).not.toHaveBeenCalled();
         });
 
-        it('should throw AuthErrorForbidden when email not verified', async () => {
+        it('should send an unverified notice (not a reset link) when email not verified (anti-enumeration)', async () => {
             mockDbUser.getOneByEmail.mockResolvedValue(unverifiedUser);
 
-            await expectToThrowWithCode(
-                userService.sendPasswordResetEmail(unverifiedUser.email),
-                AuthErrorForbidden,
-                ApplicationErrorCode.EMAIL_NOT_VERIFIED,
-                'auth.error.email-not-verified'
-            );
+            await expect(
+                userService.sendPasswordResetEmail(unverifiedUser.email)
+            ).resolves.toBeUndefined();
 
             expect(mockDbUser.updateOneById).not.toHaveBeenCalled();
+            expect(mockMailService.sendPasswordReset).not.toHaveBeenCalled();
+            expect(
+                mockMailService.sendPasswordResetUnverifiedNotice
+            ).toHaveBeenCalledWith(
+                unverifiedUser.email,
+                unverifiedUser.username
+            );
         });
 
-        it('should throw AuthErrorForbidden for Google auth users', async () => {
+        it('should send a Google notice (not a reset link) for Google auth users (anti-enumeration)', async () => {
             mockDbUser.getOneByEmail.mockResolvedValue(googleUser);
 
-            await expectToThrowWithCode(
-                userService.sendPasswordResetEmail(googleUser.email),
-                AuthErrorForbidden,
-                ApplicationErrorCode.GOOGLE_OAUTH_FAILED,
-                'auth.error.google-auth-not-supported'
-            );
+            await expect(
+                userService.sendPasswordResetEmail(googleUser.email)
+            ).resolves.toBeUndefined();
 
             expect(mockDbUser.updateOneById).not.toHaveBeenCalled();
+            expect(mockMailService.sendPasswordReset).not.toHaveBeenCalled();
+            expect(
+                mockMailService.sendPasswordResetGoogleNotice
+            ).toHaveBeenCalledWith(googleUser.email, googleUser.username);
         });
     });
 

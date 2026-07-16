@@ -967,9 +967,11 @@ class UserService {
      * Generates a fresh verification token and resends the verification email.
      * Replaces any previously issued token.
      *
+     * Resolves silently when the email is unknown or already verified.
+     * These branches are deliberately indistinguishable to prevent account enumeration.
+     *
      * @param email - Email address of the user requesting re-verification.
-     * @throws {NotFoundError} If no user with the given email exists.
-     * @throws {AuthErrorForbidden} If the email is already verified.
+     * @throws {ValidationError} If the email is missing.
      */
     @LogServiceMethod({ names: ['email'] })
     async resendVerificationEmail(email: string): Promise<void> {
@@ -988,23 +990,23 @@ class UserService {
         });
 
         if (!user) {
-            log.warn('resendVerificationEmail - user not found', { email });
-
-            throw new NotFoundError(
-                'auth.error.user-not-found',
-                ApplicationErrorCode.USER_NOT_FOUND
+            log.warn(
+                'resendVerificationEmail - user not found (silent no-op)',
+                {
+                    email
+                }
             );
+
+            return;
         }
 
         if (user?.emailVerified) {
-            log.info('resendVerificationEmail - email already verified', {
-                email
-            });
-
-            throw new AuthErrorForbidden(
-                'auth.error.email-already-verified',
-                ApplicationErrorCode.EMAIL_ALREADY_VERIFIED
+            log.info(
+                'resendVerificationEmail - email already verified (silent no-op)',
+                { email }
             );
+
+            return;
         }
 
         const verificationToken = uuid();
@@ -1029,9 +1031,12 @@ class UserService {
     /**
      * Generates a password reset token and sends a reset link to the user's email.
      *
+     * Resolves without error when the account is unknown, unverified, or uses
+     * Google OAuth to prevent enumeration of account existence, auth method, and
+     * verification status.
+     *
      * @param email - Email address of the user requesting the reset.
-     * @throws {NotFoundError} If no user with the given email exists.
-     * @throws {AuthErrorForbidden} If the email is not yet verified or the account uses Google OAuth.
+     * @throws {ValidationError} If the email is missing.
      */
     @LogServiceMethod({ names: ['email'] })
     async sendPasswordResetEmail(email: string): Promise<void> {
@@ -1049,30 +1054,34 @@ class UserService {
         );
 
         if (!user) {
-            log.info('sendPasswordResetEmail - user not found', { email });
-            throw new NotFoundError(
-                'auth.error.user-not-found',
-                ApplicationErrorCode.USER_NOT_FOUND
-            );
+            log.info('sendPasswordResetEmail - user not found (silent no-op)', {
+                email
+            });
+            return;
         }
 
         if (!user.emailVerified) {
-            log.warn('sendPasswordResetEmail - email not verified', { email });
-            throw new AuthErrorForbidden(
-                'auth.error.email-not-verified',
-                ApplicationErrorCode.EMAIL_NOT_VERIFIED
+            log.warn(
+                'sendPasswordResetEmail - email not verified (sending notice)',
+                { email }
             );
+            await mailService.sendPasswordResetUnverifiedNotice(
+                user.email,
+                user.username
+            );
+            return;
         }
 
         if (user.authType === AuthType.Google) {
             log.info(
-                'sendPasswordResetEmail - tried for user with google auth',
+                'sendPasswordResetEmail - google account (sending notice)',
                 { email, authType: user.authType }
             );
-            throw new AuthErrorForbidden(
-                'auth.error.google-auth-not-supported',
-                ApplicationErrorCode.GOOGLE_OAUTH_FAILED
+            await mailService.sendPasswordResetGoogleNotice(
+                user.email,
+                user.username
             );
+            return;
         }
 
         const passwordResetToken = uuid();
