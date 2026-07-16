@@ -92,7 +92,7 @@ jobs:
                       CONTACT_EMAIL=${{ secrets.CONTACT_EMAIL }}
 
             - name: Deploy on droplet
-              uses: appleboy/ssh-action@v1
+              uses: appleboy/ssh-action@0ff4204d59e8e51228ff73bce53f80d53301dee2 # v1.2.5
               with:
                   host: ${{ secrets.DO_SSH_HOST }}
                   username: ${{ secrets.DO_SSH_USER }}
@@ -117,3 +117,22 @@ jobs:
               env:
                   GHCR_ACTOR: ${{ github.actor }}
                   GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    sync-nginx:
+        needs: deploy
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Sync nginx config on droplet
+              uses: appleboy/ssh-action@0ff4204d59e8e51228ff73bce53f80d53301dee2 # v1.2.5
+              with:
+                  host: ${{ secrets.DO_SSH_HOST }}
+                  username: ${{ secrets.DO_SSH_USER }}
+                  key: ${{ secrets.DO_SSH_KEY }}
+                  port: 22
+                  script: |
+                      set -e
+
+                      bash /cookhound/scripts/nginx-activate.sh \
+                        /cookhound/deploy/nginx/nginx.conf \
+                        /cookhound/deploy/nginx/cookhound.com.conf

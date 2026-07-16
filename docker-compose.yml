@@ -3,7 +3,7 @@ services:
         image: ghcr.io/jaikeex/cookhound:latest
         restart: always
         ports:
-            - '3000:3000'
+            - '127.0.0.1:3000:3000'
         env_file: .env
         environment:
             - NODE_ENV=production
@@ -42,7 +42,7 @@ services:
         volumes:
             - typesense-data:/data
         ports:
-            - '8108:8108'
+            - '127.0.0.1:8108:8108'
 volumes:
     redis-data:
     typesense-data:
