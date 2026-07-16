@@ -1,6 +1,46 @@
+const isDev = process.env.NODE_ENV !== 'production';
+
+const cspHeaderKey = 'Content-Security-Policy';
+const contentSecurityPolicy = [
+    "default-src 'self'",
+    "base-uri 'self'",
+    "object-src 'none'",
+    "frame-ancestors 'none'",
+    "form-action 'self'",
+    `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ''} https://www.google.com https://www.gstatic.com`,
+    "style-src 'self' 'unsafe-inline'",
+    "img-src 'self' data: blob: https://storage.googleapis.com https://lh3.googleusercontent.com https://www.gstatic.com",
+    "font-src 'self' data:",
+    `connect-src 'self'${isDev ? ' ws:' : ''} https://www.google.com`,
+    'frame-src https://www.google.com',
+    "manifest-src 'self'",
+    ...(isDev ? [] : ['upgrade-insecure-requests'])
+].join('; ');
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     output: 'standalone',
+
+    async headers() {
+        return [
+            {
+                source: '/:path*',
+                headers: [
+                    { key: cspHeaderKey, value: contentSecurityPolicy },
+                    { key: 'X-Content-Type-Options', value: 'nosniff' },
+                    { key: 'X-Frame-Options', value: 'DENY' },
+                    {
+                        key: 'Referrer-Policy',
+                        value: 'strict-origin-when-cross-origin'
+                    },
+                    {
+                        key: 'Permissions-Policy',
+                        value: 'camera=(), microphone=(), geolocation=()'
+                    }
+                ]
+            }
+        ];
+    },
 
     serverExternalPackages: ['@prisma/client', '@prisma/adapter-pg', 'bullmq'],
 
