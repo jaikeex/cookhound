@@ -7,6 +7,7 @@ import {
     googleUser,
     userWithPasswordResetToken,
     userWithExpiredPasswordResetToken,
+    userPendingDeletion,
     duplicateEmailUser,
     duplicateUsernameUser,
     TEST_PASSWORD,
@@ -84,6 +85,12 @@ vi.mock('@/server/utils/crypto', () => ({
     needsRehash: vi.fn()
 }));
 
+vi.mock('@/server/utils/session', () => ({
+    sessions: {
+        invalidateAllUserSessions: vi.fn()
+    }
+}));
+
 vi.mock('@/server/utils/reqwest/context', async () => {
     const { UserRole } = await import('@/common/types');
     return {
@@ -121,8 +128,10 @@ import {
 } from '@/server/utils/crypto';
 import { RequestContext } from '@/server/utils/reqwest/context';
 import { redisClient } from '@/server/integrations';
+import { sessions } from '@/server/utils/session';
 import { v4 as uuid } from 'uuid';
 
+const mockSessions = vi.mocked(sessions);
 const mockRedis = vi.mocked(redisClient);
 const mockDbUser = vi.mocked(db.user);
 const mockMailService = vi.mocked(mailService);
@@ -679,6 +688,35 @@ describe('UserService', () => {
             );
         });
 
+        it('should invalidate all existing sessions on success', async () => {
+            mockDbUser.getOneByPasswordResetToken.mockResolvedValue(
+                userWithPasswordResetToken
+            );
+            mockDbUser.updateOneById.mockResolvedValue(
+                userWithPasswordResetToken
+            );
+
+            await userService.resetPassword(resetToken, newPassword);
+
+            expect(mockSessions.invalidateAllUserSessions).toHaveBeenCalledWith(
+                userWithPasswordResetToken.id
+            );
+        });
+
+        it('should not invalidate sessions when the reset fails', async () => {
+            mockDbUser.getOneByPasswordResetToken.mockResolvedValue(
+                userWithExpiredPasswordResetToken
+            );
+
+            await expect(
+                userService.resetPassword('expired-reset-token', newPassword)
+            ).rejects.toThrow(ValidationError);
+
+            expect(
+                mockSessions.invalidateAllUserSessions
+            ).not.toHaveBeenCalled();
+        });
+
         it('should throw ValidationError when token or password missing', async () => {
             await expect(
                 userService.resetPassword('', newPassword)
@@ -756,6 +794,43 @@ describe('UserService', () => {
             );
 
             expect(mockDbUser.updateOneById).not.toHaveBeenCalled();
+        });
+    });
+
+    //~=========================================================================================~//
+    //$                                  ACCOUNT DELETION                                       $//
+    //~=========================================================================================~//
+
+    describe('initiateAccountDeletion', () => {
+        it('should invalidate the user own sessions once deletion is scheduled', async () => {
+            mockDbUser.getOneById.mockResolvedValue(validUser);
+            mockDbUser.markForDeletion.mockResolvedValue(validUser);
+
+            await userService.initiateAccountDeletion(
+                validUser.id,
+                TEST_PASSWORD
+            );
+
+            expect(mockDbUser.markForDeletion).toHaveBeenCalled();
+            expect(mockSessions.invalidateAllUserSessions).toHaveBeenCalledWith(
+                validUser.id
+            );
+        });
+
+        it('should not invalidate sessions when deletion is already pending', async () => {
+            mockDbUser.getOneById.mockResolvedValue(userPendingDeletion);
+
+            await expect(
+                userService.initiateAccountDeletion(
+                    userPendingDeletion.id,
+                    TEST_PASSWORD
+                )
+            ).rejects.toThrow(ConflictError);
+
+            expect(mockDbUser.markForDeletion).not.toHaveBeenCalled();
+            expect(
+                mockSessions.invalidateAllUserSessions
+            ).not.toHaveBeenCalled();
         });
     });
 

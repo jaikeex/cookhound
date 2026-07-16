@@ -235,6 +235,10 @@ class AdminService {
 
         await db.user.updateOneById(targetUserId, { role: newRole });
 
+        // Authorization is decided from the userRole captured in the session
+        // at login time, so a role change must revoke existing sessions.
+        await sessions.invalidateAllUserSessions(targetUserId);
+
         await this.logAction(
             adminUserId,
             targetUserId,

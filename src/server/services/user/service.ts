@@ -42,6 +42,7 @@ import {
 import { serializeTermsContent } from '@/server/utils/terms';
 import { serializeConsentContent } from '@/server/utils/consent';
 import { RequestContext } from '@/server/utils/reqwest/context';
+import { sessions } from '@/server/utils/session';
 import { redisClient } from '@/server/integrations';
 import { ONE_MINUTE_IN_SECONDS } from '@/common/constants/time';
 
@@ -1169,6 +1170,8 @@ class UserService {
             lastPasswordReset: new Date()
         });
 
+        await sessions.invalidateAllUserSessions(user.id);
+
         return;
     }
 
@@ -1492,6 +1495,12 @@ class UserService {
             userEmail: user.email,
             userName: user.username
         });
+
+        // Revoke the user's own sessions so the pending-deletion state takes
+        // effect immediately: the middleware restricts PendingDeletion users
+        // to the profile area, but that guard keys off the session status,
+        // which stays Active on live sessions unless invalidated them here.
+        await sessions.invalidateAllUserSessions(userId);
 
         //|-------------------------------------------------------------------------------------|//
         //?                                   SEND EMAIL                                        ?//
