@@ -67,8 +67,7 @@ export const httpRecipeRepository: RecipeRepository = {
         await recipeApiClient.rateRecipe(id, rating);
     },
 
-    registerVisit: ({ id, userId }) =>
-        recipeApiClient.registerRecipeVisit(id, userId),
+    registerVisit: ({ id }) => recipeApiClient.registerRecipeVisit(id),
 
     submitAppeal: (args) => recipeApiClient.submitAppeal(args)
 };

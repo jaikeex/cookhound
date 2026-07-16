@@ -51,8 +51,7 @@ export const RecipeViewTemplate: React.FC<RecipeViewProps> = ({ recipe }) => {
             // this will work too, if it does not, it does not matter the visit is not
             // recorded anyway
             registerRecipeVisit({
-                id: recipeResolved.id.toString(),
-                userId: user?.id?.toString() ?? null
+                id: recipeResolved.id.toString()
             });
         }
     }, [recipeResolved?.id]);

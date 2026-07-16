@@ -72,7 +72,7 @@ export interface RecipeRepository {
 
     rate(args: { id: string; rating: number }): Promise<void>;
 
-    registerVisit(args: { id: string; userId: string | null }): Promise<void>;
+    registerVisit(args: { id: string }): Promise<void>;
 
     submitAppeal(
         args: { recipeId: number } & RecipeFlagAppealPayload

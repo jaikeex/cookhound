@@ -91,7 +91,6 @@ export type IngredientForUpdate = {
 
 export type RecipeVisitPayload = {
     id: string;
-    userId: string | null;
 };
 
 export type RecipeRatingPayload = {

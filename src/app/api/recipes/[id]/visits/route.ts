@@ -7,9 +7,8 @@ import {
     created,
     readJson
 } from '@/server/utils/reqwest';
+import { RequestContext } from '@/server/utils/reqwest/context';
 import { z } from 'zod';
-import { ApplicationErrorCode } from '@/server/error/codes';
-import { ValidationError } from '@/server/error/server';
 import { withRateLimit } from '@/server/utils/rate-limit';
 import { registerRouteDocs } from '@/server/utils/api-docs/registry';
 import { AuthLevel } from '@/common/types';
@@ -18,9 +17,7 @@ import { AuthLevel } from '@/common/types';
 //?                                     VALIDATION SCHEMAS                                      ?//
 //|=============================================================================================|//
 
-const RecipeVisitForCreateSchema = z.strictObject({
-    userId: z.coerce.number().int().positive().optional().nullable()
-});
+const RecipeVisitForCreateSchema = z.strictObject({});
 
 const RecipeVisitParamsSchema = z.strictObject({
     recipeId: z.coerce.number().int().positive()
@@ -31,7 +28,7 @@ const RecipeVisitParamsSchema = z.strictObject({
 //|=============================================================================================|//
 
 /**
- * Handles GET requests to `/api/recipes/{id}/visits` to register a recipe visit.
+ * Handles POST requests to `/api/recipes/{id}/visits` to register a recipe visit.
  *
  * @returns A JSON response with a success message.
  *
@@ -44,23 +41,12 @@ async function postHandler(request: NextRequest) {
         recipeId: request.nextUrl.pathname.split('/').at(-2)
     });
 
-    if (!recipeId || isNaN(Number(recipeId))) {
-        throw new ValidationError(
-            'app.error.bad-request',
-            ApplicationErrorCode.MISSING_FIELD
-        );
-    }
-
     const rawPayload = await readJson(request);
+    validatePayload(RecipeVisitForCreateSchema, rawPayload);
 
-    const payload = validatePayload(RecipeVisitForCreateSchema, rawPayload);
+    const userId = RequestContext.getUserId();
 
-    const { userId } = payload;
-
-    await recipeService.registerRecipeVisit(
-        Number(recipeId),
-        userId && !isNaN(Number(userId)) ? Number(userId) : null
-    );
+    await recipeService.registerRecipeVisit(Number(recipeId), userId);
 
     return created({}, { status: 201 });
 }
@@ -82,8 +68,7 @@ registerRouteDocs('/api/recipes/{id}/visits', {
     subcategory: 'Ratings & Visits',
     POST: {
         summary: 'Record a recipe visit.',
-        description: `Also updates last-viewed history if userId
-            is provided.`,
+        description: `Updates the authenticated user's last-viewed history when a session is present; records an anonymous view-count increment otherwise.`,
         auth: AuthLevel.PUBLIC,
         rateLimit: { maxRequests: 10, windowSizeInSeconds: 15 },
         bodySchema: RecipeVisitForCreateSchema,

@@ -426,8 +426,7 @@ export const recipeQueryClient = {
         const { recipeRepository } = useRepositories();
 
         return useAppMutation(
-            ({ id, userId }: { id: string; userId: string | null }) =>
-                recipeRepository.registerVisit({ id, userId }),
+            ({ id }: { id: string }) => recipeRepository.registerVisit({ id }),
             options
         );
     },

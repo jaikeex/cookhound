@@ -20,17 +20,15 @@ class RecipeApiClient {
      * Registers a recipe visit by calling `POST /api/recipes/{id}/visits`.
      *
      * @param id - The ID of the recipe to visit.
-     * @param userId - The ID of the user to visit the recipe.
      * @param config - Optional fetch request configuration.
      */
     async registerRecipeVisit(
         id: string,
-        userId: string | null,
         config?: RequestConfig
     ): Promise<void> {
         return await apiRequestWrapper.post({
             url: `/recipes/${id}/visits`,
-            data: { userId },
+            data: {},
             ...config
         });
     }
