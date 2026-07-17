@@ -229,7 +229,7 @@ class UserApiClient {
     async verifyEmail(token: string, config?: RequestConfig): Promise<void> {
         await apiRequestWrapper.put({
             url: '/users/verify-email',
-            params: { token },
+            data: { token },
             ...config
         });
     }
@@ -314,9 +314,11 @@ class UserApiClient {
         token: string,
         config?: RequestConfig
     ): Promise<UserDTO> {
+        // The token travels in the body, never as a query param — request
+        // lines (URL + query) end up in access logs; request bodies do not.
         return await apiRequestWrapper.put({
             url: '/users/me/email',
-            params: { token },
+            data: { token },
             ...config
         });
     }

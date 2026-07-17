@@ -1,4 +1,3 @@
-import { ValidationError } from '@/server/error/server';
 import { userService } from '@/server/services';
 import { withRateLimit } from '@/server/utils/rate-limit';
 import {
@@ -11,7 +10,6 @@ import {
 } from '@/server/utils/reqwest';
 import type { NextRequest } from 'next/server';
 import { z } from 'zod';
-import { ApplicationErrorCode } from '@/server/error/codes';
 import { withAuth } from '@/server/utils/reqwest';
 import { registerRouteDocs, UserResponseSchema } from '@/server/utils/api-docs';
 import { AuthLevel } from '@/common/types';
@@ -23,6 +21,10 @@ import { AuthLevel } from '@/common/types';
 const ChangeEmailSchema = z.strictObject({
     newEmail: z.email().trim(),
     password: z.string().min(1).max(100).trim()
+});
+
+const ConfirmEmailChangeSchema = z.strictObject({
+    token: z.string().trim().min(1)
 });
 
 //|=============================================================================================|//
@@ -56,20 +58,18 @@ async function postHandler(request: NextRequest) {
 /**
  * Handles PUT requests to `/api/users/me/email` to confirm an e-mail change via token.
  *
+ * ! The token must travel in the body, never in the query string, because request
+ * ! lines (URL + query) end up in access logs; request bodies do not.
+ *
  * @param request - The incoming Next.js request object.
  * @returns 200 OK with updated `UserDTO` on success.
  */
 async function putHandler(request: NextRequest) {
-    const token = request.nextUrl.searchParams.get('token');
+    const rawPayload = await readJson(request);
 
-    if (!token) {
-        throw new ValidationError(
-            undefined,
-            ApplicationErrorCode.MISSING_FIELD
-        );
-    }
+    const payload = validatePayload(ConfirmEmailChangeSchema, rawPayload);
 
-    const updatedUser = await userService.confirmEmailChange(token);
+    const updatedUser = await userService.confirmEmailChange(payload.token);
 
     return ok(updatedUser);
 }
@@ -121,9 +121,11 @@ registerRouteDocs('/api/users/me/email', {
     PUT: {
         summary: 'Verify and complete an email change via token.',
         description: `Confirms the email change using the
-            verification token.`,
+            verification token. The token is carried in the
+            request body so it never appears in access logs.`,
         auth: AuthLevel.PUBLIC,
         rateLimit: { maxRequests: 5, windowSizeInSeconds: 3600 },
+        bodySchema: ConfirmEmailChangeSchema,
         clientUsage: [
             {
                 apiClient: 'apiClient.user.confirmEmailChange',

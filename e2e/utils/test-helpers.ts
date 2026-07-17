@@ -93,14 +93,17 @@ export async function createVerifiedTestUser() {
         const { token } = await tokenResponse.json();
 
         const verifyResponse = await fetch(
-            `${TEST_API_BASE.replace('/api/test', '/api/users')}/verify-email?token=${token}`,
+            `${TEST_API_BASE.replace('/api/test', '/api/users')}/verify-email`,
             {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                     Origin: 'http://192.168.0.143:3000',
                     Referer: 'http://192.168.0.143:3000/'
-                }
+                },
+                // The token travels in the body, never as a query param —
+                // the API rejects query-string tokens (they land in access logs).
+                body: JSON.stringify({ token })
             }
         );
 

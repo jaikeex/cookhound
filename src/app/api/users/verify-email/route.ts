@@ -1,4 +1,4 @@
-import { AuthErrorForbidden, ValidationError } from '@/server/error/server';
+import { AuthErrorForbidden } from '@/server/error/server';
 import { userService } from '@/server/services';
 import {
     assertAnonymous,
@@ -20,6 +20,10 @@ import { AuthLevel } from '@/common/types';
 
 const SendVerificationEmailSchema = z.strictObject({
     email: z.email().trim()
+});
+
+const VerifyEmailSchema = z.strictObject({
+    token: z.string().trim().min(1)
 });
 
 //|=============================================================================================|//
@@ -55,14 +59,17 @@ async function postHandler(request: NextRequest) {
 
 /**
  * Handles PUT requests to `/api/users/verify-email` to verify a user's email address.
- * It uses a token from the query parameters to verify the email.
+ * It uses a token from the request body to verify the email.
+ *
+ * ! The token must travel in the body, never in the query string, because request
+ * ! lines (URL + query) end up in access logs; request bodies do not.
  *
  * ! This endpoint is restricted and only accessible to guests.
  *
  * @param request - The incoming Next.js request object.
  * @returns A JSON response indicating success or failure of the email verification.
  *
- * - 200: Success, with a success message.
+ * - 204: Success.
  * - 400: Bad Request, if the token is missing.
  * - 403: Forbidden, if the email is already verified.
  * - 404: Not Found, if the user is not found.
@@ -76,16 +83,11 @@ async function putHandler(request: NextRequest) {
         )
     );
 
-    const token = request.nextUrl.searchParams.get('token');
+    const rawPayload = await readJson(request);
 
-    if (!token) {
-        throw new ValidationError(
-            undefined,
-            ApplicationErrorCode.MISSING_FIELD
-        );
-    }
+    const payload = validatePayload(VerifyEmailSchema, rawPayload);
 
-    await userService.verifyEmail(token);
+    await userService.verifyEmail(payload.token);
 
     return noContent();
 }
@@ -136,9 +138,11 @@ registerRouteDocs('/api/users/verify-email', {
     PUT: {
         summary: 'Verify email address using a token.',
         description: `Confirms email using the verification
-            token. Single-use, time-limited.`,
+            token. Single-use. The token is carried in the
+            request body so it never appears in access logs.`,
         auth: AuthLevel.GUEST,
         rateLimit: { maxRequests: 10, windowSizeInSeconds: 60 },
+        bodySchema: VerifyEmailSchema,
         clientUsage: [
             {
                 apiClient: 'apiClient.user.verifyEmail',
