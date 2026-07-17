@@ -3,6 +3,7 @@ import { encodeHeaderUtf8 } from '@/server/queues/jobs/emails/utils/encoding';
 import { InfrastructureError } from '@/server/error';
 import { InfrastructureErrorCode } from '@/server/error/codes';
 import { Logger } from '@/server/logger';
+import { describeSmtpCommand } from './sanitize';
 import net from 'net';
 import tls from 'tls';
 
@@ -156,7 +157,10 @@ export class MailClient {
 
         if (responseCode !== expectedCode) {
             log.error('sendAndVerify - unexpected SMTP response.', undefined, {
-                command,
+                // NEVER log the raw command: on the DATA step it is the entire
+                // email body (token-bearing links) and on the AUTH step it is
+                // the base64 credentials.
+                command: describeSmtpCommand(command),
                 expectedCode,
                 responseCode,
                 response

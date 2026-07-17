@@ -142,7 +142,7 @@ class AuthService {
      * @throws {AuthErrorUnauthorized} If the token exchange or profile fetch fails.
      * @throws {AuthErrorForbidden} If the account is banned.
      */
-    @LogServiceMethod({ names: ['payload'] })
+    @LogServiceMethod({ excludeArgs: true })
     async loginWithGoogle(payload: AuthCodePayload): Promise<AuthResponse> {
         const { code } = payload;
 

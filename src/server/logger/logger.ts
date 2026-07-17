@@ -7,6 +7,7 @@ import { GoogleCloudLoggingTransport } from './transports';
 import { ENV_CONFIG_PRIVATE, ENV_CONFIG_PUBLIC } from '@/common/constants';
 import { LOG_LEVELS, type LogLevel } from './types';
 import { getLoggerContext } from '@/server/logger/context-reader';
+import { safeStringify } from '@/server/logger/redact';
 import { ServerError } from '@/server/error';
 import { ApplicationErrorCode } from '@/server/error/codes';
 
@@ -214,7 +215,7 @@ export class Logger {
         const errorInformation = {
             message:
                 error && error instanceof Error ? error.message : 'unknown',
-            code:
+            errorCode:
                 error && error instanceof ServerError
                     ? error.code
                     : ApplicationErrorCode.DEFAULT
@@ -317,13 +318,13 @@ export class Logger {
 
     private serialise(message: unknown, additional: unknown[]): string {
         const main =
-            typeof message === 'string' ? message : this.safeStringify(message);
+            typeof message === 'string' ? message : safeStringify(message);
         if (!additional.length) {
             return main;
         }
 
         const extras = additional.map((arg) =>
-            typeof arg === 'string' ? arg : this.safeStringify(arg)
+            typeof arg === 'string' ? arg : safeStringify(arg)
         );
         return `${main} | ${extras.join(' | ')}`;
     }
@@ -345,45 +346,5 @@ export class Logger {
             : '';
 
         return `${code} | ${stack}${causePart}`;
-    }
-
-    /**
-     * Attempt to stringify a value while guarding against circular structures.
-     * Falls back to `toString()` if `JSON.stringify` fails.
-     */
-    private safeStringify(value: unknown): string {
-        /**
-         * Preserve plain strings as is so that existing characters render correctly in both the
-         * console and file outputs. Calling `util.inspect` or `JSON.stringify` on a string would escape everything,
-         * causing the readability of log to go negative. By short-circuiting here multiline messages are kept intact.
-         */
-
-        if (typeof value === 'string') {
-            return value;
-        }
-
-        try {
-            /**
-             * This is a useful tool for debugging, as it makes the log print any appended object
-             * as a beautified json. Leaving it for reference here.
-             */
-            // const isDev = ENV_CONFIG_PUBLIC.ENV !== 'production';
-
-            // if (isDev) {
-            //     return util.inspect(value, {
-            //         depth: null,
-            //         compact: false,
-            //         breakLength: 120
-            //     });
-            // }
-
-            return JSON.stringify(value);
-        } catch {
-            try {
-                return String(value);
-            } catch {
-                return '[Unserialisable value]';
-            }
-        }
     }
 }
