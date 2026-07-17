@@ -4,8 +4,6 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 //$                                           MOCKS                                             $//
 //|=============================================================================================|//
 
-// notFound() / redirect() throw special navigation signals in Next; mock them
-// to throw identifiable errors so we can assert which branch ran.
 vi.mock('next/navigation', () => ({
     notFound: vi.fn(() => {
         throw new Error('NEXT_NOT_FOUND');
