@@ -95,17 +95,15 @@ function getAppRouterClientIdentifier(req: NextRequest): string {
     //# connection itself, not from the request headers, since those can be set arbitrarily
     //# by the caller.
     //#
-    //# The correct nginx config is as follows:
+    //# The live config lives in deploy/nginx/cookhound.com.conf.
     //#
-    //#     # Clear incoming client IP headers to prevent spoofing
-    //#     proxy_set_header X-Real-IP "";
-    //#     proxy_set_header X-Forwarded-For "";
     //#
-    //#     # Set the X-Real-IP header to the real remote address
-    //#     proxy_set_header X-Real-IP $remote_addr;
-    //#
-    //#     # Append the remote address to the X-Forwarded-For header
-    //#     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    //# Do NOT use $proxy_add_x_forwarded_for here: it appends $remote_addr to
+    //# the client-supplied header, so a spoofed "X-Forwarded-For: 1.2.3.4"
+    //# arrives as "1.2.3.4, <real-ip>" and the [0] read below trusts 1.2.3.4.
+    //# If a load balancer is ever put IN FRONT of nginx, revisit
+    //# this: $remote_addr then becomes the proxy's IP and nginx must instead
+    //# trust the fronting proxy's X-Forwarded-For.
     ///
     //?—————————————————————————————————————————————————————————————————————————————————————————?//
 
