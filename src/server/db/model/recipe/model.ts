@@ -361,6 +361,85 @@ class RecipeModel {
     //~=========================================================================================~//
 
     /**
+     * Builds the shared where clause for the filter queries. filterMany and
+     * countFiltered MUST stay on the same clause, the hub pages derive their
+     * page count (and indexability) from countFiltered while listing through
+     * filterMany, and a drift between the two would produce phantom pages.
+     */
+    private buildFilterWhere(
+        filters: RecipeFilterParams,
+        language: Locale
+    ): Prisma.RecipeWhereInput {
+        const andConditions: Prisma.RecipeWhereInput[] = [];
+
+        filters.containsIngredients?.forEach((id) =>
+            andConditions.push({
+                ingredients: { some: { ingredientId: id } }
+            })
+        );
+
+        filters.tags?.forEach((id) =>
+            andConditions.push({ tags: { some: { tagId: id } } })
+        );
+
+        return {
+            language,
+            flags: { none: { active: true } },
+            ...(andConditions.length && { AND: andConditions }),
+            ...(filters.excludesIngredients?.length && {
+                NOT: {
+                    ingredients: {
+                        some: {
+                            ingredientId: {
+                                in: filters.excludesIngredients
+                            }
+                        }
+                    }
+                }
+            }),
+            ...(filters.timeMin != null && {
+                time: { gte: filters.timeMin }
+            }),
+            ...(filters.timeMax != null && {
+                time: { lte: filters.timeMax }
+            }),
+            ...(filters.hasImage && { imageUrl: { not: null } })
+        };
+    }
+
+    /**
+     * Count recipes matching the provided criteria.
+     * Query class -> C1
+     */
+    async countFiltered(
+        filters: RecipeFilterParams,
+        language: Locale,
+        ttl?: number
+    ): Promise<number> {
+        const cacheKey = generateCacheKey('recipe', 'countFiltered', {
+            filters,
+            language
+        });
+
+        log.trace('Counting filtered recipes', { language, filters });
+
+        return await cachePrismaQuery(
+            cacheKey,
+            async () => {
+                log.trace('Fetching filtered recipe count from db', {
+                    language,
+                    filters
+                });
+
+                return prisma.recipe.count({
+                    where: this.buildFilterWhere(filters, language)
+                });
+            },
+            ttl ?? CACHE_TTL.TTL_1
+        );
+    }
+
+    /**
      * Filter recipes by provided criteria.
      * Query class -> C1
      */
@@ -403,44 +482,8 @@ class RecipeModel {
                     offset
                 });
 
-                const andConditions: Prisma.RecipeWhereInput[] = [];
-
-                filters.containsIngredients?.forEach((id) =>
-                    andConditions.push({
-                        ingredients: { some: { ingredientId: id } }
-                    })
-                );
-
-                filters.tags?.forEach((id) =>
-                    andConditions.push({ tags: { some: { tagId: id } } })
-                );
-
-                const where: Prisma.RecipeWhereInput = {
-                    language,
-                    flags: { none: { active: true } },
-                    ...(andConditions.length && { AND: andConditions }),
-                    ...(filters.excludesIngredients?.length && {
-                        NOT: {
-                            ingredients: {
-                                some: {
-                                    ingredientId: {
-                                        in: filters.excludesIngredients
-                                    }
-                                }
-                            }
-                        }
-                    }),
-                    ...(filters.timeMin != null && {
-                        time: { gte: filters.timeMin }
-                    }),
-                    ...(filters.timeMax != null && {
-                        time: { lte: filters.timeMax }
-                    }),
-                    ...(filters.hasImage && { imageUrl: { not: null } })
-                };
-
                 return prisma.recipe.findMany({
-                    where,
+                    where: this.buildFilterWhere(filters, language),
                     select: {
                         id: true,
                         displayId: true,

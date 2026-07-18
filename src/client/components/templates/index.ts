@@ -4,6 +4,7 @@ export * from './Cookbook';
 export * from './Contact';
 export * from './Dashboard';
 export * from './Error';
+export * from './Hub';
 export * from './Privacy';
 export * from './Recipe';
 export * from './ShoppingList';

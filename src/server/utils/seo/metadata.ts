@@ -8,7 +8,7 @@ import type { Locale } from '@/common/types';
 
 type MetadataConfig = {
     titleKey: I18nMessage;
-    descriptionKey: I18nMessage;
+    descriptionKey?: I18nMessage;
     description?: string;
     ogDescription?: string;
     imageUrl?: string;
@@ -19,6 +19,7 @@ type MetadataConfig = {
     params?: Record<string, string | number | boolean>;
     canonical?: string;
     noindex?: boolean;
+    noindexFollow?: boolean;
     type?: 'website' | 'article' | 'profile';
     publishedTime?: string;
     modifiedTime?: string;
@@ -86,7 +87,9 @@ export async function buildLocalizedMetadata(
 
     const description = validateDescription(
         config.description ??
-            tServer(locale, config.descriptionKey, config.params)
+            (config.descriptionKey
+                ? tServer(locale, config.descriptionKey, config.params)
+                : '')
     );
 
     const ogTitle = config.ogTitleKey
@@ -130,7 +133,7 @@ export async function buildLocalizedMetadata(
         robots: config.noindex
             ? {
                   index: false,
-                  follow: false
+                  follow: config.noindexFollow ?? false
               }
             : undefined
     };

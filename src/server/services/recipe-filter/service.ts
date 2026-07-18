@@ -19,7 +19,12 @@ const log = Logger.getInstance(LOG_CONTEXT);
 class RecipeFilterService {
     static readonly LOG_CONTEXT = LOG_CONTEXT;
 
-    private readonly MAX_BATCHES = 20;
+    /**
+     * Upper bound on pagination depth. Public on purpose: consumers that
+     * derive their own page counts must cap at this
+     * value, because filterRecipes rejects any batch above it.
+     */
+    readonly MAX_BATCHES = 20;
 
     /**
      * Return a paginated, filtered set of recipes.
@@ -80,6 +85,20 @@ class RecipeFilterService {
             time: recipe.time,
             portionSize: recipe.portionSize
         }));
+    }
+
+    /**
+     * Count recipes matching the filters.
+     *
+     * @param filters - Filter criteria.
+     * @param language - Locale to filter recipes by.
+     */
+    @LogServiceMethod({ names: ['language'] })
+    async countRecipes(
+        filters: RecipeFilterParams,
+        language: Locale
+    ): Promise<number> {
+        return db.recipe.countFiltered(filters, language);
     }
 }
 

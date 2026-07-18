@@ -1,6 +1,13 @@
 import type { MetadataRoute } from 'next';
-import { ENV_CONFIG_PUBLIC } from '@/common/constants';
+import {
+    ENV_CONFIG_PUBLIC,
+    DEFAULT_LOCALE,
+    HUB_SLUGS,
+    HUB_INDEXABLE_THRESHOLD
+} from '@/common/constants';
+import type { HubDbSlug } from '@/common/constants';
 import { prisma } from '@/server/integrations';
+import db from '@/server/db/model';
 import { Logger } from '@/server/logger';
 
 export const revalidate = 86400; // 24 hours
@@ -13,16 +20,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     try {
         log.trace('Generating sitemap');
 
-        const [recipes, cookbooks, users] = await Promise.all([
+        const [recipes, cookbooks, users, hubs] = await Promise.all([
             fetchPublicRecipes(),
             fetchPublicCookbooks(),
-            fetchPublicUsers()
+            fetchPublicUsers(),
+            fetchIndexableHubs()
         ]);
 
         log.trace('Fetched sitemap data', {
             recipesCount: recipes.length,
             cookbooksCount: cookbooks.length,
-            usersCount: users.length
+            usersCount: users.length,
+            hubsCount: hubs.length
         });
 
         log.trace('Generating static pages');
@@ -120,7 +129,27 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             }
         }));
 
-        return [...staticPages, ...recipePages, ...cookbookPages, ...userPages];
+        log.trace('Generating hub pages');
+
+        const hubPages: MetadataRoute.Sitemap = hubs.map((hub) => ({
+            url: `${baseUrl}/recepty/${hub.hubSlug}`,
+            lastModified: new Date(hub.lastModified),
+            changeFrequency: 'weekly',
+            priority: 0.8,
+            alternates: {
+                languages: {
+                    cs: `${baseUrl}/recepty/${hub.hubSlug}`
+                }
+            }
+        }));
+
+        return [
+            ...staticPages,
+            ...hubPages,
+            ...recipePages,
+            ...cookbookPages,
+            ...userPages
+        ];
     } catch (error: unknown) {
         log.error('Failed to generate sitemap', { error });
 
@@ -133,6 +162,43 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
                 priority: 1.0
             }
         ];
+    }
+}
+
+async function fetchIndexableHubs(): Promise<
+    Array<{
+        hubSlug: string;
+        lastModified: string;
+    }>
+> {
+    try {
+        log.trace('Fetching indexable hubs for sitemap');
+
+        const rows = await db.recipeTag.getIndexableHubs(
+            DEFAULT_LOCALE,
+            HUB_INDEXABLE_THRESHOLD
+        );
+
+        log.trace('Fetched indexable hubs', { count: rows.length });
+
+        return rows.flatMap((row) => {
+            const hubSlug = HUB_SLUGS[row.slug as HubDbSlug];
+
+            // A db tag without a hub mapping has no page, skip it.
+            if (!hubSlug) {
+                return [];
+            }
+
+            return [
+                {
+                    hubSlug,
+                    lastModified: row.lastModified.toISOString()
+                }
+            ];
+        });
+    } catch (error: unknown) {
+        log.error('Failed to fetch indexable hubs for sitemap', { error });
+        return [];
     }
 }
 

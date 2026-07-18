@@ -1,5 +1,6 @@
 import db from '@/server/db/model';
 import { Logger, LogServiceMethod } from '@/server/logger';
+import type { RecipeTagDTO } from '@/common/types';
 
 //|=============================================================================================|//
 
@@ -24,6 +25,20 @@ class RecipeTagService {
         const tags = await db.recipeTag.getAll(language);
 
         return tags;
+    }
+
+    /**
+     * Returns a single tag by its unique slug, or null when it does not exist.
+     *
+     * @param slug - The tag's database slug.
+     * @param language - Locale to translate the tag name into.
+     */
+    @LogServiceMethod({ names: ['slug', 'language'] })
+    async getBySlug(
+        slug: string,
+        language: string
+    ): Promise<RecipeTagDTO | null> {
+        return db.recipeTag.getBySlug(slug, language);
     }
 }
 
