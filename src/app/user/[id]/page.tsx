@@ -3,7 +3,11 @@ import { ProfileTemplate } from '@/client/components/templates/Profile';
 import { serverData } from '@/server/data';
 import { mapServiceErrorForRsc } from '@/server/data/runtime/mapError';
 import { ProfileTab } from '@/client/types/core';
-import { SESSION_COOKIE_NAME, ENV_CONFIG_PUBLIC } from '@/common/constants';
+import {
+    SESSION_COOKIE_NAME,
+    ENV_CONFIG_PUBLIC,
+    ROUTES
+} from '@/common/constants';
 import { cookies, headers } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
 import { verifySessionFromCookie } from '@/server/utils/session';
@@ -68,12 +72,12 @@ export default async function UserProfilePage({
     }
 
     if (resolvedTab !== incomingTab) {
-        redirect(`/user/${id}?tab=${resolvedTab}`);
+        redirect(`${ROUTES.user.detail(id)}?tab=${resolvedTab}`);
     }
 
     const user = serverData.user
         .getById(id)
-        .catch((error) => mapServiceErrorForRsc(error, `/user/${id}`));
+        .catch((error) => mapServiceErrorForRsc(error, ROUTES.user.detail(id)));
 
     return (
         <React.Fragment>
@@ -110,7 +114,7 @@ export async function generateMetadata({
             images: user.avatarUrl ? [user.avatarUrl] : ['/img/anonymous.webp'],
             twitterCard: 'summary',
             params: { username: user.username },
-            canonical: `${ENV_CONFIG_PUBLIC.ORIGIN}/user/${numericId}`,
+            canonical: `${ENV_CONFIG_PUBLIC.ORIGIN}${ROUTES.user.detail(numericId)}`,
             type: 'profile'
         });
     } catch {

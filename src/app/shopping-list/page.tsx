@@ -3,6 +3,7 @@ import { apiClient } from '@/client/request';
 import { ShoppingListTemplate } from '@/client/components/templates/ShoppingList';
 import { verifySessionFromCookie } from '@/server/utils/session';
 import { redirectToRestrictedWithLogin } from '@/server/utils/reqwest';
+import { ROUTES } from '@/common/constants';
 import type { Metadata } from 'next';
 import { cookies, headers } from 'next/headers';
 import { getLocalizedMetadata } from '@/server/utils/seo';
@@ -15,7 +16,7 @@ export default async function Page() {
     const result = await verifySessionFromCookie();
 
     if (!result.isLoggedIn) {
-        redirectToRestrictedWithLogin('/shopping-list');
+        redirectToRestrictedWithLogin(ROUTES.shoppingList);
         return;
     }
 

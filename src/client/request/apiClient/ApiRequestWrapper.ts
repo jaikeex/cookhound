@@ -1,5 +1,5 @@
 import { RequestError } from '@/client/error';
-import { ENV_CONFIG_PUBLIC } from '@/common/constants';
+import { ENV_CONFIG_PUBLIC, ROUTES } from '@/common/constants';
 import { notFound } from 'next/navigation';
 
 /**
@@ -258,7 +258,7 @@ class ApiRequestWrapper {
         if (!response.ok) {
             // Handle 429 Too Many Requests on client side
             if (response.status === 429 && typeof window !== 'undefined') {
-                window.location.href = '/error/too-many-requests';
+                window.location.href = ROUTES.error.tooManyRequests;
             }
 
             // Handle 404 Not Found on server side

@@ -1,5 +1,5 @@
 import type { Recipe, User, Cookbook } from '@/common/types';
-import { CATEGORY_IDS, DEFAULT_LOCALE } from '@/common/constants';
+import { CATEGORY_IDS, DEFAULT_LOCALE, ROUTES } from '@/common/constants';
 import { tServer } from '@/server/utils/locales';
 
 //?—————————————————————————————————————————————————————————————————————————————————————————————?//
@@ -58,7 +58,7 @@ export function generateRecipeSchema(
         schema.author = {
             '@type': 'Person',
             ...(authorName ? { name: authorName } : {}),
-            url: `${baseUrl}/user/${recipe.authorId}`
+            url: `${baseUrl}${ROUTES.user.detail(recipe.authorId)}`
         };
     }
 
@@ -133,7 +133,7 @@ export function generatePersonSchema(user: User, baseUrl: string) {
         '@type': 'Person',
         name: user.username,
         image: user.avatarUrl || `${baseUrl}/img/anonymous.webp`,
-        url: `${baseUrl}/user/${user.id}`
+        url: `${baseUrl}${ROUTES.user.detail(user.id)}`
     };
 }
 
@@ -163,7 +163,7 @@ export function generateWebSiteSchema(baseUrl: string) {
             '@type': 'SearchAction',
             target: {
                 '@type': 'EntryPoint',
-                urlTemplate: `${baseUrl}/search?query={search_term_string}`
+                urlTemplate: `${baseUrl}${ROUTES.search()}?query={search_term_string}`
             },
             'query-input': 'required name=search_term_string'
         }
@@ -209,7 +209,7 @@ export function generateCookbookSchema(cookbook: Cookbook, baseUrl: string) {
                 cookbookTitle: cookbook.title
             }),
         image: cookbook.coverImageUrl,
-        url: `${baseUrl}/cookbooks/${cookbook.displayId}`,
+        url: `${baseUrl}${ROUTES.cookbook.detail(cookbook.displayId)}`,
         dateCreated: cookbook.createdAt?.toISOString(),
         dateModified: (cookbook.updatedAt ?? cookbook.createdAt)?.toISOString()
     };

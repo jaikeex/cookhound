@@ -5,7 +5,7 @@ import React, { useCallback } from 'react';
 import { useModal, useLocale } from '@/client/store';
 import { ConsentSettingsModal } from '@/client/components';
 import Link from 'next/link';
-import { VERSION } from '@/common/constants';
+import { ROUTES, VERSION } from '@/common/constants';
 import { FooterSkeleton } from './skeleton';
 
 type FooterProps = Readonly<{
@@ -37,7 +37,7 @@ export const Footer: React.FC<FooterProps> = ({ className }) => {
                 </button>
 
                 <Link
-                    href="/terms"
+                    href={ROUTES.terms}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-sm text-gray-800 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors underline"
@@ -46,7 +46,7 @@ export const Footer: React.FC<FooterProps> = ({ className }) => {
                 </Link>
 
                 <Link
-                    href="/privacy"
+                    href={ROUTES.privacy}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-sm text-gray-800 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors underline"
@@ -55,7 +55,7 @@ export const Footer: React.FC<FooterProps> = ({ className }) => {
                 </Link>
 
                 <Link
-                    href="/contact"
+                    href={ROUTES.contact}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-sm text-gray-800 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors underline"

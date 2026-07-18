@@ -3,16 +3,17 @@
 import React, { useMemo } from 'react';
 import { Menu, NavTabs, Typography, type MenuItem } from '@/client/components';
 import { useLocale } from '@/client/store/I18nContext';
+import { ROUTES } from '@/common/constants';
 
 type AdminLayoutShellProps = Readonly<{
     children: React.ReactNode;
 }>;
 
 const NAV_ITEM_KEYS = [
-    { href: '/admin', labelKey: 'admin.nav.dashboard' as const },
-    { href: '/admin/users', labelKey: 'admin.nav.users' as const },
+    { href: ROUTES.admin.root, labelKey: 'admin.nav.dashboard' as const },
+    { href: ROUTES.admin.users, labelKey: 'admin.nav.users' as const },
     {
-        href: '/admin/api-docs',
+        href: ROUTES.admin.apiDocs,
         labelKey: 'admin.nav.apiDocs' as const
     }
 ] as const;

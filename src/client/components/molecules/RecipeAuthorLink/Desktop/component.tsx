@@ -6,6 +6,7 @@ import React from 'react';
 import { useLocale } from '@/client/store';
 import { chqc } from '@/client/data';
 import Link from 'next/link';
+import { ROUTES } from '@/common/constants';
 
 export type RecipeAuthorLinkDesktopProps = Readonly<{
     authorId: number;
@@ -55,7 +56,7 @@ export const RecipeAuthorLinkDesktop: React.FC<
             ) : author ? (
                 <React.Fragment>
                     <Link
-                        href={`/user/${authorId}`}
+                        href={ROUTES.user.detail(authorId)}
                         className="flex items-center gap-2 hover:opacity-80 transition-opacity"
                     >
                         <Avatar

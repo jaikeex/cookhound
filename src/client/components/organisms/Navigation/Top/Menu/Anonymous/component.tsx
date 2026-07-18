@@ -9,6 +9,7 @@ import {
 } from '@/client/components';
 import Link from 'next/link';
 import { useLocale } from '@/client/store';
+import { ROUTES } from '@/common/constants';
 
 export const AnonymousMenuContent: React.FC = () => {
     const { t } = useLocale();
@@ -24,7 +25,7 @@ export const AnonymousMenuContent: React.FC = () => {
             <div className="flex flex-col items-center gap-6 mt-8">
                 {/*<ButtonBase className="mx-auto w-52">Change Avatar</ButtonBase>*/}
                 <ThemeSwitcher stretch />
-                <Link href={'/auth/login'} tabIndex={-1}>
+                <Link href={ROUTES.auth.login} tabIndex={-1}>
                     <ButtonBase
                         className="mx-auto w-52"
                         color="primary"
@@ -33,7 +34,11 @@ export const AnonymousMenuContent: React.FC = () => {
                         {t('auth.form.login')}
                     </ButtonBase>
                 </Link>
-                <Link href={'/auth/register'} className="mx-auto" tabIndex={-1}>
+                <Link
+                    href={ROUTES.auth.register}
+                    className="mx-auto"
+                    tabIndex={-1}
+                >
                     <ButtonBase
                         className="mx-auto w-52"
                         color="primary"

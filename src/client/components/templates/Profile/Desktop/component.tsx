@@ -8,6 +8,7 @@ import type { User } from '@/common/types';
 import { classNames } from '@/client/utils';
 import { ProfileHeadDesktop } from '@/client/components/organisms/Profile/Head/Desktop';
 import { useParamsChangeListener } from '@/client/hooks';
+import { ROUTES } from '@/common/constants';
 
 export type DesktopRecipeViewProps = Readonly<{
     className?: string;
@@ -39,7 +40,7 @@ export const DesktopProfileTemplate: React.FC<DesktopRecipeViewProps> = ({
     });
 
     const menuItems = items.map((item) => ({
-        href: `/user/${id}?tab=${item.param}`,
+        href: `${ROUTES.user.detail(String(id))}?tab=${item.param}`,
         label: item.label
     }));
 

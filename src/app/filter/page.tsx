@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { FilterTemplate } from '@/client/components/templates/Dashboard/Filter';
 import { cookies, headers } from 'next/headers';
 import React from 'react';
-import { ENV_CONFIG_PUBLIC } from '@/common/constants';
+import { ENV_CONFIG_PUBLIC, ROUTES } from '@/common/constants';
 import {
     generateBreadcrumbSchema,
     getLocalizedMetadata
@@ -45,7 +45,7 @@ export default async function FilterPage({
         },
         {
             name: tServer(locale, 'app.recipe.filter.title'),
-            url: `${ENV_CONFIG_PUBLIC.ORIGIN}/filter`
+            url: `${ENV_CONFIG_PUBLIC.ORIGIN}${ROUTES.filter}`
         }
     ];
 
@@ -68,7 +68,7 @@ export async function generateMetadata(): Promise<Metadata> {
     return getLocalizedMetadata(cookieStore, headerList, {
         titleKey: 'meta.filter.title',
         descriptionKey: 'meta.filter.description',
-        canonical: `${ENV_CONFIG_PUBLIC.ORIGIN}/filter`,
+        canonical: `${ENV_CONFIG_PUBLIC.ORIGIN}${ROUTES.filter}`,
         noindex: true
     });
 }

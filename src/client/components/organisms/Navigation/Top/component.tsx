@@ -20,6 +20,7 @@ import { classNames } from '@/client/utils';
 import { usePathname } from 'next/navigation';
 import { AppEvent } from '@/client/events';
 import { useAppEventListener } from '@/client/hooks';
+import { ROUTES } from '@/common/constants';
 
 type TopNavigationProps = Readonly<NonNullable<unknown>>;
 
@@ -42,7 +43,9 @@ export const TopNavigation: React.FC<TopNavigationProps> = () => {
     useAppEventListener(AppEvent.NOT_FOUND_CLOSED, () => setIsNotfound(false));
 
     const isTransparent =
-        pathname === '/' || pathname === '/search' || pathname === '/filter';
+        pathname === ROUTES.home ||
+        pathname === ROUTES.search() ||
+        pathname === ROUTES.filter;
 
     if (isNotfound) return null;
 
@@ -91,7 +94,7 @@ export const TopNavigation: React.FC<TopNavigationProps> = () => {
                         disabled={isLoggedin}
                     >
                         <Link
-                            href={'/recipe/create'}
+                            href={ROUTES.recipe.create}
                             prefetch={isLoggedin}
                             tabIndex={-1}
                         >
@@ -118,7 +121,7 @@ export const TopNavigation: React.FC<TopNavigationProps> = () => {
                         <IconLink
                             aria-label={t('app.general.shopping-list')}
                             disabled={!isLoggedin || !authResolved}
-                            href={'/shopping-list'}
+                            href={ROUTES.shoppingList}
                             icon="shoppingList"
                             prefetch={isLoggedin}
                         />
@@ -150,7 +153,7 @@ export const TopNavigation: React.FC<TopNavigationProps> = () => {
                     </Popup>
 
                     <Link
-                        href={'/auth/login'}
+                        href={ROUTES.auth.login}
                         className={`${isLoggedin || !authResolved ? 'hidden' : 'block'}`}
                         tabIndex={-1}
                     >
@@ -164,7 +167,7 @@ export const TopNavigation: React.FC<TopNavigationProps> = () => {
                     </Link>
 
                     <Link
-                        href={'/auth/register'}
+                        href={ROUTES.auth.register}
                         className={`${isLoggedin || !authResolved ? 'hidden' : 'block'}`}
                         tabIndex={-1}
                     >

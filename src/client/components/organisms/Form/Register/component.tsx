@@ -12,6 +12,7 @@ import {
 import { useLocale } from '@/client/store';
 import type { I18nMessage } from '@/client/locales';
 import Link from 'next/link';
+import { ROUTES } from '@/common/constants';
 // import { useFormStatus } from 'react-dom';
 
 export type RegisterFormErrors = {
@@ -44,7 +45,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
         <>
             {t('auth.form.accept-terms')}{' '}
             <Link
-                href="/terms"
+                href={ROUTES.terms}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-blue-600 dark:text-blue-400 hover:underline"
@@ -52,7 +53,11 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
                 {t('auth.form.terms-of-use')}
             </Link>{' '}
             {t('auth.form.and')}{' '}
-            <Link href="/privacy" target="_blank" rel="noopener noreferrer">
+            <Link
+                href={ROUTES.privacy}
+                target="_blank"
+                rel="noopener noreferrer"
+            >
                 {t('auth.form.privacy-policy')}
             </Link>
         </>

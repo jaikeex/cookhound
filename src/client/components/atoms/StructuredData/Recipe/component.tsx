@@ -5,7 +5,7 @@ import {
     generateBreadcrumbSchema,
     generateRecipeSchema
 } from '@/server/utils/seo';
-import { ENV_CONFIG_PUBLIC } from '@/common/constants';
+import { ENV_CONFIG_PUBLIC, ROUTES } from '@/common/constants';
 import { tServer } from '@/server/utils/locales';
 
 type RecipeStructuredDataProps = Readonly<{
@@ -34,7 +34,7 @@ export const RecipeStructuredData: React.FC<
         },
         {
             name: recipe.title,
-            url: `${ENV_CONFIG_PUBLIC.ORIGIN}/recipe/${recipe.displayId}`
+            url: `${ENV_CONFIG_PUBLIC.ORIGIN}${ROUTES.recipe.detail(recipe.displayId)}`
         }
     ]);
 

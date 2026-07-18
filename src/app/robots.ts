@@ -1,5 +1,5 @@
 import type { MetadataRoute } from 'next';
-import { ENV_CONFIG_PUBLIC } from '@/common/constants';
+import { ENV_CONFIG_PUBLIC, ROUTES } from '@/common/constants';
 
 export default function robots(): MetadataRoute.Robots {
     const baseUrl = ENV_CONFIG_PUBLIC.ORIGIN;
@@ -11,11 +11,11 @@ export default function robots(): MetadataRoute.Robots {
                 allow: '/',
                 disallow: [
                     '/api/',
-                    '/auth/callback/',
-                    '/error/',
-                    '/shopping-list',
-                    '/recipe/create',
-                    '/user/change-email'
+                    `${ROUTES.auth.callback.root}/`,
+                    `${ROUTES.error.root}/`,
+                    ROUTES.shoppingList,
+                    ROUTES.recipe.create,
+                    ROUTES.user.changeEmail
                 ]
             },
             {

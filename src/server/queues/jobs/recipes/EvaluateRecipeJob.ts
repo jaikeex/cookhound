@@ -9,7 +9,7 @@ import { Logger } from '@/server/logger';
 import recipeFlagModel from '@/server/db/model/recipe-flag/model';
 import { InfrastructureError } from '@/server/error/server';
 import { InfrastructureErrorCode } from '@/server/error/codes';
-import { RecipeFlagReason } from '@/common/constants';
+import { RecipeFlagReason, ROUTES } from '@/common/constants';
 import { zodTextFormat } from '@/server/utils/openai';
 import { z } from 'zod';
 import { recipeSearchIndex } from '@/server/search-index/recipeIndex';
@@ -70,7 +70,9 @@ class EvaluateRecipeJob extends BaseJob<EvaluateRecipeJobData> {
                         );
                     }
 
-                    await revalidateRouteCache(`/recipe/${recipeDisplayId}`);
+                    await revalidateRouteCache(
+                        ROUTES.recipe.detail(recipeDisplayId)
+                    );
 
                     log.notice('handle - recipe accepted, prior flag cleared', {
                         recipeId,
@@ -107,7 +109,7 @@ class EvaluateRecipeJob extends BaseJob<EvaluateRecipeJobData> {
 
             recipeSearchIndex.deleteOne(recipeId);
 
-            await revalidateRouteCache(`/recipe/${recipeDisplayId}`);
+            await revalidateRouteCache(ROUTES.recipe.detail(recipeDisplayId));
 
             log.notice('handle - recipe rejected and flagged', {
                 recipeId,

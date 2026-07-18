@@ -9,6 +9,7 @@ import {
 import Link from 'next/link';
 import type { RecipeCardProps } from '@/client/components/molecules/Card/types';
 import { classNames } from '@/client/utils';
+import { ROUTES } from '@/common/constants';
 
 export const RecipeCard: React.FC<RecipeCardProps> = ({
     displayId,
@@ -28,7 +29,7 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({
             style={{ animationDelay: `${index * 1}ms` }}
         >
             <Link
-                href={`/recipe/${displayId}`}
+                href={ROUTES.recipe.detail(displayId)}
                 className="flex flex-col h-full text-inherit hover:text-blue-900 dark:hover:text-blue-300 transition-colors duration-150"
                 aria-label={title}
             >

@@ -14,6 +14,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useLocale, useModal, useSnackbar } from '@/client/store';
 import { useRouter } from 'next/navigation';
 import { classNames } from '@/client/utils';
+import { ROUTES } from '@/common/constants';
 
 export const RecipeWithHandling: React.FC<RecipeCardProps> = ({
     id,
@@ -87,7 +88,7 @@ export const RecipeWithHandling: React.FC<RecipeCardProps> = ({
                 icon: 'edit',
                 label: t('app.general.edit'),
                 onClick: () => {
-                    router.push(`/recipe/${displayId}/edit`);
+                    router.push(ROUTES.recipe.edit(displayId));
                 }
             },
             {
@@ -107,7 +108,7 @@ export const RecipeWithHandling: React.FC<RecipeCardProps> = ({
                 icon: 'flag',
                 label: t('recipe.flag.menu.view-details'),
                 onClick: () => {
-                    router.push(`/recipe/${displayId}`);
+                    router.push(ROUTES.recipe.detail(displayId));
                 },
                 color: 'danger'
             },

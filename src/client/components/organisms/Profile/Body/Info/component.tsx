@@ -19,6 +19,7 @@ import { LogoutAllConfirmModal } from '@/client/components';
 import { chqc, QUERY_KEYS } from '@/client/data';
 import { useQueryClient } from '@tanstack/react-query';
 import { useLogout } from '@/client/hooks';
+import { ROUTES } from '@/common/constants';
 
 export type ProfileBodyInfoProps = Readonly<{
     user: User;
@@ -105,7 +106,11 @@ export const ProfileBodyInfo: React.FC<ProfileBodyInfoProps> = ({ user }) => {
                         <LinkRow
                             className="mt-3"
                             heading={t('app.profile.settings.password')}
-                            href={'/auth/reset-password?email=' + user.email}
+                            href={
+                                ROUTES.auth.resetPassword +
+                                '?email=' +
+                                user.email
+                            }
                             linkText={t('app.profile.settings.password-link')}
                         />
 
@@ -114,7 +119,7 @@ export const ProfileBodyInfo: React.FC<ProfileBodyInfoProps> = ({ user }) => {
                         <LinkRow
                             className="mt-3"
                             heading={t('app.profile.settings.email')}
-                            href={'/user/change-email'}
+                            href={ROUTES.user.changeEmail}
                             linkText={t('auth.form.change-email')}
                         />
                     </React.Fragment>

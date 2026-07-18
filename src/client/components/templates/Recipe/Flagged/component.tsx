@@ -12,6 +12,7 @@ import { chqc, QUERY_KEYS } from '@/client/data';
 import { useQueryClient } from '@tanstack/react-query';
 import { useSnackbar } from '@/client/store';
 import { RecipeFlagAppealModal } from '@/client/components';
+import { ROUTES } from '@/common/constants';
 
 export type FlaggedAuthorTemplateProps = Readonly<{
     recipe: Recipe;
@@ -59,7 +60,7 @@ export const FlaggedAuthorTemplate: React.FC<FlaggedAuthorTemplateProps> = ({
         });
 
     const handleEdit = useCallback(() => {
-        router.push(`/recipe/${recipe.displayId}/edit`);
+        router.push(ROUTES.recipe.edit(recipe.displayId));
     }, [router, recipe.displayId]);
 
     const handleAppeal = useCallback(() => {

@@ -13,6 +13,7 @@ import { useAuth, useLocale, useModal } from '@/client/store';
 import { chqc } from '@/client/data';
 import { useScreenSize } from '@/client/hooks';
 import type { Recipe } from '@/common/types';
+import { ROUTES } from '@/common/constants';
 
 const AddRecipeToCookbookModal = dynamic(
     () =>
@@ -81,7 +82,7 @@ export const RecipeViewImage: React.FC<RecipeViewImageProps> = ({
         openModal((close) => (
             <ShareModal
                 close={close}
-                url={`/recipe/${recipe.displayId}`}
+                url={ROUTES.recipe.detail(recipe.displayId)}
                 title={recipe.title}
                 description={t('meta.recipe.description', {
                     recipeTitle: recipe.title

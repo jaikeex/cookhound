@@ -4,6 +4,7 @@ import { Avatar } from '@/client/components';
 import React from 'react';
 import { chqc } from '@/client/data';
 import Link from 'next/link';
+import { ROUTES } from '@/common/constants';
 
 export type RecipeAuthorLinkMobileProps = Readonly<{
     authorId: number;
@@ -27,7 +28,7 @@ export const RecipeAuthorLinkMobile: React.FC<RecipeAuthorLinkMobileProps> = ({
                 <div className="h-8 w-8 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse" />
             ) : author ? (
                 <Link
-                    href={`/user/${authorId}`}
+                    href={ROUTES.user.detail(authorId)}
                     className="hover:opacity-80 transition-opacity"
                 >
                     <Avatar

@@ -12,7 +12,7 @@ import type { RecipeForDisplayDTO } from '@/common/types';
 import { useRecipeDiscovery } from '@/client/hooks';
 import { useRouter } from 'next/navigation';
 import { classNames } from '@/client/utils';
-import { SEARCH_QUERY_SEPARATOR } from '@/common/constants';
+import { ROUTES, SEARCH_QUERY_SEPARATOR } from '@/common/constants';
 import { useLocale } from '@/client/store';
 
 type SearchTemplateProps = Readonly<{
@@ -64,18 +64,15 @@ export const SearchTemplate: React.FC<SearchTemplateProps> = ({
             // Reset the local state AND clean the URL.
             reset();
             setSearchInput('');
-            router.replace('/search', { scroll: false });
+            router.replace(ROUTES.search(), { scroll: false });
             return;
         }
 
         const newQueries = Array.from(new Set([...queries, trimmed]));
 
-        router.replace(
-            `/search?query=${encodeURIComponent(newQueries.join(SEARCH_QUERY_SEPARATOR))}`,
-            {
-                scroll: false
-            }
-        );
+        router.replace(ROUTES.search(newQueries.join(SEARCH_QUERY_SEPARATOR)), {
+            scroll: false
+        });
 
         addQuery(trimmed);
         setSearchInput('');
@@ -94,7 +91,7 @@ export const SearchTemplate: React.FC<SearchTemplateProps> = ({
             }
 
             router.replace(
-                `/search?query=${encodeURIComponent(remaining.join(SEARCH_QUERY_SEPARATOR))}`,
+                ROUTES.search(remaining.join(SEARCH_QUERY_SEPARATOR)),
                 {
                     scroll: false
                 }

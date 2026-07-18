@@ -4,6 +4,7 @@ import Image from 'next/image';
 import type { RecipeForDisplayDTO } from '@/common/types';
 import { generateImgPlaceholder, classNames } from '@/client/utils';
 import { Typography } from '@/client/components';
+import { ROUTES } from '@/common/constants';
 
 export type RecipeLinkProps = Readonly<{
     className?: string;
@@ -16,7 +17,7 @@ export const RecipeLink = forwardRef<HTMLAnchorElement, RecipeLinkProps>(
     ({ recipe, onClick, onFocus, className }, ref) => (
         <Link
             ref={ref}
-            href={`/recipe/${recipe.displayId}`}
+            href={ROUTES.recipe.detail(recipe.displayId)}
             onClick={onClick}
             onFocus={onFocus}
             className={classNames(

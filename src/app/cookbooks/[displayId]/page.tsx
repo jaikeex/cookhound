@@ -7,7 +7,7 @@ import { CookbookTemplate, StructuredData } from '@/client/components';
 import type { Metadata } from 'next';
 import { reviveCookbookDates } from '@/client/data/cookbook/revive';
 import { cookies, headers } from 'next/headers';
-import { ENV_CONFIG_PUBLIC } from '@/common/constants';
+import { ENV_CONFIG_PUBLIC, ROUTES } from '@/common/constants';
 import {
     generateCookbookSchema,
     generateBreadcrumbSchema,
@@ -66,11 +66,11 @@ export default async function Page({ params }: CookbookPageParams) {
                   },
                   {
                       name: user?.username ?? 'User',
-                      url: `${ENV_CONFIG_PUBLIC.ORIGIN}/user/${cookbook.ownerId}`
+                      url: `${ENV_CONFIG_PUBLIC.ORIGIN}${ROUTES.user.detail(cookbook.ownerId)}`
                   },
                   {
                       name: cookbook.title,
-                      url: `${ENV_CONFIG_PUBLIC.ORIGIN}/cookbooks/${cookbookDisplayId}`
+                      url: `${ENV_CONFIG_PUBLIC.ORIGIN}${ROUTES.cookbook.detail(cookbookDisplayId)}`
                   }
               ])
             : null;
@@ -108,7 +108,7 @@ export async function generateMetadata({
             })
             .then(reviveCookbookDates);
 
-        const canonical = `${ENV_CONFIG_PUBLIC.ORIGIN}/cookbooks/${displayId}`;
+        const canonical = `${ENV_CONFIG_PUBLIC.ORIGIN}${ROUTES.cookbook.detail(displayId)}`;
 
         const metadata = await getLocalizedMetadata(cookieStore, headerList, {
             titleKey: 'meta.cookbook.title',
@@ -138,7 +138,7 @@ export async function generateMetadata({
 
         return metadata;
     } catch {
-        const canonical = `${ENV_CONFIG_PUBLIC.ORIGIN}/cookbooks/${displayId}`;
+        const canonical = `${ENV_CONFIG_PUBLIC.ORIGIN}${ROUTES.cookbook.detail(displayId)}`;
 
         const metadata = await getLocalizedMetadata(cookieStore, headerList, {
             titleKey: 'meta.cookbook.fallback.title',

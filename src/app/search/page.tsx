@@ -4,7 +4,7 @@ import { serverData } from '@/server/data';
 import { getUserLocale } from '@/common/utils';
 import { cookies, headers } from 'next/headers';
 import React from 'react';
-import { ENV_CONFIG_PUBLIC } from '@/common/constants';
+import { ENV_CONFIG_PUBLIC, ROUTES } from '@/common/constants';
 import {
     generateBreadcrumbSchema,
     getLocalizedMetadata
@@ -44,8 +44,8 @@ export default async function SearchPage({
                   })
                 : tServer(locale, 'meta.search.breadcrumb-empty'),
             url: searchQuery
-                ? `${ENV_CONFIG_PUBLIC.ORIGIN}/search?query=${encodeURIComponent(searchQuery)}`
-                : `${ENV_CONFIG_PUBLIC.ORIGIN}/search`
+                ? `${ENV_CONFIG_PUBLIC.ORIGIN}${ROUTES.search(searchQuery)}`
+                : `${ENV_CONFIG_PUBLIC.ORIGIN}${ROUTES.search()}`
         }
     ];
 
@@ -78,7 +78,7 @@ export async function generateMetadata({
         return await getLocalizedMetadata(cookieStore, headerList, {
             titleKey: 'meta.search.title',
             descriptionKey: 'meta.search.description',
-            canonical: `${ENV_CONFIG_PUBLIC.ORIGIN}/search`,
+            canonical: `${ENV_CONFIG_PUBLIC.ORIGIN}${ROUTES.search()}`,
             noindex: true
         });
     }
@@ -89,7 +89,7 @@ export async function generateMetadata({
     const metadata = await getLocalizedMetadata(cookieStore, headerList, {
         titleKey: 'meta.search.title',
         descriptionKey: 'meta.search.description',
-        canonical: `${ENV_CONFIG_PUBLIC.ORIGIN}/search?query=${encodeURIComponent(q)}`,
+        canonical: `${ENV_CONFIG_PUBLIC.ORIGIN}${ROUTES.search(q)}`,
         noindex: true
     });
 

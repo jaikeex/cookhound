@@ -14,6 +14,7 @@ import { validateFormData } from '@/client/utils';
 import Link from 'next/link';
 import type { I18nMessage } from '@/client/locales';
 import { chqc } from '@/client/data';
+import { ROUTES } from '@/common/constants';
 
 //~---------------------------------------------------------------------------------------------~//
 //$                                          VALIDATION                                         $//
@@ -148,7 +149,7 @@ export const ResetPasswordTemplate: React.FC = () => {
                         {t('auth.form.reset-password.success')}
                     </Typography>
                     <Typography align="center" className="space-x-3">
-                        <Link href={`/auth/login`}>
+                        <Link href={ROUTES.auth.login}>
                             {t('auth.form.reset-password.continue')}
                         </Link>
                     </Typography>

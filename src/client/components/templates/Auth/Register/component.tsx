@@ -19,6 +19,7 @@ import Link from 'next/link';
 import type { User } from '@/common/types';
 import { z } from 'zod';
 import { chqc } from '@/client/data';
+import { ROUTES } from '@/common/constants';
 
 //~---------------------------------------------------------------------------------------------~//
 //$                                          VALIDATION                                         $//
@@ -101,7 +102,7 @@ export const RegisterTemplate: React.FC<RegisterTemplateProps> = () => {
                 : '';
 
             cleanUpAndRedirectAfterSubmit(
-                `/auth/verify-email?email=${encodedEmail}`
+                `${ROUTES.auth.verifyEmail}?email=${encodedEmail}`
             );
         }
     });
@@ -214,7 +215,7 @@ export const RegisterTemplate: React.FC<RegisterTemplateProps> = () => {
             </form>
 
             <Typography variant="body-sm" className="text-center">
-                <Link href={'/auth/login'}>
+                <Link href={ROUTES.auth.login}>
                     {t('auth.form.already-registered')}
                 </Link>
             </Typography>

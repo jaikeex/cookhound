@@ -5,6 +5,7 @@ import type { RecipeForDisplayDTO } from '@/common/types';
 import { Banner, RecipeCardList } from '@/client/components';
 import { useRecipeDiscovery } from '@/client/hooks';
 import { useRouter } from 'next/navigation';
+import { ROUTES } from '@/common/constants';
 
 type FrontPageProps = Readonly<{
     initialRecipes: Promise<RecipeForDisplayDTO[]>;
@@ -25,7 +26,7 @@ export const FrontPageTemplate: React.FC<FrontPageProps> = ({
         const trimmed = searchQuery.trim();
         if (!trimmed) return;
 
-        router.push(`/search?query=${encodeURIComponent(trimmed)}`);
+        router.push(ROUTES.search(trimmed));
     }, [searchQuery, router]);
 
     const handleInputChange = useCallback(

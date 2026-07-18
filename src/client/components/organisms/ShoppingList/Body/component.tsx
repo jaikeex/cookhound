@@ -8,6 +8,7 @@ import Link from 'next/link';
 import type { Ingredient, ShoppingListDTO } from '@/common/types';
 import type { PanInfo } from 'framer-motion';
 import { DraggableList } from '@/client/components';
+import { ROUTES } from '@/common/constants';
 
 type ShoppingListBodyProps = Readonly<{
     editing?: boolean;
@@ -44,7 +45,9 @@ export const ShoppingListBody = forwardRef<
 
                 <div className="flex items-center justify-between gap-6">
                     <div className="flex items-center gap-4">
-                        <Link href={`/recipe/${list.recipe.displayId}`}>
+                        <Link
+                            href={ROUTES.recipe.detail(list.recipe.displayId)}
+                        >
                             <Typography variant="heading-xs">
                                 {list.recipe.title}
                             </Typography>

@@ -9,6 +9,7 @@ import type { RequestError } from '@/client/error';
 import { useQueryClient } from '@tanstack/react-query';
 import type { I18nMessage } from '@/client/locales';
 import { useSearchParams } from 'next/navigation';
+import { ROUTES } from '@/common/constants';
 
 export const VerifyEmailCallbackTemplate: React.FC = () => {
     const { t } = useLocale();
@@ -60,7 +61,7 @@ export const VerifyEmailCallbackTemplate: React.FC = () => {
                     <Typography>
                         {t('auth.verify-email.success-description')}
                     </Typography>
-                    <Link href="/auth/login" className="w-full">
+                    <Link href={ROUTES.auth.login} className="w-full">
                         <ButtonBase className="w-full">
                             {t('auth.form.continue-to-login')}
                         </ButtonBase>
@@ -85,8 +86,8 @@ export const VerifyEmailCallbackTemplate: React.FC = () => {
                     <Link
                         href={
                             email
-                                ? `/auth/verify-email?new=false&email=${encodedEmail}`
-                                : '/auth/verify-email?new=false'
+                                ? `${ROUTES.auth.verifyEmail}?new=false&email=${encodedEmail}`
+                                : `${ROUTES.auth.verifyEmail}?new=false`
                         }
                     >
                         {t('auth.verify-email.try-again')}

@@ -12,8 +12,7 @@ import {
     HUB_INDEXABLE_THRESHOLD,
     ENV_CONFIG_PUBLIC,
     DEFAULT_LOCALE,
-    FILTER_PATH,
-    buildRecipePath
+    ROUTES
 } from '@/common/constants';
 import {
     buildLocalizedMetadata,
@@ -56,7 +55,7 @@ export async function renderHubPage(
             ? generateItemListSchema(
                   recipes.map((recipe) => ({
                       name: recipe.title,
-                      url: `${origin}${buildRecipePath(recipe.displayId)}`,
+                      url: `${origin}${ROUTES.recipe.detail(recipe.displayId)}`,
                       image: recipe.imageUrl || undefined
                   })),
                   title
@@ -66,7 +65,7 @@ export async function renderHubPage(
     return (
         <React.Fragment>
             <HubTemplate
-                filterHref={`${FILTER_PATH}?${serializeFilterParams({ tags: [hub.tag.id] })}`}
+                filterHref={`${ROUTES.filter}?${serializeFilterParams({ tags: [hub.tag.id] })}`}
                 hubSlug={hubSlug}
                 intro={intro}
                 page={page}

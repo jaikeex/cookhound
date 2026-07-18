@@ -11,6 +11,7 @@ import {
 import { UserRole, type User } from '@/common/types';
 import { useLocale } from '@/client/store/I18nContext';
 import Link from 'next/link';
+import { ROUTES } from '@/common/constants';
 
 type LoggedInMenuContentProps = Readonly<{
     user: User;
@@ -37,7 +38,7 @@ export const LoggedInMenuContent: React.FC<LoggedInMenuContentProps> = ({
                 <ThemeSwitcher stretch />
 
                 <Link
-                    href={`/user/${user.id}`}
+                    href={ROUTES.user.detail(user.id)}
                     className="flex flex-col items-center gap-4"
                     tabIndex={-1}
                 >
@@ -51,7 +52,7 @@ export const LoggedInMenuContent: React.FC<LoggedInMenuContentProps> = ({
 
                 {user.role === UserRole.Admin ? (
                     <Link
-                        href="/admin"
+                        href={ROUTES.admin.root}
                         className="flex flex-col items-center gap-4"
                         tabIndex={-1}
                     >

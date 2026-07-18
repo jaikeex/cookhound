@@ -4,7 +4,7 @@ import { mapServiceErrorForRsc } from '@/server/data/runtime/mapError';
 import { RecipeStructuredData, RecipeViewTemplate } from '@/client/components';
 import type { Metadata } from 'next';
 import { buildLocalizedMetadata } from '@/server/utils/seo';
-import { ENV_CONFIG_PUBLIC, DEFAULT_LOCALE } from '@/common/constants';
+import { ENV_CONFIG_PUBLIC, DEFAULT_LOCALE, ROUTES } from '@/common/constants';
 import db from '@/server/db/model';
 
 export const revalidate = 3600;
@@ -26,7 +26,7 @@ export default async function Page({ params }: RecipePageParams) {
     const recipePromise = serverData.recipe
         .getByDisplayId(recipeDisplayId)
         .catch((error) =>
-            mapServiceErrorForRsc(error, `/recipe/${recipeDisplayId}`)
+            mapServiceErrorForRsc(error, ROUTES.recipe.detail(recipeDisplayId))
         );
 
     // A missing author must not break the schema block
@@ -74,7 +74,7 @@ export async function generateMetadata({
             .getById(recipe.authorId)
             .catch(() => null);
 
-        const canonical = `${ENV_CONFIG_PUBLIC.ORIGIN}/recipe/${recipeDisplayId}`;
+        const canonical = `${ENV_CONFIG_PUBLIC.ORIGIN}${ROUTES.recipe.detail(recipeDisplayId)}`;
 
         const recipeDescription = recipe.description?.trim() || undefined;
 
@@ -104,7 +104,7 @@ export async function generateMetadata({
         return buildLocalizedMetadata(DEFAULT_LOCALE, {
             titleKey: 'meta.recipe.fallback.title',
             descriptionKey: 'meta.recipe.fallback.description',
-            canonical: `${ENV_CONFIG_PUBLIC.ORIGIN}/recipe/${recipeDisplayId}`,
+            canonical: `${ENV_CONFIG_PUBLIC.ORIGIN}${ROUTES.recipe.detail(recipeDisplayId)}`,
             noindex: true
         });
     }

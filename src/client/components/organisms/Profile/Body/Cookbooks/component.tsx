@@ -15,6 +15,7 @@ import type { Cookbook } from '@/common/types';
 import Link from 'next/link';
 import { useLocale } from '@/client/store';
 import { useModal } from '@/client/store/ModalContext';
+import { ROUTES } from '@/common/constants';
 
 const CreateCookbookModal = dynamic(
     () =>
@@ -64,7 +65,7 @@ export const Cookbooks: React.FC<CookbooksProps> = ({
                         </Typography>
                     ) : null}
 
-                    <Link href={`/cookbooks/${cookbook.displayId}`}>
+                    <Link href={ROUTES.cookbook.detail(cookbook.displayId)}>
                         <ButtonBase size="md">
                             {t('app.cookbook.view')}
                         </ButtonBase>

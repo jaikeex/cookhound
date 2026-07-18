@@ -1,11 +1,12 @@
 import { redirect } from 'next/navigation';
+import { ROUTES } from '@/common/constants';
 
 export function redirectToRoot() {
-    redirect('/');
+    redirect(ROUTES.home);
 }
 
 export function redirectToRestricted() {
-    redirect('/error/restricted');
+    redirect(ROUTES.error.restricted);
 }
 
 export function redirectToRestrictedWithLogin(pathname: string) {
@@ -13,5 +14,5 @@ export function redirectToRestrictedWithLogin(pathname: string) {
     params.set('anonymous', 'true');
     params.set('target', pathname);
 
-    redirect(`/error/restricted?${params.toString()}`);
+    redirect(`${ROUTES.error.restricted}?${params.toString()}`);
 }

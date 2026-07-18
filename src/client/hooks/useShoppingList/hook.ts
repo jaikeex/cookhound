@@ -13,6 +13,7 @@ import type {
 } from '@/common/types';
 import { USER_QUERY_KEYS } from '@/client/data/user';
 import { usePathname } from 'next/navigation';
+import { ROUTES } from '@/common/constants';
 
 /**
  * A catch-all react hook for managing the shopping list.
@@ -71,7 +72,7 @@ export const useShoppingList = () => {
         error: queryError,
         refetch
     } = chqc.user.useShoppingList(userId ?? 0, {
-        enabled: !!userId && pathname === '/shopping-list'
+        enabled: !!userId && pathname === ROUTES.shoppingList
     });
 
     //~-----------------------------------------------------------------------------------------~//
@@ -129,8 +130,7 @@ export const useShoppingList = () => {
         // Rollback everything on error
         onError: (_err, _payload, ctx) => {
             const context = ctx as
-                | { previous?: ShoppingListDTO[] | null }
-                | undefined;
+                { previous?: ShoppingListDTO[] | null } | undefined;
 
             if (listQueryKey && context?.previous) {
                 queryClient.setQueryData(listQueryKey, context.previous);
@@ -178,8 +178,7 @@ export const useShoppingList = () => {
         },
         onError: (_err, _payload, ctx) => {
             const context = ctx as
-                | { previous?: ShoppingListDTO[] | null }
-                | undefined;
+                { previous?: ShoppingListDTO[] | null } | undefined;
 
             if (listQueryKey && context?.previous) {
                 queryClient.setQueryData(listQueryKey, context.previous);
@@ -215,8 +214,7 @@ export const useShoppingList = () => {
         },
         onError: (_err, _payload, context) => {
             const ctx = context as
-                | { previous?: ShoppingListDTO[] | null }
-                | undefined;
+                { previous?: ShoppingListDTO[] | null } | undefined;
 
             if (listQueryKey && ctx?.previous) {
                 queryClient.setQueryData(listQueryKey, ctx.previous);

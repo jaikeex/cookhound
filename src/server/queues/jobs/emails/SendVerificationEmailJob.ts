@@ -4,7 +4,7 @@ import type { Job } from 'bullmq';
 import { emailVerificationTpl } from './templates/email-verification';
 import { createTemplate } from './utils';
 import type { Locale } from '@/common/types';
-import { ENV_CONFIG_PUBLIC } from '@/common/constants';
+import { ENV_CONFIG_PUBLIC, ROUTES } from '@/common/constants';
 import { Logger } from '@/server/logger';
 import { queueManager } from '@/server/queues/QueueManager';
 import { JOB_NAMES, QUEUE_NAMES } from '@/server/queues/jobs/names';
@@ -34,7 +34,7 @@ class SendVerificationEmailJob extends BaseJob<VerificationEmailJobData> {
         const encodedToken = encodeURIComponent(token);
         const encodedEmail = encodeURIComponent(to.address);
 
-        const verificationLink = `${ENV_CONFIG_PUBLIC.ORIGIN}/auth/callback/verify-email?token=${encodedToken}&email=${encodedEmail}`;
+        const verificationLink = `${ENV_CONFIG_PUBLIC.ORIGIN}${ROUTES.auth.callback.verifyEmail}?token=${encodedToken}&email=${encodedEmail}`;
 
         const { subject, html } = createTemplate(
             emailVerificationTpl,

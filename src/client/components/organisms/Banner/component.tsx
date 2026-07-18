@@ -9,6 +9,7 @@ import { Typography } from '@/client/components';
 import { useLocale } from '@/client/store/I18nContext';
 import { BannerSkeleton } from './skeleton';
 import Link from 'next/link';
+import { ROUTES } from '@/common/constants';
 
 type BannerProps = Readonly<{
     defaultSearchValue?: string;
@@ -77,7 +78,7 @@ export const Banner: React.FC<BannerProps> = ({
 
                     {hideFiltersLink ? null : (
                         <Link
-                            href={'/filter'}
+                            href={ROUTES.filter}
                             className="text-blue-700 dark:text-blue-200 hover:text-blue-500 dark:hover:text-blue-400"
                         >
                             <Typography

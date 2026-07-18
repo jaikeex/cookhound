@@ -1,4 +1,5 @@
 import { ENV_CONFIG_PUBLIC } from '@/common/constants/env';
+import { ROUTES } from './routes';
 
 //?=============================================================================================?//
 
@@ -9,7 +10,7 @@ export const VERSION = '1.3.2';
 export const DEFAULT_LOCALE = 'cs';
 export const SUPPORTED_LOCALES = ['en', 'cs'] as const;
 
-export const GOOGLE_SIGNIN_REDIRECT_URL = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${ENV_CONFIG_PUBLIC.GOOGLE_OAUTH_CLIENT_ID}&redirect_uri=${ENV_CONFIG_PUBLIC.ORIGIN}/auth/callback/google&response_type=code&scope=email%20profile&access_type=offline`;
+export const GOOGLE_SIGNIN_REDIRECT_URL = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${ENV_CONFIG_PUBLIC.GOOGLE_OAUTH_CLIENT_ID}&redirect_uri=${ENV_CONFIG_PUBLIC.ORIGIN}${ROUTES.auth.callback.google}&response_type=code&scope=email%20profile&access_type=offline`;
 
 export const SEARCH_QUERY_SEPARATOR = '|';
 

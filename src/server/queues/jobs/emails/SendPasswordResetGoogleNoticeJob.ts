@@ -1,7 +1,7 @@
 import { mailClient } from '@/server/integrations';
 import { BaseJob } from '@/server/queues/BaseJob';
 import type { Job } from 'bullmq';
-import { ENV_CONFIG_PUBLIC } from '@/common/constants';
+import { ENV_CONFIG_PUBLIC, ROUTES } from '@/common/constants';
 import { Logger } from '@/server/logger';
 import { queueManager } from '@/server/queues/QueueManager';
 import { JOB_NAMES, QUEUE_NAMES } from '@/server/queues/jobs/names';
@@ -27,7 +27,7 @@ class SendPasswordResetGoogleNoticeJob extends BaseJob<PasswordResetGoogleNotice
 
         log.trace('handle - sending password reset google notice', to);
 
-        const login_link = `${ENV_CONFIG_PUBLIC.ORIGIN}/auth/login`;
+        const login_link = `${ENV_CONFIG_PUBLIC.ORIGIN}${ROUTES.auth.login}`;
         const { subject, html } = createTemplate(
             passwordResetGoogleNoticeTpl,
             locale,

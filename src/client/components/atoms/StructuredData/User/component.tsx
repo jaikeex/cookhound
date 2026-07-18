@@ -1,5 +1,5 @@
 import { StructuredData } from '@/client/components';
-import { ENV_CONFIG_PUBLIC } from '@/common/constants';
+import { ENV_CONFIG_PUBLIC, ROUTES } from '@/common/constants';
 import type { Locale, User } from '@/common/types';
 import React from 'react';
 import {
@@ -27,7 +27,7 @@ export const UserStructuredData: React.FC<UserStructuredDataProps> = async ({
         },
         {
             name: user.username,
-            url: `${ENV_CONFIG_PUBLIC.ORIGIN}/user/${user.id}`
+            url: `${ENV_CONFIG_PUBLIC.ORIGIN}${ROUTES.user.detail(user.id)}`
         }
     ]);
 

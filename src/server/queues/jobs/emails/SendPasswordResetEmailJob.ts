@@ -1,7 +1,7 @@
 import { mailClient } from '@/server/integrations';
 import { BaseJob } from '@/server/queues/BaseJob';
 import type { Job } from 'bullmq';
-import { ENV_CONFIG_PUBLIC } from '@/common/constants';
+import { ENV_CONFIG_PUBLIC, ROUTES } from '@/common/constants';
 import { Logger } from '@/server/logger';
 import { queueManager } from '@/server/queues/QueueManager';
 import { JOB_NAMES, QUEUE_NAMES } from '@/server/queues/jobs/names';
@@ -28,7 +28,7 @@ class SendPasswordResetEmailJob extends BaseJob<PasswordResetEmailJobData> {
 
         log.trace('handle - attempting to send password reset email', to);
 
-        const reset_link = `${ENV_CONFIG_PUBLIC.ORIGIN}/auth/callback/reset-password?token=${token}`;
+        const reset_link = `${ENV_CONFIG_PUBLIC.ORIGIN}${ROUTES.auth.callback.resetPassword}?token=${token}`;
         const { subject, html } = createTemplate(
             resetPasswordTpl,
             locale,

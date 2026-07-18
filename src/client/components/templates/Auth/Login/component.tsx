@@ -20,6 +20,7 @@ import { useRouter } from 'next/navigation';
 import { chqc, QUERY_KEYS } from '@/client/data';
 import { useQueryClient } from '@tanstack/react-query';
 import { AppEvent, eventBus } from '@/client/events';
+import { ROUTES } from '@/common/constants';
 
 //~---------------------------------------------------------------------------------------------~//
 //$                                          VALIDATION                                         $//
@@ -150,13 +151,13 @@ export const LoginTemplate: React.FC<LoginTemplateProps> = ({
             </form>
 
             <Typography variant="body-sm" className="text-center">
-                <Link href={'/auth/reset-password'}>
+                <Link href={ROUTES.auth.resetPassword}>
                     {t('auth.form.forgot-password')}
                 </Link>
             </Typography>
 
             <Typography variant="body-sm" className="text-center">
-                <Link href={'/auth/register'}>
+                <Link href={ROUTES.auth.register}>
                     {t('auth.form.not-registered')}
                 </Link>
             </Typography>

@@ -5,7 +5,7 @@ import { SearchSuggestionBox } from './SearchSuggestionBox';
 import { useOutsideClick } from '@/client/hooks';
 import { useDebounce } from '@/client/hooks/useDebounce';
 import { useAuth, useLocale } from '@/client/store';
-import { SEARCH_QUERY_SEPARATOR } from '@/common/constants';
+import { ROUTES, SEARCH_QUERY_SEPARATOR } from '@/common/constants';
 import type { SearchInputProps } from '@/client/components/molecules/Form/SearchInput/component';
 import { Chip, Typography, SearchInput } from '@/client/components';
 import { chqc } from '@/client/data';
@@ -185,7 +185,7 @@ export const RecipeSearchInput: React.FC<RecipeSearchInputProps> = ({
         if (!user && authResolved) {
             return (
                 <React.Fragment>
-                    <Link href="/auth/login">
+                    <Link href={ROUTES.auth.login}>
                         {t('app.recipe.search-suggestions.login-link')}
                     </Link>
                     &nbsp;

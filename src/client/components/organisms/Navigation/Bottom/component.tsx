@@ -10,8 +10,9 @@ import { usePathname } from 'next/navigation';
 import { AppEvent } from '@/client/events';
 import { useAppEventListener } from '@/client/hooks';
 import { BottomNavigationSkeleton } from './skeleton';
+import { ROUTES } from '@/common/constants';
 
-const DISABLED_FOR_ROUTES = ['/recipe/create'];
+const DISABLED_FOR_ROUTES: string[] = [ROUTES.recipe.create];
 
 /**
  * Check if the current pathname should disable the bottom navigation
@@ -61,12 +62,12 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = () => {
                 `flex *:w-full items-center justify-between border-t border-gray-300 dark:border-gray-800`
             )}
         >
-            <Link href={'/'} aria-label={t('app.general.home')}>
+            <Link href={ROUTES.home} aria-label={t('app.general.home')}>
                 <Icon name="home" label={t('app.general.home')} />
             </Link>
 
             <Link
-                href={`/user/${user?.id}?tab=cookbooks`}
+                href={`${ROUTES.user.detail(user?.id ?? '')}?tab=cookbooks`}
                 aria-label={t('app.general.cookbooks')}
                 tabIndex={isLoggedin ? 0 : -1}
                 className={classNames(!isLoggedin && 'link-disabled')}
@@ -84,7 +85,7 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = () => {
                 position={'top'}
             >
                 <Link
-                    href={'/recipe/create'}
+                    href={ROUTES.recipe.create}
                     aria-label={t('app.recipe.create')}
                     prefetch={isLoggedin}
                     tabIndex={isLoggedin ? 0 : -1}
@@ -104,7 +105,7 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = () => {
                 position={'top-end'}
             >
                 <Link
-                    href={'/shopping-list'}
+                    href={ROUTES.shoppingList}
                     aria-label={t('app.general.shopping-list')}
                     prefetch={isLoggedin}
                     tabIndex={isLoggedin ? 0 : -1}

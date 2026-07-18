@@ -9,6 +9,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import type { I18nMessage } from '@/client/locales';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { ROUTES } from '@/common/constants';
 
 export const VerifyEmailChangeTemplate: React.FC = () => {
     const { t } = useLocale();
@@ -59,7 +60,7 @@ export const VerifyEmailChangeTemplate: React.FC = () => {
                     <Typography>
                         {t('auth.verify-email-change.success-description')}
                     </Typography>
-                    <Link href="/auth/login" className="w-full">
+                    <Link href={ROUTES.auth.login} className="w-full">
                         <ButtonBase className="w-full">
                             {t('auth.verify-email-change.continue')}
                         </ButtonBase>

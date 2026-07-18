@@ -4,6 +4,7 @@ import { mapServiceErrorForRsc } from '@/server/data/runtime/mapError';
 import { RecipeEditTemplate } from '@/client/components';
 import { verifySessionFromCookie } from '@/server/utils/session';
 import { ClientRedirect } from '@/client/components';
+import { ROUTES } from '@/common/constants';
 import type { Metadata } from 'next';
 
 type RecipePageParams = {
@@ -35,7 +36,7 @@ export default async function Page({ params }: RecipePageParams) {
     if (!result.isLoggedIn) {
         return (
             <ClientRedirect
-                url={`/error/restricted?anonymous=true&target=/recipe/${recipeDisplayId}/edit`}
+                url={`${ROUTES.error.restricted}?anonymous=true&target=${ROUTES.recipe.edit(recipeDisplayId)}`}
             />
         );
     }
@@ -45,7 +46,7 @@ export default async function Page({ params }: RecipePageParams) {
     const recipe = await serverData.recipe
         .getByDisplayIdFresh(recipeDisplayId)
         .catch((error) =>
-            mapServiceErrorForRsc(error, `/recipe/${recipeDisplayId}/edit`)
+            mapServiceErrorForRsc(error, ROUTES.recipe.edit(recipeDisplayId))
         );
 
     if (recipe.authorId !== result.session.userId) {

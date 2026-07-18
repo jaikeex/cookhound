@@ -15,6 +15,7 @@ import { useLocale } from '@/client/store';
 import { useRouter } from 'next/navigation';
 import { GRID_COLS } from '@/client/constants';
 import { serializeFilterParams } from '@/common/utils';
+import { ROUTES } from '@/common/constants';
 
 type FilterTemplateProps = Readonly<{
     initialFilters?: RecipeFilterParams;
@@ -50,7 +51,7 @@ export const FilterTemplate: React.FC<FilterTemplateProps> = ({
         const trimmed = searchInput.trim();
         if (!trimmed) return;
 
-        router.push(`/search?query=${encodeURIComponent(trimmed)}`);
+        router.push(ROUTES.search(trimmed));
     }, [searchInput, router]);
 
     /**
@@ -64,7 +65,7 @@ export const FilterTemplate: React.FC<FilterTemplateProps> = ({
         const params = serializeFilterParams(filters);
         const search = params.toString();
 
-        router.replace(search ? `/filter?${search}` : '/filter', {
+        router.replace(search ? `${ROUTES.filter}?${search}` : ROUTES.filter, {
             scroll: false
         });
         // this is intentional

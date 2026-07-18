@@ -5,7 +5,7 @@ import { queueManager } from '@/server/queues/QueueManager';
 import { JOB_NAMES, QUEUE_NAMES } from '@/server/queues/jobs/names';
 import { FROM_ADDRESS, FROM_NAME, QUEUE_OPTIONS } from './constants';
 import { Logger } from '@/server/logger';
-import { ENV_CONFIG_PUBLIC } from '@/common/constants';
+import { ENV_CONFIG_PUBLIC, ROUTES } from '@/common/constants';
 import { emailChangeConfirmationTpl } from './templates';
 import { createTemplate } from './utils';
 import type { Locale } from '@/common/types';
@@ -28,7 +28,7 @@ class SendEmailChangeConfirmationJob extends BaseJob<EmailChangeConfirmationData
 
         log.trace('handle - sending email change confirmation', to);
 
-        const confirmationLink = `${ENV_CONFIG_PUBLIC.ORIGIN}/auth/verify-email-change?token=${token}`;
+        const confirmationLink = `${ENV_CONFIG_PUBLIC.ORIGIN}${ROUTES.auth.verifyEmailChange}?token=${token}`;
 
         const { subject, html } = createTemplate(
             emailChangeConfirmationTpl,

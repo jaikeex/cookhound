@@ -3,7 +3,9 @@ import {
     ENV_CONFIG_PUBLIC,
     DEFAULT_LOCALE,
     HUB_SLUGS,
-    HUB_INDEXABLE_THRESHOLD
+    HUB_INDEXABLE_THRESHOLD,
+    ROUTES,
+    buildHubPath
 } from '@/common/constants';
 import type { HubDbSlug } from '@/common/constants';
 import { prisma } from '@/server/integrations';
@@ -49,35 +51,35 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
                 }
             },
             {
-                url: `${baseUrl}/search`,
+                url: `${baseUrl}${ROUTES.search()}`,
                 lastModified: new Date(),
                 changeFrequency: 'daily',
                 priority: 0.8,
                 alternates: {
                     languages: {
-                        cs: `${baseUrl}/search`
+                        cs: `${baseUrl}${ROUTES.search()}`
                     }
                 }
             },
             {
-                url: `${baseUrl}/terms`,
+                url: `${baseUrl}${ROUTES.terms}`,
                 lastModified: new Date(),
                 changeFrequency: 'monthly',
                 priority: 0.5,
                 alternates: {
                     languages: {
-                        cs: `${baseUrl}/terms`
+                        cs: `${baseUrl}${ROUTES.terms}`
                     }
                 }
             },
             {
-                url: `${baseUrl}/privacy`,
+                url: `${baseUrl}${ROUTES.privacy}`,
                 lastModified: new Date(),
                 changeFrequency: 'monthly',
                 priority: 0.5,
                 alternates: {
                     languages: {
-                        cs: `${baseUrl}/privacy`
+                        cs: `${baseUrl}${ROUTES.privacy}`
                     }
                 }
             }
@@ -86,13 +88,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         log.trace('Generating recipe pages');
 
         const recipePages: MetadataRoute.Sitemap = recipes.map((recipe) => ({
-            url: `${baseUrl}/recipe/${recipe.displayId}`,
+            url: `${baseUrl}${ROUTES.recipe.detail(recipe.displayId)}`,
             lastModified: new Date(recipe.updatedAt || recipe.createdAt),
             changeFrequency: 'weekly',
             priority: 0.9,
             alternates: {
                 languages: {
-                    cs: `${baseUrl}/recipe/${recipe.displayId}`
+                    cs: `${baseUrl}${ROUTES.recipe.detail(recipe.displayId)}`
                 }
             }
         }));
@@ -101,7 +103,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
         const cookbookPages: MetadataRoute.Sitemap = cookbooks.map(
             (cookbook) => ({
-                url: `${baseUrl}/cookbooks/${cookbook.displayId}`,
+                url: `${baseUrl}${ROUTES.cookbook.detail(cookbook.displayId)}`,
                 lastModified: new Date(
                     cookbook.updatedAt || cookbook.createdAt
                 ),
@@ -109,7 +111,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
                 priority: 0.7,
                 alternates: {
                     languages: {
-                        cs: `${baseUrl}/cookbooks/${cookbook.displayId}`
+                        cs: `${baseUrl}${ROUTES.cookbook.detail(cookbook.displayId)}`
                     }
                 }
             })
@@ -118,13 +120,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         log.trace('Generating user pages');
 
         const userPages: MetadataRoute.Sitemap = users.map((user) => ({
-            url: `${baseUrl}/user/${user.id}`,
+            url: `${baseUrl}${ROUTES.user.detail(user.id)}`,
             lastModified: new Date(user.updatedAt || user.createdAt),
             changeFrequency: 'weekly',
             priority: 0.6,
             alternates: {
                 languages: {
-                    cs: `${baseUrl}/user/${user.id}`
+                    cs: `${baseUrl}${ROUTES.user.detail(user.id)}`
                 }
             }
         }));
@@ -132,13 +134,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         log.trace('Generating hub pages');
 
         const hubPages: MetadataRoute.Sitemap = hubs.map((hub) => ({
-            url: `${baseUrl}/recepty/${hub.hubSlug}`,
+            url: `${baseUrl}${buildHubPath(hub.hubSlug, 1)}`,
             lastModified: new Date(hub.lastModified),
             changeFrequency: 'weekly',
             priority: 0.8,
             alternates: {
                 languages: {
-                    cs: `${baseUrl}/recepty/${hub.hubSlug}`
+                    cs: `${baseUrl}${buildHubPath(hub.hubSlug, 1)}`
                 }
             }
         }));

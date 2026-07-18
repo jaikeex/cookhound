@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { UserRole, Status } from '@/common/types';
-import { ENV_CONFIG_PUBLIC } from '@/common/constants';
+import { ENV_CONFIG_PUBLIC, ROUTES } from '@/common/constants';
 import { MiddlewareError } from '@/server/error';
 import { type ServerSession } from './manager';
 import { verifySessionFromCookie } from './verify-server';
@@ -11,13 +11,13 @@ interface RouteConfig {
 }
 
 export const PROTECTED_ROUTES: RouteConfig[] = [
-    { path: '/admin', roles: [UserRole.Admin] },
-    { path: '/recipe/create', roles: [] },
-    { path: '/shopping-list', roles: [] },
-    { path: '/user/change-email', roles: [] },
-    { path: '/auth/login', roles: null },
-    { path: '/auth/register', roles: null },
-    { path: '/auth/verify-email', roles: null }
+    { path: ROUTES.admin.root, roles: [UserRole.Admin] },
+    { path: ROUTES.recipe.create, roles: [] },
+    { path: ROUTES.shoppingList, roles: [] },
+    { path: ROUTES.user.changeEmail, roles: [] },
+    { path: ROUTES.auth.login, roles: null },
+    { path: ROUTES.auth.register, roles: null },
+    { path: ROUTES.auth.verifyEmail, roles: null }
 ];
 
 export const PROTECTED_ROUTES_LIST = PROTECTED_ROUTES.map(
@@ -40,7 +40,7 @@ function getRouteConfig(pathname: string) {
 function redirectToRoot() {
     throw new MiddlewareError(
         'Already logged in',
-        NextResponse.redirect(new URL('/', ENV_CONFIG_PUBLIC.ORIGIN))
+        NextResponse.redirect(new URL(ROUTES.home, ENV_CONFIG_PUBLIC.ORIGIN))
     );
 }
 
@@ -48,7 +48,7 @@ function redirectToRestricted() {
     throw new MiddlewareError(
         'Unauthorized',
         NextResponse.redirect(
-            new URL(`/error/restricted`, ENV_CONFIG_PUBLIC.ORIGIN)
+            new URL(ROUTES.error.restricted, ENV_CONFIG_PUBLIC.ORIGIN)
         )
     );
 }
@@ -62,7 +62,7 @@ function redirectToRestrictedWithLogin(pathname: string) {
         'Unauthorized',
         NextResponse.redirect(
             new URL(
-                `/error/restricted?${params.toString()}`,
+                `${ROUTES.error.restricted}?${params.toString()}`,
                 ENV_CONFIG_PUBLIC.ORIGIN
             )
         )
@@ -73,7 +73,7 @@ function redirectToBanned() {
     throw new MiddlewareError(
         'Account banned',
         NextResponse.redirect(
-            new URL('/error/banned', ENV_CONFIG_PUBLIC.ORIGIN)
+            new URL(ROUTES.error.banned, ENV_CONFIG_PUBLIC.ORIGIN)
         )
     );
 }
@@ -82,7 +82,7 @@ function redirectToProfile(userId: number) {
     throw new MiddlewareError(
         'Account pending deletion - access restricted to profile only',
         NextResponse.redirect(
-            new URL(`/user/${userId}`, ENV_CONFIG_PUBLIC.ORIGIN)
+            new URL(ROUTES.user.detail(userId), ENV_CONFIG_PUBLIC.ORIGIN)
         )
     );
 }
@@ -174,7 +174,9 @@ export const verifyRouteAccess: MiddlewareStepFunction = async (request) => {
     // Check if user has pending deletion status
     if (session && session.status === Status.PendingDeletion) {
         // Allow access to profile page and API routes
-        const isProfilePage = pathname.startsWith(`/user/${session.userId}`);
+        const isProfilePage = pathname.startsWith(
+            ROUTES.user.detail(session.userId)
+        );
         const isApiRoute = pathname.startsWith('/api/');
 
         if (!isProfilePage && !isApiRoute) {
