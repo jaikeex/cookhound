@@ -125,7 +125,6 @@ export async function buildLocalizedMetadata(
             ? {
                   canonical: config.canonical,
                   languages: {
-                      en: config.canonical,
                       cs: config.canonical
                   }
               }

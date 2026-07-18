@@ -1,5 +1,6 @@
 import type { Recipe, User, Cookbook } from '@/common/types';
-import { CATEGORY_IDS } from '@/common/constants';
+import { CATEGORY_IDS, DEFAULT_LOCALE } from '@/common/constants';
+import { tServer } from '@/server/utils/locales';
 
 //?—————————————————————————————————————————————————————————————————————————————————————————————?//
 //?                                     RICH RESULTS SCHEMA                                     ?//
@@ -83,7 +84,15 @@ export function generateRecipeSchema(
     }
 
     if (recipe.portionSize) {
-        schema.recipeYield = `${recipe.portionSize} servings`;
+        // Czech pluralization: 1-4 "porce", 5+ "porcí"
+        const yieldKey =
+            recipe.portionSize <= 4
+                ? 'meta.recipe.yield-few'
+                : 'meta.recipe.yield-many';
+
+        schema.recipeYield = tServer(recipe.language, yieldKey, {
+            count: recipe.portionSize
+        });
     }
 
     if (recipe.ingredients && recipe.ingredients.length > 0) {
@@ -149,7 +158,7 @@ export function generateWebSiteSchema(baseUrl: string) {
         '@type': 'WebSite',
         name: 'Cookhound',
         url: baseUrl,
-        description: 'Cookhound is a platform for sharing recipes',
+        description: tServer(DEFAULT_LOCALE, 'meta.site.description'),
         potentialAction: {
             '@type': 'SearchAction',
             target: {
@@ -194,7 +203,11 @@ export function generateCookbookSchema(cookbook: Cookbook, baseUrl: string) {
         '@context': 'https://schema.org',
         '@type': 'CollectionPage',
         name: cookbook.title,
-        description: cookbook.description || `View ${cookbook.title} cookbook`,
+        description:
+            cookbook.description ||
+            tServer(cookbook.language, 'meta.cookbook.description', {
+                cookbookTitle: cookbook.title
+            }),
         image: cookbook.coverImageUrl,
         url: `${baseUrl}/cookbooks/${cookbook.displayId}`,
         dateCreated: cookbook.createdAt?.toISOString(),

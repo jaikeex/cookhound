@@ -38,7 +38,11 @@ export default async function SearchPage({
             url: ENV_CONFIG_PUBLIC.ORIGIN
         },
         {
-            name: searchQuery ? `Search: ${searchQuery}` : 'Search',
+            name: searchQuery
+                ? tServer(locale, 'meta.search.breadcrumb', {
+                      query: searchQuery
+                  })
+                : tServer(locale, 'meta.search.breadcrumb-empty'),
             url: searchQuery
                 ? `${ENV_CONFIG_PUBLIC.ORIGIN}/search?query=${encodeURIComponent(searchQuery)}`
                 : `${ENV_CONFIG_PUBLIC.ORIGIN}/search`
@@ -80,6 +84,7 @@ export async function generateMetadata({
     }
 
     const capitalised = q.charAt(0).toUpperCase() + q.slice(1);
+    const locale = await getUserLocale(cookieStore, headerList);
 
     const metadata = await getLocalizedMetadata(cookieStore, headerList, {
         titleKey: 'meta.search.title',
@@ -91,11 +96,17 @@ export async function generateMetadata({
     return {
         ...metadata,
         title: `${capitalised} | ${metadata.title}`,
-        description: `Results for ${capitalised} recipes on Cookhound.`,
+        description: tServer(locale, 'meta.search.results.description', {
+            query: capitalised
+        }),
         openGraph: {
             ...metadata.openGraph,
-            title: `Search results for ${capitalised}`,
-            description: `Discover delicious ${capitalised} recipes shared by the community.`
+            title: tServer(locale, 'meta.search.results.og-title', {
+                query: capitalised
+            }),
+            description: tServer(locale, 'meta.search.results.og-description', {
+                query: capitalised
+            })
         },
         twitter: {
             card: 'summary'
