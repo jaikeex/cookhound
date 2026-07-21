@@ -2,12 +2,7 @@
  * Supported log levels in this project.
  */
 export type LogLevel =
-    | 'trace'
-    | 'info'
-    | 'request'
-    | 'notice'
-    | 'warn'
-    | 'error';
+    'trace' | 'info' | 'request' | 'notice' | 'warn' | 'error';
 
 export const LOG_LEVELS = {
     levels: {

@@ -78,8 +78,7 @@ export class EventBus<EventMap extends object = object> {
         handler: Handler<EventMap[K]>
     ): void {
         const set = this.handlers.get(event) as
-            | Set<Handler<EventMap[K]>>
-            | undefined;
+            Set<Handler<EventMap[K]>> | undefined;
         if (set) {
             set.delete(handler);
             if (set.size === 0) this.handlers.delete(event);
@@ -120,8 +119,7 @@ export class EventBus<EventMap extends object = object> {
         payload: EventMap[K]
     ): Promise<PromiseSettledResult<void>[]> {
         const set = this.handlers.get(event) as
-            | Set<Handler<EventMap[K]>>
-            | undefined;
+            Set<Handler<EventMap[K]>> | undefined;
 
         if (!set || set.size === 0) return [];
 

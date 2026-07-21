@@ -127,8 +127,7 @@ export function resolveSchemaForTable(schema: Record<string, unknown>): {
 
     return {
         properties: resolved.properties as
-            | Record<string, Record<string, unknown>>
-            | undefined,
+            Record<string, Record<string, unknown>> | undefined,
         required: (resolved.required as string[]) ?? [],
         isArray,
         isNullable

@@ -1,8 +1,5 @@
 export type ConsentCategory =
-    | 'essential'
-    | 'preferences'
-    | 'analytics'
-    | 'marketing';
+    'essential' | 'preferences' | 'analytics' | 'marketing';
 
 export type CookieConsentFromBrowser = {
     consent: boolean;
@@ -36,9 +33,7 @@ export type CookieConsentDTO = Omit<
 };
 
 export type CookieConsent =
-    | CookieConsentFromBrowser
-    | CookieConsentFromDb
-    | CookieConsentDTO;
+    CookieConsentFromBrowser | CookieConsentFromDb | CookieConsentDTO;
 
 export type CookieConsentPayload = {
     consent: boolean;
