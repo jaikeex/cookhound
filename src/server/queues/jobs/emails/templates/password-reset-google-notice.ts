@@ -1,27 +1,8 @@
 import type { MailTemplate } from '@/server/queues/jobs/emails/utils';
 
 export const passwordResetGoogleNoticeTpl: MailTemplate<[string, string]> = {
-    subject: {
-        en: 'About your password reset request',
-        cs: 'K vaší žádosti o obnovení hesla'
-    },
-    body: {
-        en: (username, loginLink) => `
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>About your password reset request</title>
-    </head>
-    <body>
-        <p>Hi ${username},</p>
-        <p>We received a request to reset the password for your <strong>Cookhound.com</strong> account.</p>
-        <p>Your account uses <strong>Google Sign-In</strong>, so there's no password for us to reset. To get back to your kitchen, just use the <em>"Continue with Google"</em> button on the login page:</p>
-        <p><a href="${loginLink}">Sign in to Cookhound</a></p>
-        <p>If you did not request a password reset, please ignore this email or contact us if you have any concerns about your account's security.</p>
-        <p>Happy Cooking,<br/>The Cookhound Team 🐾</p>
-    </body>
-</html>`,
-        cs: (username, loginLink) => `
+    subject: 'K vaší žádosti o obnovení hesla',
+    body: (username, loginLink) => `
 <!DOCTYPE html>
 <html>
     <head>
@@ -36,5 +17,4 @@ export const passwordResetGoogleNoticeTpl: MailTemplate<[string, string]> = {
         <p>Přejeme příjemné vaření,<br/>Tým Cookhound 🐾</p>
     </body>
 </html>`
-    }
 };

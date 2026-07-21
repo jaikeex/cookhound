@@ -1,32 +1,8 @@
 import type { MailTemplate } from '@/server/queues/jobs/emails/utils';
 
 export const accountDeletionCancelledTpl: MailTemplate<[string]> = {
-    subject: {
-        en: 'Account Deletion Cancelled - Welcome Back! - Cookhound.com',
-        cs: 'Mazání účtu zrušeno - Vítejte zpět! - Cookhound.com'
-    },
-    body: {
-        en: (username) => `
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Account Deletion Cancelled</title>
-    </head>
-    <body>
-        <p>Hi ${username},</p>
-        <p>Great news! Your account deletion has been successfully cancelled. We're thrilled to have you back! 🎉</p>
-        <p>Your account is now fully active again, and you can continue enjoying all the features of Cookhound:</p>
-        <ul>
-            <li>Create and share delicious recipes</li>
-            <li>Build your cookbook collections</li>
-            <li>Connect with fellow food enthusiasts</li>
-            <li>Discover new culinary adventures</li>
-        </ul>
-        <p>If you didn't cancel this deletion, please secure your account immediately and contact us at support@cookhound.com.</p>
-        <p>Happy cooking!<br/>The Cookhound Team 🐾</p>
-    </body>
-</html>`,
-        cs: (username) => `
+    subject: 'Mazání účtu zrušeno - Vítejte zpět! - Cookhound.com',
+    body: (username) => `
 <!DOCTYPE html>
 <html>
     <head>
@@ -46,5 +22,4 @@ export const accountDeletionCancelledTpl: MailTemplate<[string]> = {
         <p>Příjemné vaření!<br/>Tým Cookhound 🐾</p>
     </body>
 </html>`
-    }
 };

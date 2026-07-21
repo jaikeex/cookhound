@@ -1,37 +1,8 @@
 import type { MailTemplate } from '@/server/queues/jobs/emails/utils';
 
 export const accountDeletedTpl: MailTemplate<[string]> = {
-    subject: {
-        en: 'Your Account Has Been Deleted - Cookhound.com',
-        cs: 'Váš účet byl smazán - Cookhound.com'
-    },
-    body: {
-        en: (username) => `
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Account Deleted</title>
-    </head>
-    <body>
-        <p>Hi ${username},</p>
-        <p>This is to confirm that your Cookhound account has been permanently deleted as requested.</p>
-        <p>What has been deleted:</p>
-        <ul>
-            <li>Your account profile and personal information</li>
-            <li>Your saved preferences and settings</li>
-            <li>Your cookbooks and saved recipes</li>
-            <li>Your ratings and comments</li>
-        </ul>
-        <p>What has been preserved:</p>
-        <ul>
-            <li>Your published recipes (now anonymized to preserve community value)</li>
-        </ul>
-        <p>This deletion is permanent and cannot be undone. If you wish to use Cookhound again in the future, you'll need to create a new account.</p>
-        <p>Thank you for being part of our community. We hope to see you again someday! 🍳</p>
-        <p>Best regards,<br/>The Cookhound Team 🐾</p>
-    </body>
-</html>`,
-        cs: (username) => `
+    subject: 'Váš účet byl smazán - Cookhound.com',
+    body: (username) => `
 <!DOCTYPE html>
 <html>
     <head>
@@ -56,5 +27,4 @@ export const accountDeletedTpl: MailTemplate<[string]> = {
         <p>S pozdravem,<br/>Tým Cookhound 🐾</p>
     </body>
 </html>`
-    }
 };

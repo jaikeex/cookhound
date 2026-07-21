@@ -2,28 +2,8 @@ import type { MailTemplate } from '@/server/queues/jobs/emails/utils';
 
 export const passwordResetUnverifiedNoticeTpl: MailTemplate<[string, string]> =
     {
-        subject: {
-            en: 'About your password reset request',
-            cs: 'K vaší žádosti o obnovení hesla'
-        },
-        body: {
-            en: (username, verifyLink) => `
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>About your password reset request</title>
-    </head>
-    <body>
-        <p>Hi ${username},</p>
-        <p>We received a request to reset the password for your <strong>Cookhound.com</strong> account.</p>
-        <p>Before you can reset your password, we need to confirm your email address. Please verify your email first &mdash; you can request a fresh verification link here:</p>
-        <p><a href="${verifyLink}">Verify my email</a></p>
-        <p>Once your email is verified, head back to the login page and use "Forgot your password?" again.</p>
-        <p>If you did not request a password reset, please ignore this email or contact us if you have any concerns about your account's security.</p>
-        <p>Happy Cooking,<br/>The Cookhound Team 🐾</p>
-    </body>
-</html>`,
-            cs: (username, verifyLink) => `
+        subject: 'K vaší žádosti o obnovení hesla',
+        body: (username, verifyLink) => `
 <!DOCTYPE html>
 <html>
     <head>
@@ -39,5 +19,4 @@ export const passwordResetUnverifiedNoticeTpl: MailTemplate<[string, string]> =
         <p>Přejeme příjemné vaření,<br/>Tým Cookhound 🐾</p>
     </body>
 </html>`
-        }
     };

@@ -28,23 +28,13 @@ vi.mock('@/server/utils/session/manager', () => ({
     }
 }));
 
-vi.mock('@/common/utils', async (importOriginal) => {
-    const actual: any = await importOriginal();
-    return {
-        ...actual,
-        getUserLocale: vi.fn()
-    };
-});
-
 //|=============================================================================================|//
 //$                                          IMPORTS                                            $//
 //|=============================================================================================|//
 
 import { sessions } from '@/server/utils/session/manager';
-import { getUserLocale } from '@/common/utils';
 
 const mockSessions = vi.mocked(sessions);
-const mockGetUserLocale = vi.mocked(getUserLocale);
 
 //|=============================================================================================|//
 //$                                           TESTS                                             $//
@@ -55,7 +45,6 @@ describe('RequestContext', () => {
         vi.clearAllMocks();
         mockCookieStore.get.mockReturnValue(undefined);
         mockHeaderStore.get.mockReturnValue(null);
-        mockGetUserLocale.mockResolvedValue('en');
     });
 
     afterEach(() => {
@@ -82,7 +71,6 @@ describe('RequestContext', () => {
             const mockSession = createMockSession({ userId: 1 });
             mockCookieStore.get.mockReturnValue({ value: 'session-token' });
             mockSessions.validateSession.mockResolvedValue(mockSession);
-            mockGetUserLocale.mockResolvedValue('en');
 
             await RequestContext.run(mockRequest, () => {
                 expect(RequestContext.getRequestMethod()).toBe('POST');
@@ -92,7 +80,6 @@ describe('RequestContext', () => {
                 expect(RequestContext.getUserId()).toBe(1);
                 expect(RequestContext.getUserRole()).toBe('user');
                 expect(RequestContext.getSessionId()).toBe('test-session-id');
-                expect(RequestContext.getUserLocale()).toBe('en');
                 expect(RequestContext.getRequestId()).toBeTruthy();
             });
         });
@@ -201,16 +188,6 @@ describe('RequestContext', () => {
             });
         });
 
-        it('should handle locale fetching errors gracefully', async () => {
-            const mockRequest = new Request('http://localhost:3000/');
-            mockGetUserLocale.mockRejectedValue(new Error('Locale error'));
-
-            await RequestContext.run(mockRequest, () => {
-                const locale = RequestContext.getUserLocale();
-                expect(locale).toBe('cs');
-            });
-        });
-
         it('should never throw - continues with partial data on errors', async () => {
             const mockRequest = new Request('http://localhost:3000/');
             mockSessions.validateSession.mockRejectedValue(
@@ -257,7 +234,6 @@ describe('RequestContext', () => {
             expect(RequestContext.getUserAgent()).toBeNull();
             expect(RequestContext.getSessionId()).toBeNull();
             expect(RequestContext.getRequestId()).toBeNull();
-            expect(RequestContext.getUserLocale()).toBeNull();
             expect(RequestContext.getRequestPath()).toBeUndefined();
             expect(RequestContext.getRequestMethod()).toBeUndefined();
         });

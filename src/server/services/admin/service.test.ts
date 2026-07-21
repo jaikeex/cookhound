@@ -34,7 +34,8 @@ vi.mock('@/server/utils/reqwest', () => ({
 
 vi.mock('@/server/utils/reqwest/context', () => ({
     RequestContext: {
-        getUserLocale: vi.fn(() => 'en')
+        getIp: vi.fn(() => null),
+        getUserAgent: vi.fn(() => null)
     }
 }));
 

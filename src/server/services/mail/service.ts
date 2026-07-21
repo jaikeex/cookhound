@@ -1,7 +1,5 @@
 import { Logger, LogServiceMethod } from '@/server/logger';
 import { queueManager } from '@/server/queues/QueueManager';
-import { RequestContext } from '@/server/utils/reqwest/context/requestContext';
-import { DEFAULT_LOCALE } from '@/common/constants/general';
 import { JOB_NAMES } from '@/server/queues/jobs/names';
 
 //|=============================================================================================|//
@@ -13,7 +11,6 @@ const log = Logger.getInstance(LOG_CONTEXT);
 /**
  * Enqueues transactional emails via BullMQ. All methods are fire-and-forget
  * from the caller's perspective, actual delivery happens in the worker process.
- * The recipient's locale is resolved from {@link RequestContext}.
  */
 class MailService {
     static readonly LOG_CONTEXT = LOG_CONTEXT;
@@ -33,8 +30,7 @@ class MailService {
     ) {
         await queueManager.addJob(JOB_NAMES.SEND_VERIFICATION_EMAIL, {
             token,
-            to: { name: username, address: email },
-            locale: RequestContext.getUserLocale() ?? DEFAULT_LOCALE
+            to: { name: username, address: email }
         });
     }
 
@@ -49,8 +45,7 @@ class MailService {
     async sendPasswordReset(email: string, username: string, token: string) {
         await queueManager.addJob(JOB_NAMES.SEND_PASSWORD_RESET_EMAIL, {
             token,
-            to: { name: username, address: email },
-            locale: RequestContext.getUserLocale() ?? DEFAULT_LOCALE
+            to: { name: username, address: email }
         });
     }
 
@@ -64,8 +59,7 @@ class MailService {
     @LogServiceMethod({ names: ['email', 'username'] })
     async sendPasswordResetGoogleNotice(email: string, username: string) {
         await queueManager.addJob(JOB_NAMES.SEND_PASSWORD_RESET_GOOGLE_NOTICE, {
-            to: { name: username, address: email },
-            locale: RequestContext.getUserLocale() ?? DEFAULT_LOCALE
+            to: { name: username, address: email }
         });
     }
 
@@ -81,8 +75,7 @@ class MailService {
         await queueManager.addJob(
             JOB_NAMES.SEND_PASSWORD_RESET_UNVERIFIED_NOTICE,
             {
-                to: { name: username, address: email },
-                locale: RequestContext.getUserLocale() ?? DEFAULT_LOCALE
+                to: { name: username, address: email }
             }
         );
     }
@@ -103,8 +96,7 @@ class MailService {
     ) {
         await queueManager.addJob(JOB_NAMES.SEND_EMAIL_CHANGE_CONFIRMATION, {
             token,
-            to: { name: username, address: email },
-            locale: RequestContext.getUserLocale() ?? DEFAULT_LOCALE
+            to: { name: username, address: email }
         });
     }
 
@@ -118,8 +110,7 @@ class MailService {
     @LogServiceMethod({ names: ['email', 'username'] })
     async sendEmailChangeNotice(email: string, username: string) {
         await queueManager.addJob(JOB_NAMES.SEND_EMAIL_CHANGE_NOTICE, {
-            to: { name: username, address: email },
-            locale: RequestContext.getUserLocale() ?? DEFAULT_LOCALE
+            to: { name: username, address: email }
         });
     }
 
@@ -139,8 +130,7 @@ class MailService {
     ) {
         await queueManager.addJob(JOB_NAMES.SEND_EMAIL_CHANGED_AUDIT, {
             toOld: { name: username, address: oldEmail },
-            toNew: { name: username, address: newEmail },
-            locale: RequestContext.getUserLocale() ?? DEFAULT_LOCALE
+            toNew: { name: username, address: newEmail }
         });
     }
 
@@ -161,8 +151,7 @@ class MailService {
             JOB_NAMES.SEND_ACCOUNT_DELETION_CONFIRMATION,
             {
                 scheduledDate,
-                to: { name: username, address: email },
-                locale: RequestContext.getUserLocale() ?? DEFAULT_LOCALE
+                to: { name: username, address: email }
             }
         );
     }
@@ -184,8 +173,7 @@ class MailService {
             JOB_NAMES.SEND_ADMIN_ACCOUNT_DELETION_NOTICE,
             {
                 scheduledDate,
-                to: { name: username, address: email },
-                locale: RequestContext.getUserLocale() ?? DEFAULT_LOCALE
+                to: { name: username, address: email }
             }
         );
     }
@@ -210,8 +198,7 @@ class MailService {
         await queueManager.addJob(JOB_NAMES.SEND_ACCOUNT_DELETION_REMINDER, {
             daysRemaining,
             scheduledDate,
-            to: { name: username, address: email },
-            locale: RequestContext.getUserLocale() ?? DEFAULT_LOCALE
+            to: { name: username, address: email }
         });
     }
 
@@ -224,8 +211,7 @@ class MailService {
     @LogServiceMethod({ names: ['email', 'username'] })
     async sendAccountDeletionCancelled(email: string, username: string) {
         await queueManager.addJob(JOB_NAMES.SEND_ACCOUNT_DELETION_CANCELLED, {
-            to: { name: username, address: email },
-            locale: RequestContext.getUserLocale() ?? DEFAULT_LOCALE
+            to: { name: username, address: email }
         });
     }
 
@@ -238,8 +224,7 @@ class MailService {
     @LogServiceMethod({ names: ['email', 'username'] })
     async sendAccountDeleted(email: string, username: string) {
         await queueManager.addJob(JOB_NAMES.SEND_ACCOUNT_DELETED, {
-            to: { name: username, address: email },
-            locale: RequestContext.getUserLocale() ?? DEFAULT_LOCALE
+            to: { name: username, address: email }
         });
     }
 
@@ -262,8 +247,7 @@ class MailService {
             name,
             email,
             subject,
-            message,
-            locale: RequestContext.getUserLocale() ?? DEFAULT_LOCALE
+            message
         });
     }
 
@@ -284,8 +268,7 @@ class MailService {
         message: string;
     }) {
         await queueManager.addJob(JOB_NAMES.SEND_FLAG_APPEAL_NOTIFICATION, {
-            ...payload,
-            locale: RequestContext.getUserLocale() ?? DEFAULT_LOCALE
+            ...payload
         });
     }
 }

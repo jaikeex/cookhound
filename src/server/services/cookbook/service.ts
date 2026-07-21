@@ -5,7 +5,6 @@ import type { CookbookForCreatePayload, CookbookDTO } from '@/common/types';
 import { assertAuthenticated } from '@/server/utils/reqwest';
 import { randomUUID } from 'crypto';
 import { DEFAULT_LOCALE } from '@/common/constants';
-import { RequestContext } from '@/server/utils/reqwest/context';
 import db from '@/server/db/model';
 import { NotFoundError, ServerError } from '@/server/error';
 import { InfrastructureErrorCode } from '@/server/error/codes';
@@ -105,7 +104,7 @@ class CookbookService {
     async createCookbook(payload: CookbookForCreatePayload): Promise<Cookbook> {
         const userId = assertAuthenticated();
 
-        const language = RequestContext.getUserLocale() ?? DEFAULT_LOCALE;
+        const language = DEFAULT_LOCALE;
 
         const displayId = randomUUID();
 

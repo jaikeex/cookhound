@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import { FrontPageTemplate } from '@/client/components/templates/Dashboard/FrontPage';
 import { serverData } from '@/server/data';
-import { getUserLocale } from '@/common/utils';
 import { cookies, headers } from 'next/headers';
 import React from 'react';
 import {
@@ -10,16 +9,13 @@ import {
     getLocalizedMetadata
 } from '@/server/utils/seo';
 import { StructuredData } from '@/client/components';
-import { ENV_CONFIG_PUBLIC } from '@/common/constants';
+import { DEFAULT_LOCALE, ENV_CONFIG_PUBLIC } from '@/common/constants';
 import { mapServiceErrorForRsc } from '@/server/data/runtime/mapError';
 
 //|=============================================================================================|//
 
 export default async function Home() {
-    const cookieStore = await cookies();
-    const headerList = await headers();
-
-    const locale = await getUserLocale(cookieStore, headerList);
+    const locale = DEFAULT_LOCALE;
 
     const recipesForDisplay = serverData.recipe
         .list(locale, 1, 24)

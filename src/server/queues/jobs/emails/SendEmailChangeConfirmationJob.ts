@@ -8,14 +8,12 @@ import { Logger } from '@/server/logger';
 import { ENV_CONFIG_PUBLIC, ROUTES } from '@/common/constants';
 import { emailChangeConfirmationTpl } from './templates';
 import { createTemplate } from './utils';
-import type { Locale } from '@/common/types';
 
 const log = Logger.getInstance('email-change-confirmation-worker');
 
 type EmailChangeConfirmationData = {
     token: string;
     to: { address: string; name: string };
-    locale: Locale;
 };
 
 class SendEmailChangeConfirmationJob extends BaseJob<EmailChangeConfirmationData> {
@@ -24,7 +22,7 @@ class SendEmailChangeConfirmationJob extends BaseJob<EmailChangeConfirmationData
     static queueOptions = QUEUE_OPTIONS;
 
     async handle(job: Job<EmailChangeConfirmationData>) {
-        const { token, to, locale } = job.data;
+        const { token, to } = job.data;
 
         log.trace('handle - sending email change confirmation', to);
 
@@ -32,7 +30,6 @@ class SendEmailChangeConfirmationJob extends BaseJob<EmailChangeConfirmationData
 
         const { subject, html } = createTemplate(
             emailChangeConfirmationTpl,
-            locale,
             to.name,
             confirmationLink
         );

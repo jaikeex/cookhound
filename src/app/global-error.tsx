@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { ButtonBase, Logo, Typography } from '@/client/components';
 import Link from 'next/link';
-import { locales, type Locale } from '@/client/locales';
+import { locales } from '@/client/locales';
 import { DEFAULT_LOCALE } from '@/common/constants';
 
 type ErrorPageProps = Readonly<{
@@ -16,21 +16,14 @@ export default function GlobalError({ error }: ErrorPageProps) {
      * This requires custom translation solution because it cannot be a server component
      * and lives outside the app tree so i18n context is not available.
      */
-    const [locale, setLocale] = useState<Locale>(DEFAULT_LOCALE);
-
     useEffect(() => {
-        const browserLang = navigator.language.split('-')[0] as Locale;
-        if (browserLang === 'cs' || browserLang === 'en') {
-            setLocale(browserLang);
-        }
-
         console.error('Global error:', error);
     }, [error]);
 
-    const messages = locales[locale];
+    const messages = locales[DEFAULT_LOCALE];
 
     return (
-        <html lang={locale}>
+        <html lang={DEFAULT_LOCALE}>
             <body>
                 <div className="flex flex-col items-center min-h-screen pt-10 text-center">
                     <Logo className="logo-md mb-8" />

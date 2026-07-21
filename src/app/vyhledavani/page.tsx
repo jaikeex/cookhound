@@ -1,10 +1,9 @@
 import type { Metadata } from 'next';
 import { SearchTemplate } from '@/client/components/templates/Dashboard/Search';
 import { serverData } from '@/server/data';
-import { getUserLocale } from '@/common/utils';
 import { cookies, headers } from 'next/headers';
 import React from 'react';
-import { ENV_CONFIG_PUBLIC, ROUTES } from '@/common/constants';
+import { DEFAULT_LOCALE, ENV_CONFIG_PUBLIC, ROUTES } from '@/common/constants';
 import {
     generateBreadcrumbSchema,
     getLocalizedMetadata
@@ -23,10 +22,7 @@ export default async function SearchPage({
 }>) {
     const searchQuery = (await searchParams)?.query ?? '';
 
-    const cookieStore = await cookies();
-    const headerList = await headers();
-
-    const locale = await getUserLocale(cookieStore, headerList);
+    const locale = DEFAULT_LOCALE;
 
     const recipesForDisplay = searchQuery
         ? serverData.recipe.search(searchQuery, locale, 1, 24)
@@ -84,7 +80,7 @@ export async function generateMetadata({
     }
 
     const capitalised = q.charAt(0).toUpperCase() + q.slice(1);
-    const locale = await getUserLocale(cookieStore, headerList);
+    const locale = DEFAULT_LOCALE;
 
     const metadata = await getLocalizedMetadata(cookieStore, headerList, {
         titleKey: 'meta.search.title',

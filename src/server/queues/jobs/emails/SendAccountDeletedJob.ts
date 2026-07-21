@@ -3,7 +3,6 @@ import { BaseJob } from '@/server/queues/BaseJob';
 import type { Job } from 'bullmq';
 import { accountDeletedTpl } from './templates/account-deleted';
 import { createTemplate } from './utils';
-import type { Locale } from '@/common/types';
 import { Logger } from '@/server/logger';
 import { queueManager } from '@/server/queues/QueueManager';
 import { JOB_NAMES, QUEUE_NAMES } from '@/server/queues/jobs/names';
@@ -13,7 +12,6 @@ const log = Logger.getInstance('account-deleted-worker');
 
 type AccountDeletedJobData = {
     to: { address: string; name: string };
-    locale: Locale;
 };
 
 class SendAccountDeletedJob extends BaseJob<AccountDeletedJobData> {
@@ -22,15 +20,11 @@ class SendAccountDeletedJob extends BaseJob<AccountDeletedJobData> {
     static queueOptions = QUEUE_OPTIONS;
 
     async handle(job: Job<AccountDeletedJobData>) {
-        const { to, locale } = job.data;
+        const { to } = job.data;
 
         log.trace('handle - attempting to send account deleted', to);
 
-        const { subject, html } = createTemplate(
-            accountDeletedTpl,
-            locale,
-            to.name
-        );
+        const { subject, html } = createTemplate(accountDeletedTpl, to.name);
 
         await mailClient.send({
             from: {

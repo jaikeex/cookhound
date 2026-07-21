@@ -4,12 +4,7 @@ import { randomUUID } from 'crypto';
 import { cookies, headers } from 'next/headers';
 import { sessions } from '@/server/utils/session/manager';
 import { setLoggerContextReader } from '@/server/logger/context-reader';
-import {
-    DEFAULT_LOCALE,
-    SESSION_COOKIE_NAME
-} from '@/common/constants/general';
-import type { Locale } from '@/common/types';
-import { getUserLocale } from '@/common/utils';
+import { SESSION_COOKIE_NAME } from '@/common/constants/general';
 
 export const REQUEST_ID_FIELD_NAME = 'requestId';
 export const REQUEST_PATH_FIELD_NAME = 'path';
@@ -24,7 +19,6 @@ export interface RequestContextShape {
     requestMethod?: string;
     sessionId?: string | null;
     userRole?: UserRole | null;
-    userLocale?: Locale | null;
     userId?: number | null;
     userAgent?: string | null;
     ip?: string | null;
@@ -90,19 +84,6 @@ async function buildContext(
         ///---------------------------------------------------------------------------------///
 
         const cookieStore = await cookies();
-
-        ///---------------------------------------------------------------------------------///
-        ///                                     LOCALE                                      ///
-        ///---------------------------------------------------------------------------------///
-
-        try {
-            const locale = await getUserLocale(cookieStore, source.headers);
-
-            ctx.userLocale = locale;
-        } catch {
-            // If the locale fetching fails, provide a placeholder, do nothing more.
-            ctx.userLocale = DEFAULT_LOCALE;
-        }
 
         ///---------------------------------------------------------------------------------///
         ///                                     SESSION                                     ///
@@ -217,10 +198,6 @@ export const RequestContext = {
 
     getUserId(): number | null {
         return this.get('userId') ?? null;
-    },
-
-    getUserLocale(): Locale | null {
-        return (this.get('userLocale') as Locale | null) ?? null;
     },
 
     getIp(): string | null {

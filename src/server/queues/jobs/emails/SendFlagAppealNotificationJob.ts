@@ -6,7 +6,6 @@ import { JOB_NAMES, QUEUE_NAMES } from '@/server/queues/jobs/names';
 import { FROM_ADDRESS, QUEUE_OPTIONS } from './constants';
 import { Logger } from '@/server/logger';
 import { flagAppealNotificationTpl } from './templates/flag-appeal-notification';
-import type { Locale } from '@/common/types';
 import { createTemplate } from './utils';
 import { ENV_CONFIG_PRIVATE } from '@/common/constants/env';
 
@@ -21,7 +20,6 @@ type FlagAppealNotificationData = {
     recipeTitle: string;
     authorId: number;
     message: string;
-    locale: Locale;
 };
 
 class SendFlagAppealNotificationJob extends BaseJob<FlagAppealNotificationData> {
@@ -38,8 +36,7 @@ class SendFlagAppealNotificationJob extends BaseJob<FlagAppealNotificationData> 
             recipeDisplayId,
             recipeTitle,
             authorId,
-            message,
-            locale
+            message
         } = job.data;
 
         log.trace('handle - sending flag appeal notification', {
@@ -50,7 +47,6 @@ class SendFlagAppealNotificationJob extends BaseJob<FlagAppealNotificationData> 
 
         const { subject, html } = createTemplate(
             flagAppealNotificationTpl,
-            locale,
             appealId,
             flagId,
             flagReason,

@@ -7,14 +7,12 @@ import { queueManager } from '@/server/queues/QueueManager';
 import { JOB_NAMES, QUEUE_NAMES } from '@/server/queues/jobs/names';
 import { FROM_ADDRESS, FROM_NAME, QUEUE_OPTIONS } from './constants';
 import { passwordResetUnverifiedNoticeTpl } from './templates/password-reset-unverified-notice';
-import type { Locale } from '@/common/types';
 import { createTemplate } from './utils';
 
 const log = Logger.getInstance('password-reset-unverified-notice-worker');
 
 type PasswordResetUnverifiedNoticeData = {
     to: { address: string; name: string };
-    locale: Locale;
 };
 
 class SendPasswordResetUnverifiedNoticeJob extends BaseJob<PasswordResetUnverifiedNoticeData> {
@@ -23,14 +21,13 @@ class SendPasswordResetUnverifiedNoticeJob extends BaseJob<PasswordResetUnverifi
     static queueOptions = QUEUE_OPTIONS;
 
     async handle(job: Job<PasswordResetUnverifiedNoticeData>) {
-        const { to, locale } = job.data;
+        const { to } = job.data;
 
         log.trace('handle - sending password reset unverified notice', to);
 
         const verify_link = `${ENV_CONFIG_PUBLIC.ORIGIN}${ROUTES.auth.verifyEmail}`;
         const { subject, html } = createTemplate(
             passwordResetUnverifiedNoticeTpl,
-            locale,
             to.name,
             verify_link
         );

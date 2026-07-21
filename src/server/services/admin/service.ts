@@ -459,7 +459,7 @@ class AdminService {
         );
 
         try {
-            const locale = RequestContext.getUserLocale() ?? DEFAULT_LOCALE;
+            const locale = DEFAULT_LOCALE;
 
             await mailService.sendAdminAccountDeletionNotice(
                 user.email,

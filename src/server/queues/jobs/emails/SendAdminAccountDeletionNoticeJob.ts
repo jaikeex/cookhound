@@ -3,7 +3,6 @@ import { BaseJob } from '@/server/queues/BaseJob';
 import type { Job } from 'bullmq';
 import { adminAccountDeletionNoticeTpl } from './templates/admin-account-deletion-notice';
 import { createTemplate } from './utils';
-import type { Locale } from '@/common/types';
 import { Logger } from '@/server/logger';
 import { queueManager } from '@/server/queues/QueueManager';
 import { JOB_NAMES, QUEUE_NAMES } from '@/server/queues/jobs/names';
@@ -14,7 +13,6 @@ const log = Logger.getInstance('admin-deletion-notice-worker');
 type AdminAccountDeletionNoticeJobData = {
     scheduledDate: string;
     to: { address: string; name: string };
-    locale: Locale;
 };
 
 class SendAdminAccountDeletionNoticeJob extends BaseJob<AdminAccountDeletionNoticeJobData> {
@@ -23,7 +21,7 @@ class SendAdminAccountDeletionNoticeJob extends BaseJob<AdminAccountDeletionNoti
     static queueOptions = QUEUE_OPTIONS;
 
     async handle(job: Job<AdminAccountDeletionNoticeJobData>) {
-        const { scheduledDate, to, locale } = job.data;
+        const { scheduledDate, to } = job.data;
 
         log.trace(
             'handle - attempting to send admin account deletion notice',
@@ -32,7 +30,6 @@ class SendAdminAccountDeletionNoticeJob extends BaseJob<AdminAccountDeletionNoti
 
         const { subject, html } = createTemplate(
             adminAccountDeletionNoticeTpl,
-            locale,
             to.name,
             scheduledDate
         );

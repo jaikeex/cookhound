@@ -3,7 +3,6 @@ import { BaseJob } from '@/server/queues/BaseJob';
 import type { Job } from 'bullmq';
 import { accountDeletionReminderTpl } from './templates/account-deletion-reminder';
 import { createTemplate } from './utils';
-import type { Locale } from '@/common/types';
 import { Logger } from '@/server/logger';
 import { queueManager } from '@/server/queues/QueueManager';
 import { JOB_NAMES, QUEUE_NAMES } from '@/server/queues/jobs/names';
@@ -15,7 +14,6 @@ type AccountDeletionReminderJobData = {
     daysRemaining: number;
     scheduledDate: string;
     to: { address: string; name: string };
-    locale: Locale;
 };
 
 class SendAccountDeletionReminderJob extends BaseJob<AccountDeletionReminderJobData> {
@@ -24,13 +22,12 @@ class SendAccountDeletionReminderJob extends BaseJob<AccountDeletionReminderJobD
     static queueOptions = QUEUE_OPTIONS;
 
     async handle(job: Job<AccountDeletionReminderJobData>) {
-        const { daysRemaining, scheduledDate, to, locale } = job.data;
+        const { daysRemaining, scheduledDate, to } = job.data;
 
         log.trace('handle - attempting to send account deletion reminder', to);
 
         const { subject, html } = createTemplate(
             accountDeletionReminderTpl,
-            locale,
             to.name,
             daysRemaining,
             scheduledDate

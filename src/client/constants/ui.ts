@@ -1,5 +1,4 @@
 export const THEME_STORAGE_KEY = 'theme';
-export const LOCALE_STORAGE_KEY = 'locale';
 
 export const THEMES = ['light', 'dark'];
 

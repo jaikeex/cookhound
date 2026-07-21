@@ -10,28 +10,8 @@ import {
 export const contactFormTpl: MailTemplate<
     [name: string, email: string, subject: string, message: string]
 > = {
-    subject: {
-        en: 'Contact Form Submission - Cookhound.com',
-        cs: 'Contact Form Submission - Cookhound.com'
-    },
-    body: {
-        en: (name, email, subject, message) => `
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Contact Form Submission</title>
-    </head>
-    <body>
-        <h2>Contact Form Submission</h2>
-        <p><strong>Name:</strong> ${escapeHtml(name)}</p>
-        <p><strong>Email:</strong> ${escapeHtml(email)}</p>
-        <p><strong>Subject:</strong> ${escapeHtml(subject)}</p>
-        <hr />
-        <p><strong>Message:</strong></p>
-        <p>${escapeHtml(message).replace(/\n/g, '<br />')}</p>
-    </body>
-</html>`,
-        cs: (name, email, subject, message) => `
+    subject: 'Contact Form Submission - Cookhound.com',
+    body: (name, email, subject, message) => `
 <!DOCTYPE html>
 <html>
     <head>
@@ -47,5 +27,4 @@ export const contactFormTpl: MailTemplate<
         <p>${escapeHtml(message).replace(/\n/g, '<br />')}</p>
     </body>
 </html>`
-    }
 };

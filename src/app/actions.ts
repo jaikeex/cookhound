@@ -3,22 +3,12 @@
 import { cookies } from 'next/headers';
 import {
     CONSENT_COOKIE_MAX_AGE,
-    LOCALE_COOKIE_NAME,
-    ONE_YEAR_IN_SECONDS,
     SESSION_COOKIE_NAME
 } from '@/common/constants';
 import type { CookieConsent } from '@/common/types/cookie-consent';
 import { cache } from 'react';
 import { serverData } from '@/server/data';
 import { setCookie } from '@/server/utils/reqwest/cookies';
-
-export const setLocaleCookie = async (locale: string): Promise<void> => {
-    // Shared attributes (path / secure / domain) are applied by setCookie.
-    await setCookie(LOCALE_COOKIE_NAME, locale, {
-        maxAge: ONE_YEAR_IN_SECONDS,
-        sameSite: 'strict'
-    });
-};
 
 export const setConsentCookie = async (
     consent: CookieConsent

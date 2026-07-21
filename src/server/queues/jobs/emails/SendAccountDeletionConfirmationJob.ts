@@ -3,7 +3,6 @@ import { BaseJob } from '@/server/queues/BaseJob';
 import type { Job } from 'bullmq';
 import { accountDeletionConfirmationTpl } from './templates/account-deletion-confirmation';
 import { createTemplate } from './utils';
-import type { Locale } from '@/common/types';
 import { Logger } from '@/server/logger';
 import { queueManager } from '@/server/queues/QueueManager';
 import { JOB_NAMES, QUEUE_NAMES } from '@/server/queues/jobs/names';
@@ -14,7 +13,6 @@ const log = Logger.getInstance('deletion-confirm-worker');
 type AccountDeletionConfirmationJobData = {
     scheduledDate: string;
     to: { address: string; name: string };
-    locale: Locale;
 };
 
 class SendAccountDeletionConfirmationJob extends BaseJob<AccountDeletionConfirmationJobData> {
@@ -23,7 +21,7 @@ class SendAccountDeletionConfirmationJob extends BaseJob<AccountDeletionConfirma
     static queueOptions = QUEUE_OPTIONS;
 
     async handle(job: Job<AccountDeletionConfirmationJobData>) {
-        const { scheduledDate, to, locale } = job.data;
+        const { scheduledDate, to } = job.data;
 
         log.trace(
             'handle - attempting to send account deletion confirmation',
@@ -32,7 +30,6 @@ class SendAccountDeletionConfirmationJob extends BaseJob<AccountDeletionConfirma
 
         const { subject, html } = createTemplate(
             accountDeletionConfirmationTpl,
-            locale,
             to.name,
             scheduledDate
         );

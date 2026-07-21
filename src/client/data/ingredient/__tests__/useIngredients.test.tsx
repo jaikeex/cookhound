@@ -57,7 +57,7 @@ describe('useIngredients', () => {
         });
 
         const { result } = renderHook(
-            () => ingredientQueryClient.useIngredients('en'),
+            () => ingredientQueryClient.useIngredients('cs'),
             { wrapper }
         );
 
@@ -66,7 +66,7 @@ describe('useIngredients', () => {
         expect(repo.list).toHaveBeenCalledTimes(1);
         expect(repo.list).toHaveBeenCalledWith(
             expect.objectContaining({
-                language: 'en',
+                language: 'cs',
                 signal: expect.any(AbortSignal)
             })
         );

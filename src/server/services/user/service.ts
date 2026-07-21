@@ -41,7 +41,6 @@ import {
 } from '@/server/utils/crypto';
 import { serializeTermsContent } from '@/server/utils/terms';
 import { serializeConsentContent } from '@/server/utils/consent';
-import { RequestContext } from '@/server/utils/reqwest/context';
 import { sessions } from '@/server/utils/session';
 import { redisClient } from '@/server/integrations';
 import { ONE_MINUTE_IN_SECONDS } from '@/common/constants/time';
@@ -1516,7 +1515,7 @@ class UserService {
         //|-------------------------------------------------------------------------------------|//
 
         try {
-            const locale = RequestContext.getUserLocale() ?? DEFAULT_LOCALE;
+            const locale = DEFAULT_LOCALE;
 
             await mailService.sendAccountDeletionConfirmation(
                 user.email,

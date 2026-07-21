@@ -6,7 +6,6 @@ import { JOB_NAMES, QUEUE_NAMES } from '@/server/queues/jobs/names';
 import { FROM_ADDRESS, QUEUE_OPTIONS } from './constants';
 import { Logger } from '@/server/logger';
 import { contactFormTpl } from './templates/contact-form';
-import type { Locale } from '@/common/types';
 import { createTemplate } from './utils';
 import { ENV_CONFIG_PRIVATE } from '@/common/constants/env';
 
@@ -17,7 +16,6 @@ type ContactFormData = {
     email: string;
     subject: string;
     message: string;
-    locale: Locale;
 };
 
 class SendContactFormJob extends BaseJob<ContactFormData> {
@@ -26,7 +24,7 @@ class SendContactFormJob extends BaseJob<ContactFormData> {
     static queueOptions = QUEUE_OPTIONS;
 
     async handle(job: Job<ContactFormData>) {
-        const { name, email, subject, message, locale } = job.data;
+        const { name, email, subject, message } = job.data;
 
         log.trace('handle - sending contact form submission', {
             name,
@@ -36,7 +34,6 @@ class SendContactFormJob extends BaseJob<ContactFormData> {
 
         const { html } = createTemplate(
             contactFormTpl,
-            locale,
             name,
             email,
             subject,

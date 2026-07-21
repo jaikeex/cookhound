@@ -3,7 +3,6 @@ import { BaseJob } from '@/server/queues/BaseJob';
 import type { Job } from 'bullmq';
 import { accountDeletionCancelledTpl } from './templates/account-deletion-cancelled';
 import { createTemplate } from './utils';
-import type { Locale } from '@/common/types';
 import { Logger } from '@/server/logger';
 import { queueManager } from '@/server/queues/QueueManager';
 import { JOB_NAMES, QUEUE_NAMES } from '@/server/queues/jobs/names';
@@ -13,7 +12,6 @@ const log = Logger.getInstance('deletion-cancelled-worker');
 
 type AccountDeletionCancelledJobData = {
     to: { address: string; name: string };
-    locale: Locale;
 };
 
 class SendAccountDeletionCancelledJob extends BaseJob<AccountDeletionCancelledJobData> {
@@ -22,13 +20,12 @@ class SendAccountDeletionCancelledJob extends BaseJob<AccountDeletionCancelledJo
     static queueOptions = QUEUE_OPTIONS;
 
     async handle(job: Job<AccountDeletionCancelledJobData>) {
-        const { to, locale } = job.data;
+        const { to } = job.data;
 
         log.trace('handle - attempting to send account deletion cancelled', to);
 
         const { subject, html } = createTemplate(
             accountDeletionCancelledTpl,
-            locale,
             to.name
         );
 

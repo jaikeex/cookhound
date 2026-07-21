@@ -8,14 +8,13 @@ export const VERSION = '1.3.2';
 //?=============================================================================================?//
 
 export const DEFAULT_LOCALE = 'cs';
-export const SUPPORTED_LOCALES = ['en', 'cs'] as const;
+export const SUPPORTED_LOCALES = ['cs'] as const;
 
 export const GOOGLE_SIGNIN_REDIRECT_URL = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${ENV_CONFIG_PUBLIC.GOOGLE_OAUTH_CLIENT_ID}&redirect_uri=${ENV_CONFIG_PUBLIC.ORIGIN}${ROUTES.auth.callback.google}&response_type=code&scope=email%20profile&access_type=offline`;
 
 export const SEARCH_QUERY_SEPARATOR = '|';
 
 export const SESSION_COOKIE_NAME = 'session';
-export const LOCALE_COOKIE_NAME = 'locale';
 
 export const OAUTH_STATE_KEY = 'oauth_state';
 

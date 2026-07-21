@@ -8,6 +8,7 @@ import type { Ingredient, Recipe, RecipeTagDTO } from '@/common/types';
 import type { Locale } from '@/common/types';
 import type { RecipeFlagDTO } from '@/common/types/flags/recipe-flag';
 import recipeModel from '@/server/db/model/recipe/model';
+import { SUPPORTED_LOCALES } from '@/common/constants';
 
 const log = Logger.getInstance('recipe-reindex-job');
 
@@ -28,7 +29,7 @@ class ReindexRecipesJob extends BaseJob {
     async handle(_job: Job): Promise<void> {
         log.info('handle - starting full recipe re-index run');
 
-        const languages = ['en', 'cs'];
+        const languages = [...SUPPORTED_LOCALES];
 
         await recipeSearchIndex.deleteAllDocuments();
 
@@ -71,8 +72,7 @@ class ReindexRecipesJob extends BaseJob {
                         imageUrl: recipe.imageUrl ?? '',
                         rating: recipe.rating ? Number(recipe.rating) : null,
                         flags: recipe.flags as unknown as
-                            | RecipeFlagDTO[]
-                            | null,
+                            RecipeFlagDTO[] | null,
                         tags: recipe.tags as unknown as RecipeTagDTO[] | null,
                         timesRated: recipe.timesRated ?? 0,
                         timesViewed: recipe.timesViewed ?? 0,

@@ -31,19 +31,6 @@ interface LanguagePack {
     translations: Record<TimeUnits, Partial<Record<PluralCategory, string>>>;
 }
 
-const en: LanguagePack = {
-    pluralization: (n) => (n === 1 ? 'one' : 'other'),
-    formatter: (value, unit) => `${value} ${unit}`,
-    translations: {
-        year: { one: 'year', other: 'years' },
-        month: { one: 'month', other: 'months' },
-        day: { one: 'day', other: 'days' },
-        hour: { one: 'hour', other: 'hours' },
-        minute: { one: 'minute', other: 'minutes' },
-        second: { one: 'second', other: 'seconds' }
-    }
-};
-
 const cs: LanguagePack = {
     pluralization: (n) => {
         if (n === 1) return 'one';
@@ -62,7 +49,6 @@ const cs: LanguagePack = {
 };
 
 const languagePacks: Record<Locale, LanguagePack> = {
-    en,
     cs
 };
 

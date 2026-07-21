@@ -7,14 +7,13 @@ import { CookbookTemplate, StructuredData } from '@/client/components';
 import type { Metadata } from 'next';
 import { reviveCookbookDates } from '@/client/data/cookbook/revive';
 import { cookies, headers } from 'next/headers';
-import { ENV_CONFIG_PUBLIC, ROUTES } from '@/common/constants';
+import { DEFAULT_LOCALE, ENV_CONFIG_PUBLIC, ROUTES } from '@/common/constants';
 import {
     generateCookbookSchema,
     generateBreadcrumbSchema,
     getLocalizedMetadata
 } from '@/server/utils/seo';
 import { tServer } from '@/server/utils/locales';
-import { getUserLocale } from '@/common/utils';
 
 type CookbookPageParams = {
     readonly params: Promise<
@@ -39,9 +38,7 @@ export default async function Page({ params }: CookbookPageParams) {
             .then(reviveCookbookDates)
     ]);
 
-    const cookieStore = await cookies();
-    const headerList = await headers();
-    const locale = await getUserLocale(cookieStore, headerList);
+    const locale = DEFAULT_LOCALE;
 
     const isOwner = cookbook?.ownerId === user?.id;
     const isPublic = cookbook?.visibility === CookbookVisibility.PUBLIC;

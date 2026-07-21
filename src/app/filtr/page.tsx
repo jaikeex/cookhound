@@ -2,14 +2,14 @@ import type { Metadata } from 'next';
 import { FilterTemplate } from '@/client/components/templates/Dashboard/Filter';
 import { cookies, headers } from 'next/headers';
 import React from 'react';
-import { ENV_CONFIG_PUBLIC, ROUTES } from '@/common/constants';
+import { DEFAULT_LOCALE, ENV_CONFIG_PUBLIC, ROUTES } from '@/common/constants';
 import {
     generateBreadcrumbSchema,
     getLocalizedMetadata
 } from '@/server/utils/seo';
 import { StructuredData } from '@/client/components';
 import { tServer } from '@/server/utils/locales';
-import { deserializeFilterParams, getUserLocale } from '@/common/utils';
+import { deserializeFilterParams } from '@/common/utils';
 
 export const dynamic = 'force-dynamic';
 
@@ -20,9 +20,6 @@ export default async function FilterPage({
 }: Readonly<{
     searchParams: Promise<Record<string, string | string[] | undefined>>;
 }>) {
-    const cookieStore = await cookies();
-    const headerList = await headers();
-
     const rawParams = await searchParams;
     const urlSearchParams = new URLSearchParams();
 
@@ -36,7 +33,7 @@ export default async function FilterPage({
 
     const initialFilters = deserializeFilterParams(urlSearchParams);
 
-    const locale = await getUserLocale(cookieStore, headerList);
+    const locale = DEFAULT_LOCALE;
 
     const breadcrumbItems = [
         {

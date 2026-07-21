@@ -1,9 +1,8 @@
 import type { Metadata } from 'next';
 import type { ReadonlyRequestCookies } from 'next/dist/server/web/spec-extension/adapters/request-cookies';
-import { getUserLocale } from '@/common/utils';
 import { tServer } from '@/server/utils/locales';
 import type { I18nMessage } from '@/client/locales';
-import { ENV_CONFIG_PUBLIC } from '@/common/constants';
+import { DEFAULT_LOCALE, ENV_CONFIG_PUBLIC } from '@/common/constants';
 import type { Locale } from '@/common/types';
 
 type MetadataConfig = {
@@ -42,25 +41,17 @@ function validateDescription(description: string, maxLength = 160): string {
 /**
  * Generates localized metadata for Next.js pages with SEO optimizations.
  *
- * Resolves the locale from the request (cookie/header). This reads dynamic
- * request data and therefore opts the calling route into dynamic rendering;
- * use it for pages that are dynamic anyway. For statically rendered / ISR
- * pages whose language is an intrinsic property of the content (e.g. a recipe
- * record's own language), call {@link buildLocalizedMetadata} with an explicit
- * locale instead, so the route stays statically renderable.
- *
- * @param cookies - The request cookies
- * @param headers - The request headers
+ * @param _cookies - The request cookies (unused, see above)
+ * @param _headers - The request headers (unused, see above)
  * @param config - Configuration object for metadata
  * @returns - The localized metadata object
  */
 export async function getLocalizedMetadata(
-    cookies: ReadonlyRequestCookies,
-    headers: Headers,
+    _cookies: ReadonlyRequestCookies,
+    _headers: Headers,
     config: MetadataConfig
 ): Promise<Metadata> {
-    const locale = await getUserLocale(cookies, headers);
-    return buildLocalizedMetadata(locale, config);
+    return buildLocalizedMetadata(DEFAULT_LOCALE, config);
 }
 
 /**

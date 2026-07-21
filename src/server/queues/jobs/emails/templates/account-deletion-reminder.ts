@@ -3,34 +3,8 @@ import type { MailTemplate } from '@/server/queues/jobs/emails/utils';
 export const accountDeletionReminderTpl: MailTemplate<
     [string, number, string]
 > = {
-    subject: {
-        en: 'Reminder: Your Account Will Be Deleted Soon - Cookhound.com',
-        cs: 'Připomínka: Váš účet bude brzy smazán - Cookhound.com'
-    },
-    body: {
-        en: (username, daysRemaining, scheduledDate) => `
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Account Deletion Reminder</title>
-    </head>
-    <body>
-        <p>Hi ${username},</p>
-        <p>This is a friendly reminder that your Cookhound account is scheduled for deletion.</p>
-        <p><strong>Days remaining: ${daysRemaining}</strong></p>
-        <p><strong>Scheduled deletion date: ${scheduledDate}</strong></p>
-        <p>If you've changed your mind and want to keep your account, you can cancel the deletion by:</p>
-        <ol>
-            <li>Logging into your Cookhound account</li>
-            <li>Going to your profile settings</li>
-            <li>Clicking the "Cancel Deletion" button</li>
-        </ol>
-        <p>After ${scheduledDate}, your account will be permanently deleted and cannot be recovered.</p>
-        <p>If you have any questions, feel free to reach out to us at support@cookhound.com</p>
-        <p>Best regards,<br/>The Cookhound Team 🐾</p>
-    </body>
-</html>`,
-        cs: (username, daysRemaining, scheduledDate) => `
+    subject: 'Připomínka: Váš účet bude brzy smazán - Cookhound.com',
+    body: (username, daysRemaining, scheduledDate) => `
 <!DOCTYPE html>
 <html>
     <head>
@@ -52,5 +26,4 @@ export const accountDeletionReminderTpl: MailTemplate<
         <p>S pozdravem,<br/>Tým Cookhound 🐾</p>
     </body>
 </html>`
-    }
 };

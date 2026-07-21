@@ -7,7 +7,6 @@ import { queueManager } from '@/server/queues/QueueManager';
 import { JOB_NAMES, QUEUE_NAMES } from '@/server/queues/jobs/names';
 import { FROM_ADDRESS, FROM_NAME, QUEUE_OPTIONS } from './constants';
 import { resetPasswordTpl } from './templates/reset-password';
-import type { Locale } from '@/common/types';
 import { createTemplate } from './utils';
 
 const log = Logger.getInstance('password-reset-email-worker');
@@ -15,7 +14,6 @@ const log = Logger.getInstance('password-reset-email-worker');
 type PasswordResetEmailJobData = {
     token: string;
     to: { address: string; name: string };
-    locale: Locale;
 };
 
 class SendPasswordResetEmailJob extends BaseJob<PasswordResetEmailJobData> {
@@ -24,14 +22,13 @@ class SendPasswordResetEmailJob extends BaseJob<PasswordResetEmailJobData> {
     static queueOptions = QUEUE_OPTIONS;
 
     async handle(job: Job<PasswordResetEmailJobData>) {
-        const { token, to, locale } = job.data;
+        const { token, to } = job.data;
 
         log.trace('handle - attempting to send password reset email', to);
 
         const reset_link = `${ENV_CONFIG_PUBLIC.ORIGIN}${ROUTES.auth.callback.resetPassword}?token=${token}`;
         const { subject, html } = createTemplate(
             resetPasswordTpl,
-            locale,
             to.name,
             reset_link
         );

@@ -4,6 +4,7 @@ import { serverData } from '@/server/data';
 import { mapServiceErrorForRsc } from '@/server/data/runtime/mapError';
 import { ProfileTab } from '@/client/types/core';
 import {
+    DEFAULT_LOCALE,
     SESSION_COOKIE_NAME,
     ENV_CONFIG_PUBLIC,
     ROUTES
@@ -14,7 +15,6 @@ import { verifySessionFromCookie } from '@/server/utils/session';
 import React from 'react';
 import { getLocalizedMetadata } from '@/server/utils/seo';
 import { UserStructuredData } from '@/client/components';
-import { getUserLocale } from '@/common/utils';
 
 type UserProfilePageParams = {
     readonly params: Promise<
@@ -38,16 +38,9 @@ export default async function UserProfilePage({
 
     if (isNaN(id)) notFound();
 
-    /**
-     * Get the locale for the structured ld data. This must be done here because
-     * next will throw if cookies are called from a components folder...
-     * I was not able to find out why so here it stays.
-     */
+    const locale = DEFAULT_LOCALE;
+
     const cookieStore = await cookies();
-    const headerList = await headers();
-
-    const locale = await getUserLocale(cookieStore, headerList);
-
     const sessionId = cookieStore.get(SESSION_COOKIE_NAME)?.value;
 
     // Check whether the caller is the profile owner, this is important for the default tab

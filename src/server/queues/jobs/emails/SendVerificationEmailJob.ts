@@ -3,7 +3,6 @@ import { BaseJob } from '@/server/queues/BaseJob';
 import type { Job } from 'bullmq';
 import { emailVerificationTpl } from './templates/email-verification';
 import { createTemplate } from './utils';
-import type { Locale } from '@/common/types';
 import { ENV_CONFIG_PUBLIC, ROUTES } from '@/common/constants';
 import { Logger } from '@/server/logger';
 import { queueManager } from '@/server/queues/QueueManager';
@@ -18,7 +17,6 @@ type VerificationEmailJobData = {
         address: string;
         name: string;
     };
-    locale: Locale;
 };
 
 class SendVerificationEmailJob extends BaseJob<VerificationEmailJobData> {
@@ -27,7 +25,7 @@ class SendVerificationEmailJob extends BaseJob<VerificationEmailJobData> {
     static queueOptions = QUEUE_OPTIONS;
 
     async handle(job: Job<VerificationEmailJobData>) {
-        const { token, to, locale } = job.data;
+        const { token, to } = job.data;
 
         log.trace('handle - attempting to send verification email', to);
 
@@ -38,7 +36,6 @@ class SendVerificationEmailJob extends BaseJob<VerificationEmailJobData> {
 
         const { subject, html } = createTemplate(
             emailVerificationTpl,
-            locale,
             to.name,
             verificationLink
         );

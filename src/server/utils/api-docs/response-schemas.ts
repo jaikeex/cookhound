@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { SUPPORTED_LOCALES } from '@/common/constants';
 
 /**
  * Shared Zod response schemas for API documentation.
@@ -92,7 +93,7 @@ export const RecipeResponseSchema = z.object({
     displayId: z.string(),
     title: z.string(),
     authorId: z.number(),
-    language: z.enum(['en', 'cs']),
+    language: z.enum(SUPPORTED_LOCALES),
     time: z.number().nullable(),
     portionSize: z.number().nullable(),
     ingredients: z.array(IngredientResponseSchema),
@@ -137,7 +138,7 @@ export const CookbookResponseSchema = z.object({
     ownerId: z.number(),
     title: z.string(),
     description: z.string().nullable(),
-    language: z.enum(['en', 'cs']),
+    language: z.enum(SUPPORTED_LOCALES),
     visibility: z.enum(['PUBLIC', 'PRIVATE', 'UNLISTED']),
     coverImageUrl: z.string().nullable(),
     recipeCount: z.number(),
