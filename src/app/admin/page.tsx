@@ -1,26 +1,13 @@
 import React from 'react';
 import { AdminDashboardTemplate } from '@/client/components';
 import type { Metadata } from 'next';
-import { cookies } from 'next/headers';
 import { buildLocalizedMetadata } from '@/server/utils/seo';
-import { SESSION_COOKIE_NAME } from '@/common/constants';
-import { apiClient } from '@/client/request';
+import { serverData } from '@/server/data';
 
 //|=============================================================================================|//
 
 export default async function AdminPage() {
-    const cookieStore = await cookies();
-
-    const sessionId = cookieStore.get(SESSION_COOKIE_NAME)?.value;
-
-    const stats = apiClient.admin.getDashboardStats({
-        cache: 'no-store',
-        ...(sessionId
-            ? {
-                  headers: { 'Cookie': `session=${sessionId}` }
-              }
-            : {})
-    });
+    const stats = serverData.admin.getDashboardStats();
 
     return <AdminDashboardTemplate stats={stats} />;
 }

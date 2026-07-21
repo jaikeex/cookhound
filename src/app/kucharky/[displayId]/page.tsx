@@ -1,11 +1,11 @@
 import React from 'react';
-import { apiClient } from '@/client/request';
+import { serverData } from '@/server/data';
+import { mapServiceErrorForRsc } from '@/server/data/runtime/mapError';
 import { CookbookVisibility } from '@/common/types';
 import { notFound } from 'next/navigation';
 import { getCurrentUser } from '@/app/actions';
 import { CookbookTemplate, StructuredData } from '@/client/components';
 import type { Metadata } from 'next';
-import { reviveCookbookDates } from '@/client/data/cookbook/revive';
 import { ENV_CONFIG_PUBLIC, ROUTES } from '@/common/constants';
 import {
     generateCookbookSchema,
@@ -30,11 +30,14 @@ export default async function Page({ params }: CookbookPageParams) {
 
     const [user, cookbook] = await Promise.all([
         getCurrentUser(),
-        apiClient.cookbook
-            .getCookbookByDisplayId(cookbookDisplayId, {
-                revalidate: 3600
-            })
-            .then(reviveCookbookDates)
+        serverData.cookbook
+            .getByDisplayId(cookbookDisplayId)
+            .catch((error) =>
+                mapServiceErrorForRsc(
+                    error,
+                    ROUTES.cookbook.detail(cookbookDisplayId)
+                )
+            )
     ]);
 
     const isOwner = cookbook?.ownerId === user?.id;
@@ -94,11 +97,7 @@ export async function generateMetadata({
     const { displayId } = await params;
 
     try {
-        const cookbook = await apiClient.cookbook
-            .getCookbookByDisplayId(displayId, {
-                revalidate: 3600
-            })
-            .then(reviveCookbookDates);
+        const cookbook = await serverData.cookbook.getByDisplayId(displayId);
 
         const canonical = `${ENV_CONFIG_PUBLIC.ORIGIN}${ROUTES.cookbook.detail(displayId)}`;
 

@@ -46,21 +46,36 @@ class CookbookModel {
             [CACHE_TAGS.cookbook.entity(id)]
         );
 
-        return cookbook[0] ?? null;
+        return this.reviveCookbookDates(cookbook[0] ?? null);
     }
 
     async getOneByDisplayId(
-        displayId: string
+        displayId: string,
+        ttl?: number
     ): Promise<getCookbookByDisplayId.Result | null> {
         log.trace('Getting cookbook by display id', { displayId });
 
-        // This is intentionally not cached.
-
-        const cookbook = await prisma.$queryRawTyped(
-            getCookbookByDisplayId(displayId)
+        const cacheKey = generateCacheKey('cookbook', 'findByDisplayId', {
+            where: { displayId }
+        });
+        /**
+         * Keyed by displayId, but tagged with the numeric id so it shares
+         * getOneById's invalidation: every writer already drops
+         * cookbook.entity(id), so any write clears this entry too.
+         */
+        const cookbook = await cachePrismaQuery(
+            cacheKey,
+            async () => {
+                log.trace('Fetching cookbook from db by display id', {
+                    displayId
+                });
+                return prisma.$queryRawTyped(getCookbookByDisplayId(displayId));
+            },
+            ttl ?? CACHE_TTL.TTL_2,
+            (rows) => (rows[0] ? [CACHE_TAGS.cookbook.entity(rows[0].id)] : [])
         );
 
-        return cookbook[0] ?? null;
+        return this.reviveCookbookDates(cookbook[0] ?? null);
     }
 
     async getManyByOwnerId(
@@ -305,6 +320,22 @@ class CookbookModel {
         });
 
         await invalidateTags([CACHE_TAGS.cookbook.ownedBy(ownerId)]);
+    }
+
+    //~=========================================================================================~//
+    //$                                          HELPERS                                        $//
+    //~=========================================================================================~//
+
+    private reviveCookbookDates<T extends { createdAt: Date; updatedAt: Date }>(
+        cookbook: T | null
+    ): T | null {
+        if (!cookbook) return null;
+
+        return {
+            ...cookbook,
+            createdAt: new Date(cookbook.createdAt),
+            updatedAt: new Date(cookbook.updatedAt)
+        };
     }
 }
 

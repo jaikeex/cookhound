@@ -1,5 +1,5 @@
 import React from 'react';
-import { apiClient } from '@/client/request';
+import { serverData } from '@/server/data';
 import { ShoppingListTemplate } from '@/client/components/templates/ShoppingList';
 import { verifySessionFromCookie } from '@/server/utils/session';
 import { redirectToRestrictedWithLogin } from '@/server/utils/reqwest';
@@ -19,17 +19,9 @@ export default async function Page() {
         return;
     }
 
-    const { userId, sessionId } = result.session;
+    const { userId } = result.session;
 
-    const shoppingList = await apiClient.user.getShoppingList(Number(userId), {
-        ...(userId
-            ? {
-                  headers: {
-                      'Cookie': `session=${sessionId}`
-                  }
-              }
-            : {})
-    });
+    const shoppingList = await serverData.user.getShoppingList(Number(userId));
 
     return <ShoppingListTemplate initialData={shoppingList} />;
 }

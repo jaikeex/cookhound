@@ -234,4 +234,14 @@ class CookbookService {
     }
 }
 
+/**
+ * Render-safe subset of CookbookService. serverData access points and rsc render paths
+ * depend on this so that only allowed methods are in scope, and side effects
+ * cannot be called by mistake.
+ */
+export interface CookbookReads {
+    getCookbookByDisplayId(displayId: string): Promise<CookbookDTO>;
+}
+
 export const cookbookService = new CookbookService();
+export const cookbookReads: CookbookReads = cookbookService;

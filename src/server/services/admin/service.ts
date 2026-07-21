@@ -567,4 +567,14 @@ class AdminService {
     }
 }
 
+/**
+ * Render-safe subset of AdminService. serverData access points and rsc render paths
+ * depend on this so that only allowed methods are in scope, and side effects
+ * cannot be called by mistake.
+ */
+export interface AdminReads {
+    getDashboardStats(): Promise<AdminDashboardStatsDTO>;
+}
+
 export const adminService = new AdminService();
+export const adminReads: AdminReads = adminService;

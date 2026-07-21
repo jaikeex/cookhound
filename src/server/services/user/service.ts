@@ -41,6 +41,7 @@ import {
 } from '@/server/utils/crypto';
 import { serializeTermsContent } from '@/server/utils/terms';
 import { serializeConsentContent } from '@/server/utils/consent';
+import { assertSelf } from '@/server/utils/reqwest';
 import { sessions } from '@/server/utils/session';
 import { redisClient } from '@/server/integrations';
 import { ONE_MINUTE_IN_SECONDS } from '@/common/constants/time';
@@ -275,19 +276,27 @@ class UserService {
      *
      * @param userId - Database ID of the owning user.
      * @returns Shopping list entries grouped by recipe.
+     * @throws {AuthErrorUnauthorized} If the caller is not the owning user.
      * @throws {NotFoundError} If a referenced recipe no longer exists.
      */
     @LogServiceMethod({ names: ['userId'] })
     async getShoppingList(userId: number): Promise<ShoppingListDTO[]> {
+        assertSelf(userId);
+
         const shoppingList = await db.shoppingList.getShoppingList(userId);
 
-        const recipeIdList = shoppingList.map((item) => item.recipeId);
-        const uniqueRecipeIdList = [...new Set(recipeIdList)];
+        const uniqueRecipeIdList = [
+            ...new Set(shoppingList.map((item) => item.recipeId))
+        ];
 
-        const shoppingListByRecipeId: ShoppingListDTO[] = [];
+        // Resolve every referenced recipe in parallel here. Each getOneById is
+        // cached individually, so this way remove unnecessary roundtrips.
+        const recipeList = await Promise.all(
+            uniqueRecipeIdList.map((recipeId) => db.recipe.getOneById(recipeId))
+        );
 
-        for (const recipeId of uniqueRecipeIdList) {
-            const recipe = await db.recipe.getOneById(recipeId);
+        return uniqueRecipeIdList.map((recipeId, index) => {
+            const recipe = recipeList[index];
 
             if (!recipe || !recipe.displayId || !recipe.title || !recipe.id) {
                 log.warn('getShoppingList - recipe not found', { recipeId });
@@ -301,20 +310,16 @@ class UserService {
                 (item) => item.recipeId === recipeId
             );
 
-            const recipeDTO = {
-                id: recipe.id,
-                displayId: recipe.displayId,
-                title: recipe.title,
-                portionSize: recipe.portionSize
-            };
-
-            shoppingListByRecipeId.push({
-                recipe: recipeDTO,
+            return {
+                recipe: {
+                    id: recipe.id,
+                    displayId: recipe.displayId,
+                    title: recipe.title,
+                    portionSize: recipe.portionSize
+                },
                 ingredients
-            });
-        }
-
-        return shoppingListByRecipeId;
+            };
+        });
     }
 
     //~-----------------------------------------------------------------------------------------~//
@@ -1713,6 +1718,7 @@ class UserService {
  */
 export interface UserReads {
     getUserById(id: number): Promise<UserDTO>;
+    getShoppingList(userId: number): Promise<ShoppingListDTO[]>;
 }
 
 export const userService = new UserService();
