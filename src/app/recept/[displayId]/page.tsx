@@ -44,9 +44,9 @@ export default async function Page({ params }: RecipePageParams) {
             mapServiceErrorForRsc(error, ROUTES.recipe.detail(recipeDisplayId))
         );
 
-    // A missing author must not break the schema block
+    // A missing author must not break the schema block.
     const authorNamePromise = recipePromise
-        .then((recipe) => serverData.user.getById(recipe.authorId))
+        .then((recipe) => serverData.user.getByIdPublic(recipe.authorId))
         .then((author) => author.username)
         .catch(() => undefined);
 
@@ -86,7 +86,7 @@ export async function generateMetadata({
         const recipe = await serverData.recipe.getByDisplayId(recipeDisplayId);
 
         const author = await serverData.user
-            .getById(recipe.authorId)
+            .getByIdPublic(recipe.authorId)
             .catch(() => null);
 
         const canonical = `${ENV_CONFIG_PUBLIC.ORIGIN}${ROUTES.recipe.detail(recipeDisplayId)}`;

@@ -16,17 +16,19 @@ import { ensureRenderContext } from '@/server/data/runtime/ensureContext';
  * render call sites to handle them.
  */
 export const userServerData = {
-    getById: cache(
-        (id: number): Promise<User> =>
-            ensureRenderContext(() => userReads.getUserById(id)).then(
-                reviveUserDates
-            )
+    getById: cache((id: number): Promise<User> =>
+        ensureRenderContext(() => userReads.getUserById(id)).then(
+            reviveUserDates
+        )
     ),
 
-    getCurrent: cache(
-        (): Promise<User> =>
-            ensureRenderContext(() => authReads.getAuthenticatedUser()).then(
-                reviveUserDates
-            )
+    getByIdPublic: cache((id: number): Promise<User> =>
+        userReads.getUserById(id).then(reviveUserDates)
+    ),
+
+    getCurrent: cache((): Promise<User> =>
+        ensureRenderContext(() => authReads.getAuthenticatedUser()).then(
+            reviveUserDates
+        )
     )
 };
