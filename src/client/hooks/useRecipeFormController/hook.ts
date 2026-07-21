@@ -23,7 +23,7 @@ import type {
 import type { I18nMessage } from '@/client/locales';
 import type { RecipeFormErrors } from '@/client/components';
 import type { RecipeFormMode } from '@/client/types/core';
-import { DEFAULT_LOCALE, ROUTES } from '@/common/constants';
+import { ROUTES } from '@/common/constants';
 
 export interface UseRecipeFormControllerProps {
     //When in edit mode, this existing recipe will pre-fill the form.
@@ -195,8 +195,7 @@ export const useRecipeFormController = ({
             }
 
             const payload: RecipeForCreatePayload = {
-                ...formData,
-                language: DEFAULT_LOCALE
+                ...formData
             };
 
             if (isEdit && initialRecipe) {

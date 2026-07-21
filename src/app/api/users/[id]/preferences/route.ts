@@ -11,7 +11,6 @@ import {
 import type { NextRequest } from 'next/server';
 import { withAuth } from '@/server/utils/reqwest';
 import { z } from 'zod';
-import { SUPPORTED_LOCALES } from '@/common/constants';
 import { registerRouteDocs } from '@/server/utils/api-docs/registry';
 import { AuthLevel } from '@/common/types';
 
@@ -20,8 +19,7 @@ import { AuthLevel } from '@/common/types';
 //|=============================================================================================|//
 
 const UserPreferencesForUpdateSchema = z.strictObject({
-    theme: z.enum(['light', 'dark', 'system']).optional(),
-    locale: z.enum(SUPPORTED_LOCALES).optional()
+    theme: z.enum(['light', 'dark', 'system']).optional()
 });
 
 //|=============================================================================================|//

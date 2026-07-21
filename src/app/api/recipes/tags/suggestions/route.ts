@@ -10,7 +10,6 @@ import { withRateLimit } from '@/server/utils/rate-limit';
 import { z } from 'zod';
 import type { Recipe } from '@/common/types';
 import { withAuth } from '@/server/utils/reqwest';
-import { SUPPORTED_LOCALES } from '@/common/constants';
 import {
     registerRouteDocs,
     RecipeTagResponseSchema
@@ -27,9 +26,6 @@ const IngredientForTagSuggestionSchema = z.looseObject({
 });
 
 const RecipeForTagSuggestionPayloadSchema = z.looseObject({
-    language: z.enum(SUPPORTED_LOCALES, {
-        error: () => 'Language must be supported'
-    }),
     title: z.string().trim().min(1).max(200),
     instructions: z.array(z.string().trim().min(1)).min(1),
     notes: z.string().trim().max(1400).nullable(),

@@ -8,7 +8,8 @@ import { z } from 'zod';
 import { zodTextFormat } from '@/server/utils/openai';
 import {
     RECIPE_CATEGORY_TAGS,
-    RECIPE_TAG_CATEGORY_LIMITS_BY_NAME
+    RECIPE_TAG_CATEGORY_LIMITS_BY_NAME,
+    DEFAULT_LOCALE
 } from '@/common/constants';
 import type { RecipeTagDTO } from '@/common/types';
 import recipeTagModel from '@/server/db/model/recipe-tag/model';
@@ -147,7 +148,7 @@ class OpenAIApiService {
 
         const dbTags = await recipeTagModel.getManyBySlugs(
             filteredSlugs,
-            recipe.language
+            DEFAULT_LOCALE
         );
 
         if (filteredSlugs.length === 0) {

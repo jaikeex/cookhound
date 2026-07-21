@@ -252,7 +252,7 @@ class RecipeService {
         const recipeforCreate: RecipeForCreate = {
             displayId,
             title: payload.title,
-            language: payload.language,
+            language: DEFAULT_LOCALE,
             description: payload.description,
             notes: payload.notes,
             time: payload.time,

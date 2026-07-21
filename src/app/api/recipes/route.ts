@@ -11,7 +11,6 @@ import { withRateLimit } from '@/server/utils/rate-limit';
 import { withAuth } from '@/server/utils/reqwest';
 import { z } from 'zod';
 import { validateQuery } from '@/server/utils/reqwest';
-import { SUPPORTED_LOCALES } from '@/common/constants';
 import {
     registerRouteDocs,
     RecipeDisplayResponseSchema,
@@ -35,9 +34,6 @@ const IngredientForCreateSchema = z.strictObject({
 });
 
 const RecipeForCreatePayloadSchema = z.strictObject({
-    language: z.enum(SUPPORTED_LOCALES, {
-        error: () => 'Language must be supported'
-    }),
     title: z.string().trim().min(1).max(200),
     instructions: z.array(z.string().trim().min(1)).min(1),
     description: z.string().trim().max(300).nullable(),

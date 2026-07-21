@@ -1,4 +1,3 @@
-import type { Locale } from '@/common/types';
 import type { CookieConsentDTO } from '@/common/types/cookie-consent';
 import type { TermsAcceptanceDTO } from '@/common/types/terms-acceptance';
 
@@ -59,7 +58,6 @@ export type UserVisibilityGroup = 'public' | 'self' | 'admin';
 
 export type UserPreferences = {
     theme?: 'light' | 'dark' | 'system';
-    locale?: Locale;
 };
 
 export enum UserRole {

@@ -64,7 +64,6 @@ export type Ingredient = {
 };
 
 export type RecipeForCreatePayload = {
-    language: Locale;
     title: string;
     instructions: string[];
     description: string | null;
