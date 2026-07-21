@@ -68,7 +68,7 @@ export async function generateMetadata({
     const q = query ?? '';
 
     if (!q) {
-        return await buildLocalizedMetadata({
+        return buildLocalizedMetadata({
             titleKey: 'meta.search.title',
             descriptionKey: 'meta.search.description',
             canonical: `${ENV_CONFIG_PUBLIC.ORIGIN}${ROUTES.search()}`,
@@ -78,7 +78,7 @@ export async function generateMetadata({
 
     const capitalised = q.charAt(0).toUpperCase() + q.slice(1);
 
-    const metadata = await buildLocalizedMetadata({
+    const metadata = buildLocalizedMetadata({
         titleKey: 'meta.search.title',
         descriptionKey: 'meta.search.description',
         canonical: `${ENV_CONFIG_PUBLIC.ORIGIN}${ROUTES.search(q)}`,

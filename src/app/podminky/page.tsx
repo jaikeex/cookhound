@@ -12,7 +12,7 @@ export default function TermsPage() {
 //|=============================================================================================|//
 
 export async function generateMetadata(): Promise<Metadata> {
-    return await buildLocalizedMetadata({
+    return buildLocalizedMetadata({
         titleKey: 'meta.terms.title',
         descriptionKey: 'meta.terms.description',
         type: 'website'

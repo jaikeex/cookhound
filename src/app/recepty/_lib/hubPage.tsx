@@ -106,7 +106,7 @@ export const parsePageNumber = (raw: string): number | null => {
 /**
  * Generic, noindex metadata for a hub url that resolves to no real page.
  */
-export function buildHubFallbackMetadata(): Promise<Metadata> {
+export function buildHubFallbackMetadata(): Metadata {
     return buildLocalizedMetadata({
         titleKey: 'meta.hub.fallback.title',
         descriptionKey: 'meta.hub.fallback.description',

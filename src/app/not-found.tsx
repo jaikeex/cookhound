@@ -12,7 +12,7 @@ export default function NotFoundPage() {
 //|=============================================================================================|//
 
 export async function generateMetadata(): Promise<Metadata> {
-    return await buildLocalizedMetadata({
+    return buildLocalizedMetadata({
         titleKey: 'meta.not-found.title',
         descriptionKey: 'meta.not-found.description',
         noindex: true

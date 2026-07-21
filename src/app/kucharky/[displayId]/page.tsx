@@ -102,7 +102,7 @@ export async function generateMetadata({
 
         const canonical = `${ENV_CONFIG_PUBLIC.ORIGIN}${ROUTES.cookbook.detail(displayId)}`;
 
-        const metadata = await buildLocalizedMetadata({
+        const metadata = buildLocalizedMetadata({
             titleKey: 'meta.cookbook.title',
             descriptionKey: 'meta.cookbook.description',
             images: cookbook.coverImageUrl ? [cookbook.coverImageUrl] : [],
@@ -132,7 +132,7 @@ export async function generateMetadata({
     } catch {
         const canonical = `${ENV_CONFIG_PUBLIC.ORIGIN}${ROUTES.cookbook.detail(displayId)}`;
 
-        const metadata = await buildLocalizedMetadata({
+        const metadata = buildLocalizedMetadata({
             titleKey: 'meta.cookbook.fallback.title',
             descriptionKey: 'meta.cookbook.fallback.description',
             canonical

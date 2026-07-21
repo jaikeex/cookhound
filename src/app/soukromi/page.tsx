@@ -12,7 +12,7 @@ export default function PrivacyPage() {
 //|=============================================================================================|//
 
 export async function generateMetadata(): Promise<Metadata> {
-    return await buildLocalizedMetadata({
+    return buildLocalizedMetadata({
         titleKey: 'meta.privacy.title',
         descriptionKey: 'meta.privacy.description',
         type: 'website'

@@ -86,7 +86,7 @@ export async function generateMetadata({
     const numericId = Number(id);
 
     if (isNaN(numericId)) {
-        return await buildLocalizedMetadata({
+        return buildLocalizedMetadata({
             titleKey: 'meta.user.fallback.title',
             descriptionKey: 'meta.user.fallback.description',
             noindex: true
@@ -96,7 +96,7 @@ export async function generateMetadata({
     try {
         const user = await serverData.user.getById(numericId);
 
-        return await buildLocalizedMetadata({
+        return buildLocalizedMetadata({
             titleKey: 'meta.user.title',
             descriptionKey: 'meta.user.description',
             images: user.avatarUrl ? [user.avatarUrl] : ['/img/anonymous.webp'],
@@ -106,7 +106,7 @@ export async function generateMetadata({
             type: 'profile'
         });
     } catch {
-        return await buildLocalizedMetadata({
+        return buildLocalizedMetadata({
             titleKey: 'meta.user.fallback.title',
             descriptionKey: 'meta.user.fallback.description',
             noindex: true

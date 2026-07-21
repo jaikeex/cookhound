@@ -39,12 +39,14 @@ function validateDescription(description: string, maxLength = 160): string {
 /**
  * Builds page metadata with SEO optimizations.
  *
+ * Synchronous: all strings resolve through the pure `t()` catalog lookup,
+ * so there is nothing to await. Callers inside an async `generateMetadata`
+ * may return its result directly (no `await` needed).
+ *
  * @param config - Configuration object for metadata
  * @returns - The metadata object
  */
-export async function buildLocalizedMetadata(
-    config: MetadataConfig
-): Promise<Metadata> {
+export function buildLocalizedMetadata(config: MetadataConfig): Metadata {
     //|-----------------------------------------------------------------------------------------|//
     //?                                      BASIC METADATA                                     ?//
     //|-----------------------------------------------------------------------------------------|//

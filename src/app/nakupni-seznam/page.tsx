@@ -37,7 +37,7 @@ export default async function Page() {
 //|=============================================================================================|//
 
 export async function generateMetadata(): Promise<Metadata> {
-    return await buildLocalizedMetadata({
+    return buildLocalizedMetadata({
         titleKey: 'meta.shopping-list.title',
         descriptionKey: 'meta.shopping-list.description',
         noindex: true
