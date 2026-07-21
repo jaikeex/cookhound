@@ -1,23 +1,18 @@
-import type { Locale } from '@/common/types';
 import { useAppQuery } from '@/client/data/queryFactories';
 import { useRepositories } from '@/client/data';
 import { INGREDIENT_QUERY_KEYS, type IngredientListOptions } from './keys';
 
 export const ingredientQueryClient = {
     /**
-     * Gets full ingredient list for the given locale.
+     * Gets the full ingredient list.
      */
-    useIngredients: (
-        language: Locale,
-        options?: Partial<IngredientListOptions>
-    ) => {
+    useIngredients: (options?: Partial<IngredientListOptions>) => {
         const { ingredientRepository } = useRepositories();
 
         return useAppQuery(
-            INGREDIENT_QUERY_KEYS.list(language),
-            ({ signal }) => ingredientRepository.list({ language, signal }),
+            INGREDIENT_QUERY_KEYS.list(),
+            ({ signal }) => ingredientRepository.list({ signal }),
             {
-                enabled: Boolean(language),
                 staleTime: 6 * 60 * 60 * 1000, // 6 hours
                 retry: 1,
                 ...options

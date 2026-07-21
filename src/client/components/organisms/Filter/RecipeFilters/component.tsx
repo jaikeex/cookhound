@@ -12,7 +12,6 @@ import {
 import { chqc } from '@/client/data';
 import { useModal, useSnackbar } from '@/client/store';
 import { t } from '@/client/locales';
-import { DEFAULT_LOCALE } from '@/common/constants';
 import { generateRandomId } from '@/client/utils';
 import type {
     RecipeFilterParams,
@@ -61,10 +60,9 @@ export const RecipeFilters: React.FC<RecipeFiltersProps> = ({
         data: tagLists,
         isLoading: isTagsLoading,
         error: tagsError
-    } = chqc.tag.useTags(DEFAULT_LOCALE);
+    } = chqc.tag.useTags();
 
-    const { data: ingredients } =
-        chqc.ingredient.useIngredients(DEFAULT_LOCALE);
+    const { data: ingredients } = chqc.ingredient.useIngredients();
 
     //~-----------------------------------------------------------------------------------------~//
     //$                               SELECTED FILTER DISPLAY DATA                              $//

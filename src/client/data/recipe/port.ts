@@ -1,5 +1,4 @@
 import type {
-    Locale,
     Recipe,
     RecipeFilterParams,
     RecipeForCreatePayload,
@@ -22,7 +21,6 @@ export interface RecipeRepository {
     }): Promise<Recipe>;
 
     list(args: {
-        language: Locale;
         batch: number;
         perPage: number;
         signal?: AbortSignal;
@@ -30,7 +28,6 @@ export interface RecipeRepository {
 
     search(args: {
         query: string;
-        language: Locale;
         batch: number;
         perPage: number;
         signal?: AbortSignal;
@@ -38,7 +35,6 @@ export interface RecipeRepository {
 
     listByUser(args: {
         userId: string;
-        language: Locale;
         batch: number;
         perPage: number;
         signal?: AbortSignal;
@@ -47,14 +43,12 @@ export interface RecipeRepository {
     searchByUser(args: {
         userId: string;
         query: string;
-        language: Locale;
         batch: number;
         perPage: number;
         signal?: AbortSignal;
     }): Promise<RecipeForDisplayDTO[]>;
 
     filter(args: {
-        language: Locale;
         batch: number;
         perPage: number;
         filters: RecipeFilterParams;

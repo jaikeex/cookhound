@@ -1,5 +1,5 @@
 import type { UseQueryOptions } from '@tanstack/react-query';
-import type { IngredientDTO, Locale } from '@/common/types';
+import type { IngredientDTO } from '@/common/types';
 import type { RequestError } from '@/client/error';
 
 //~---------------------------------------------------------------------------------------------~//
@@ -10,8 +10,7 @@ const INGREDIENT_NAMESPACE_QUERY_KEY = 'ingredient';
 
 export const INGREDIENT_QUERY_KEYS = Object.freeze({
     namespace: INGREDIENT_NAMESPACE_QUERY_KEY,
-    list: (language: Locale) =>
-        [INGREDIENT_NAMESPACE_QUERY_KEY, 'list', language] as const
+    list: () => [INGREDIENT_NAMESPACE_QUERY_KEY, 'list'] as const
 });
 
 //~---------------------------------------------------------------------------------------------~//

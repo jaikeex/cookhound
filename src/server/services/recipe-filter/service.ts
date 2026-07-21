@@ -1,8 +1,5 @@
-import type {
-    Locale,
-    RecipeForDisplayDTO,
-    RecipeFilterParams
-} from '@/common/types';
+import type { RecipeForDisplayDTO, RecipeFilterParams } from '@/common/types';
+import { DEFAULT_LOCALE } from '@/common/constants';
 import db from '@/server/db/model';
 import { ValidationError } from '@/server/error';
 import { ApplicationErrorCode } from '@/server/error/codes';
@@ -38,15 +35,13 @@ class RecipeFilterService {
      *  - hasImage: only recipes with an image URL
      *
      * @param filters - Filter criteria (all optional).
-     * @param language - Locale to filter recipes by.
      * @param batch - 1-based batch index (max 20).
      * @param perPage - Batch size (max 100).
      * @returns Display-ready recipe DTOs matching the filters.
      */
-    @LogServiceMethod({ names: ['language', 'batch', 'perPage'] })
+    @LogServiceMethod({ names: ['batch', 'perPage'] })
     async filterRecipes(
         filters: RecipeFilterParams,
-        language: Locale,
         batch: number,
         perPage: number
     ): Promise<RecipeForDisplayDTO[]> {
@@ -70,7 +65,7 @@ class RecipeFilterService {
 
         const results = await db.recipe.filterMany(
             filters,
-            language,
+            DEFAULT_LOCALE,
             perPage,
             offset
         );
@@ -91,14 +86,10 @@ class RecipeFilterService {
      * Count recipes matching the filters.
      *
      * @param filters - Filter criteria.
-     * @param language - Locale to filter recipes by.
      */
-    @LogServiceMethod({ names: ['language'] })
-    async countRecipes(
-        filters: RecipeFilterParams,
-        language: Locale
-    ): Promise<number> {
-        return db.recipe.countFiltered(filters, language);
+    @LogServiceMethod({ names: [] })
+    async countRecipes(filters: RecipeFilterParams): Promise<number> {
+        return db.recipe.countFiltered(filters, DEFAULT_LOCALE);
     }
 }
 

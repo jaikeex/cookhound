@@ -3,7 +3,6 @@ import { recipeService } from '@/server/services/recipe/service';
 import { z } from 'zod';
 import { validateQuery } from '@/server/utils/reqwest';
 import { makeHandler, ok } from '@/server/utils/reqwest';
-import { SUPPORTED_LOCALES } from '@/common/constants';
 import {
     registerRouteDocs,
     RecipeDisplayResponseSchema
@@ -16,9 +15,6 @@ import { AuthLevel } from '@/common/types';
 
 const SearchRecipesSchema = z.strictObject({
     query: z.string().trim().min(1).max(100),
-    language: z.enum(SUPPORTED_LOCALES, {
-        error: () => 'Language must be supported'
-    }),
     perPage: z.coerce.number().int().positive(),
     batch: z.coerce.number().int().positive()
 });
@@ -35,14 +31,9 @@ const SearchRecipesSchema = z.strictObject({
 async function getHandler(request: NextRequest) {
     const payload = validateQuery(SearchRecipesSchema, request.nextUrl);
 
-    const { query, language, perPage, batch } = payload;
+    const { query, perPage, batch } = payload;
 
-    const recipes = await recipeService.searchRecipes(
-        query,
-        language,
-        batch,
-        perPage
-    );
+    const recipes = await recipeService.searchRecipes(query, batch, perPage);
 
     return ok(recipes);
 }

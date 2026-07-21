@@ -1,6 +1,7 @@
 import db from '@/server/db/model';
 import { Logger, LogServiceMethod } from '@/server/logger';
 import type { RecipeTagDTO } from '@/common/types';
+import { DEFAULT_LOCALE } from '@/common/constants';
 
 //|=============================================================================================|//
 
@@ -15,14 +16,13 @@ class RecipeTagService {
     static readonly LOG_CONTEXT = LOG_CONTEXT;
 
     /**
-     * Returns all recipe tags for a given locale.
+     * Returns all recipe tags.
      *
-     * @param language - Locale to filter tags by.
-     * @returns All available recipe tags for the locale.
+     * @returns All available recipe tags.
      */
-    @LogServiceMethod({ names: ['language'] })
-    async getAll(language: string) {
-        const tags = await db.recipeTag.getAll(language);
+    @LogServiceMethod({ names: [] })
+    async getAll() {
+        const tags = await db.recipeTag.getAll(DEFAULT_LOCALE);
 
         return tags;
     }
@@ -31,14 +31,10 @@ class RecipeTagService {
      * Returns a single tag by its unique slug, or null when it does not exist.
      *
      * @param slug - The tag's database slug.
-     * @param language - Locale to translate the tag name into.
      */
-    @LogServiceMethod({ names: ['slug', 'language'] })
-    async getBySlug(
-        slug: string,
-        language: string
-    ): Promise<RecipeTagDTO | null> {
-        return db.recipeTag.getBySlug(slug, language);
+    @LogServiceMethod({ names: ['slug'] })
+    async getBySlug(slug: string): Promise<RecipeTagDTO | null> {
+        return db.recipeTag.getBySlug(slug, DEFAULT_LOCALE);
     }
 }
 

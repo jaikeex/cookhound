@@ -7,7 +7,7 @@ import type { TagRepository } from '@/client/data/tag/port';
  * HTTP-backed implementation of {@link TagRepository}.
  */
 export const httpTagRepository: TagRepository = {
-    list: ({ language, signal }) => tagApiClient.getTags(language, { signal }),
+    list: ({ signal }) => tagApiClient.getTags({ signal }),
 
     suggest: (recipe) => tagApiClient.getSuggestions(recipe)
 };

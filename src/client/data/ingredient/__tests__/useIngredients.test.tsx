@@ -57,7 +57,7 @@ describe('useIngredients', () => {
         });
 
         const { result } = renderHook(
-            () => ingredientQueryClient.useIngredients('cs'),
+            () => ingredientQueryClient.useIngredients(),
             { wrapper }
         );
 
@@ -66,33 +66,9 @@ describe('useIngredients', () => {
         expect(repo.list).toHaveBeenCalledTimes(1);
         expect(repo.list).toHaveBeenCalledWith(
             expect.objectContaining({
-                language: 'cs',
                 signal: expect.any(AbortSignal)
             })
         );
         expect(result.current.data).toEqual(fixtureIngredients);
-    });
-
-    it('does not fetch when language is falsy', async () => {
-        const repo = buildFakeIngredientRepository();
-        const wrapper = buildWrapper({
-            ingredientRepository: repo,
-            recipeRepository: buildEmptyRepository<RecipeRepository>(),
-            userRepository: buildEmptyRepository<UserRepository>(),
-            authRepository: buildEmptyRepository<AuthRepository>(),
-            fileRepository: buildEmptyRepository<FileRepository>(),
-            tagRepository: buildEmptyRepository<TagRepository>(),
-            contactRepository: buildEmptyRepository<ContactRepository>(),
-            adminRepository: buildEmptyRepository<AdminRepository>(),
-            cookbookRepository: buildEmptyRepository<CookbookRepository>()
-        });
-
-        renderHook(() => ingredientQueryClient.useIngredients('' as never), {
-            wrapper
-        });
-
-        await waitFor(() => {
-            expect(repo.list).not.toHaveBeenCalled();
-        });
     });
 });

@@ -3,7 +3,6 @@ import { makeHandler, ok, validatePayload } from '@/server/utils/reqwest';
 import type { NextRequest } from 'next/server';
 import type { RecipeFilterParams } from '@/common/types';
 import { z } from 'zod';
-import { SUPPORTED_LOCALES } from '@/common/constants';
 import {
     registerRouteDocs,
     RecipeDisplayResponseSchema
@@ -15,7 +14,6 @@ import { AuthLevel } from '@/common/types';
 //|=============================================================================================|//
 
 const FilterRecipesSchema = z.strictObject({
-    language: z.enum(SUPPORTED_LOCALES),
     batch: z.coerce.number().int().positive(),
     perPage: z.coerce.number().int().positive(),
     containsIngredients: z.array(z.coerce.number().int().positive()).optional(),
@@ -42,7 +40,6 @@ async function getHandler(request: NextRequest) {
     const params = request.nextUrl.searchParams;
 
     const raw = {
-        language: params.get('language') ?? undefined,
         batch: params.get('batch') ?? undefined,
         perPage: params.get('perPage') ?? undefined,
         containsIngredients: params.getAll('containsIngredients'),
@@ -55,7 +52,7 @@ async function getHandler(request: NextRequest) {
 
     const payload = validatePayload(FilterRecipesSchema, raw);
 
-    const { language, batch, perPage, timeMin, timeMax, hasImage } = payload;
+    const { batch, perPage, timeMin, timeMax, hasImage } = payload;
 
     const filters: RecipeFilterParams = {
         containsIngredients: payload.containsIngredients?.length
@@ -72,7 +69,6 @@ async function getHandler(request: NextRequest) {
 
     const recipes = await recipeFilterService.filterRecipes(
         filters,
-        language,
         batch,
         perPage
     );

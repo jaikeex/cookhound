@@ -6,11 +6,7 @@ import { useOutsideClick } from '@/client/hooks';
 import { useDebounce } from '@/client/hooks/useDebounce';
 import { useAuth } from '@/client/store';
 import { t } from '@/client/locales';
-import {
-    DEFAULT_LOCALE,
-    ROUTES,
-    SEARCH_QUERY_SEPARATOR
-} from '@/common/constants';
+import { ROUTES, SEARCH_QUERY_SEPARATOR } from '@/common/constants';
 import type { SearchInputProps } from '@/client/components/molecules/Form/SearchInput/component';
 import { Chip, Typography, SearchInput } from '@/client/components';
 import { chqc } from '@/client/data';
@@ -65,7 +61,6 @@ export const RecipeSearchInput: React.FC<RecipeSearchInputProps> = ({
 
     const searchRecipesQuery = chqc.recipe.useSearchRecipes(
         preparedQuery,
-        DEFAULT_LOCALE,
         1,
         5,
         { enabled: isInputFocused && enableSuggestions && isSearchMode }

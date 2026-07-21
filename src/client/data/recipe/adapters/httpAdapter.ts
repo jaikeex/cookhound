@@ -21,31 +21,26 @@ export const httpRecipeRepository: RecipeRepository = {
         return reviveRecipeDates(dto);
     },
 
-    list: ({ language, batch, perPage, signal }) =>
-        recipeApiClient.getRecipeList(language, batch, perPage, { signal }),
+    list: ({ batch, perPage, signal }) =>
+        recipeApiClient.getRecipeList(batch, perPage, { signal }),
 
-    search: ({ query, language, batch, perPage, signal }) =>
-        recipeApiClient.searchRecipes(query, language, batch, perPage, {
+    search: ({ query, batch, perPage, signal }) =>
+        recipeApiClient.searchRecipes(query, batch, perPage, {
             signal
         }),
 
-    listByUser: ({ userId, language, batch, perPage, signal }) =>
-        recipeApiClient.getUserRecipes(userId, language, batch, perPage, {
+    listByUser: ({ userId, batch, perPage, signal }) =>
+        recipeApiClient.getUserRecipes(userId, batch, perPage, {
             signal
         }),
 
-    searchByUser: ({ userId, query, language, batch, perPage, signal }) =>
-        recipeApiClient.searchUserRecipes(
-            userId,
-            query,
-            language,
-            batch,
-            perPage,
-            { signal }
-        ),
+    searchByUser: ({ userId, query, batch, perPage, signal }) =>
+        recipeApiClient.searchUserRecipes(userId, query, batch, perPage, {
+            signal
+        }),
 
-    filter: ({ language, batch, perPage, filters, signal }) =>
-        recipeApiClient.filterRecipes(language, batch, perPage, filters, {
+    filter: ({ batch, perPage, filters, signal }) =>
+        recipeApiClient.filterRecipes(batch, perPage, filters, {
             signal
         }),
 

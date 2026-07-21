@@ -1,4 +1,3 @@
-import type { Locale } from '@/common/types';
 import { useInfiniteQuery, keepPreviousData } from '@tanstack/react-query';
 import { useAppQuery, useAppMutation } from '@/client/data/queryFactories';
 import { useRepositories } from '@/client/data';
@@ -64,7 +63,6 @@ export const recipeQueryClient = {
     },
 
     useRecipeList: (
-        language: Locale,
         batch: number,
         perPage: number,
         options?: Partial<RecipeListOptions>
@@ -72,11 +70,10 @@ export const recipeQueryClient = {
         const { recipeRepository } = useRepositories();
 
         return useAppQuery(
-            RECIPE_QUERY_KEYS.list(language, batch, perPage),
-            ({ signal }) =>
-                recipeRepository.list({ language, batch, perPage, signal }),
+            RECIPE_QUERY_KEYS.list(batch, perPage),
+            ({ signal }) => recipeRepository.list({ batch, perPage, signal }),
             {
-                enabled: Boolean(language && batch > 0 && perPage),
+                enabled: Boolean(batch > 0 && perPage),
                 retry: 1,
                 placeholderData: keepPreviousData,
                 ...options
@@ -85,7 +82,6 @@ export const recipeQueryClient = {
     },
 
     useRecipeListInfinite: (
-        language: Locale,
         perPage: number,
         maxBatches?: number,
         options?: Partial<RecipeListInfiniteOptions>
@@ -93,11 +89,10 @@ export const recipeQueryClient = {
         const { recipeRepository } = useRepositories();
 
         return useInfiniteQuery({
-            queryKey: [...RECIPE_QUERY_KEYS.listInfinite(language, perPage)],
+            queryKey: [...RECIPE_QUERY_KEYS.listInfinite(perPage)],
             initialPageParam: 1,
             queryFn: ({ pageParam, signal }) =>
                 recipeRepository.list({
-                    language,
                     batch: Number(pageParam ?? 1),
                     perPage,
                     signal
@@ -108,14 +103,13 @@ export const recipeQueryClient = {
                     return null;
                 return allPages.length + 1;
             },
-            enabled: Boolean(language && perPage),
+            enabled: Boolean(perPage),
             ...options
         });
     },
 
     useSearchRecipes: (
         query: string,
-        language: Locale,
         batch: number,
         perPage: number,
         options?: Partial<SearchRecipesOptions>
@@ -123,17 +117,16 @@ export const recipeQueryClient = {
         const { recipeRepository } = useRepositories();
 
         return useAppQuery(
-            RECIPE_QUERY_KEYS.search(query, language, batch, perPage),
+            RECIPE_QUERY_KEYS.search(query, batch, perPage),
             ({ signal }) =>
                 recipeRepository.search({
                     query,
-                    language,
                     batch,
                     perPage,
                     signal
                 }),
             {
-                enabled: Boolean(query && language && batch > 0 && perPage),
+                enabled: Boolean(query && batch > 0 && perPage),
                 retry: 1,
                 placeholderData: keepPreviousData,
                 ...options
@@ -143,7 +136,6 @@ export const recipeQueryClient = {
 
     useSearchRecipesInfinite: (
         query: string,
-        language: Locale,
         perPage: number,
         maxBatches?: number,
         options?: Partial<SearchRecipesInfiniteOptions>
@@ -151,14 +143,11 @@ export const recipeQueryClient = {
         const { recipeRepository } = useRepositories();
 
         return useInfiniteQuery({
-            queryKey: [
-                ...RECIPE_QUERY_KEYS.searchInfinite(query, language, perPage)
-            ],
+            queryKey: [...RECIPE_QUERY_KEYS.searchInfinite(query, perPage)],
             initialPageParam: 1,
             queryFn: ({ pageParam, signal }) =>
                 recipeRepository.search({
                     query,
-                    language,
                     batch: Number(pageParam ?? 1),
                     perPage,
                     signal
@@ -169,7 +158,7 @@ export const recipeQueryClient = {
                     return null;
                 return allPages.length + 1;
             },
-            enabled: Boolean(query && language && perPage),
+            enabled: Boolean(query && perPage),
             ...options
         });
     },
@@ -177,7 +166,6 @@ export const recipeQueryClient = {
     useUserSearchRecipes: (
         userId: string,
         query: string,
-        language: Locale,
         batch: number,
         perPage: number,
         options?: Partial<UserSearchRecipesOptions>
@@ -185,26 +173,17 @@ export const recipeQueryClient = {
         const { recipeRepository } = useRepositories();
 
         return useAppQuery(
-            RECIPE_QUERY_KEYS.userSearchRecipes(
-                userId,
-                query,
-                language,
-                batch,
-                perPage
-            ),
+            RECIPE_QUERY_KEYS.userSearchRecipes(userId, query, batch, perPage),
             ({ signal }) =>
                 recipeRepository.searchByUser({
                     userId,
                     query,
-                    language,
                     batch,
                     perPage,
                     signal
                 }),
             {
-                enabled: Boolean(
-                    userId && query && language && batch > 0 && perPage
-                ),
+                enabled: Boolean(userId && query && batch > 0 && perPage),
                 retry: 1,
                 placeholderData: keepPreviousData,
                 ...options
@@ -215,7 +194,6 @@ export const recipeQueryClient = {
     useUserSearchRecipesInfinite: (
         userId: string,
         query: string,
-        language: Locale,
         perPage: number,
         maxBatches?: number,
         options?: Partial<UserSearchRecipesInfiniteOptions>
@@ -227,7 +205,6 @@ export const recipeQueryClient = {
                 ...RECIPE_QUERY_KEYS.userSearchRecipesInfinite(
                     userId,
                     query,
-                    language,
                     perPage
                 )
             ],
@@ -236,7 +213,6 @@ export const recipeQueryClient = {
                 recipeRepository.searchByUser({
                     userId,
                     query,
-                    language,
                     batch: Number(pageParam ?? 1),
                     perPage,
                     signal
@@ -247,14 +223,13 @@ export const recipeQueryClient = {
                     return null;
                 return allPages.length + 1;
             },
-            enabled: Boolean(userId && query && language && perPage),
+            enabled: Boolean(userId && query && perPage),
             ...options
         });
     },
 
     useUserRecipes: (
         userId: string,
-        language: Locale,
         batch: number,
         perPage: number,
         options?: Partial<UserRecipesOptions>
@@ -262,17 +237,16 @@ export const recipeQueryClient = {
         const { recipeRepository } = useRepositories();
 
         return useAppQuery(
-            RECIPE_QUERY_KEYS.userRecipes(userId, language, batch, perPage),
+            RECIPE_QUERY_KEYS.userRecipes(userId, batch, perPage),
             ({ signal }) =>
                 recipeRepository.listByUser({
                     userId,
-                    language,
                     batch,
                     perPage,
                     signal
                 }),
             {
-                enabled: Boolean(userId && language && batch > 0 && perPage),
+                enabled: Boolean(userId && batch > 0 && perPage),
                 retry: 1,
                 placeholderData: keepPreviousData,
                 ...options
@@ -282,7 +256,6 @@ export const recipeQueryClient = {
 
     useUserRecipesInfinite: (
         userId: string,
-        language: Locale,
         perPage: number,
         maxBatches?: number,
         options?: Partial<UserRecipesInfiniteOptions>
@@ -291,17 +264,12 @@ export const recipeQueryClient = {
 
         return useInfiniteQuery({
             queryKey: [
-                ...RECIPE_QUERY_KEYS.userRecipesInfinite(
-                    userId,
-                    language,
-                    perPage
-                )
+                ...RECIPE_QUERY_KEYS.userRecipesInfinite(userId, perPage)
             ],
             initialPageParam: 1,
             queryFn: ({ pageParam, signal }) =>
                 recipeRepository.listByUser({
                     userId,
-                    language,
                     batch: Number(pageParam ?? 1),
                     perPage,
                     signal
@@ -312,13 +280,12 @@ export const recipeQueryClient = {
                     return null;
                 return allPages.length + 1;
             },
-            enabled: Boolean(userId && language && perPage),
+            enabled: Boolean(userId && perPage),
             ...options
         });
     },
 
     useFilterRecipes: (
-        language: Locale,
         batch: number,
         perPage: number,
         filters: RecipeFilterParams = {},
@@ -327,17 +294,16 @@ export const recipeQueryClient = {
         const { recipeRepository } = useRepositories();
 
         return useAppQuery(
-            RECIPE_QUERY_KEYS.filter(language, batch, perPage, filters),
+            RECIPE_QUERY_KEYS.filter(batch, perPage, filters),
             ({ signal }) =>
                 recipeRepository.filter({
-                    language,
                     batch,
                     perPage,
                     filters,
                     signal
                 }),
             {
-                enabled: Boolean(language && batch > 0 && perPage > 0),
+                enabled: Boolean(batch > 0 && perPage > 0),
                 retry: 1,
                 placeholderData: keepPreviousData,
                 ...options
@@ -346,7 +312,6 @@ export const recipeQueryClient = {
     },
 
     useFilterRecipesInfinite: (
-        language: Locale,
         perPage: number,
         filters: RecipeFilterParams = {},
         maxBatches?: number,
@@ -355,13 +320,10 @@ export const recipeQueryClient = {
         const { recipeRepository } = useRepositories();
 
         return useInfiniteQuery({
-            queryKey: [
-                ...RECIPE_QUERY_KEYS.filterInfinite(language, perPage, filters)
-            ],
+            queryKey: [...RECIPE_QUERY_KEYS.filterInfinite(perPage, filters)],
             initialPageParam: 1,
             queryFn: ({ pageParam, signal }) =>
                 recipeRepository.filter({
-                    language,
                     batch: Number(pageParam ?? 1),
                     perPage,
                     filters,
@@ -373,7 +335,7 @@ export const recipeQueryClient = {
                     return null;
                 return allPages.length + 1;
             },
-            enabled: Boolean(language && perPage > 0),
+            enabled: Boolean(perPage > 0),
             ...options
         });
     },

@@ -8,7 +8,7 @@ import {
     buildLocalizedMetadata
 } from '@/server/utils/seo';
 import { StructuredData } from '@/client/components';
-import { DEFAULT_LOCALE, ENV_CONFIG_PUBLIC } from '@/common/constants';
+import { ENV_CONFIG_PUBLIC } from '@/common/constants';
 import { mapServiceErrorForRsc } from '@/server/data/runtime/mapError';
 
 /**
@@ -22,10 +22,8 @@ export const revalidate = 300;
 //|=============================================================================================|//
 
 export default async function Home() {
-    const locale = DEFAULT_LOCALE;
-
     const recipesForDisplay = serverData.recipe
-        .list(locale, 1, 24)
+        .list(1, 24)
         .catch((error) => mapServiceErrorForRsc(error, `/`));
 
     const websiteSchema = generateWebSiteSchema(ENV_CONFIG_PUBLIC.ORIGIN);

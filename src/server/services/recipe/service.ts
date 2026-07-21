@@ -22,7 +22,11 @@ import { randomUUID } from 'crypto';
 import { recipeSearchIndex } from '@/server/search-index';
 import { intersectArrays } from '@/common/utils';
 import { revalidateRouteCache } from '@/server/utils/revalidateRouteCache';
-import { SEARCH_QUERY_SEPARATOR, ROUTES } from '@/common/constants';
+import {
+    SEARCH_QUERY_SEPARATOR,
+    ROUTES,
+    DEFAULT_LOCALE
+} from '@/common/constants';
 import { queueManager } from '@/server/queues/QueueManager';
 import { JOB_NAMES } from '@/server/queues/jobs/names';
 import { ApplicationErrorCode } from '@/server/error/codes';
@@ -554,14 +558,12 @@ class RecipeService {
      * rating-count threshold until the batch is filled or no further
      * loosening is possible. Flagged recipes are excluded.
      *
-     * @param language - Locale to filter recipes by.
      * @param batch - 1-based batch index (max 5).
      * @param perPage - Batch size (max 100, defaults to 24).
      * @returns Display-ready recipe DTOs for the requested page.
      */
-    @LogServiceMethod({ names: ['language', 'batch', 'perPage'] })
+    @LogServiceMethod({ names: ['batch', 'perPage'] })
     async getFrontPageRecipes(
-        language: Locale,
         batch: number,
         perPage: number = 24
     ): Promise<RecipeForDisplayDTO[]> {
@@ -598,7 +600,7 @@ class RecipeService {
 
         for (const threshold of MIN_TIMES_RATED_THRESHOLDS) {
             results = await db.recipe.getManyForFrontPage(
-                language,
+                DEFAULT_LOCALE,
                 perPage,
                 offset,
                 threshold
@@ -638,15 +640,13 @@ class RecipeService {
      * database text search if Typesense is unavailable.
      *
      * @param query - Free-text search query (pipe-delimited for multi-term).
-     * @param language - Locale to filter recipes by.
      * @param batch - 1-based batch index (max 20).
      * @param perPage - Batch size (max 100, defaults to 24).
      * @returns Display-ready recipe DTOs matching the query.
      */
-    @LogServiceMethod({ names: ['query', 'language', 'batch', 'perPage'] })
+    @LogServiceMethod({ names: ['query', 'batch', 'perPage'] })
     async searchRecipes(
         query: string,
-        language: Locale,
         batch: number,
         perPage: number = 24
     ): Promise<RecipeForDisplayDTO[]> {
@@ -728,7 +728,7 @@ class RecipeService {
 
                 results = await recipeSearchIndex.searchSingleQuery(
                     queryTerms[0],
-                    language,
+                    DEFAULT_LOCALE,
                     perPage,
                     offset
                 );
@@ -757,7 +757,7 @@ class RecipeService {
                 const searchPromises = queryTerms.map((term) =>
                     recipeSearchIndex.searchSingleQuery(
                         term,
-                        language,
+                        DEFAULT_LOCALE,
                         searchLimit,
                         0
                     )
@@ -802,7 +802,7 @@ class RecipeService {
              */
             const dbResults = await db.recipe.searchManyByText(
                 queryTerms[0],
-                language,
+                DEFAULT_LOCALE,
                 perPage,
                 offset
             );
@@ -835,15 +835,13 @@ class RecipeService {
      * Includes active content flags (visible to the author).
      *
      * @param userId - Database ID of the author.
-     * @param language - Locale to filter recipes by.
      * @param batch - 1-based batch index.
      * @param perPage - Batch size (max 100, defaults to 24).
      * @returns Display-ready recipe DTOs with flag information, or an empty array.
      */
-    @LogServiceMethod({ names: ['userId', 'language', 'batch', 'perPage'] })
+    @LogServiceMethod({ names: ['userId', 'batch', 'perPage'] })
     async getUserRecipes(
         userId: number,
-        language: Locale,
         batch: number,
         perPage: number = 24
     ): Promise<RecipeForDisplayDTO[]> {
@@ -861,7 +859,7 @@ class RecipeService {
 
         const recipes = await db.recipe.getManyForUser(
             userId,
-            language,
+            DEFAULT_LOCALE,
             perPage,
             offset
         );
@@ -896,18 +894,16 @@ class RecipeService {
      *
      * @param userId - Database ID of the author whose recipes to search.
      * @param query - Free-text search string.
-     * @param language - Locale to filter recipes by.
      * @param batch - 1-based batch index.
      * @param perPage - Batch size (max 100, defaults to 24).
      * @returns Display-ready recipe DTOs matching the query, or an empty array.
      */
     @LogServiceMethod({
-        names: ['userId', 'query', 'language', 'batch', 'perPage']
+        names: ['userId', 'query', 'batch', 'perPage']
     })
     async searchUserRecipes(
         userId: number,
         query: string,
-        language: Locale,
         batch: number,
         perPage: number = 24
     ): Promise<RecipeForDisplayDTO[]> {
@@ -926,7 +922,7 @@ class RecipeService {
         const recipes = await db.recipe.searchManyByTextForUser(
             userId,
             query,
-            language,
+            DEFAULT_LOCALE,
             perPage,
             offset
         );
@@ -962,13 +958,11 @@ export interface RecipeReads {
     getRecipeByDisplayId(displayId: string): Promise<Recipe>;
     getFreshRecipeByDisplayId(displayId: string): Promise<Recipe>;
     getFrontPageRecipes(
-        language: Locale,
         batch: number,
         perPage: number
     ): Promise<RecipeForDisplayDTO[]>;
     searchRecipes(
         query: string,
-        language: Locale,
         batch: number,
         perPage: number
     ): Promise<RecipeForDisplayDTO[]>;

@@ -3,7 +3,6 @@
 import { useCallback, useMemo, useState } from 'react';
 import type { RecipeForDisplayDTO } from '@/common/types';
 import type { RecipeFilterParams } from '@/common/types/recipe';
-import { DEFAULT_LOCALE } from '@/common/constants';
 import { useDebounce } from '@/client/hooks/useDebounce';
 import { chqc } from '@/client/data';
 import type { InfiniteData } from '@tanstack/react-query';
@@ -37,7 +36,6 @@ export const useRecipeFilters = (initialFilters: RecipeFilterParams = {}) => {
     //~-----------------------------------------------------------------------------------------~//
 
     const filterQuery = chqc.recipe.useFilterRecipesInfinite(
-        DEFAULT_LOCALE,
         PER_PAGE,
         debouncedFilters,
         MAX_BATCHES

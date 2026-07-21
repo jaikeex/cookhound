@@ -1,4 +1,3 @@
-import type { Locale } from '@/common/types';
 import { useAppMutation, useAppQuery } from '@/client/data/queryFactories';
 import { useRepositories } from '@/client/data';
 import {
@@ -9,14 +8,14 @@ import {
 
 export const tagQueryClient = {
     /**
-     * Gets the full list of tag categories for the given locale.
+     * Gets the full list of tag categories.
      */
-    useTags: (language: Locale, options?: Partial<TagListOptions>) => {
+    useTags: (options?: Partial<TagListOptions>) => {
         const { tagRepository } = useRepositories();
 
         return useAppQuery(
             TAG_QUERY_KEYS.list(),
-            ({ signal }) => tagRepository.list({ language, signal }),
+            ({ signal }) => tagRepository.list({ signal }),
             {
                 staleTime: 10 * 60 * 1000, // 10 minutes
                 ...options

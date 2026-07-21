@@ -7,6 +7,5 @@ import type { IngredientRepository } from '@/client/data/ingredient/port';
  * HTTP-backed implementation of {@link IngredientRepository}.
  */
 export const httpIngredientRepository: IngredientRepository = {
-    list: ({ language, signal }) =>
-        ingredientApiClient.getIngredients(language, { signal })
+    list: ({ signal }) => ingredientApiClient.getIngredients({ signal })
 };

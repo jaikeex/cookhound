@@ -1,4 +1,5 @@
-import type { IngredientDTO, Locale } from '@/common/types';
+import type { IngredientDTO } from '@/common/types';
+import { DEFAULT_LOCALE } from '@/common/constants';
 import db from '@/server/db/model';
 import { Logger, LogServiceMethod } from '@/server/logger';
 
@@ -15,14 +16,13 @@ class IngredientService {
     static readonly LOG_CONTEXT = LOG_CONTEXT;
 
     /**
-     * Returns all ingredients for a given locale, sorted alphabetically.
+     * Returns all ingredients, sorted alphabetically.
      *
-     * @param language - Locale to filter ingredients by.
      * @returns Alphabetically sorted ingredient DTOs.
      */
-    @LogServiceMethod({ names: ['language'] })
-    async getAll(language: Locale): Promise<IngredientDTO[]> {
-        return db.ingredient.getManyByLanguage(language);
+    @LogServiceMethod({ names: [] })
+    async getAll(): Promise<IngredientDTO[]> {
+        return db.ingredient.getManyByLanguage(DEFAULT_LOCALE);
     }
 }
 

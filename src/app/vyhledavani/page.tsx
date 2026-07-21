@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { SearchTemplate } from '@/client/components/templates/Dashboard/Search';
 import { serverData } from '@/server/data';
 import React from 'react';
-import { DEFAULT_LOCALE, ENV_CONFIG_PUBLIC, ROUTES } from '@/common/constants';
+import { ENV_CONFIG_PUBLIC, ROUTES } from '@/common/constants';
 import {
     generateBreadcrumbSchema,
     buildLocalizedMetadata
@@ -21,10 +21,8 @@ export default async function SearchPage({
 }>) {
     const searchQuery = (await searchParams)?.query ?? '';
 
-    const locale = DEFAULT_LOCALE;
-
     const recipesForDisplay = searchQuery
-        ? serverData.recipe.search(searchQuery, locale, 1, 24)
+        ? serverData.recipe.search(searchQuery, 1, 24)
         : Promise.resolve([]);
 
     const breadcrumbItems = [

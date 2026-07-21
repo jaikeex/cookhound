@@ -1,4 +1,3 @@
-import { SUPPORTED_LOCALES } from '@/common/constants';
 import { ApplicationErrorCode } from '@/server/error/codes';
 import { ValidationError } from '@/server/error/server';
 import { recipeService } from '@/server/services';
@@ -16,9 +15,6 @@ import { AuthLevel } from '@/common/types';
 //|=============================================================================================|//
 
 const RecipesByUserSchema = z.strictObject({
-    language: z.enum(SUPPORTED_LOCALES, {
-        error: () => 'Language must be supported'
-    }),
     batch: z.coerce.number().int().positive(),
     perPage: z.coerce.number().int().positive()
 });
@@ -50,11 +46,10 @@ async function getHandler(request: NextRequest) {
 
     const payload = validateQuery(RecipesByUserSchema, request.nextUrl);
 
-    const { language, batch, perPage } = payload;
+    const { batch, perPage } = payload;
 
     const recipes = await recipeService.getUserRecipes(
         Number(userId),
-        language,
         batch,
         perPage
     );
@@ -74,7 +69,7 @@ registerRouteDocs('/api/recipes/user/{userId}', {
     GET: {
         summary: 'Get recipes by a specific user (paginated).',
         description: `Returns recipes authored by the specified user,
-            filtered by language and paginated.`,
+            paginated.`,
         auth: AuthLevel.PUBLIC,
         querySchema: RecipesByUserSchema,
         clientUsage: [

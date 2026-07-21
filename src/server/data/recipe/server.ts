@@ -1,7 +1,7 @@
 import 'server-only';
 import { cache } from 'react';
 import { recipeReads } from '@/server/services';
-import type { Locale, Recipe, RecipeForDisplayDTO } from '@/common/types';
+import type { Recipe, RecipeForDisplayDTO } from '@/common/types';
 
 /**
  * Server-side data access for the recipe domain.
@@ -19,36 +19,29 @@ import type { Locale, Recipe, RecipeForDisplayDTO } from '@/common/types';
  * sites to handle them.
  */
 export const recipeServerData = {
-    getById: cache(
-        (id: number): Promise<Recipe> => recipeReads.getRecipeById(id)
+    getById: cache((id: number): Promise<Recipe> =>
+        recipeReads.getRecipeById(id)
     ),
 
-    getByDisplayId: cache(
-        (displayId: string): Promise<Recipe> =>
-            recipeReads.getRecipeByDisplayId(displayId)
+    getByDisplayId: cache((displayId: string): Promise<Recipe> =>
+        recipeReads.getRecipeByDisplayId(displayId)
     ),
 
-    getByDisplayIdFresh: cache(
-        (displayId: string): Promise<Recipe> =>
-            recipeReads.getFreshRecipeByDisplayId(displayId)
+    getByDisplayIdFresh: cache((displayId: string): Promise<Recipe> =>
+        recipeReads.getFreshRecipeByDisplayId(displayId)
     ),
 
     list: cache(
-        (
-            language: Locale,
-            batch: number,
-            perPage: number
-        ): Promise<RecipeForDisplayDTO[]> =>
-            recipeReads.getFrontPageRecipes(language, batch, perPage)
+        (batch: number, perPage: number): Promise<RecipeForDisplayDTO[]> =>
+            recipeReads.getFrontPageRecipes(batch, perPage)
     ),
 
     search: cache(
         (
             query: string,
-            language: Locale,
             batch: number,
             perPage: number
         ): Promise<RecipeForDisplayDTO[]> =>
-            recipeReads.searchRecipes(query, language, batch, perPage)
+            recipeReads.searchRecipes(query, batch, perPage)
     )
 };

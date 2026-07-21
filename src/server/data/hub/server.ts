@@ -1,11 +1,7 @@
 import 'server-only';
 import { cache } from 'react';
 import { recipeFilterService, recipeTagService } from '@/server/services';
-import {
-    resolveHubSlug,
-    DEFAULT_LOCALE,
-    HUB_PAGE_SIZE
-} from '@/common/constants';
+import { resolveHubSlug, HUB_PAGE_SIZE } from '@/common/constants';
 import type { HubDbSlug } from '@/common/constants';
 import type { RecipeForDisplayDTO, RecipeTagDTO } from '@/common/types';
 
@@ -37,16 +33,15 @@ export const hubServerData = {
             return null;
         }
 
-        const tag = await recipeTagService.getBySlug(dbSlug, DEFAULT_LOCALE);
+        const tag = await recipeTagService.getBySlug(dbSlug);
 
         if (!tag) {
             return null;
         }
 
-        const recipeCount = await recipeFilterService.countRecipes(
-            { tags: [tag.id] },
-            DEFAULT_LOCALE
-        );
+        const recipeCount = await recipeFilterService.countRecipes({
+            tags: [tag.id]
+        });
 
         return {
             dbSlug,
@@ -66,7 +61,6 @@ export const hubServerData = {
         (tagId: number, page: number): Promise<RecipeForDisplayDTO[]> =>
             recipeFilterService.filterRecipes(
                 { tags: [tagId] },
-                DEFAULT_LOCALE,
                 page,
                 HUB_PAGE_SIZE
             )

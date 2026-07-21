@@ -24,9 +24,6 @@ import { AuthLevel } from '@/common/types';
 //|=============================================================================================|//
 
 const FrontPageRecipesSchema = z.strictObject({
-    language: z.enum(SUPPORTED_LOCALES, {
-        error: () => 'Language must be supported'
-    }),
     batch: z.coerce.number().int().positive(),
     perPage: z.coerce.number().int().positive()
 });
@@ -68,13 +65,9 @@ const RecipeForCreatePayloadSchema = z.strictObject({
 async function getHandler(request: NextRequest) {
     const payload = validateQuery(FrontPageRecipesSchema, request.nextUrl);
 
-    const { language, batch, perPage } = payload;
+    const { batch, perPage } = payload;
 
-    const recipes = await recipeService.getFrontPageRecipes(
-        language,
-        batch,
-        perPage
-    );
+    const recipes = await recipeService.getFrontPageRecipes(batch, perPage);
 
     return ok(recipes);
 }

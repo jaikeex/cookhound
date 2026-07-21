@@ -1,4 +1,3 @@
-import type { Locale } from '@/common/types';
 import { apiRequestWrapper } from '@/client/request/apiClient/ApiRequestWrapper';
 import type { RequestConfig } from '@/client/request/apiClient/ApiRequestWrapper';
 import type { Recipe, TagListDTO, RecipeTagDTO } from '@/common/types';
@@ -14,12 +13,9 @@ class TagApiClient {
      * @throws {Error} Throws an error if the request fails.
      * - 500: Internal Server Error, if there is an error during the request.
      */
-    async getTags(
-        language: Locale,
-        config?: RequestConfig
-    ): Promise<TagListDTO[]> {
+    async getTags(config?: RequestConfig): Promise<TagListDTO[]> {
         return await apiRequestWrapper.get({
-            url: `/recipes/tags?lang=${language}`,
+            url: `/recipes/tags`,
             ...config
         });
     }

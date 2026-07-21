@@ -1,4 +1,4 @@
-import type { Locale, Recipe } from '@/common/types';
+import type { Recipe } from '@/common/types';
 import type {
     RecipeFilterParams,
     RecipeForCreatePayload,
@@ -35,59 +35,32 @@ export const RECIPE_QUERY_KEYS = Object.freeze({
     byId: (id: string | number) =>
         [RECIPE_NAMESPACE_QUERY_KEY, 'id', id] as const,
 
-    list: (language: Locale, batch: number, perPage: number) =>
-        [RECIPE_NAMESPACE_QUERY_KEY, 'list', language, batch, perPage] as const,
+    list: (batch: number, perPage: number) =>
+        [RECIPE_NAMESPACE_QUERY_KEY, 'list', batch, perPage] as const,
 
-    listInfinite: (language: Locale, perPage: number) =>
-        [
-            RECIPE_NAMESPACE_QUERY_KEY,
-            'list',
-            language,
-            perPage,
-            'infinite'
-        ] as const,
+    listInfinite: (perPage: number) =>
+        [RECIPE_NAMESPACE_QUERY_KEY, 'list', perPage, 'infinite'] as const,
 
-    search: (query: string, language: Locale, batch: number, perPage: number) =>
+    search: (query: string, batch: number, perPage: number) =>
+        [RECIPE_NAMESPACE_QUERY_KEY, 'search', query, batch, perPage] as const,
+
+    searchInfinite: (query: string, perPage: number) =>
         [
             RECIPE_NAMESPACE_QUERY_KEY,
             'search',
             query,
-            language,
-            batch,
-            perPage
-        ] as const,
-
-    searchInfinite: (query: string, language: Locale, perPage: number) =>
-        [
-            RECIPE_NAMESPACE_QUERY_KEY,
-            'search',
-            query,
-            language,
             perPage,
             'infinite'
         ] as const,
 
-    userRecipes: (
-        userId: string,
-        language: Locale,
-        batch: number,
-        perPage: number
-    ) =>
-        [
-            RECIPE_NAMESPACE_QUERY_KEY,
-            'user',
-            userId,
-            language,
-            batch,
-            perPage
-        ] as const,
+    userRecipes: (userId: string, batch: number, perPage: number) =>
+        [RECIPE_NAMESPACE_QUERY_KEY, 'user', userId, batch, perPage] as const,
 
-    userRecipesInfinite: (userId: string, language: Locale, perPage: number) =>
+    userRecipesInfinite: (userId: string, perPage: number) =>
         [
             RECIPE_NAMESPACE_QUERY_KEY,
             'user',
             userId,
-            language,
             perPage,
             'infinite'
         ] as const,
@@ -95,7 +68,6 @@ export const RECIPE_QUERY_KEYS = Object.freeze({
     userSearchRecipes: (
         userId: string,
         query: string,
-        language: Locale,
         batch: number,
         perPage: number
     ) =>
@@ -105,7 +77,6 @@ export const RECIPE_QUERY_KEYS = Object.freeze({
             userId,
             'search',
             query,
-            language,
             batch,
             perPage
         ] as const,
@@ -113,7 +84,6 @@ export const RECIPE_QUERY_KEYS = Object.freeze({
     userSearchRecipesInfinite: (
         userId: string,
         query: string,
-        language: Locale,
         perPage: number
     ) =>
         [
@@ -122,35 +92,23 @@ export const RECIPE_QUERY_KEYS = Object.freeze({
             userId,
             'search',
             query,
-            language,
             perPage,
             'infinite'
         ] as const,
 
-    filter: (
-        language: Locale,
-        batch: number,
-        perPage: number,
-        filters: RecipeFilterParams
-    ) =>
+    filter: (batch: number, perPage: number, filters: RecipeFilterParams) =>
         [
             RECIPE_NAMESPACE_QUERY_KEY,
             'filter',
-            language,
             batch,
             perPage,
             filters
         ] as const,
 
-    filterInfinite: (
-        language: Locale,
-        perPage: number,
-        filters: RecipeFilterParams
-    ) =>
+    filterInfinite: (perPage: number, filters: RecipeFilterParams) =>
         [
             RECIPE_NAMESPACE_QUERY_KEY,
             'filter',
-            language,
             perPage,
             filters,
             'infinite'
