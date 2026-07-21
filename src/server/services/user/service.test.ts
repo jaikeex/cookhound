@@ -176,7 +176,8 @@ describe('UserService', () => {
             email: 'newuser@example.com',
             password: TEST_PASSWORD,
             username: 'newuser',
-            termsAccepted: true
+            termsAccepted: true,
+            captchaToken: 'mock-captcha-token'
         };
 
         it('should successfully create user with valid credentials', async () => {
