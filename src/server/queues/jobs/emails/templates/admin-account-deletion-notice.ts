@@ -1,4 +1,7 @@
+import { ENV_CONFIG_PUBLIC, ROUTES } from '@/common/constants';
 import type { MailTemplate } from '@/server/queues/jobs/emails/utils';
+
+const contactLink = `${ENV_CONFIG_PUBLIC.ORIGIN}${ROUTES.contact}`;
 
 export const adminAccountDeletionNoticeTpl: MailTemplate<[string, string]> = {
     subject: {
@@ -17,7 +20,7 @@ export const adminAccountDeletionNoticeTpl: MailTemplate<[string, string]> = {
         <p>We're writing to let you know that an administrator has scheduled your cookhound.com account for deletion.</p>
         <p><strong>Your account is scheduled for permanent deletion on ${scheduledDate}.</strong></p>
         <p>After that date, your account and associated data will be permanently removed. Your recipes will be preserved and anonymized.</p>
-        <p>If you believe this is a mistake, please reach out to us through our <a href="https://cookhound.com/contact">contact page</a>.</p>
+        <p>If you believe this is a mistake, please reach out to us through our <a href="${contactLink}">contact page</a>.</p>
         <p>Best regards,<br/>The Cookhound Team</p>
     </body>
 </html>`,
@@ -32,7 +35,7 @@ export const adminAccountDeletionNoticeTpl: MailTemplate<[string, string]> = {
         <p>Rádi bychom vás informovali, že administrátor naplánoval smazání vašeho účtu na cookhound.com.</p>
         <p><strong>Váš účet je naplánován k trvalému smazání dne ${scheduledDate}.</strong></p>
         <p>Po tomto datu bude váš účet a související data trvale odstraněny. Vaše recepty budou zachovány a anonymizovány.</p>
-        <p>Pokud se domníváte, že se jedná o chybu, kontaktujte nás prosím prostřednictvím naší <a href="https://cookhound.com/contact">kontaktní stránky</a>.</p>
+        <p>Pokud se domníváte, že se jedná o chybu, kontaktujte nás prosím prostřednictvím naší <a href="${contactLink}">kontaktní stránky</a>.</p>
         <p>S pozdravem,<br/>Tým Cookhound</p>
     </body>
 </html>`

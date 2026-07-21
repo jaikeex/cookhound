@@ -14,6 +14,10 @@ import { ROUTES } from '@/common/constants';
 
 const DISABLED_FOR_ROUTES: string[] = [ROUTES.recipe.create];
 
+const RECIPE_EDIT_ROUTE_PATTERN = new RegExp(
+    `^${ROUTES.recipe.detail('[^/]+')}/edit$`
+);
+
 /**
  * Check if the current pathname should disable the bottom navigation
  *
@@ -25,7 +29,7 @@ const isNavigationDisabled = (pathname: string): boolean => {
         return true;
     }
 
-    if (pathname.match(/^\/recipe\/[^/]+\/edit$/)) {
+    if (RECIPE_EDIT_ROUTE_PATTERN.test(pathname)) {
         return true;
     }
 
@@ -67,7 +71,11 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = () => {
             </Link>
 
             <Link
-                href={`${ROUTES.user.detail(user?.id ?? '')}?tab=cookbooks`}
+                href={
+                    isLoggedin
+                        ? `${ROUTES.user.detail(user.id)}?tab=cookbooks`
+                        : ROUTES.auth.login
+                }
                 aria-label={t('app.general.cookbooks')}
                 tabIndex={isLoggedin ? 0 : -1}
                 className={classNames(!isLoggedin && 'link-disabled')}

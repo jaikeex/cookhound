@@ -88,10 +88,6 @@ export const ProfileTemplate: React.FC<ProfileProps> = ({
          * If the user is not the current user and the tab is dashboard, set it to recipes.
          */
         if (initialTab === ProfileTab.Dashboard && !isCurrentUser) {
-            router.replace('/user/recipes', {
-                scroll: false
-            });
-
             currentUrl.searchParams.set('tab', ProfileTab.Recipes);
 
             router.replace(currentUrl.pathname + currentUrl.search, {

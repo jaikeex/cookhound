@@ -5,6 +5,7 @@ import {
     waitForEmailProcessing,
     invalidTestData
 } from './utils/test-helpers';
+import { ROUTES } from '../src/common/constants/routes';
 
 test.describe('User Registration', () => {
     //~=========================================================================================~//
@@ -15,7 +16,7 @@ test.describe('User Registration', () => {
         const testUser = generateTestUser();
 
         try {
-            await page.goto('/auth/register');
+            await page.goto(ROUTES.auth.register);
 
             await page.getByTestId('register-username').fill(testUser.username);
             await page.getByTestId('register-email').fill(testUser.email);
@@ -44,7 +45,7 @@ test.describe('User Registration', () => {
         const testUser = generateTestUser();
 
         try {
-            await page.goto('/auth/register');
+            await page.goto(ROUTES.auth.register);
             await page.getByTestId('register-username').fill(testUser.username);
             await page.getByTestId('register-email').fill(testUser.email);
             await page.getByTestId('register-password').fill(testUser.password);
@@ -72,19 +73,19 @@ test.describe('User Registration', () => {
     test('should display validation errors for empty fields', async ({
         page
     }) => {
-        await page.goto('/auth/register');
+        await page.goto(ROUTES.auth.register);
 
         await page.getByTestId('register-submit').click();
 
         await page.waitForTimeout(500);
 
-        expect(page.url()).toContain('/auth/register');
+        expect(page.url()).toContain(ROUTES.auth.register);
     });
 
     test('should show error for invalid email format', async ({ page }) => {
         const testUser = generateTestUser();
 
-        await page.goto('/auth/register');
+        await page.goto(ROUTES.auth.register);
 
         await page.getByTestId('register-username').fill(testUser.username);
         await page
@@ -99,13 +100,13 @@ test.describe('User Registration', () => {
 
         await page.waitForTimeout(500);
 
-        expect(page.url()).toContain('/auth/register');
+        expect(page.url()).toContain(ROUTES.auth.register);
     });
 
     test('should show error for password too short', async ({ page }) => {
         const testUser = generateTestUser();
 
-        await page.goto('/auth/register');
+        await page.goto(ROUTES.auth.register);
 
         await page.getByTestId('register-username').fill(testUser.username);
         await page.getByTestId('register-email').fill(testUser.email);
@@ -120,13 +121,13 @@ test.describe('User Registration', () => {
 
         await page.waitForTimeout(500);
 
-        expect(page.url()).toContain('/auth/register');
+        expect(page.url()).toContain(ROUTES.auth.register);
     });
 
     test('should show error for weak password', async ({ page }) => {
         const testUser = generateTestUser();
 
-        await page.goto('/auth/register');
+        await page.goto(ROUTES.auth.register);
 
         await page.getByTestId('register-username').fill(testUser.username);
         await page.getByTestId('register-email').fill(testUser.email);
@@ -141,13 +142,13 @@ test.describe('User Registration', () => {
 
         await page.waitForTimeout(500);
 
-        expect(page.url()).toContain('/auth/register');
+        expect(page.url()).toContain(ROUTES.auth.register);
     });
 
     test('should show error when passwords do not match', async ({ page }) => {
         const testUser = generateTestUser();
 
-        await page.goto('/auth/register');
+        await page.goto(ROUTES.auth.register);
 
         await page.getByTestId('register-username').fill(testUser.username);
         await page.getByTestId('register-email').fill(testUser.email);
@@ -162,13 +163,13 @@ test.describe('User Registration', () => {
 
         await page.waitForTimeout(500);
 
-        expect(page.url()).toContain('/auth/register');
+        expect(page.url()).toContain(ROUTES.auth.register);
     });
 
     test('should show error when terms not accepted', async ({ page }) => {
         const testUser = generateTestUser();
 
-        await page.goto('/auth/register');
+        await page.goto(ROUTES.auth.register);
 
         await page.getByTestId('register-username').fill(testUser.username);
         await page.getByTestId('register-email').fill(testUser.email);
@@ -180,7 +181,7 @@ test.describe('User Registration', () => {
 
         await page.waitForTimeout(500);
 
-        expect(page.url()).toContain('/auth/register');
+        expect(page.url()).toContain(ROUTES.auth.register);
     });
 
     test('should show error for username with invalid characters', async ({
@@ -188,7 +189,7 @@ test.describe('User Registration', () => {
     }) => {
         const testUser = generateTestUser();
 
-        await page.goto('/auth/register');
+        await page.goto(ROUTES.auth.register);
 
         await page
             .getByTestId('register-username')
@@ -203,13 +204,13 @@ test.describe('User Registration', () => {
 
         await page.waitForTimeout(500);
 
-        expect(page.url()).toContain('/auth/register');
+        expect(page.url()).toContain(ROUTES.auth.register);
     });
 
     test('should show error for username too short', async ({ page }) => {
         const testUser = generateTestUser();
 
-        await page.goto('/auth/register');
+        await page.goto(ROUTES.auth.register);
 
         await page
             .getByTestId('register-username')
@@ -224,13 +225,13 @@ test.describe('User Registration', () => {
 
         await page.waitForTimeout(500);
 
-        expect(page.url()).toContain('/auth/register');
+        expect(page.url()).toContain(ROUTES.auth.register);
     });
 
     test('should show error for username too long', async ({ page }) => {
         const testUser = generateTestUser();
 
-        await page.goto('/auth/register');
+        await page.goto(ROUTES.auth.register);
 
         await page
             .getByTestId('register-username')
@@ -245,7 +246,7 @@ test.describe('User Registration', () => {
 
         await page.waitForTimeout(500);
 
-        expect(page.url()).toContain('/auth/register');
+        expect(page.url()).toContain(ROUTES.auth.register);
     });
 
     //~=========================================================================================~//
@@ -257,7 +258,7 @@ test.describe('User Registration', () => {
         const testUserB = generateTestUser();
 
         try {
-            await page.goto('/auth/register');
+            await page.goto(ROUTES.auth.register);
             await page
                 .getByTestId('register-username')
                 .fill(testUserA.username);
@@ -273,7 +274,7 @@ test.describe('User Registration', () => {
 
             await page.waitForURL(/auth\/verify-email/, { timeout: 10000 });
 
-            await page.goto('/auth/register');
+            await page.goto(ROUTES.auth.register);
             await page
                 .getByTestId('register-username')
                 .fill(testUserA.username);
@@ -289,7 +290,7 @@ test.describe('User Registration', () => {
 
             await page.waitForTimeout(2000);
 
-            expect(page.url()).toContain('/auth/register');
+            expect(page.url()).toContain(ROUTES.auth.register);
 
             const pageContent = await page.content();
             expect(pageContent.length).toBeGreaterThan(0);
@@ -303,7 +304,7 @@ test.describe('User Registration', () => {
         const testUserB = generateTestUser();
 
         try {
-            await page.goto('/auth/register');
+            await page.goto(ROUTES.auth.register);
             await page
                 .getByTestId('register-username')
                 .fill(testUserA.username);
@@ -319,7 +320,7 @@ test.describe('User Registration', () => {
 
             await page.waitForURL(/auth\/verify-email/, { timeout: 10000 });
 
-            await page.goto('/auth/register');
+            await page.goto(ROUTES.auth.register);
             await page
                 .getByTestId('register-username')
                 .fill(testUserB.username);
@@ -335,7 +336,7 @@ test.describe('User Registration', () => {
 
             await page.waitForTimeout(2000);
 
-            expect(page.url()).toContain('/auth/register');
+            expect(page.url()).toContain(ROUTES.auth.register);
 
             const pageContent = await page.content();
             expect(pageContent.length).toBeGreaterThan(0);

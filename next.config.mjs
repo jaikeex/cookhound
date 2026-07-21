@@ -21,6 +21,71 @@ const contentSecurityPolicy = [
 const nextConfig = {
     output: 'standalone',
 
+    async redirects() {
+        return [
+            {
+                source: '/recipe/:path*',
+                destination: '/recept/:path*',
+                permanent: true
+            },
+            {
+                source: '/cookbooks/:path*',
+                destination: '/kucharky/:path*',
+                permanent: true
+            },
+            {
+                source: '/user/:path*',
+                destination: '/profil/:path*',
+                permanent: true
+            },
+            {
+                source: '/search',
+                destination: '/vyhledavani',
+                permanent: true
+            },
+            {
+                source: '/filter',
+                destination: '/filtr',
+                permanent: true
+            },
+            {
+                source: '/terms',
+                destination: '/podminky',
+                permanent: true
+            },
+            {
+                source: '/privacy',
+                destination: '/soukromi',
+                permanent: true
+            },
+            {
+                source: '/contact',
+                destination: '/kontakt',
+                permanent: true
+            },
+            {
+                source: '/shopping-list',
+                destination: '/nakupni-seznam',
+                permanent: true
+            },
+            {
+                source: '/auth/login',
+                destination: '/auth/prihlaseni',
+                permanent: true
+            },
+            {
+                source: '/auth/register',
+                destination: '/auth/registrace',
+                permanent: true
+            },
+            {
+                source: '/auth/reset-password',
+                destination: '/auth/reset-hesla',
+                permanent: true
+            }
+        ];
+    },
+
     async headers() {
         return [
             {

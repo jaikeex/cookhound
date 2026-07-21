@@ -2,7 +2,7 @@
 
 import React, { useCallback, useMemo } from 'react';
 import { ButtonBase, Icon, Typography } from '@/client/components';
-import { useLocale, useModal } from '@/client/store';
+import { useAuth, useLocale, useModal } from '@/client/store';
 import { useRouter } from 'next/navigation';
 import type { Recipe } from '@/common/types';
 import type { RecipeFlagReason } from '@/common/constants';
@@ -26,6 +26,7 @@ export const FlaggedAuthorTemplate: React.FC<FlaggedAuthorTemplateProps> = ({
     const queryClient = useQueryClient();
     const { openModal } = useModal();
     const { alert } = useSnackbar();
+    const { user } = useAuth();
 
     const activeFlag = useMemo(
         () => recipe.flags?.find((flag) => flag.active) ?? null,
@@ -49,7 +50,7 @@ export const FlaggedAuthorTemplate: React.FC<FlaggedAuthorTemplateProps> = ({
                     variant: 'success'
                 });
 
-                router.push('/profile');
+                router.push(user ? ROUTES.user.detail(user.id) : ROUTES.home);
             },
             onError: () => {
                 alert({

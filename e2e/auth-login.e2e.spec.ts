@@ -5,6 +5,7 @@ import {
     createVerifiedTestUser,
     invalidTestData
 } from './utils/test-helpers';
+import { ROUTES } from '../src/common/constants/routes';
 
 test.describe('User Login', () => {
     //~=========================================================================================~//
@@ -17,7 +18,7 @@ test.describe('User Login', () => {
         const testUser = await createVerifiedTestUser();
 
         try {
-            await page.goto('/auth/login');
+            await page.goto(ROUTES.auth.login);
 
             await page.getByTestId('login-email').fill(testUser.email);
             await page.getByTestId('login-password').fill(testUser.password);
@@ -37,7 +38,7 @@ test.describe('User Login', () => {
         const testUser = await createVerifiedTestUser();
 
         try {
-            await page.goto('/auth/login');
+            await page.goto(ROUTES.auth.login);
 
             await page.getByTestId('login-email').fill(testUser.email);
             await page.getByTestId('login-password').fill(testUser.password);
@@ -58,7 +59,7 @@ test.describe('User Login', () => {
         const testUser = await createVerifiedTestUser();
 
         try {
-            await page.goto('/auth/login');
+            await page.goto(ROUTES.auth.login);
 
             await page.getByTestId('login-email').fill(testUser.email);
             await page.getByTestId('login-password').fill(testUser.password);
@@ -79,33 +80,33 @@ test.describe('User Login', () => {
     test('should display validation error for empty email field', async ({
         page
     }) => {
-        await page.goto('/auth/login');
+        await page.goto(ROUTES.auth.login);
 
         await page.getByTestId('login-password').fill('TestPassword123!');
         await page.getByTestId('login-submit').click();
 
         await page.waitForTimeout(500);
 
-        expect(page.url()).toContain('/auth/login');
+        expect(page.url()).toContain(ROUTES.auth.login);
     });
 
     test('should display validation error for empty password field', async ({
         page
     }) => {
-        await page.goto('/auth/login');
+        await page.goto(ROUTES.auth.login);
 
         await page.getByTestId('login-email').fill('test@example.com');
         await page.getByTestId('login-submit').click();
 
         await page.waitForTimeout(500);
 
-        expect(page.url()).toContain('/auth/login');
+        expect(page.url()).toContain(ROUTES.auth.login);
     });
 
     test('should display validation error for invalid email format', async ({
         page
     }) => {
-        await page.goto('/auth/login');
+        await page.goto(ROUTES.auth.login);
 
         await page
             .getByTestId('login-email')
@@ -115,19 +116,19 @@ test.describe('User Login', () => {
 
         await page.waitForTimeout(500);
 
-        expect(page.url()).toContain('/auth/login');
+        expect(page.url()).toContain(ROUTES.auth.login);
     });
 
     test('should display validation error when both fields are empty', async ({
         page
     }) => {
-        await page.goto('/auth/login');
+        await page.goto(ROUTES.auth.login);
 
         await page.getByTestId('login-submit').click();
 
         await page.waitForTimeout(500);
 
-        expect(page.url()).toContain('/auth/login');
+        expect(page.url()).toContain(ROUTES.auth.login);
     });
 
     //~=========================================================================================~//
@@ -137,7 +138,7 @@ test.describe('User Login', () => {
     test('should display error for non-existent email', async ({ page }) => {
         const testUser = generateTestUser();
 
-        await page.goto('/auth/login');
+        await page.goto(ROUTES.auth.login);
 
         await page.getByTestId('login-email').fill(testUser.email);
         await page.getByTestId('login-password').fill(testUser.password);
@@ -145,7 +146,7 @@ test.describe('User Login', () => {
 
         await page.waitForTimeout(2000);
 
-        expect(page.url()).toContain('/auth/login');
+        expect(page.url()).toContain(ROUTES.auth.login);
 
         const pageContent = await page.content();
         expect(pageContent.length).toBeGreaterThan(0);
@@ -155,7 +156,7 @@ test.describe('User Login', () => {
         const testUser = await createVerifiedTestUser();
 
         try {
-            await page.goto('/auth/login');
+            await page.goto(ROUTES.auth.login);
 
             await page.getByTestId('login-email').fill(testUser.email);
             await page.getByTestId('login-password').fill('WrongPassword123!');
@@ -163,7 +164,7 @@ test.describe('User Login', () => {
 
             await page.waitForTimeout(2000);
 
-            expect(page.url()).toContain('/auth/login');
+            expect(page.url()).toContain(ROUTES.auth.login);
 
             const pageContent = await page.content();
             expect(pageContent.length).toBeGreaterThan(0);
@@ -178,7 +179,7 @@ test.describe('User Login', () => {
         const testUser = generateTestUser();
 
         try {
-            await page.goto('/auth/register');
+            await page.goto(ROUTES.auth.register);
             await page.getByTestId('register-username').fill(testUser.username);
             await page.getByTestId('register-email').fill(testUser.email);
             await page.getByTestId('register-password').fill(testUser.password);
@@ -190,14 +191,14 @@ test.describe('User Login', () => {
 
             await page.waitForURL(/auth\/verify-email/, { timeout: 10000 });
 
-            await page.goto('/auth/login');
+            await page.goto(ROUTES.auth.login);
             await page.getByTestId('login-email').fill(testUser.email);
             await page.getByTestId('login-password').fill(testUser.password);
             await page.getByTestId('login-submit').click();
 
             await page.waitForTimeout(2000);
 
-            expect(page.url()).toContain('/auth/login');
+            expect(page.url()).toContain(ROUTES.auth.login);
 
             const pageContent = await page.content();
             expect(pageContent.length).toBeGreaterThan(0);

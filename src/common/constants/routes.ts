@@ -12,9 +12,9 @@
 //?—————————————————————————————————————————————————————————————————————————————————————————————?//
 
 const SEGMENTS = {
-    recipe: '/recipe',
-    cookbook: '/cookbooks',
-    user: '/user',
+    recipe: '/recept',
+    cookbook: '/kucharky',
+    user: '/profil',
     auth: '/auth',
     admin: '/admin',
     error: '/error'
@@ -31,20 +31,20 @@ const SEGMENTS = {
 ///
 //~—————————————————————————————————————————————————————————————————————————————————————————————~//
 
-/** A recipe detail path, e.g. `/recipe/abc123`. */
+/** A recipe detail path, e.g. `/recept/abc123`. */
 export type RecipePath = `${typeof SEGMENTS.recipe}/${string}`;
 
-/** A recipe edit path, e.g. `/recipe/abc123/edit`. */
+/** A recipe edit path, e.g. `/recept/abc123/edit`. */
 export type RecipeEditPath = `${RecipePath}/edit`;
 
-/** A cookbook detail path, e.g. `/cookbooks/abc123`. */
+/** A cookbook detail path, e.g. `/kucharky/abc123`. */
 export type CookbookPath = `${typeof SEGMENTS.cookbook}/${string}`;
 
-/** A user profile path, e.g. `/user/42`. */
+/** A user profile path, e.g. `/profil/42`. */
 export type UserPath = `${typeof SEGMENTS.user}/${string | number}`;
 
 /** The search path, bare or with an (already url-encoded) query. */
-export type SearchPath = '/search' | `/search?query=${string}`;
+export type SearchPath = '/vyhledavani' | `/vyhledavani?query=${string}`;
 
 //~—————————————————————————————————————————————————————————————————————————————————————————————~//
 //$                                       ROUTE REGISTRY                                        $//
@@ -56,20 +56,22 @@ export const ROUTES = {
     //|-----------------------------------------------------------------------------------------|//
 
     home: '/',
-    filter: '/filter',
-    terms: '/terms',
-    privacy: '/privacy',
-    contact: '/contact',
+    filter: '/filtr',
+    terms: '/podminky',
+    privacy: '/soukromi',
+    contact: '/kontakt',
 
     /**
      * Builds the path for the search page, optionally with a query.
      * The query is url-encoded here - pass it raw. Call with no argument
-     * for the bare `/search` path.
+     * for the bare `/vyhledavani` path.
      *
      * @param query - The raw search query (already-joined multi-queries included).
      */
     search: (query?: string): SearchPath =>
-        query ? `/search?query=${encodeURIComponent(query)}` : '/search',
+        query
+            ? `/vyhledavani?query=${encodeURIComponent(query)}`
+            : '/vyhledavani',
 
     //|-----------------------------------------------------------------------------------------|//
     //?                                         RECIPE                                          ?//
@@ -124,16 +126,16 @@ export const ROUTES = {
         detail: (id: number | string): UserPath => `${SEGMENTS.user}/${id}`
     },
 
-    shoppingList: '/shopping-list',
+    shoppingList: '/nakupni-seznam',
 
     //|-----------------------------------------------------------------------------------------|//
     //?                                          AUTH                                           ?//
     //|-----------------------------------------------------------------------------------------|//
 
     auth: {
-        login: `${SEGMENTS.auth}/login`,
-        register: `${SEGMENTS.auth}/register`,
-        resetPassword: `${SEGMENTS.auth}/reset-password`,
+        login: `${SEGMENTS.auth}/prihlaseni`,
+        register: `${SEGMENTS.auth}/registrace`,
+        resetPassword: `${SEGMENTS.auth}/reset-hesla`,
         verifyEmail: `${SEGMENTS.auth}/verify-email`,
         verifyEmailChange: `${SEGMENTS.auth}/verify-email-change`,
 
