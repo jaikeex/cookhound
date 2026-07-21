@@ -7,7 +7,9 @@ import type { CaptchaAction } from '@/common/types';
  * @param action - name for the action being protected.
  */
 export function executeCaptcha(action: CaptchaAction): Promise<string> {
-    if (!ENV_CONFIG_PUBLIC.CAPTCHA_SITE_KEY) {
+    const siteKey = ENV_CONFIG_PUBLIC.CAPTCHA_SITE_KEY;
+
+    if (!siteKey) {
         return Promise.resolve('captcha-bypass');
     }
 
@@ -19,7 +21,7 @@ export function executeCaptcha(action: CaptchaAction): Promise<string> {
 
         window.grecaptcha.ready(() => {
             window.grecaptcha
-                ?.execute(ENV_CONFIG_PUBLIC.CAPTCHA_SITE_KEY, { action })
+                ?.execute(siteKey, { action })
                 .then(resolve)
                 .catch(reject);
         });
