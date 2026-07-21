@@ -7,7 +7,22 @@ import { buildLocalizedMetadata } from '@/server/utils/seo';
 import { ENV_CONFIG_PUBLIC, ROUTES } from '@/common/constants';
 import db from '@/server/db/model';
 
+//?—————————————————————————————————————————————————————————————————————————————————————?//
+//?                                    BUILD WARMUP                                     ?//
+///
+//# The number of recipes prerendered at build time must be capped.
+//# Primary problem here is the db connection pool. The do postgres i am using
+//# has a cap of 22, which, surprisingly, is not that hard to exhaust during build.
+//# There is another layer of defense in the dockerfile, setting connection limit
+//# to 1 on the db connection string for the build only, but just to drive the point
+//# home and to tell future me this might be a problem, this guard exists.
+///
+//?—————————————————————————————————————————————————————————————————————————————————————?//
+
 export const revalidate = 3600;
+export const dynamicParams = true;
+
+const SSG_PREWARM_LIMIT = 30;
 
 type RecipePageParams = {
     readonly params: Promise<
@@ -56,7 +71,7 @@ export default async function Page({ params }: RecipePageParams) {
 export async function generateStaticParams(): Promise<
     Array<{ displayId: string }>
 > {
-    return db.recipe.listDisplayIdsForStaticGeneration(undefined, 0); // no need to cache this
+    return db.recipe.listDisplayIdsForStaticGeneration(SSG_PREWARM_LIMIT, 0); // no need to cache this
 }
 
 //|=============================================================================================|//

@@ -149,7 +149,9 @@ const nextConfig = {
 
     experimental: {
         optimizeCss: true,
-        optimizePackageImports: ['@/client/components']
+        optimizePackageImports: ['@/client/components'],
+        cpus: 4,
+        staticGenerationMaxConcurrency: 2
     },
 
     logging: {

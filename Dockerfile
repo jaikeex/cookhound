@@ -66,7 +66,22 @@ COPY . .
 # 2) Generate Prisma client (incl. TypedSQL) against the migrated database
 # 3) Build standalone Next.js output
 # 4) Copy static assets into standalone folder
-RUN yarn prisma migrate deploy \
+RUN \
+    # Force a single DB connection for the whole build. next build prerenders
+    # pages with multiple workers, each process holding its own Prisma pool
+    # (default connection_limit), so the peak can be workers × limit and exhaust
+    # the database's connection slots.
+    case "$DATABASE_URL" in \
+        *connection_limit=*) DATABASE_URL="$(printf '%s' "$DATABASE_URL" | sed -E 's/connection_limit=[0-9]+/connection_limit=1/')" ;; \
+        *\?*)                DATABASE_URL="${DATABASE_URL}&connection_limit=1" ;; \
+        *)                   DATABASE_URL="${DATABASE_URL}?connection_limit=1" ;; \
+    esac; \
+    case "$DATABASE_URL" in \
+        *pool_timeout=*) DATABASE_URL="$(printf '%s' "$DATABASE_URL" | sed -E 's/pool_timeout=[0-9]+/pool_timeout=30/')" ;; \
+        *)               DATABASE_URL="${DATABASE_URL}&pool_timeout=30" ;; \
+    esac; \
+    export DATABASE_URL; \
+    yarn prisma migrate deploy \
     && yarn prisma generate --sql \
     && yarn next build --webpack \
     && node scripts/copy-standalone.js
