@@ -12,7 +12,8 @@ import {
     ScrollToTop,
     Head,
     Footer,
-    ConsentBanner
+    ConsentBanner,
+    GoogleAnalytics
 } from '@/client/components';
 
 import { CONTENT_WRAPPER_ID, MAIN_PAGE_ID } from '@/client/constants';
@@ -67,6 +68,7 @@ export default function RootLayout({
                     <AppProviders initialTheme="dark" initialConsent={null}>
                         <ClientShell />
                         <ConsentBanner />
+                        <GoogleAnalytics />
                         <ScrollToTop />
                         <div
                             id={MAIN_PAGE_ID}

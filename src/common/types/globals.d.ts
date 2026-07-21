@@ -21,6 +21,12 @@ declare global {
         ReturnType<Fn> extends Promise<infer R> ? R : ReturnType<Fn>;
 
     interface Window {
+        // Google analytics stuff
+        dataLayer?: unknown[];
+        gtag?: (...args: unknown[]) => void;
+        [key: `ga-disable-${string}`]: boolean | undefined;
+
+        // Google recaptcha stuff
         grecaptcha?: {
             ready: (cb: () => void) => void;
             execute: (

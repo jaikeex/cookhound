@@ -1,4 +1,4 @@
-export const PRIVACY_VERSION = '2025-10-07';
+export const PRIVACY_VERSION = '2026-07-21';
 
 export type PRIVACY_CONTENT_TYPE = {
     title: string;
@@ -9,7 +9,7 @@ export type PRIVACY_CONTENT_TYPE = {
 };
 
 export const PRIVACY_TITLE = 'Zásady ochrany osobních údajů pro cookhound.com';
-export const PRIVACY_TIMESTAMP = 'Datum účinnosti: 7. října 2025';
+export const PRIVACY_TIMESTAMP = 'Datum účinnosti: 21. července 2026';
 
 export const PRIVACY_CONTENT = [
     {
@@ -59,7 +59,7 @@ Právní základ: Oprávněný zájem na zajištění bezpečnosti a optimalizac
         content: [
             {
                 content: `Pro zajištění některých funkcí využíváme specializované služby třetích stran, které vystupují v roli zpracovatelů osobních údajů. S těmito zpracovateli máme uzavřené smlouvy, které zajišťují ochranu vašich údajů v souladu s GDPR.
-Google (Google Cloud Platform, Gmail): Využíváme pro hosting našich serverů (CDN, logging) a pro odesílání e-mailů (např. potvrzení registrace, reset hesla). Google zpracovává data v zabezpečených datových centrech.
+Google (Google Cloud Platform, Gmail, Google Analytics): Využíváme pro hosting našich serverů (CDN, logging), pro odesílání e-mailů (např. potvrzení registrace, reset hesla) a – pouze s vaším souhlasem – pro statistické měření návštěvnosti webu prostřednictvím služby Google Analytics. Google zpracovává data v zabezpečených datových centrech.
 OpenAI: Využíváme služby pro automatickou moderaci nahrávaného obsahu (proti nevhodným příspěvkům) a pro generování návrhů a doporučení v rámci našich služeb. Společnost OpenAI se řídí platnými předpisy na ochranu soukromí, včetně GDPR.`
             }
         ]
@@ -81,6 +81,7 @@ Toto předávání je právně ošetřeno na základě rozhodnutí Evropské kom
 Nezbytné (funkční) cookies: Jsou nutné pro základní fungování webu (např. přihlášení uživatele). K jejich použití nepotřebujeme váš souhlas.
 Cookies spojené s nastavením aplikace : Umožní nám zapamatovat si vaše nastavení (např. tmavý režim). K jejich použití potřebujeme váš aktivní souhlas.
 Analytické cookies: Pomáhají nám pochopit, jak návštěvníci používají naše stránky. K jejich použití potřebujeme váš aktivní souhlas.
+K měření návštěvnosti používáme na základě vašeho souhlasu službu Google Analytics 4 poskytovanou společností Google LLC (1600 Amphitheatre Parkway, Mountain View, CA 94043, USA), která vystupuje v roli zpracovatele osobních údajů. Google Analytics ukládá do vašeho zařízení soubory cookies _ga a _ga_*, které slouží k rozlišení jednotlivých návštěvníků a relací. Údaje o používání webu jsou uchovávány po dobu nejvýše 14 měsíců. Funkce Google Signals ani personalizace reklam nejsou aktivovány a shromážděné údaje nevyužíváme k reklamním účelům. Předávání údajů do USA probíhá na základě rámce EU-U.S. Data Privacy Framework, k němuž je společnost Google LLC certifikována. Souhlas můžete kdykoli odvolat v nastavení cookies; po odvolání se měření zastaví a analytické cookies budou z vašeho zařízení odstraněny.
 Marketingové cookies: Pomáhají nám přizpůsobit reklamu a měřit její efektivitu. K jejich použití potřebujeme váš aktivní souhlas.
 Podrobné informace o používaných cookies a možnostech jejich nastavení naleznete {{link:modal:cookies}}zde{{/link}}.`
             }

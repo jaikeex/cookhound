@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import type * as ServerIntegrations from '@/server/integrations';
+import type * as ServerCrypto from '@/server/utils/crypto';
 import { userService } from './service';
 import {
     validUser,
@@ -22,6 +23,8 @@ import {
     NotFoundError,
     ValidationError
 } from '@/server/error';
+import { generateProofHash } from '@/server/utils/crypto';
+import { serializeConsentContent } from '@/server/utils/consent';
 import { ApplicationErrorCode } from '@/server/error/codes';
 
 //|=============================================================================================|//
@@ -80,12 +83,18 @@ vi.mock('@/server/services/mail/service', () => ({
     }
 }));
 
-vi.mock('@/server/utils/crypto', () => ({
-    verifyPassword: vi.fn(),
-    safeVerifyPassword: vi.fn(),
-    hashPassword: vi.fn(),
-    needsRehash: vi.fn()
-}));
+vi.mock('@/server/utils/crypto', async (importOriginal) => {
+    const actual = await importOriginal<typeof ServerCrypto>();
+    return {
+        verifyPassword: vi.fn(),
+        safeVerifyPassword: vi.fn(),
+        hashPassword: vi.fn(),
+        needsRehash: vi.fn(),
+        // Real implementation — verifyCookieConsentHash tests exercise the
+        // actual hashing pipeline against stored records.
+        generateProofHash: actual.generateProofHash
+    };
+});
 
 vi.mock('@/server/utils/session', () => ({
     sessions: {
@@ -964,6 +973,92 @@ describe('UserService', () => {
             expect(result).toHaveProperty('userAgent');
             expect(result).toHaveProperty('createdAt');
             expect(result).toHaveProperty('updatedAt');
+        });
+    });
+
+    describe('verifyCookieConsentHash', () => {
+        const consentCreatedAt = new Date('2025-10-08T12:00:00.000Z');
+        const consentAccepted = ['essential', 'analytics'];
+
+        /**
+         * Builds a stored consent record whose proofHash was generated the
+         * same way the creation route does it — from the consent text of the
+         * record's version.
+         */
+        const buildStoredConsent = (
+            overrides: Record<string, unknown> = {}
+        ) => ({
+            id: 1,
+            userId: validUser.id,
+            consent: true,
+            accepted: consentAccepted,
+            version: '2025-10-08',
+            userIpAddress: '127.0.0.1',
+            userAgent: 'Mozilla/5.0 Test Browser',
+            proofHash: generateProofHash({
+                text: serializeConsentContent('2025-10-08'),
+                userId: validUser.id,
+                timestamp: consentCreatedAt,
+                accepted: consentAccepted
+            }),
+            createdAt: consentCreatedAt,
+            revokedAt: null,
+            updatedAt: consentCreatedAt,
+            ...overrides
+        });
+
+        it('should verify an untampered record as valid', async () => {
+            mockDbUser.getLatestUserCookieConsent.mockResolvedValue(
+                buildStoredConsent() as any
+            );
+
+            const result = await userService.verifyCookieConsentHash(
+                validUser.id,
+                1
+            );
+
+            expect(result.valid).toBe(true);
+            expect(result.details.computedHash).toBeUndefined();
+        });
+
+        it('should report a tampered record as invalid', async () => {
+            mockDbUser.getLatestUserCookieConsent.mockResolvedValue(
+                buildStoredConsent({
+                    accepted: ['essential', 'analytics', 'marketing']
+                }) as any
+            );
+
+            const result = await userService.verifyCookieConsentHash(
+                validUser.id,
+                1
+            );
+
+            expect(result.valid).toBe(false);
+            expect(result.details.computedHash).toBeDefined();
+        });
+
+        it('should report a record with an unverifiable version as invalid without throwing', async () => {
+            mockDbUser.getLatestUserCookieConsent.mockResolvedValue(
+                buildStoredConsent({ version: '2025-09-15' }) as any
+            );
+
+            const result = await userService.verifyCookieConsentHash(
+                validUser.id,
+                1
+            );
+
+            expect(result.valid).toBe(false);
+            expect(result.details.computedHash).toBeUndefined();
+        });
+
+        it('should throw NotFoundError when no record exists', async () => {
+            mockDbUser.getLatestUserCookieConsent.mockResolvedValue(
+                null as any
+            );
+
+            await expect(
+                userService.verifyCookieConsentHash(validUser.id, 1)
+            ).rejects.toBeInstanceOf(NotFoundError);
         });
     });
 });

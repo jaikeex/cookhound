@@ -338,7 +338,7 @@
     "app.cookies.modal.preferences": "Předvolby",
     "app.cookies.modal.preferences-description": "Umožní nám zapamatovat si vaše nastavení",
     "app.cookies.modal.analytics": "Analytika",
-    "app.cookies.modal.analytics-description": "Pomůže nám pochopit, jak návštěvníci používají naši webovou stránku",
+    "app.cookies.modal.analytics-description": "Pomáhají nám pochopit, jak návštěvníci používají náš web. K měření návštěvnosti používáme službu Google Analytics společnosti Google LLC.",
     "app.cookies.modal.marketing": "Marketing",
     "app.cookies.modal.marketing-description": "Přizpůsobení reklam a měření jejich efektivity",
     "app.cookies.modal.allways-on": "Vždy zapnuto",

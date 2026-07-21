@@ -830,19 +830,33 @@ class UserService {
 
         const storedHash = cookieConsent.proofHash;
 
-        // Regenerate the hash from stored data
-        const consentText = serializeConsentContent();
-        const computedHash = generateProofHash({
-            text: consentText,
-            userId: cookieConsent.userId,
-            timestamp: cookieConsent.createdAt,
-            accepted: cookieConsent.accepted
-        });
+        // Regenerate the hash from stored data, using the consent text of the
+        // version the user actually consented to. Records whose version has no
+        // registered text are unverifiable by definition.
+        let computedHash: string | undefined;
 
-        const valid = timingSafeEqual(
-            Buffer.from(storedHash),
-            Buffer.from(computedHash)
-        );
+        try {
+            const consentText = serializeConsentContent(cookieConsent.version);
+
+            computedHash = generateProofHash({
+                text: consentText,
+                userId: cookieConsent.userId,
+                timestamp: cookieConsent.createdAt,
+                accepted: cookieConsent.accepted
+            });
+        } catch (error: unknown) {
+            log.warn('verifyCookieConsentHash - unverifiable version', {
+                userId,
+                consentId,
+                version: cookieConsent.version,
+                error
+            });
+        }
+
+        const valid =
+            computedHash !== undefined &&
+            storedHash.length === computedHash.length &&
+            timingSafeEqual(Buffer.from(storedHash), Buffer.from(computedHash));
 
         log.trace('verifyCookieConsentHash - verification complete', {
             userId,

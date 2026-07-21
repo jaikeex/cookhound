@@ -17,6 +17,7 @@ import { ValidationError } from '@/server/error';
 import { ApplicationErrorCode } from '@/server/error/codes';
 import { registerRouteDocs } from '@/server/utils/api-docs';
 import { AuthLevel } from '@/common/types';
+import { CONSENT_VERSION } from '@/common/constants';
 
 //|=============================================================================================|//
 //?                                     VALIDATION SCHEMAS                                      ?//
@@ -40,7 +41,7 @@ const CookieConsentResponseSchema = z.object({
 
 const UserCookieConsentForCreateSchema = z.strictObject({
     consent: z.boolean(),
-    version: z.string(),
+    version: z.literal(CONSENT_VERSION),
     createdAt: z.coerce.date(),
     userId: z.string().optional(),
     accepted: z.array(
@@ -80,7 +81,7 @@ async function postHandler(request: NextRequest) {
     const userIpAddress = RequestContext.getIp() || '';
     const userAgent = RequestContext.getUserAgent() || '';
 
-    const consentText = serializeConsentContent();
+    const consentText = serializeConsentContent(payload.version);
 
     const proofHash = generateProofHash({
         text: consentText,

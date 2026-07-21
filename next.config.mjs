@@ -7,11 +7,12 @@ const contentSecurityPolicy = [
     "object-src 'none'",
     "frame-ancestors 'none'",
     "form-action 'self'",
-    `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ''} https://www.google.com https://www.gstatic.com`,
+    `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ''} https://www.google.com https://www.gstatic.com https://www.googletagmanager.com`,
     "style-src 'self' 'unsafe-inline'",
-    "img-src 'self' data: blob: https://storage.googleapis.com https://lh3.googleusercontent.com https://www.gstatic.com",
+    // *.google-analytics.com covers the GA4 regional endpoints (region1.google-analytics.com etc.)
+    "img-src 'self' data: blob: https://storage.googleapis.com https://lh3.googleusercontent.com https://www.gstatic.com https://*.google-analytics.com https://www.googletagmanager.com",
     "font-src 'self' data:",
-    `connect-src 'self'${isDev ? ' ws:' : ''} https://www.google.com`,
+    `connect-src 'self'${isDev ? ' ws:' : ''} https://www.google.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com`,
     'frame-src https://www.google.com',
     "manifest-src 'self'",
     ...(isDev ? [] : ['upgrade-insecure-requests'])
