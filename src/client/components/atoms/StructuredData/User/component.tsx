@@ -1,28 +1,26 @@
 import { StructuredData } from '@/client/components';
 import { ENV_CONFIG_PUBLIC, ROUTES } from '@/common/constants';
-import type { Locale, User } from '@/common/types';
+import type { User } from '@/common/types';
 import React from 'react';
 import {
     generateBreadcrumbSchema,
     generatePersonSchema
 } from '@/server/utils/seo';
-import { tServer } from '@/server/utils/locales';
+import { t } from '@/client/locales';
 
 type UserStructuredDataProps = Readonly<{
     userPromise: Promise<User>;
-    locale: Locale;
 }>;
 
 export const UserStructuredData: React.FC<UserStructuredDataProps> = async ({
-    userPromise,
-    locale
+    userPromise
 }) => {
     const user = await userPromise;
     const userSchema = generatePersonSchema(user, ENV_CONFIG_PUBLIC.ORIGIN);
 
     const breadcrumbSchema = generateBreadcrumbSchema([
         {
-            name: tServer(locale, 'app.general.home'),
+            name: t('app.general.home'),
             url: ENV_CONFIG_PUBLIC.ORIGIN
         },
         {

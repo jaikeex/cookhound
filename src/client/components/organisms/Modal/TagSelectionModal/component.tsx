@@ -9,10 +9,11 @@ import {
     TagSelectionList,
     TagSelectionBox
 } from '@/client/components';
-import { useCreateRecipeStore, useLocale, useSnackbar } from '@/client/store';
+import { useCreateRecipeStore, useSnackbar } from '@/client/store';
 import type { RequestError } from '@/client/error';
 import { MAX_TAGS, RECIPE_TAG_CATEGORY_LIMITS_BY_ID } from '@/common/constants';
 import { chqc } from '@/client/data';
+import { t } from '@/client/locales';
 
 type TagSelectionModalProps = Readonly<{
     error?: RequestError | null;
@@ -33,7 +34,6 @@ export const TagSelectionModal: React.FC<TagSelectionModalProps> = ({
     onCancel,
     tagLists
 }) => {
-    const { t } = useLocale();
     const { alert } = useSnackbar();
 
     const recipeObject = useCreateRecipeStore((state) => state.recipeObject);
@@ -122,14 +122,7 @@ export const TagSelectionModal: React.FC<TagSelectionModalProps> = ({
         }
 
         suggestTags(recipeObject);
-    }, [
-        recipeObject,
-        suggestTags,
-        alert,
-        t,
-        canSuggest,
-        getRemainingsuggestions
-    ]);
+    }, [recipeObject, suggestTags, alert, canSuggest, getRemainingsuggestions]);
 
     const handleApply = useCallback(() => {
         onApply?.(selectedTags);
@@ -145,7 +138,7 @@ export const TagSelectionModal: React.FC<TagSelectionModalProps> = ({
         if (error) {
             alert({ message: t('app.error.default'), variant: 'error' });
         }
-    }, [error, alert, t]);
+    }, [error, alert]);
 
     if (isLoading) return <Loader />;
 

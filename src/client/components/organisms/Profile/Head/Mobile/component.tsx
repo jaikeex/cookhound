@@ -9,7 +9,7 @@ import {
     Time,
     Typography
 } from '@/client/components';
-import { useLocale } from '@/client/store';
+import { t } from '@/client/locales';
 import { getAgeString } from '@/client/utils';
 
 export type ProfileHeadPropsMobile = Readonly<{
@@ -21,11 +21,9 @@ export const ProfileHeadMobile: React.FC<ProfileHeadPropsMobile> = ({
     user,
     isCurrentUser
 }) => {
-    const { t, locale } = useLocale();
-
     const accountAge = useMemo(
-        () => getAgeString(user.createdAt, locale),
-        [user.createdAt, locale]
+        () => getAgeString(user.createdAt),
+        [user.createdAt]
     );
 
     return (

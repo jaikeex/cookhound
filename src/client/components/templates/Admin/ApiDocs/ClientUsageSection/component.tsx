@@ -2,8 +2,8 @@
 
 import React from 'react';
 import { Typography } from '@/client/components';
-import { useLocale } from '@/client/store/I18nContext';
 import type { ClientUsageEntry } from '@/common/types';
+import { t } from '@/client/locales';
 
 export type ClientUsageSectionProps = Readonly<{
     clientUsage: readonly ClientUsageEntry[];
@@ -12,8 +12,6 @@ export type ClientUsageSectionProps = Readonly<{
 export const ClientUsageSection: React.FC<ClientUsageSectionProps> = ({
     clientUsage
 }) => {
-    const { t } = useLocale();
-
     return (
         <div>
             <Typography

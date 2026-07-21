@@ -2,8 +2,9 @@ import { useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 import { chqc } from '@/client/data';
-import { useAuth, useLocale, useSnackbar } from '@/client/store';
+import { useAuth, useSnackbar } from '@/client/store';
 import { AppEvent, eventBus } from '@/client/events';
+import { t } from '@/client/locales';
 
 /**
  * Hook that logs the current user out and performs all required clean-up on success.
@@ -11,8 +12,6 @@ import { AppEvent, eventBus } from '@/client/events';
 export const useLogout = () => {
     const { setUser } = useAuth();
     const { alert } = useSnackbar();
-    const { t } = useLocale();
-
     const router = useRouter();
     const queryClient = useQueryClient();
 

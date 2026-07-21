@@ -1,9 +1,9 @@
 'use client';
 
 import { ButtonBase, Loader, TextInput, Typography } from '@/client/components';
-import { useLocale } from '@/client/store';
 import * as React from 'react';
 import { useCallback, useEffect, useState } from 'react';
+import { t } from '@/client/locales';
 
 type TextInputRowProps = Readonly<{
     className?: string;
@@ -24,8 +24,6 @@ export const TextInputRow: React.FC<TextInputRowProps> = ({
     name,
     inputId
 }) => {
-    const { t } = useLocale();
-
     const [isEditing, setIsEditing] = useState(false);
     const [value, setValue] = useState(defaultValue);
 

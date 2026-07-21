@@ -8,7 +8,7 @@ import {
     CategoryHeader
 } from '@/client/components';
 import type { Ingredient } from '@/common/types';
-import { useLocale } from '@/client/store';
+import { t } from '@/client/locales';
 
 type IngredientsListCreateProps = Readonly<{
     defaultIngredients?: Ingredient[] | null;
@@ -25,9 +25,6 @@ export const IngredientsListCreate: React.FC<IngredientsListCreateProps> = ({
     //|-----------------------------------------------------------------------------------------|//
     //?                                          STATE                                          ?//
     //|-----------------------------------------------------------------------------------------|//
-
-    const { t } = useLocale();
-
     const [categories, setCategories] = useState<string[]>([]);
     const [ingredientsByCategory, setIngredientsByCategory] =
         useState<IngredientByCategory>(
@@ -148,7 +145,7 @@ export const IngredientsListCreate: React.FC<IngredientsListCreateProps> = ({
         setCategories((prev) => [...prev, newName]);
         setIngredientsByCategory((prev) => new Map(prev).set(newName, []));
         setDragKeysByCategory((prev) => new Map(prev).set(newName, []));
-    }, [categories, t]);
+    }, [categories]);
 
     const handleRenameCategory = useCallback(
         (oldName: string, newName: string) => {
@@ -469,8 +466,7 @@ export const IngredientsListCreate: React.FC<IngredientsListCreateProps> = ({
             createIngredientAddHandler,
             handleIngredientChange,
             createIngredientRemoveHandler,
-            getGlobalIndex,
-            t
+            getGlobalIndex
         ]
     );
 
@@ -493,7 +489,7 @@ export const IngredientsListCreate: React.FC<IngredientsListCreateProps> = ({
                 )}
             </>
         ),
-        [categories, handleAddUncategorizedIngredient, renderCategorySection, t]
+        [categories, handleAddUncategorizedIngredient, renderCategorySection]
     );
 
     return (

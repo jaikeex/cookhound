@@ -11,11 +11,11 @@ import {
 } from '@/client/components';
 import type { RecipeFilterParams } from '@/common/types';
 import { useRecipeFilters } from '@/client/hooks';
-import { useLocale } from '@/client/store';
 import { useRouter } from 'next/navigation';
 import { GRID_COLS } from '@/client/constants';
 import { serializeFilterParams } from '@/common/utils';
 import { ROUTES } from '@/common/constants';
+import { t } from '@/client/locales';
 
 type FilterTemplateProps = Readonly<{
     initialFilters?: RecipeFilterParams;
@@ -24,7 +24,6 @@ type FilterTemplateProps = Readonly<{
 export const FilterTemplate: React.FC<FilterTemplateProps> = ({
     initialFilters = {}
 }) => {
-    const { t } = useLocale();
     const router = useRouter();
 
     const [searchInput, setSearchInput] = useState<string>('');

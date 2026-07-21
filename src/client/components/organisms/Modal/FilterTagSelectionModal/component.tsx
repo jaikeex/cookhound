@@ -9,8 +9,9 @@ import {
     TagSelectionList,
     TagSelectionBox
 } from '@/client/components';
-import { useLocale, useSnackbar } from '@/client/store';
+import { useSnackbar } from '@/client/store';
 import type { RequestError } from '@/client/error';
+import { t } from '@/client/locales';
 
 type FilterTagSelectionModalProps = Readonly<{
     error?: RequestError | null;
@@ -33,7 +34,6 @@ export const FilterTagSelectionModal: React.FC<
     onCancel,
     tagLists
 }) => {
-    const { t } = useLocale();
     const { alert } = useSnackbar();
 
     const [selectedTags, setSelectedTags] =
@@ -65,7 +65,7 @@ export const FilterTagSelectionModal: React.FC<
         if (error) {
             alert({ message: t('app.error.default'), variant: 'error' });
         }
-    }, [error, alert, t]);
+    }, [error, alert]);
 
     if (isLoading) return <Loader />;
 

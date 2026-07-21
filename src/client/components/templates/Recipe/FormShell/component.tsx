@@ -13,7 +13,8 @@ import {
 import { classNames } from '@/client/utils';
 import type { Recipe } from '@/common/types';
 import type { RecipeFormMode } from '@/client/types/core';
-import { useLocale, RecipeHandlingProvider } from '@/client/store';
+import { RecipeHandlingProvider } from '@/client/store';
+import { t } from '@/client/locales';
 
 export type RecipeFormShellProps = Readonly<{
     recipeObject: Recipe | null;
@@ -50,7 +51,6 @@ export const RecipeFormShell: React.FC<RecipeFormShellProps> = ({
     handleClosePreview,
     mode
 }) => {
-    const { t } = useLocale();
     /**
      * This memo is imporant to prevent the edit form fields from resetting when the form remounts.
      * The main source of mounts are url changes, and there are two ways that can happen: TahSelectionModal

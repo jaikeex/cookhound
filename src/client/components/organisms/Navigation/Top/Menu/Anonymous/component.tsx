@@ -8,12 +8,10 @@ import {
     Typography
 } from '@/client/components';
 import Link from 'next/link';
-import { useLocale } from '@/client/store';
 import { ROUTES } from '@/common/constants';
+import { t } from '@/client/locales';
 
 export const AnonymousMenuContent: React.FC = () => {
-    const { t } = useLocale();
-
     return (
         <React.Fragment>
             <Avatar src="anonymous" size="xxl" className="mx-auto" />

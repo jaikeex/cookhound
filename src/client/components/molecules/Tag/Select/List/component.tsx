@@ -9,7 +9,7 @@ import {
     RECIPE_TAG_CATEGORY_LIMITS_BY_ID,
     RECIPE_TAG_CATEGORY_LIMITS_BY_NAME
 } from '@/common/constants';
-import { useLocale } from '@/client/store';
+import { t } from '@/client/locales';
 
 type TagSelectionListProps = Readonly<{
     className?: string;
@@ -26,8 +26,6 @@ export const TagSelectionList: React.FC<TagSelectionListProps> = ({
     onSelect,
     showCategoryLimits = true
 }) => {
-    const { t } = useLocale();
-
     const handleToggle = useCallback(
         (tag: RecipeTagDTO) => () => onSelect?.(tag),
         [onSelect]

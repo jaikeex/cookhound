@@ -8,8 +8,8 @@ import {
     TextInput,
     Typography
 } from '@/client/components';
-import { useLocale } from '@/client/store';
 import type { I18nMessage } from '@/client/locales';
+import { t } from '@/client/locales';
 
 export type ContactFormErrors = {
     name?: I18nMessage;
@@ -28,8 +28,6 @@ export const ContactForm: React.FC<ContactFormProps> = ({
     errors,
     pending
 }) => {
-    const { t } = useLocale();
-
     const errorsToDisplay = Object.values(errors).map((error) => t(error));
 
     return (

@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { useAuth, useLocale } from '@/client/store';
+import { useAuth } from '@/client/store';
 import type { Recipe } from '@/common/types/recipe';
 import {
     Typography,
@@ -10,6 +10,7 @@ import {
     InstructionsView
 } from '@/client/components';
 import { IngredientsListView } from '@/client/components/organisms/IngredientsList';
+import { t } from '@/client/locales';
 
 export type DesktopRecipeBodyProps = Readonly<{
     isPreview?: boolean;
@@ -22,7 +23,6 @@ export const DesktopRecipeBody: React.FC<DesktopRecipeBodyProps> = ({
     onShoppingListCreate,
     recipe
 }) => {
-    const { t } = useLocale();
     const { user } = useAuth();
 
     const displayShoppingListButton = user && !isPreview;

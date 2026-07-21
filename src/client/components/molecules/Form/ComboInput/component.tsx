@@ -10,7 +10,7 @@ import React, {
 import { BaseInput, Icon, InputError, InputLabel } from '@/client/components';
 import type { FormInputProps } from '@/client/components/molecules/Form/types';
 import { classNames } from '@/client/utils';
-import { useLocale } from '@/client/store';
+import { t } from '@/client/locales';
 
 //~---------------------------------------------------------------------------------------------~//
 //$                                           TYPES                                             $//
@@ -53,8 +53,6 @@ export const ComboInput: React.FC<ComboInputProps> = ({
     resetValueOnSelect,
     ...props
 }) => {
-    const { t } = useLocale();
-
     const [inputValue, setInputValue] = useState(defaultValue);
     const [isOpen, setIsOpen] = useState(false);
     const [highlightedIndex, setHighlightedIndex] = useState(-1);
@@ -98,8 +96,7 @@ export const ComboInput: React.FC<ComboInputProps> = ({
     useEffect(() => {
         if (highlightedIndex >= 0 && listRef.current) {
             const item = listRef.current.children[highlightedIndex] as
-                | HTMLElement
-                | undefined;
+                HTMLElement | undefined;
 
             item?.scrollIntoView({ block: 'nearest' });
         }

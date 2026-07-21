@@ -3,7 +3,8 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { BaseInput, DraggableInputRow } from '@/client/components';
 import type { Ingredient } from '@/common/types';
-import { useCreateRecipeStore, useLocale } from '@/client/store';
+import { useCreateRecipeStore } from '@/client/store';
+import { t } from '@/client/locales';
 
 type IngredientRowCreateProps = Readonly<{
     className?: string;
@@ -26,8 +27,6 @@ export const IngredientRowCreate: React.FC<IngredientRowCreateProps> = ({
     onRemove,
     defaultIngredient
 }) => {
-    const { t } = useLocale();
-
     const [ingredient, setIngredient] = useState<Ingredient>(
         defaultIngredient ?? ({} as Ingredient)
     );

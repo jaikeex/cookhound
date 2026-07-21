@@ -3,12 +3,13 @@
 import React, { useCallback, useState } from 'react';
 import type { ModalProps } from '@/client/components/organisms/Modal/types';
 import { ButtonBase, Typography, PasswordInput } from '@/client/components';
-import { useLocale, useSnackbar, useAuth } from '@/client/store';
+import { useSnackbar, useAuth } from '@/client/store';
 import { AuthType } from '@/common/types';
 import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { chqc } from '@/client/data';
 import { eventBus, AppEvent } from '@/client/events';
+import { t } from '@/client/locales';
 
 export type LogoutAllConfirmModalProps = Readonly<{
     onClose?: () => void;
@@ -19,7 +20,6 @@ export const LogoutAllConfirmModal: React.FC<LogoutAllConfirmModalProps> = ({
     onClose,
     close
 }) => {
-    const { t } = useLocale();
     const { alert } = useSnackbar();
     const { user, setUser } = useAuth();
     const queryClient = useQueryClient();

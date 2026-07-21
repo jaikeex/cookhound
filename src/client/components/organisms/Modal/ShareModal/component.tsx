@@ -3,12 +3,13 @@
 import React, { useCallback, useState } from 'react';
 import type { ModalProps } from '@/client/components/organisms/Modal/types';
 import { ButtonBase, ShareButton, Typography } from '@/client/components';
-import { useLocale, useSnackbar } from '@/client/store';
+import { useSnackbar } from '@/client/store';
 import {
     DEFAULT_SHARE_PLATFORMS,
     type SocialPlatform
 } from '@/client/constants';
 import { shareToSocial, copyToClipboard, getShareUrl } from '@/client/utils';
+import { t } from '@/client/locales';
 
 export type ShareModalProps = Readonly<{
     url: string;
@@ -25,7 +26,6 @@ export const ShareModal: React.FC<ShareModalProps> = ({
     platforms = DEFAULT_SHARE_PLATFORMS,
     close
 }) => {
-    const { t } = useLocale();
     const { alert } = useSnackbar();
     const [copiedRecently, setCopiedRecently] = useState(false);
 
@@ -40,7 +40,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({
 
             return null;
         }
-    }, [url, alert, t]);
+    }, [url, alert]);
 
     const handleCopy = useCallback(async () => {
         const fullUrl = getFullUrl();
@@ -67,7 +67,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({
                 variant: 'error'
             });
         }
-    }, [alert, getFullUrl, t]);
+    }, [alert, getFullUrl]);
 
     const handleShare = useCallback(
         (platform: SocialPlatform) => async () => {

@@ -1,7 +1,6 @@
 import React from 'react';
 import { RestrictedTemplate } from '@/client/components';
-import { getLocalizedMetadata } from '@/server/utils/seo';
-import { cookies, headers } from 'next/headers';
+import { buildLocalizedMetadata } from '@/server/utils/seo';
 import type { Metadata } from 'next';
 
 export const dynamic = 'force-dynamic';
@@ -23,10 +22,7 @@ export default async function Page({ searchParams }: RestrictedPageProps) {
 //|=============================================================================================|//
 
 export async function generateMetadata(): Promise<Metadata> {
-    const cookieStore = await cookies();
-    const headerList = await headers();
-
-    return getLocalizedMetadata(cookieStore, headerList, {
+    return buildLocalizedMetadata({
         titleKey: 'meta.restricted.title',
         descriptionKey: 'meta.restricted.description',
         noindex: true

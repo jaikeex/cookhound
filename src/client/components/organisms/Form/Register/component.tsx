@@ -9,10 +9,10 @@ import {
     TextInput,
     Typography
 } from '@/client/components';
-import { useLocale } from '@/client/store';
 import type { I18nMessage } from '@/client/locales';
 import Link from 'next/link';
 import { ROUTES } from '@/common/constants';
+import { t } from '@/client/locales';
 // import { useFormStatus } from 'react-dom';
 
 export type RegisterFormErrors = {
@@ -36,9 +36,6 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
     // This hook call does nothing at the moment as it only works with react server actions.
     // It is left here for reference and to possibly inspire another solution in the future :D
     // const { pending } = useFormStatus();
-
-    const { t } = useLocale();
-
     const errorsToDisplay = Object.values(errors).map((error) => t(error));
 
     const termsLabel = (

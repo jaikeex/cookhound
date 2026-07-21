@@ -2,10 +2,10 @@
 
 import React, { useMemo, useState, useCallback } from 'react';
 import { ChipButton, Typography } from '@/client/components';
-import { useLocale } from '@/client/store/I18nContext';
 import type { SerializedRouteDoc } from '@/common/types';
 import { CategoryChipButton } from './CategoryChipButton';
 import { EndpointCard } from './EndpointCard';
+import { t } from '@/client/locales';
 
 export type AdminApiDocsTemplateProps = Readonly<{
     data: SerializedRouteDoc[];
@@ -14,7 +14,6 @@ export type AdminApiDocsTemplateProps = Readonly<{
 export const AdminApiDocsTemplate: React.FC<AdminApiDocsTemplateProps> = ({
     data
 }) => {
-    const { t } = useLocale();
     const [search, setSearch] = useState('');
     const [activeCategory, setActiveCategory] = useState<string | null>(null);
 

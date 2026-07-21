@@ -2,9 +2,9 @@
 
 import React, { useCallback } from 'react';
 import { ButtonWithCooldown, Typography } from '@/client/components';
-import { useLocale } from '@/client/store';
 import { chqc } from '@/client/data';
 import type { I18nMessage } from '@/client/locales';
+import { t } from '@/client/locales';
 
 export type VerifyEmailTemplateProps = Readonly<{
     new: boolean;
@@ -13,8 +13,6 @@ export type VerifyEmailTemplateProps = Readonly<{
 export const VerifyEmailTemplate: React.FC<VerifyEmailTemplateProps> = ({
     new: newParam
 }) => {
-    const { t } = useLocale();
-
     const { mutate: resendVerificationEmail, error } =
         chqc.user.useResendVerificationEmail();
 

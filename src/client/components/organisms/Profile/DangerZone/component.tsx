@@ -2,15 +2,15 @@
 
 import React, { useCallback } from 'react';
 import { ButtonBase, Divider, Typography } from '@/client/components';
-import { useLocale, useModal } from '@/client/store';
+import { useModal } from '@/client/store';
 import { DeleteAccountModal } from '@/client/components';
+import { t } from '@/client/locales';
 
 export type DangerZoneProps = Readonly<{
     className?: string;
 }>;
 
 export const DangerZone: React.FC<DangerZoneProps> = ({ className }) => {
-    const { t } = useLocale();
     const { openModal } = useModal();
 
     const handleDeleteAccount = useCallback(

@@ -2,8 +2,8 @@
 
 import React from 'react';
 import { PasswordInput, Submit, Typography } from '@/client/components';
-import { useLocale } from '@/client/store';
 import type { I18nMessage } from '@/client/locales';
+import { t } from '@/client/locales';
 // import { useFormStatus } from 'react-dom';
 
 export type ResetPasswordFormErrors = {
@@ -26,9 +26,6 @@ export const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({
     // This hook call does nothing at the moment as it only works with react server actions.
     // It is left here for reference and to possibly inspire another solution in the future :D
     // const { pending } = useFormStatus();
-
-    const { t } = useLocale();
-
     return (
         <div className="base-form">
             <PasswordInput

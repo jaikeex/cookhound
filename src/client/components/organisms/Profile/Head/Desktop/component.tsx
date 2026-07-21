@@ -3,7 +3,7 @@
 import React, { useMemo } from 'react';
 import type { User } from '@/common/types';
 import { Avatar, AvatarInput, Time, Typography } from '@/client/components';
-import { useLocale } from '@/client/store';
+import { t } from '@/client/locales';
 import { getAgeString } from '@/client/utils';
 
 export type ProfileHeadPropsDesktop = Readonly<{
@@ -15,11 +15,9 @@ export const ProfileHeadDesktop: React.FC<ProfileHeadPropsDesktop> = ({
     isCurrentUser,
     user
 }) => {
-    const { t, locale } = useLocale();
-
     const accountAge = useMemo(
-        () => getAgeString(user.createdAt, locale),
-        [user.createdAt, locale]
+        () => getAgeString(user.createdAt),
+        [user.createdAt]
     );
 
     return (

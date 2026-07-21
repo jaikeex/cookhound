@@ -1,6 +1,6 @@
 import type { Recipe, User, Cookbook } from '@/common/types';
-import { CATEGORY_IDS, DEFAULT_LOCALE, ROUTES } from '@/common/constants';
-import { tServer } from '@/server/utils/locales';
+import { CATEGORY_IDS, ROUTES } from '@/common/constants';
+import { t } from '@/client/locales';
 
 //?—————————————————————————————————————————————————————————————————————————————————————————————?//
 //?                                     RICH RESULTS SCHEMA                                     ?//
@@ -90,7 +90,7 @@ export function generateRecipeSchema(
                 ? 'meta.recipe.yield-few'
                 : 'meta.recipe.yield-many';
 
-        schema.recipeYield = tServer(recipe.language, yieldKey, {
+        schema.recipeYield = t(yieldKey, {
             count: recipe.portionSize
         });
     }
@@ -158,7 +158,7 @@ export function generateWebSiteSchema(baseUrl: string) {
         '@type': 'WebSite',
         name: 'Cookhound',
         url: baseUrl,
-        description: tServer(DEFAULT_LOCALE, 'meta.site.description'),
+        description: t('meta.site.description'),
         potentialAction: {
             '@type': 'SearchAction',
             target: {
@@ -205,7 +205,7 @@ export function generateCookbookSchema(cookbook: Cookbook, baseUrl: string) {
         name: cookbook.title,
         description:
             cookbook.description ||
-            tServer(cookbook.language, 'meta.cookbook.description', {
+            t('meta.cookbook.description', {
                 cookbookTitle: cookbook.title
             }),
         image: cookbook.coverImageUrl,

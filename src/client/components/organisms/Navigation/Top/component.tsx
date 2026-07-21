@@ -11,11 +11,11 @@ import {
     Tooltip
 } from '@/client/components';
 import Link from 'next/link';
-import { useAuth, useLocale } from '@/client/store';
+import { useAuth } from '@/client/store';
 import { Sidebar } from '@/client/components/molecules/Sidebar';
 import { NavMenu } from './Menu';
-import { TopNavigationSkeleton } from './skeleton';
 import { TOP_NAVBAR_ID } from '@/client/constants';
+import { t } from '@/client/locales';
 import { classNames } from '@/client/utils';
 import { usePathname } from 'next/navigation';
 import { AppEvent } from '@/client/events';
@@ -25,7 +25,6 @@ import { ROUTES } from '@/common/constants';
 type TopNavigationProps = Readonly<NonNullable<unknown>>;
 
 export const TopNavigation: React.FC<TopNavigationProps> = () => {
-    const { t, localeResolved } = useLocale();
     const { authResolved, user } = useAuth();
     const pathname = usePathname();
 
@@ -48,8 +47,6 @@ export const TopNavigation: React.FC<TopNavigationProps> = () => {
         pathname === ROUTES.filter;
 
     if (isNotfound) return null;
-
-    if (!localeResolved) return <TopNavigationSkeleton />;
 
     return (
         <div

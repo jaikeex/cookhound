@@ -4,7 +4,7 @@ import React from 'react';
 import { Icon, Typography } from '@/client/components';
 import { type SocialPlatform, SOCIAL_PLATFORMS } from '@/client/constants';
 import { classNames } from '@/client/utils';
-import { useLocale } from '@/client/store';
+import { t } from '@/client/locales';
 
 //~---------------------------------------------------------------------------------------------~//
 //$                                            TYPES                                            $//
@@ -30,7 +30,6 @@ export const ShareButton: React.FC<ShareButtonProps> = ({
     onClick,
     disabled = false
 }) => {
-    const { t } = useLocale();
     const config = SOCIAL_PLATFORMS[platform];
 
     const color = disabled

@@ -2,9 +2,10 @@
 
 import React, { useCallback, useMemo } from 'react';
 import { Typography, ButtonBase } from '@/client/components';
-import { useLocale, useSnackbar } from '@/client/store';
+import { useSnackbar } from '@/client/store';
 import { chqc } from '@/client/data';
 import { classNames } from '@/client/utils';
+import { t } from '@/client/locales';
 
 export type PendingDeletionBannerProps = Readonly<{
     deletionScheduledFor: Date | string;
@@ -13,7 +14,6 @@ export type PendingDeletionBannerProps = Readonly<{
 export const PendingDeletionBanner: React.FC<PendingDeletionBannerProps> = ({
     deletionScheduledFor
 }) => {
-    const { t } = useLocale();
     const { alert } = useSnackbar();
 
     const { mutateAsync: cancelDeletion, isPending } =

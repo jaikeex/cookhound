@@ -3,9 +3,10 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { classNames, convertImgToWebP, verifyImgSize } from '@/client/utils';
 import { Icon, ImageCropperModal, Loader } from '@/client/components';
-import { useLocale, useSnackbar, useModal } from '@/client/store';
+import { useSnackbar, useModal } from '@/client/store';
 import Image from 'next/image';
 import type { I18nMessage } from '@/client/locales';
+import { t } from '@/client/locales';
 
 type ImageInputProps = Readonly<{
     className?: string;
@@ -43,7 +44,6 @@ export const ImageInput: React.FC<ImageInputProps> = ({
         defaultImageUrl ?? null
     );
     const { alert, clearAlerts } = useSnackbar();
-    const { t } = useLocale();
     const { openModal } = useModal();
 
     const handleDragOver = useCallback(
@@ -167,7 +167,6 @@ export const ImageInput: React.FC<ImageInputProps> = ({
         },
         [
             alert,
-            t,
             maxWidth,
             maxHeight,
             maxSize,
@@ -229,7 +228,7 @@ export const ImageInput: React.FC<ImageInputProps> = ({
 
             openModal(getModalContent(file), modalOptions);
         },
-        [openModal, getModalContent, alert, t]
+        [openModal, getModalContent, alert]
     );
 
     //|-----------------------------------------------------------------------------------------|//

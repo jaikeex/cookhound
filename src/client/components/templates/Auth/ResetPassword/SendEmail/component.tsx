@@ -12,11 +12,11 @@ import {
 } from '@/client/components';
 import type { ResetPasswordEmailFormData } from '@/common/types';
 import { z } from 'zod';
-import { useLocale } from '@/client/store';
 import { useCaptcha } from '@/client/hooks';
 import { validateFormData, executeCaptcha } from '@/client/utils';
 import type { I18nMessage } from '@/client/locales';
 import { chqc } from '@/client/data';
+import { t } from '@/client/locales';
 
 export type SendResetPasswordEmailTemplateProps = Readonly<{
     email: string;
@@ -39,8 +39,6 @@ const sendResetPasswordEmailSchema = z.object({
 export const SendResetPasswordEmailTemplate: React.FC<
     SendResetPasswordEmailTemplateProps
 > = ({ email }) => {
-    const { t } = useLocale();
-
     const { ready: captchaReady } = useCaptcha();
 
     const formRef = React.useRef<HTMLFormElement>(null);

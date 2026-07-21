@@ -13,7 +13,7 @@ import { z } from 'zod';
 import { validateFormData } from '@/client/utils/form';
 
 import { useGoogleSignIn } from '@/client/hooks';
-import { useAuth, useLocale, useSnackbar } from '@/client/store';
+import { useAuth, useSnackbar } from '@/client/store';
 import type { I18nMessage } from '@/client/locales';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -21,6 +21,7 @@ import { chqc, QUERY_KEYS } from '@/client/data';
 import { useQueryClient } from '@tanstack/react-query';
 import { AppEvent, eventBus } from '@/client/events';
 import { ROUTES } from '@/common/constants';
+import { t } from '@/client/locales';
 
 //~---------------------------------------------------------------------------------------------~//
 //$                                          VALIDATION                                         $//
@@ -51,8 +52,6 @@ export const LoginTemplate: React.FC<LoginTemplateProps> = ({
     const queryClient = useQueryClient();
     const { setUser } = useAuth();
     const { alert } = useSnackbar();
-    const { t } = useLocale();
-
     const formRef = React.useRef<HTMLFormElement>(null);
 
     const [formErrors, setFormErrors] = useState<LoginFormErrors>({});
@@ -86,7 +85,7 @@ export const LoginTemplate: React.FC<LoginTemplateProps> = ({
             formRef.current?.reset();
             router.push(callbackUrl ?? '/');
         },
-        [alert, callbackUrl, router, setUser, t]
+        [alert, callbackUrl, router, setUser]
     );
 
     const {

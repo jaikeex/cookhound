@@ -3,7 +3,7 @@
 import React from 'react';
 import { Typography, ButtonBase, Loader } from '@/client/components';
 import { classNames } from '@/client/utils';
-import { useLocale } from '@/client/store';
+import { t } from '@/client/locales';
 
 type ShoppingListHeadProps = Readonly<{
     editing?: boolean;
@@ -18,8 +18,6 @@ export const ShoppingListHead: React.FC<ShoppingListHeadProps> = ({
     loading,
     onEdit
 }) => {
-    const { t } = useLocale();
-
     return (
         <React.Fragment>
             <div className="flex items-center justify-between">

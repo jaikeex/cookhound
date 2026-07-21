@@ -3,7 +3,7 @@
 import { Avatar, Time, Typography } from '@/client/components';
 import { classNames, getAgeString } from '@/client/utils';
 import React from 'react';
-import { useLocale } from '@/client/store';
+import { t } from '@/client/locales';
 import { chqc } from '@/client/data';
 import Link from 'next/link';
 import { ROUTES } from '@/common/constants';
@@ -22,15 +22,13 @@ export type RecipeAuthorLinkDesktopProps = Readonly<{
 export const RecipeAuthorLinkDesktop: React.FC<
     RecipeAuthorLinkDesktopProps
 > = ({ authorId, createdAt, className }) => {
-    const { t, locale } = useLocale();
-
     // Fetch author data only if authorId is not -1 (not deleted)
     const { data: author, isLoading: isLoadingAuthor } =
         chqc.user.useGetUserById(authorId, {
             enabled: authorId !== -1
         });
 
-    const ageString = getAgeString(createdAt.toISOString(), locale);
+    const ageString = getAgeString(createdAt.toISOString());
 
     const ageLabel = (
         <>

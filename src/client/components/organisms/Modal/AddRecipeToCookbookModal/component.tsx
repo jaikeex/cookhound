@@ -8,10 +8,11 @@ import {
     Typography,
     type SelectOption
 } from '@/client/components';
-import { useLocale, useModal, useSnackbar } from '@/client/store';
+import { useModal, useSnackbar } from '@/client/store';
 import { chqc, QUERY_KEYS } from '@/client/data';
 import { useQueryClient } from '@tanstack/react-query';
 import dynamic from 'next/dynamic';
+import { t } from '@/client/locales';
 
 const CreateCookbookModal = dynamic(
     () =>
@@ -38,7 +39,6 @@ export type AddRecipeToCookbookModalProps = Readonly<{
 export const AddRecipeToCookbookModal: React.FC<
     AddRecipeToCookbookModalProps
 > = ({ recipeId, options, close }) => {
-    const { t } = useLocale();
     const { alert } = useSnackbar();
     const { openModal } = useModal();
     const queryClient = useQueryClient();
@@ -108,7 +108,7 @@ export const AddRecipeToCookbookModal: React.FC<
                 }
             );
         },
-        [addRecipe, recipeId, queryClient, alert, t, close]
+        [addRecipe, recipeId, queryClient, alert, close]
     );
 
     const handleCreateCookbook = useCallback(() => {

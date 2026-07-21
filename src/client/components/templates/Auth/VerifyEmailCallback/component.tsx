@@ -2,7 +2,6 @@
 
 import React, { useEffect } from 'react';
 import { ButtonBase, Loader, Typography } from '@/client/components';
-import { useLocale } from '@/client/store';
 import Link from 'next/link';
 import { chqc, QUERY_KEYS } from '@/client/data';
 import type { RequestError } from '@/client/error';
@@ -10,9 +9,9 @@ import { useQueryClient } from '@tanstack/react-query';
 import type { I18nMessage } from '@/client/locales';
 import { useSearchParams } from 'next/navigation';
 import { ROUTES } from '@/common/constants';
+import { t } from '@/client/locales';
 
 export const VerifyEmailCallbackTemplate: React.FC = () => {
-    const { t } = useLocale();
     const queryClient = useQueryClient();
     const searchParams = useSearchParams();
 

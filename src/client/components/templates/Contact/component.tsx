@@ -10,10 +10,11 @@ import {
 import type { ContactFormData } from '@/common/types';
 import { z } from 'zod';
 import { validateFormData, executeCaptcha } from '@/client/utils';
-import { useLocale, useSnackbar } from '@/client/store';
+import { useSnackbar } from '@/client/store';
 import type { I18nMessage } from '@/client/locales';
 import { chqc } from '@/client/data';
 import { useCaptcha } from '@/client/hooks';
+import { t } from '@/client/locales';
 
 //~---------------------------------------------------------------------------------------------~//
 //$                                          VALIDATION                                         $//
@@ -44,8 +45,6 @@ export type ContactTemplateProps = NonNullable<unknown>;
 
 export const ContactTemplate: React.FC<ContactTemplateProps> = () => {
     const { alert } = useSnackbar();
-    const { t } = useLocale();
-
     const formRef = React.useRef<HTMLFormElement>(null);
 
     const [formErrors, setFormErrors] = useState<ContactFormErrors>({});

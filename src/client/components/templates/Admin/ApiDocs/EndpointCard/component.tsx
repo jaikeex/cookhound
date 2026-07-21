@@ -2,7 +2,6 @@
 
 import React, { useCallback, useState } from 'react';
 import { Typography, Chip } from '@/client/components';
-import { useLocale } from '@/client/store/I18nContext';
 import type { SerializedEndpointDoc } from '@/common/types';
 import {
     METHOD_COLORS,
@@ -12,6 +11,7 @@ import { formatWindow } from '@/client/components/templates/Admin/ApiDocs/utils'
 import { SchemaSection } from '@/client/components/templates/Admin/ApiDocs/SchemaSection';
 import { ResponsesSection } from '@/client/components/templates/Admin/ApiDocs/ResponsesSection';
 import { ClientUsageSection } from '@/client/components/templates/Admin/ApiDocs/ClientUsageSection';
+import { t } from '@/client/locales';
 
 export type EndpointCardProps = Readonly<{
     path: string;
@@ -22,7 +22,6 @@ export const EndpointCard: React.FC<EndpointCardProps> = ({
     path,
     endpoint
 }) => {
-    const { t } = useLocale();
     const [expanded, setExpanded] = useState(false);
 
     const toggleExpanded = useCallback(() => {

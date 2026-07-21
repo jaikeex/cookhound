@@ -5,7 +5,8 @@ import { classNames } from '@/client/utils';
 import { Star, Tooltip, Typography, type StarState } from '@/client/components';
 import { generateStars } from '@/client/components/molecules/Rating/utils';
 import { useCooldown, useScreenSize } from '@/client/hooks';
-import { useLocale, useSnackbar } from '@/client/store';
+import { useSnackbar } from '@/client/store';
+import { t } from '@/client/locales';
 
 export type RatingSize = 'sm' | 'md' | 'lg';
 
@@ -39,7 +40,6 @@ export const Rating: React.FC<RatingProps> = ({
     rating,
     size = 'md'
 }) => {
-    const { t } = useLocale();
     const { alert } = useSnackbar();
     const { isMobile } = useScreenSize();
 
@@ -134,8 +134,7 @@ export const Rating: React.FC<RatingProps> = ({
             cooldown,
             isMobile,
             alert,
-            remainingTime,
-            t
+            remainingTime
         ]
     );
 

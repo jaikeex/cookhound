@@ -12,7 +12,7 @@ import {
     TextInputRow,
     Typography
 } from '@/client/components';
-import { useLocale, useSnackbar } from '@/client/store';
+import { useSnackbar } from '@/client/store';
 import { useModal } from '@/client/store';
 import { ConsentSettingsModal } from '@/client/components';
 import { LogoutAllConfirmModal } from '@/client/components';
@@ -20,13 +20,13 @@ import { chqc, QUERY_KEYS } from '@/client/data';
 import { useQueryClient } from '@tanstack/react-query';
 import { useLogout } from '@/client/hooks';
 import { ROUTES } from '@/common/constants';
+import { t } from '@/client/locales';
 
 export type ProfileBodyInfoProps = Readonly<{
     user: User;
 }>;
 
 export const ProfileBodyInfo: React.FC<ProfileBodyInfoProps> = ({ user }) => {
-    const { t } = useLocale();
     const { alert } = useSnackbar();
     const { openModal } = useModal();
 
@@ -58,7 +58,7 @@ export const ProfileBodyInfo: React.FC<ProfileBodyInfoProps> = ({ user }) => {
                 }
             );
         },
-        [updateUserById, user.id, alert, t]
+        [updateUserById, user.id, alert]
     );
 
     const handleCookieSettings = useCallback(

@@ -10,8 +10,9 @@ import {
     Tabs
 } from '@/client/components';
 import { IngredientsListView } from '@/client/components/organisms/IngredientsList';
-import { useAuth, useLocale } from '@/client/store';
+import { useAuth } from '@/client/store';
 import { classNames } from '@/client/utils';
+import { t } from '@/client/locales';
 
 export type MobileRecipeBodyProps = Readonly<{
     isPreview?: boolean;
@@ -24,7 +25,6 @@ export const MobileRecipeBody: React.FC<MobileRecipeBodyProps> = ({
     onShoppingListCreate,
     recipe
 }) => {
-    const { t } = useLocale();
     const { user } = useAuth();
 
     const displayShoppingListButton = user && !isPreview;

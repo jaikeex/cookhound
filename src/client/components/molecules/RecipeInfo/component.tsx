@@ -7,8 +7,8 @@ import {
     Typography,
     type TypographyVariant
 } from '@/client/components';
-import { useLocale } from '@/client/store';
 import { classNames } from '@/client/utils';
+import { t } from '@/client/locales';
 
 type RecipeInfoSize = 'sm' | 'md';
 
@@ -52,8 +52,6 @@ export const RecipeInfo: React.FC<RecipeInfoProps> = ({
     typographyVariant = 'body-sm',
     verbose
 }) => {
-    const { t } = useLocale();
-
     return (
         <div
             className={classNames(

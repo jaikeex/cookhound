@@ -1,9 +1,7 @@
 import type { Metadata } from 'next';
-import type { ReadonlyRequestCookies } from 'next/dist/server/web/spec-extension/adapters/request-cookies';
-import { tServer } from '@/server/utils/locales';
+import { t } from '@/client/locales';
 import type { I18nMessage } from '@/client/locales';
 import { DEFAULT_LOCALE, ENV_CONFIG_PUBLIC } from '@/common/constants';
-import type { Locale } from '@/common/types';
 
 type MetadataConfig = {
     titleKey: I18nMessage;
@@ -39,31 +37,12 @@ function validateDescription(description: string, maxLength = 160): string {
 }
 
 /**
- * Generates localized metadata for Next.js pages with SEO optimizations.
+ * Builds page metadata with SEO optimizations.
  *
- * @param _cookies - The request cookies (unused, see above)
- * @param _headers - The request headers (unused, see above)
  * @param config - Configuration object for metadata
- * @returns - The localized metadata object
- */
-export async function getLocalizedMetadata(
-    _cookies: ReadonlyRequestCookies,
-    _headers: Headers,
-    config: MetadataConfig
-): Promise<Metadata> {
-    return buildLocalizedMetadata(DEFAULT_LOCALE, config);
-}
-
-/**
- * Builds localized metadata from an explicit locale, without touching any
- * dynamic request APIs. Safe to call from statically rendered / ISR routes.
- *
- * @param locale - The locale to render the metadata strings in
- * @param config - Configuration object for metadata
- * @returns - The localized metadata object
+ * @returns - The metadata object
  */
 export async function buildLocalizedMetadata(
-    locale: Locale,
     config: MetadataConfig
 ): Promise<Metadata> {
     //|-----------------------------------------------------------------------------------------|//
@@ -74,26 +53,23 @@ export async function buildLocalizedMetadata(
 
     const canonicalUrl = config.canonical || baseUrl;
 
-    const title = tServer(locale, config.titleKey, config.params);
+    const title = t(config.titleKey, config.params);
 
     const description = validateDescription(
         config.description ??
             (config.descriptionKey
-                ? tServer(locale, config.descriptionKey, config.params)
+                ? t(config.descriptionKey, config.params)
                 : '')
     );
 
     const ogTitle = config.ogTitleKey
-        ? tServer(locale, config.ogTitleKey, config.params)
+        ? t(config.ogTitleKey, config.params)
         : title;
 
     const ogDescription = config.ogDescription
         ? validateDescription(config.ogDescription, 200)
         : config.ogDescriptionKey
-          ? validateDescription(
-                tServer(locale, config.ogDescriptionKey, config.params),
-                200
-            )
+          ? validateDescription(t(config.ogDescriptionKey, config.params), 200)
           : description;
 
     const metadata: Metadata = {
@@ -104,7 +80,7 @@ export async function buildLocalizedMetadata(
             title: ogTitle,
             description: ogDescription,
             siteName: 'Cookhound',
-            locale: locale,
+            locale: DEFAULT_LOCALE,
             url: canonicalUrl
         },
         twitter: {
@@ -211,28 +187,4 @@ export async function buildLocalizedMetadata(
     }
 
     return metadata;
-}
-
-/**
- * Generates basic localized metadata
- *
- * @param cookies - The request cookies
- * @param headers - The request headers
- * @param titleKey - Translation key for the title
- * @param descriptionKey - Translation key for the description
- * @param params - Optional parameters for translation
- * @returns Promise<Metadata>
- */
-export async function simpleLocalizedMetadata(
-    cookies: ReadonlyRequestCookies,
-    headers: Headers,
-    titleKey: I18nMessage,
-    descriptionKey: I18nMessage,
-    params?: Record<string, string | number | boolean>
-): Promise<Metadata> {
-    return getLocalizedMetadata(cookies, headers, {
-        titleKey,
-        descriptionKey,
-        params
-    });
 }

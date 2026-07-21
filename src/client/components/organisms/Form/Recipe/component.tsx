@@ -14,10 +14,11 @@ import {
     TextInput,
     Typography
 } from '@/client/components';
-import { useAuth, useLocale } from '@/client/store';
+import { useAuth } from '@/client/store';
 import type { Ingredient, Recipe, RecipeTagDTO } from '@/common/types';
 import type { I18nMessage } from '@/client/locales';
 import type { RecipeFormMode } from '@/client/types/core';
+import { t } from '@/client/locales';
 // import { useFormStatus } from 'react-dom';
 
 type RecipeFormProps = Readonly<{
@@ -48,7 +49,6 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({
     // It is left here for reference and to possibly inspire another solution in the future :D
     // const { pending } = useFormStatus();
     const { authResolved, user } = useAuth();
-    const { t } = useLocale();
     const isLoggedin = authResolved && !!user;
 
     const handleImageChange = useCallback(

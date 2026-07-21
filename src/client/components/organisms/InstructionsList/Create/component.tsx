@@ -3,7 +3,7 @@
 import React, { useCallback, useEffect, useState, useMemo } from 'react';
 import { ButtonBase, DraggableList } from '@/client/components';
 import { InstructionRowCreate } from '@/client/components/molecules/InstructionRow';
-import { useLocale } from '@/client/store';
+import { t } from '@/client/locales';
 
 type InstructionsListCreateProps = Readonly<{
     defaultInstructions?: string[] | null;
@@ -14,8 +14,6 @@ export const InstructionsListCreate: React.FC<InstructionsListCreateProps> = ({
     defaultInstructions,
     onChange
 }) => {
-    const { t } = useLocale();
-
     // used only for the draggable list - should not be used to determine the order of instructions
     const [instructions, setInstructions] = useState<number[]>(() =>
         defaultInstructions && defaultInstructions.length > 0

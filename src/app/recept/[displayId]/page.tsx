@@ -4,7 +4,7 @@ import { mapServiceErrorForRsc } from '@/server/data/runtime/mapError';
 import { RecipeStructuredData, RecipeViewTemplate } from '@/client/components';
 import type { Metadata } from 'next';
 import { buildLocalizedMetadata } from '@/server/utils/seo';
-import { ENV_CONFIG_PUBLIC, DEFAULT_LOCALE, ROUTES } from '@/common/constants';
+import { ENV_CONFIG_PUBLIC, ROUTES } from '@/common/constants';
 import db from '@/server/db/model';
 
 export const revalidate = 3600;
@@ -80,7 +80,7 @@ export async function generateMetadata({
 
         // The metadata language is an intrinsic property of the recipe, not of the visitor.
         // Getting it from the record keeps this route ISR-eligible.
-        return buildLocalizedMetadata(recipe.language, {
+        return buildLocalizedMetadata({
             titleKey: 'meta.recipe.title',
             descriptionKey: 'meta.recipe.description',
             ogTitleKey: 'meta.recipe.title',
@@ -101,7 +101,7 @@ export async function generateMetadata({
         // Recipe could not be fetched (e.g. not found): we have no record to
         // read a language from, so fall back to the default locale. Still no
         // dynamic request APIs, so the route stays statically renderable.
-        return buildLocalizedMetadata(DEFAULT_LOCALE, {
+        return buildLocalizedMetadata({
             titleKey: 'meta.recipe.fallback.title',
             descriptionKey: 'meta.recipe.fallback.description',
             canonical: `${ENV_CONFIG_PUBLIC.ORIGIN}${ROUTES.recipe.detail(recipeDisplayId)}`,

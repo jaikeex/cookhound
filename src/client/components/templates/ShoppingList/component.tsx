@@ -14,9 +14,10 @@ import {
     Trash,
     Typography
 } from '@/client/components';
-import { useAuth, useLocale, useModal } from '@/client/store';
+import { useAuth, useModal } from '@/client/store';
 import { useShoppingList } from '@/client/hooks';
 import Link from 'next/link';
+import { t } from '@/client/locales';
 
 type ShoppingListTemplateProps = Readonly<{
     initialData: ShoppingListDTO[];
@@ -31,8 +32,6 @@ export const ShoppingListTemplate: React.FC<ShoppingListTemplateProps> = ({
 
     const { user } = useAuth();
     const { openModal } = useModal();
-    const { t } = useLocale();
-
     const {
         shoppingList,
         editingShoppingList,
@@ -197,7 +196,7 @@ export const ShoppingListTemplate: React.FC<ShoppingListTemplateProps> = ({
                 </div>
             );
         },
-        [handleDeleteRecipeShoppingList, t]
+        [handleDeleteRecipeShoppingList]
     );
 
     const openConfirmDeleteModal = useCallback(

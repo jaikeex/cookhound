@@ -9,11 +9,12 @@ import {
 import { classNames } from '@/client/utils';
 import React, { useCallback, useMemo } from 'react';
 import dynamic from 'next/dynamic';
-import { useAuth, useLocale, useModal } from '@/client/store';
+import { useAuth, useModal } from '@/client/store';
 import { chqc } from '@/client/data';
 import { useScreenSize } from '@/client/hooks';
 import type { Recipe } from '@/common/types';
 import { ROUTES } from '@/common/constants';
+import { t } from '@/client/locales';
 
 const AddRecipeToCookbookModal = dynamic(
     () =>
@@ -45,8 +46,6 @@ export const RecipeViewImage: React.FC<RecipeViewImageProps> = ({
     const { openModal } = useModal();
     const { user } = useAuth();
     const { isMobile } = useScreenSize();
-    const { t } = useLocale();
-
     const { data: cookbooks = [] } = chqc.cookbook.useCookbooksByUser(
         user?.id ?? 0
     );
@@ -89,7 +88,7 @@ export const RecipeViewImage: React.FC<RecipeViewImageProps> = ({
                 })}
             />
         ));
-    }, [openModal, recipe.displayId, recipe.title, t]);
+    }, [openModal, recipe.displayId, recipe.title]);
 
     //|-----------------------------------------------------------------------------------------|//
     //?                                         ACTIONS                                         ?//
@@ -146,7 +145,6 @@ export const RecipeViewImage: React.FC<RecipeViewImageProps> = ({
     }, [
         isPreview,
         handleOpenCookbookModal,
-        t,
         handleOpenShareModal,
         recipe.authorId,
         isMobile

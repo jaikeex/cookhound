@@ -9,9 +9,10 @@ import {
     FormCheckbox,
     Textarea
 } from '@/client/components';
-import { useLocale, useSnackbar, useAuth } from '@/client/store';
+import { useSnackbar, useAuth } from '@/client/store';
 import { AuthType } from '@/common/types';
 import { chqc } from '@/client/data';
+import { t } from '@/client/locales';
 
 export type DeleteAccountModalProps = Readonly<{
     onClose?: () => void;
@@ -22,7 +23,6 @@ export const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
     onClose,
     close
 }) => {
-    const { t } = useLocale();
     const { alert } = useSnackbar();
     const { user } = useAuth();
 

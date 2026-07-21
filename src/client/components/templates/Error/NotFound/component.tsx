@@ -2,15 +2,13 @@
 
 import { ButtonBase, Logo, Typography } from '@/client/components';
 import { eventBus, AppEvent } from '@/client/events';
-import { useLocale } from '@/client/store';
 import * as React from 'react';
 import { useCallback, useEffect } from 'react';
+import { t } from '@/client/locales';
 
 type NotFoundTemplateProps = Readonly<NonNullable<unknown>>;
 
 export const NotFoundTemplate: React.FC<NotFoundTemplateProps> = () => {
-    const { t } = useLocale();
-
     const handleNavigateHome = useCallback(() => {
         window.location.href = '/';
     }, []);

@@ -9,17 +9,13 @@ import React, {
     useState
 } from 'react';
 import type { Recipe } from '@/common/types';
-import {
-    useAuth,
-    useLocale,
-    useRecipeSelectionStore,
-    useSnackbar
-} from '@/client/store';
+import { useAuth, useRecipeSelectionStore, useSnackbar } from '@/client/store';
 import { useShoppingList } from '@/client/hooks';
 import { scaleIngredientsToPortionSize } from '@/client/utils';
 import { chqc, QUERY_KEYS } from '@/client/data';
 import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
+import { t } from '@/client/locales';
 
 //~=============================================================================================~//
 //$                                            TYPES                                            $//
@@ -87,7 +83,6 @@ export const RecipeHandlingProvider: React.FC<RecipeHandlingProviderProps> = ({
     recipe,
     children
 }) => {
-    const { t } = useLocale();
     const { user } = useAuth();
     const { alert } = useSnackbar();
     const router = useRouter();
@@ -215,7 +210,6 @@ export const RecipeHandlingProvider: React.FC<RecipeHandlingProviderProps> = ({
         portionSize,
         createShoppingList,
         alert,
-        t,
         user
     ]);
 

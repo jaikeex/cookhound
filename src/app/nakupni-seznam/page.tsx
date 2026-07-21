@@ -5,8 +5,7 @@ import { verifySessionFromCookie } from '@/server/utils/session';
 import { redirectToRestrictedWithLogin } from '@/server/utils/reqwest';
 import { ROUTES } from '@/common/constants';
 import type { Metadata } from 'next';
-import { cookies, headers } from 'next/headers';
-import { getLocalizedMetadata } from '@/server/utils/seo';
+import { buildLocalizedMetadata } from '@/server/utils/seo';
 
 export const dynamic = 'force-dynamic';
 
@@ -38,10 +37,7 @@ export default async function Page() {
 //|=============================================================================================|//
 
 export async function generateMetadata(): Promise<Metadata> {
-    const cookieStore = await cookies();
-    const headerList = await headers();
-
-    return await getLocalizedMetadata(cookieStore, headerList, {
+    return await buildLocalizedMetadata({
         titleKey: 'meta.shopping-list.title',
         descriptionKey: 'meta.shopping-list.description',
         noindex: true

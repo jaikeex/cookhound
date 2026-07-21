@@ -1,15 +1,14 @@
 import type { Metadata } from 'next';
 import { SearchTemplate } from '@/client/components/templates/Dashboard/Search';
 import { serverData } from '@/server/data';
-import { cookies, headers } from 'next/headers';
 import React from 'react';
 import { DEFAULT_LOCALE, ENV_CONFIG_PUBLIC, ROUTES } from '@/common/constants';
 import {
     generateBreadcrumbSchema,
-    getLocalizedMetadata
+    buildLocalizedMetadata
 } from '@/server/utils/seo';
 import { StructuredData } from '@/client/components';
-import { tServer } from '@/server/utils/locales';
+import { t } from '@/client/locales';
 
 export const dynamic = 'force-dynamic';
 
@@ -30,15 +29,15 @@ export default async function SearchPage({
 
     const breadcrumbItems = [
         {
-            name: tServer(locale, 'app.general.home'),
+            name: t('app.general.home'),
             url: ENV_CONFIG_PUBLIC.ORIGIN
         },
         {
             name: searchQuery
-                ? tServer(locale, 'meta.search.breadcrumb', {
+                ? t('meta.search.breadcrumb', {
                       query: searchQuery
                   })
-                : tServer(locale, 'meta.search.breadcrumb-empty'),
+                : t('meta.search.breadcrumb-empty'),
             url: searchQuery
                 ? `${ENV_CONFIG_PUBLIC.ORIGIN}${ROUTES.search(searchQuery)}`
                 : `${ENV_CONFIG_PUBLIC.ORIGIN}${ROUTES.search()}`
@@ -67,11 +66,9 @@ export async function generateMetadata({
 }): Promise<Metadata> {
     const { query } = await searchParams;
     const q = query ?? '';
-    const cookieStore = await cookies();
-    const headerList = await headers();
 
     if (!q) {
-        return await getLocalizedMetadata(cookieStore, headerList, {
+        return await buildLocalizedMetadata({
             titleKey: 'meta.search.title',
             descriptionKey: 'meta.search.description',
             canonical: `${ENV_CONFIG_PUBLIC.ORIGIN}${ROUTES.search()}`,
@@ -80,9 +77,8 @@ export async function generateMetadata({
     }
 
     const capitalised = q.charAt(0).toUpperCase() + q.slice(1);
-    const locale = DEFAULT_LOCALE;
 
-    const metadata = await getLocalizedMetadata(cookieStore, headerList, {
+    const metadata = await buildLocalizedMetadata({
         titleKey: 'meta.search.title',
         descriptionKey: 'meta.search.description',
         canonical: `${ENV_CONFIG_PUBLIC.ORIGIN}${ROUTES.search(q)}`,
@@ -92,15 +88,15 @@ export async function generateMetadata({
     return {
         ...metadata,
         title: `${capitalised} | ${metadata.title}`,
-        description: tServer(locale, 'meta.search.results.description', {
+        description: t('meta.search.results.description', {
             query: capitalised
         }),
         openGraph: {
             ...metadata.openGraph,
-            title: tServer(locale, 'meta.search.results.og-title', {
+            title: t('meta.search.results.og-title', {
                 query: capitalised
             }),
-            description: tServer(locale, 'meta.search.results.og-description', {
+            description: t('meta.search.results.og-description', {
                 query: capitalised
             })
         },

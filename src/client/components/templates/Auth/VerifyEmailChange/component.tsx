@@ -2,7 +2,6 @@
 
 import React, { useEffect } from 'react';
 import { Loader, Typography, ButtonBase } from '@/client/components';
-import { useLocale } from '@/client/store';
 import { chqc, QUERY_KEYS } from '@/client/data';
 import type { RequestError } from '@/client/error';
 import { useQueryClient } from '@tanstack/react-query';
@@ -10,9 +9,9 @@ import type { I18nMessage } from '@/client/locales';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { ROUTES } from '@/common/constants';
+import { t } from '@/client/locales';
 
 export const VerifyEmailChangeTemplate: React.FC = () => {
-    const { t } = useLocale();
     const queryClient = useQueryClient();
     const searchParams = useSearchParams();
 

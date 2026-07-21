@@ -11,11 +11,12 @@ import {
 import type { SelectOption } from '@/client/components';
 import type { TableColumn } from '@/client/components';
 import { AdminUserDetailModal } from '@/client/components/organisms/Modal/AdminUserDetailModal';
-import { useLocale, useModal } from '@/client/store';
+import { useModal } from '@/client/store';
 import { chqc } from '@/client/data';
 import { formatDate } from '@/client/utils';
 import { Status, UserRole } from '@/common/types';
 import type { AdminUserListItemDTO } from '@/common/types';
+import { t } from '@/client/locales';
 
 //~=================================================================================================~//
 //$                                          HELPERS                                                 $//
@@ -43,7 +44,6 @@ function getRoleChipColor(role: string): 'primary' | 'secondary' {
 //~=================================================================================================~//
 
 export const AdminUsersTemplate: React.FC = () => {
-    const { t } = useLocale();
     const { openModal } = useModal();
 
     // Filter & pagination state
@@ -99,7 +99,7 @@ export const AdminUsersTemplate: React.FC = () => {
             { value: 'user', label: 'User' },
             { value: 'admin', label: 'Admin' }
         ],
-        [t]
+        []
     );
 
     const statusOptions: SelectOption[] = useMemo(
@@ -112,7 +112,7 @@ export const AdminUsersTemplate: React.FC = () => {
                 label: 'Pending Deletion'
             }
         ],
-        [t]
+        []
     );
 
     const authTypeOptions: SelectOption[] = useMemo(
@@ -121,7 +121,7 @@ export const AdminUsersTemplate: React.FC = () => {
             { value: 'local', label: 'Local' },
             { value: 'google', label: 'Google' }
         ],
-        [t]
+        []
     );
 
     // Row click handler
@@ -191,7 +191,7 @@ export const AdminUsersTemplate: React.FC = () => {
                     item.lastLogin ? formatDate(item.lastLogin) : '—'
             }
         ],
-        [t, handleRowClick]
+        [handleRowClick]
     );
 
     const getRowKey = useCallback((item: AdminUserListItemDTO) => item.id, []);

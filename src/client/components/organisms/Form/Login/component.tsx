@@ -9,8 +9,8 @@ import {
     TextInput,
     Typography
 } from '@/client/components';
-import { useLocale } from '@/client/store';
 import type { I18nMessage } from '@/client/locales';
+import { t } from '@/client/locales';
 // import { useFormStatus } from 'react-dom';
 
 export type LoginFormErrors = {
@@ -29,9 +29,6 @@ export const LoginForm: React.FC<LoginFormProps> = ({ errors, pending }) => {
     // This hook call does nothing at the moment as it only works with react server actions.
     // It is left here for reference and to possibly inspire another solution in the future :D
     // const { pending } = useFormStatus();
-
-    const { t } = useLocale();
-
     const errorsToDisplay = Object.values(errors).map((error) => t(error));
 
     return (

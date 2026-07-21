@@ -2,8 +2,8 @@
 
 import React, { useCallback, useMemo } from 'react';
 import { BaseSelect, IconButton, Typography } from '@/client/components';
-import { useLocale } from '@/client/store';
 import { classNames } from '@/client/utils';
+import { t } from '@/client/locales';
 
 const DEFAULT_PAGE_SIZE_OPTIONS = [10, 25, 50];
 
@@ -28,8 +28,6 @@ export const Pagination: React.FC<PaginationProps> = ({
     pageSizeOptions = DEFAULT_PAGE_SIZE_OPTIONS,
     className
 }) => {
-    const { t } = useLocale();
-
     const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
     const safePage = Math.min(Math.max(1, page), totalPages);
 

@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Typography } from '@/client/components';
-import { useLocale } from '@/client/store';
+import { t } from '@/client/locales';
 
 export type CaptchaDisclosureProps = Readonly<{
     className?: string;
@@ -17,8 +17,6 @@ export type CaptchaDisclosureProps = Readonly<{
 export const CaptchaDisclosure: React.FC<CaptchaDisclosureProps> = ({
     className
 }) => {
-    const { t } = useLocale();
-
     return (
         <Typography
             variant="body-xs"

@@ -2,7 +2,9 @@
 
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { Typography, ConsentRow, ButtonBase } from '@/client/components';
-import { useConsent, useLocale } from '@/client/store';
+import { useConsent } from '@/client/store';
+import { t } from '@/client/locales';
+import { DEFAULT_LOCALE } from '@/common/constants';
 import type { ConsentCategory } from '@/common/types/cookie-consent';
 
 type ConsentSettingsModalProps = Readonly<{
@@ -16,7 +18,6 @@ export const ConsentSettingsModal: React.FC<ConsentSettingsModalProps> = ({
     //$                                          STATE                                          $//
     //~-----------------------------------------------------------------------------------------~//
 
-    const { t, locale } = useLocale();
     const { consent, updateConsent } = useConsent();
 
     const [preferences, setPreferences] = useState<boolean>(
@@ -102,10 +103,10 @@ export const ConsentSettingsModal: React.FC<ConsentSettingsModalProps> = ({
                 : 'app.cookies.status.declined';
 
             return t(translationKey, {
-                date: `${createdAt.toLocaleDateString(locale)} ${createdAt.toLocaleTimeString(locale)}`
+                date: `${createdAt.toLocaleDateString(DEFAULT_LOCALE)} ${createdAt.toLocaleTimeString(DEFAULT_LOCALE)}`
             });
         };
-    }, [consent, locale, t]);
+    }, [consent]);
 
     return (
         <div className="flex flex-col gap-6 w-[90vw] max-w-lg">

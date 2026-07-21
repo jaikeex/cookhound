@@ -27,8 +27,8 @@ import { useAppEventListener } from '@/client/hooks';
 import { useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/client/store/AuthContext';
 import { useSnackbar } from '@/client/store/SnackbarContext';
-import { useLocale } from '@/client/store';
 import { areConsentsEqual } from '@/common/utils';
+import { t } from '@/client/locales';
 
 //?—————————————————————————————————————————————————————————————————————————————————————————————?//
 //?                                  CONSENT SOURCE OF TRUTH                                    ?//
@@ -118,7 +118,6 @@ export const ConsentProvider: React.FC<ConsentProviderProps> = ({
 
     const { user } = useAuth();
     const { alert } = useSnackbar();
-    const { t } = useLocale();
     const queryClient = useQueryClient();
 
     const [consent, setConsent] = useState<CookieConsent | null>(
@@ -210,7 +209,7 @@ export const ConsentProvider: React.FC<ConsentProviderProps> = ({
                 setConsentAndEmit(previousConsent ?? null);
             }
         },
-        [user, createUserCookieConsent, alert, t, setConsentAndEmit]
+        [user, createUserCookieConsent, alert, setConsentAndEmit]
     );
 
     const acceptAll = useCallback(async () => {

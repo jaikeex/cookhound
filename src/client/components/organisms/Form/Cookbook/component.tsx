@@ -9,10 +9,10 @@ import {
     Typography,
     RadioSelect
 } from '@/client/components';
-import { useLocale } from '@/client/store';
 import { CookbookVisibility } from '@/common/types/cookbook';
 import type { I18nMessage } from '@/client/locales';
 import { classNames } from '@/client/utils';
+import { t } from '@/client/locales';
 
 export type CookbookFormErrors = {
     title?: I18nMessage;
@@ -33,8 +33,6 @@ export const CookbookForm: React.FC<CookbookFormProps> = ({
     hideSubmit,
     pending
 }) => {
-    const { t } = useLocale();
-
     const errorsToDisplay = Object.values(errors).map((err) => t(err));
 
     return (

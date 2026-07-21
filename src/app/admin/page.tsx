@@ -1,8 +1,8 @@
 import React from 'react';
 import { AdminDashboardTemplate } from '@/client/components';
 import type { Metadata } from 'next';
-import { cookies, headers } from 'next/headers';
-import { getLocalizedMetadata } from '@/server/utils/seo';
+import { cookies } from 'next/headers';
+import { buildLocalizedMetadata } from '@/server/utils/seo';
 import { SESSION_COOKIE_NAME } from '@/common/constants';
 import { apiClient } from '@/client/request';
 
@@ -28,10 +28,7 @@ export default async function AdminPage() {
 //|=============================================================================================|//
 
 export async function generateMetadata(): Promise<Metadata> {
-    const cookieStore = await cookies();
-    const headerList = await headers();
-
-    return getLocalizedMetadata(cookieStore, headerList, {
+    return buildLocalizedMetadata({
         titleKey: 'meta.admin.title',
         descriptionKey: 'meta.admin.description',
         noindex: true

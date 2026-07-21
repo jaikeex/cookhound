@@ -2,8 +2,8 @@
 
 import React, { useMemo } from 'react';
 import { Menu, NavTabs, Typography, type MenuItem } from '@/client/components';
-import { useLocale } from '@/client/store/I18nContext';
 import { ROUTES } from '@/common/constants';
+import { t } from '@/client/locales';
 
 type AdminLayoutShellProps = Readonly<{
     children: React.ReactNode;
@@ -21,15 +21,13 @@ const NAV_ITEM_KEYS = [
 export const AdminLayoutShell: React.FC<AdminLayoutShellProps> = ({
     children
 }) => {
-    const { t } = useLocale();
-
     const menuItems: MenuItem[] = useMemo(
         () =>
             NAV_ITEM_KEYS.map((item) => ({
                 href: item.href,
                 label: t(item.labelKey)
             })),
-        [t]
+        []
     );
 
     return (

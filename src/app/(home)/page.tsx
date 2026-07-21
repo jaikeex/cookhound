@@ -1,16 +1,23 @@
 import type { Metadata } from 'next';
 import { FrontPageTemplate } from '@/client/components/templates/Dashboard/FrontPage';
 import { serverData } from '@/server/data';
-import { cookies, headers } from 'next/headers';
 import React from 'react';
 import {
     generateWebSiteSchema,
     generateOrganizationSchema,
-    getLocalizedMetadata
+    buildLocalizedMetadata
 } from '@/server/utils/seo';
 import { StructuredData } from '@/client/components';
 import { DEFAULT_LOCALE, ENV_CONFIG_PUBLIC } from '@/common/constants';
 import { mapServiceErrorForRsc } from '@/server/data/runtime/mapError';
+
+/**
+ * The front page is statically rendered and revalidated on a short window so
+ * newly accepted recipes surface without a redeploy. Nothing in the request
+ * is personalised here - keep it that way, dynamic APIs would force
+ * per-request rendering.
+ */
+export const revalidate = 300;
 
 //|=============================================================================================|//
 
@@ -42,10 +49,7 @@ export default async function Home() {
 //|=============================================================================================|//
 
 export async function generateMetadata(): Promise<Metadata> {
-    const cookieStore = await cookies();
-    const headerList = await headers();
-
-    return getLocalizedMetadata(cookieStore, headerList, {
+    return buildLocalizedMetadata({
         titleKey: 'meta.home.title',
         descriptionKey: 'meta.home.description',
         imageUrl: '/img/banner.avif',

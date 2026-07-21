@@ -3,9 +3,9 @@
 import React, { useCallback, use, useMemo } from 'react';
 import { Table, StatCard, Typography } from '@/client/components';
 import type { TableColumn } from '@/client/components';
-import { useLocale } from '@/client/store';
 import { formatDate } from '@/client/utils';
 import type { AdminDashboardStatsDTO } from '@/common/types';
+import { t } from '@/client/locales';
 
 type AdminDashboardTemplateProps = Readonly<{
     stats: Promise<AdminDashboardStatsDTO>;
@@ -14,7 +14,6 @@ type AdminDashboardTemplateProps = Readonly<{
 export const AdminDashboardTemplate: React.FC<AdminDashboardTemplateProps> = ({
     stats
 }) => {
-    const { t } = useLocale();
     const data = use(stats);
 
     const getRecipeKey = useCallback(
@@ -52,7 +51,7 @@ export const AdminDashboardTemplate: React.FC<AdminDashboardTemplateProps> = ({
                 render: (r) => formatDate(r.createdAt)
             }
         ],
-        [t]
+        []
     );
 
     const userColumns: TableColumn<
@@ -80,7 +79,7 @@ export const AdminDashboardTemplate: React.FC<AdminDashboardTemplateProps> = ({
                 render: (u) => formatDate(u.createdAt)
             }
         ],
-        [t]
+        []
     );
 
     return (

@@ -1,21 +1,19 @@
-import type { Locale } from '@/common/types';
 import type { Recipe } from '@/common/types';
+import { DEFAULT_LOCALE } from '@/common/constants';
+import { t } from '@/client/locales';
 
 /**
  * Produce a minimal placeholder recipe used while filling the recipe forms.
  * This ensures preview components always receive a complete object.
  */
-export function createRecipePlaceholder(
-    language: Locale,
-    t: (key: string) => string
-): Recipe {
+export function createRecipePlaceholder(): Recipe {
     return {
         id: 0,
         displayId: '',
         rating: null,
         timesRated: 0,
         timesViewed: 0,
-        language,
+        language: DEFAULT_LOCALE,
         imageUrl: '/img/recipe-placeholder.webp',
         title: t('app.recipe.title'),
         portionSize: null,

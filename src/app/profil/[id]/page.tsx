@@ -4,16 +4,15 @@ import { serverData } from '@/server/data';
 import { mapServiceErrorForRsc } from '@/server/data/runtime/mapError';
 import { ProfileTab } from '@/client/types/core';
 import {
-    DEFAULT_LOCALE,
     SESSION_COOKIE_NAME,
     ENV_CONFIG_PUBLIC,
     ROUTES
 } from '@/common/constants';
-import { cookies, headers } from 'next/headers';
+import { cookies } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
 import { verifySessionFromCookie } from '@/server/utils/session';
 import React from 'react';
-import { getLocalizedMetadata } from '@/server/utils/seo';
+import { buildLocalizedMetadata } from '@/server/utils/seo';
 import { UserStructuredData } from '@/client/components';
 
 type UserProfilePageParams = {
@@ -37,8 +36,6 @@ export default async function UserProfilePage({
     const id = Number(paramsResolved.id);
 
     if (isNaN(id)) notFound();
-
-    const locale = DEFAULT_LOCALE;
 
     const cookieStore = await cookies();
     const sessionId = cookieStore.get(SESSION_COOKIE_NAME)?.value;
@@ -75,7 +72,7 @@ export default async function UserProfilePage({
     return (
         <React.Fragment>
             <ProfileTemplate user={user} initialTab={resolvedTab} />
-            <UserStructuredData userPromise={user} locale={locale} />
+            <UserStructuredData userPromise={user} />
         </React.Fragment>
     );
 }
@@ -87,11 +84,9 @@ export async function generateMetadata({
 }: UserProfilePageParams): Promise<Metadata> {
     const { id } = await params;
     const numericId = Number(id);
-    const cookieStore = await cookies();
-    const headerList = await headers();
 
     if (isNaN(numericId)) {
-        return await getLocalizedMetadata(cookieStore, headerList, {
+        return await buildLocalizedMetadata({
             titleKey: 'meta.user.fallback.title',
             descriptionKey: 'meta.user.fallback.description',
             noindex: true
@@ -101,7 +96,7 @@ export async function generateMetadata({
     try {
         const user = await serverData.user.getById(numericId);
 
-        return await getLocalizedMetadata(cookieStore, headerList, {
+        return await buildLocalizedMetadata({
             titleKey: 'meta.user.title',
             descriptionKey: 'meta.user.description',
             images: user.avatarUrl ? [user.avatarUrl] : ['/img/anonymous.webp'],
@@ -111,7 +106,7 @@ export async function generateMetadata({
             type: 'profile'
         });
     } catch {
-        return await getLocalizedMetadata(cookieStore, headerList, {
+        return await buildLocalizedMetadata({
             titleKey: 'meta.user.fallback.title',
             descriptionKey: 'meta.user.fallback.description',
             noindex: true

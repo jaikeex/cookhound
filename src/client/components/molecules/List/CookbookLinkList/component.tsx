@@ -5,7 +5,7 @@ import type { RecipeForDisplayDTO } from '@/common/types';
 import { useScreenSize } from '@/client/hooks';
 import { RecipeLink, Typography } from '@/client/components';
 import { classNames } from '@/client/utils';
-import { useLocale } from '@/client/store';
+import { t } from '@/client/locales';
 
 type CookbookRecipeLinkListProps = Readonly<{
     recipes: RecipeForDisplayDTO[];
@@ -15,8 +15,6 @@ export const CookbookRecipeLinkList: React.FC<CookbookRecipeLinkListProps> = ({
     recipes = []
 }) => {
     const { isMobile } = useScreenSize();
-    const { t } = useLocale();
-
     const MAX_PER_COLUMN = 10;
     const MAX_COLUMNS = isMobile ? 1 : 2;
 

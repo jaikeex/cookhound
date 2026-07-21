@@ -13,13 +13,14 @@ import {
 } from '@/client/components';
 import { validateFormData, executeCaptcha } from '@/client/utils';
 import { useRouter } from 'next/navigation';
-import { useAuth, useLocale, useSnackbar } from '@/client/store';
+import { useAuth, useSnackbar } from '@/client/store';
 import type { I18nMessage } from '@/client/locales';
 import Link from 'next/link';
 import type { User } from '@/common/types';
 import { z } from 'zod';
 import { chqc } from '@/client/data';
 import { ROUTES } from '@/common/constants';
+import { t } from '@/client/locales';
 
 //~---------------------------------------------------------------------------------------------~//
 //$                                          VALIDATION                                         $//
@@ -78,8 +79,6 @@ export const RegisterTemplate: React.FC<RegisterTemplateProps> = () => {
     const router = useRouter();
     const { setUser } = useAuth();
     const { alert } = useSnackbar();
-    const { t } = useLocale();
-
     const { ready: captchaReady } = useCaptcha();
 
     const formRef = React.useRef<HTMLFormElement>(null);
@@ -130,7 +129,7 @@ export const RegisterTemplate: React.FC<RegisterTemplateProps> = () => {
             });
             cleanUpAndRedirectAfterSubmit('/');
         },
-        [alert, cleanUpAndRedirectAfterSubmit, setUser, t]
+        [alert, cleanUpAndRedirectAfterSubmit, setUser]
     );
 
     const {

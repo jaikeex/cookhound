@@ -4,8 +4,13 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { SearchSuggestionBox } from './SearchSuggestionBox';
 import { useOutsideClick } from '@/client/hooks';
 import { useDebounce } from '@/client/hooks/useDebounce';
-import { useAuth, useLocale } from '@/client/store';
-import { ROUTES, SEARCH_QUERY_SEPARATOR } from '@/common/constants';
+import { useAuth } from '@/client/store';
+import { t } from '@/client/locales';
+import {
+    DEFAULT_LOCALE,
+    ROUTES,
+    SEARCH_QUERY_SEPARATOR
+} from '@/common/constants';
 import type { SearchInputProps } from '@/client/components/molecules/Form/SearchInput/component';
 import { Chip, Typography, SearchInput } from '@/client/components';
 import { chqc } from '@/client/data';
@@ -30,7 +35,6 @@ export const RecipeSearchInput: React.FC<RecipeSearchInputProps> = ({
     //$                                          STATE                                          $//
     //~-----------------------------------------------------------------------------------------~//
 
-    const { locale, t } = useLocale();
     const { user, authResolved } = useAuth();
 
     const [inputValue, setInputValue] = useState(value ?? defaultValue ?? '');
@@ -61,7 +65,7 @@ export const RecipeSearchInput: React.FC<RecipeSearchInputProps> = ({
 
     const searchRecipesQuery = chqc.recipe.useSearchRecipes(
         preparedQuery,
-        locale,
+        DEFAULT_LOCALE,
         1,
         5,
         { enabled: isInputFocused && enableSuggestions && isSearchMode }
@@ -172,7 +176,6 @@ export const RecipeSearchInput: React.FC<RecipeSearchInputProps> = ({
     }, [
         shouldShowSuggestions,
         isShowingSearchResults,
-        t,
         initialQueries,
         inputValue
     ]);
@@ -195,7 +198,7 @@ export const RecipeSearchInput: React.FC<RecipeSearchInputProps> = ({
         }
 
         return t('app.recipe.search-suggestions.empty-last-viewed');
-    }, [isShowingSearchResults, t, user, authResolved]);
+    }, [isShowingSearchResults, user, authResolved]);
 
     //~-----------------------------------------------------------------------------------------~//
     //$                                         RENDER                                          $//

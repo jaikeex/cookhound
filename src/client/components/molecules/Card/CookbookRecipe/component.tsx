@@ -4,10 +4,11 @@ import React, { useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import { IconButton, RecipeCard } from '@/client/components';
 import type { RecipeCardProps } from '@/client/components/molecules/Card/types';
-import { useModal, useLocale, useSnackbar } from '@/client/store';
+import { useModal, useSnackbar } from '@/client/store';
 import { chqc, QUERY_KEYS } from '@/client/data';
 import { useQueryClient } from '@tanstack/react-query';
 import { SortableItem, SortableKnob } from 'react-easy-sort';
+import { t } from '@/client/locales';
 
 const DeleteFromCookbookConfirmationModal = dynamic(
     () =>
@@ -30,7 +31,6 @@ export const CookbookRecipeCard: React.FC<CookbookRecipeCardProps> = ({
     ...recipeProps
 }) => {
     const { openModal } = useModal();
-    const { t } = useLocale();
     const { alert } = useSnackbar();
     const queryClient = useQueryClient();
 
@@ -96,7 +96,7 @@ export const CookbookRecipeCard: React.FC<CookbookRecipeCardProps> = ({
                 variant: 'error'
             });
         }
-    }, [openModal, getModalContent, alert, t]);
+    }, [openModal, getModalContent, alert]);
 
     //|-----------------------------------------------------------------------------------------|//
     //?                                         RENDER                                          ?//

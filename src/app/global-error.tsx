@@ -3,7 +3,7 @@
 import React, { useEffect } from 'react';
 import { ButtonBase, Logo, Typography } from '@/client/components';
 import Link from 'next/link';
-import { locales } from '@/client/locales';
+import { t } from '@/client/locales';
 import { DEFAULT_LOCALE } from '@/common/constants';
 
 type ErrorPageProps = Readonly<{
@@ -12,15 +12,9 @@ type ErrorPageProps = Readonly<{
 }>;
 
 export default function GlobalError({ error }: ErrorPageProps) {
-    /**
-     * This requires custom translation solution because it cannot be a server component
-     * and lives outside the app tree so i18n context is not available.
-     */
     useEffect(() => {
         console.error('Global error:', error);
     }, [error]);
-
-    const messages = locales[DEFAULT_LOCALE];
 
     return (
         <html lang={DEFAULT_LOCALE}>
@@ -29,19 +23,19 @@ export default function GlobalError({ error }: ErrorPageProps) {
                     <Logo className="logo-md mb-8" />
 
                     <Typography as="h1" variant="heading-lg" className="mb-4">
-                        {messages['app.error.global']}
+                        {t('app.error.global')}
                     </Typography>
 
                     <Typography
                         variant="body"
                         className="mb-6 text-gray-700 dark:text-gray-300"
                     >
-                        {messages['app.error.global.description']}
+                        {t('app.error.global.description')}
                     </Typography>
 
                     <Link href={'/'} className="mx-auto">
                         <ButtonBase className="mx-auto w-52" color="primary">
-                            {messages['app.general.home']}
+                            {t('app.general.home')}
                         </ButtonBase>
                     </Link>
                 </div>

@@ -8,13 +8,13 @@ import type {
 import { ResetPasswordForm, Typography } from '@/client/components';
 import type { ResetPasswordPayload } from '@/common/types';
 import { z } from 'zod';
-import { useLocale } from '@/client/store';
 
 import { validateFormData } from '@/client/utils';
 import Link from 'next/link';
 import type { I18nMessage } from '@/client/locales';
 import { chqc } from '@/client/data';
 import { ROUTES } from '@/common/constants';
+import { t } from '@/client/locales';
 
 //~---------------------------------------------------------------------------------------------~//
 //$                                          VALIDATION                                         $//
@@ -51,8 +51,6 @@ type ResetPasswordFormData = {
 };
 
 export const ResetPasswordTemplate: React.FC = () => {
-    const { t } = useLocale();
-
     const formRef = React.useRef<HTMLFormElement>(null);
 
     const [formErrors, setFormErrors] = useState<LoginFormErrors>({});

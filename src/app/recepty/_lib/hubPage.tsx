@@ -11,7 +11,6 @@ import {
     HUB_UI,
     HUB_INDEXABLE_THRESHOLD,
     ENV_CONFIG_PUBLIC,
-    DEFAULT_LOCALE,
     ROUTES
 } from '@/common/constants';
 import {
@@ -108,7 +107,7 @@ export const parsePageNumber = (raw: string): number | null => {
  * Generic, noindex metadata for a hub url that resolves to no real page.
  */
 export function buildHubFallbackMetadata(): Promise<Metadata> {
-    return buildLocalizedMetadata(DEFAULT_LOCALE, {
+    return buildLocalizedMetadata({
         titleKey: 'meta.hub.fallback.title',
         descriptionKey: 'meta.hub.fallback.description',
         noindex: true
@@ -137,7 +136,7 @@ export async function buildHubMetadata(
     const intro = buildHubIntro(hub.dbSlug, hub.tag.name);
     const description = page > 1 ? `Strana ${page}: ${intro}` : intro;
 
-    return buildLocalizedMetadata(DEFAULT_LOCALE, {
+    return buildLocalizedMetadata({
         titleKey: 'meta.hub.title',
         description,
         params: { hubTitle },

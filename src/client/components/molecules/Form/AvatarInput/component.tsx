@@ -3,9 +3,10 @@
 import React, { useCallback } from 'react';
 import { ImageInput } from '@/client/components';
 import { chqc, QUERY_KEYS } from '@/client/data';
-import { useAuth, useLocale, useSnackbar } from '@/client/store';
+import { useAuth, useSnackbar } from '@/client/store';
 import { generateUuid } from '@/client/utils';
 import { useQueryClient } from '@tanstack/react-query';
+import { t } from '@/client/locales';
 
 export type AvatarInputProps = Readonly<{
     className?: string;
@@ -15,8 +16,6 @@ export const AvatarInput: React.FC<AvatarInputProps> = ({ className }) => {
     //~-----------------------------------------------------------------------------------------~//
     //$                                   STATE & MUTATIONS                                     $//
     //~-----------------------------------------------------------------------------------------~//
-
-    const { t } = useLocale();
     const { alert } = useSnackbar();
     const { user, authResolved } = useAuth();
 
@@ -67,7 +66,7 @@ export const AvatarInput: React.FC<AvatarInputProps> = ({ className }) => {
                 });
             }
         },
-        [alert, t, uploadAvatarImage, updateUserById, user?.id]
+        [alert, uploadAvatarImage, updateUserById, user?.id]
     );
 
     //~-----------------------------------------------------------------------------------------~//

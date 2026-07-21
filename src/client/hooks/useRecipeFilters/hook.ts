@@ -3,7 +3,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import type { RecipeForDisplayDTO } from '@/common/types';
 import type { RecipeFilterParams } from '@/common/types/recipe';
-import { useLocale } from '@/client/store/I18nContext';
+import { DEFAULT_LOCALE } from '@/common/constants';
 import { useDebounce } from '@/client/hooks/useDebounce';
 import { chqc } from '@/client/data';
 import type { InfiniteData } from '@tanstack/react-query';
@@ -27,8 +27,6 @@ const DEBOUNCE_MS = 400;
  * @param initialFilters - Optional initial filter state. Defaults to no filters.
  */
 export const useRecipeFilters = (initialFilters: RecipeFilterParams = {}) => {
-    const { locale } = useLocale();
-
     const [filters, setFiltersState] =
         useState<RecipeFilterParams>(initialFilters);
 
@@ -39,7 +37,7 @@ export const useRecipeFilters = (initialFilters: RecipeFilterParams = {}) => {
     //~-----------------------------------------------------------------------------------------~//
 
     const filterQuery = chqc.recipe.useFilterRecipesInfinite(
-        locale,
+        DEFAULT_LOCALE,
         PER_PAGE,
         debouncedFilters,
         MAX_BATCHES
@@ -53,8 +51,7 @@ export const useRecipeFilters = (initialFilters: RecipeFilterParams = {}) => {
         const pages =
             (
                 filterQuery.data as
-                    | InfiniteData<RecipeForDisplayDTO[]>
-                    | undefined
+                    InfiniteData<RecipeForDisplayDTO[]> | undefined
             )?.pages ?? [];
 
         return pages.flat();

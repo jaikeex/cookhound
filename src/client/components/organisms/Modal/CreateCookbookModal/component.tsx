@@ -8,7 +8,7 @@ import {
     ButtonBase,
     Submit
 } from '@/client/components';
-import { useLocale, useSnackbar } from '@/client/store';
+import { useSnackbar } from '@/client/store';
 import type { I18nMessage } from '@/client/locales';
 import { chqc, QUERY_KEYS } from '@/client/data';
 import {
@@ -18,6 +18,7 @@ import {
 import { useQueryClient } from '@tanstack/react-query';
 import { z } from 'zod';
 import { validateFormData } from '@/client/utils';
+import { t } from '@/client/locales';
 
 //~---------------------------------------------------------------------------------------------~//
 //$                                          VALIDATION                                         $//
@@ -52,7 +53,6 @@ export const CreateCookbookModal: React.FC<CreateCookbookModalProps> = ({
     close,
     onCreate
 }) => {
-    const { t } = useLocale();
     const { alert } = useSnackbar();
     const queryClient = useQueryClient();
 

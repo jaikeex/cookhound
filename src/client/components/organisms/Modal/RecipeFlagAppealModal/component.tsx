@@ -8,9 +8,10 @@ import {
     Textarea,
     Typography
 } from '@/client/components';
-import { useLocale, useSnackbar } from '@/client/store';
+import { useSnackbar } from '@/client/store';
 import { chqc } from '@/client/data';
 import type { ModalProps } from '@/client/components/organisms/Modal/types';
+import { t } from '@/client/locales';
 
 const APPEAL_ERROR_CODE = {
     APPEAL_ALREADY_PENDING: 'APPEAL_ALREADY_PENDING',
@@ -31,7 +32,6 @@ export const RecipeFlagAppealModal: React.FC<RecipeFlagAppealModalProps> = ({
     flagId,
     close
 }) => {
-    const { t } = useLocale();
     const { alert } = useSnackbar();
 
     const [message, setMessage] = useState('');
@@ -93,7 +93,7 @@ export const RecipeFlagAppealModal: React.FC<RecipeFlagAppealModalProps> = ({
 
             submitAppeal({ recipeId, flagId, message: trimmed });
         },
-        [message, submitAppeal, recipeId, flagId, t]
+        [message, submitAppeal, recipeId, flagId]
     );
 
     const errorsToDisplay = [validationError, serverError].filter(

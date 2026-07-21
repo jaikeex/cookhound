@@ -2,10 +2,10 @@
 
 import React from 'react';
 import { Typography } from '@/client/components';
-import { useLocale } from '@/client/store/I18nContext';
 import type { SerializedResponseDoc } from '@/common/types';
 import { SchemaSection } from '@/client/components/templates/Admin/ApiDocs/SchemaSection';
 import { getStatusColor } from '@/client/components/templates/Admin/ApiDocs/utils';
+import { t } from '@/client/locales';
 
 export type ResponsesSectionProps = Readonly<{
     responses: Record<number, SerializedResponseDoc>;
@@ -14,7 +14,6 @@ export type ResponsesSectionProps = Readonly<{
 export const ResponsesSection: React.FC<ResponsesSectionProps> = ({
     responses
 }) => {
-    const { t } = useLocale();
     const entries = Object.entries(responses);
 
     if (entries.length === 0) {

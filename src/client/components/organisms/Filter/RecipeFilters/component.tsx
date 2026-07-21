@@ -10,7 +10,9 @@ import {
     IngredientFilterInput
 } from '@/client/components';
 import { chqc } from '@/client/data';
-import { useLocale, useModal, useSnackbar } from '@/client/store';
+import { useModal, useSnackbar } from '@/client/store';
+import { t } from '@/client/locales';
+import { DEFAULT_LOCALE } from '@/common/constants';
 import { generateRandomId } from '@/client/utils';
 import type {
     RecipeFilterParams,
@@ -37,7 +39,6 @@ export const RecipeFilters: React.FC<RecipeFiltersProps> = ({
     filters,
     updateFilter
 }) => {
-    const { locale, t } = useLocale();
     const { openModal } = useModal();
     const { alert } = useSnackbar();
 
@@ -60,9 +61,10 @@ export const RecipeFilters: React.FC<RecipeFiltersProps> = ({
         data: tagLists,
         isLoading: isTagsLoading,
         error: tagsError
-    } = chqc.tag.useTags(locale);
+    } = chqc.tag.useTags(DEFAULT_LOCALE);
 
-    const { data: ingredients } = chqc.ingredient.useIngredients(locale);
+    const { data: ingredients } =
+        chqc.ingredient.useIngredients(DEFAULT_LOCALE);
 
     //~-----------------------------------------------------------------------------------------~//
     //$                               SELECTED FILTER DISPLAY DATA                              $//
@@ -193,8 +195,7 @@ export const RecipeFilters: React.FC<RecipeFiltersProps> = ({
             alert,
             filters.containsIngredients,
             filters.excludesIngredients,
-            updateFilter,
-            t
+            updateFilter
         ]
     );
 
@@ -221,8 +222,7 @@ export const RecipeFilters: React.FC<RecipeFiltersProps> = ({
             alert,
             filters.containsIngredients,
             filters.excludesIngredients,
-            updateFilter,
-            t
+            updateFilter
         ]
     );
 

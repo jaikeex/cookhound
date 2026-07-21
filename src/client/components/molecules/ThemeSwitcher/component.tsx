@@ -8,12 +8,11 @@ import {
     type IconButtonProps,
     type SwitchProps
 } from '@/client/components';
-import { useLocale } from '@/client/store';
+import { t } from '@/client/locales';
 
 type ThemeSwitcherIconProps = Omit<IconButtonProps, 'icon' | 'onClick'>;
 
 export const ThemeSwitcherIcon: React.FC<ThemeSwitcherIconProps> = (props) => {
-    const { t } = useLocale();
     const { theme, setTheme, resolvedTheme } = useTheme();
     const [mounted, setMounted] = useState(false);
 
@@ -79,7 +78,7 @@ export const ThemeSwitcherIcon: React.FC<ThemeSwitcherIconProps> = (props) => {
                     />
                 );
         }
-    }, [currentTheme, iconProps, t]);
+    }, [currentTheme, iconProps]);
 
     return icon;
 };
@@ -91,7 +90,6 @@ type ThemeSwitcherProps = Omit<
 
 export const ThemeSwitcher: React.FC<ThemeSwitcherProps> = (props) => {
     const { theme, setTheme, resolvedTheme } = useTheme();
-    const { t } = useLocale();
     const [mounted, setMounted] = useState(false);
 
     // Ensure component is mounted before rendering theme-dependent content

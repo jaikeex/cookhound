@@ -16,9 +16,8 @@ import {
 } from '@/client/components';
 
 import { CONTENT_WRAPPER_ID, MAIN_PAGE_ID } from '@/client/constants';
-import { locales } from '@/client/locales';
 import { classNames } from '@/client/utils';
-import { tServer } from '@/server/utils/locales';
+import { t } from '@/client/locales';
 import { DEFAULT_LOCALE, ENV_CONFIG_PUBLIC } from '@/common/constants';
 
 const openSans = Open_Sans({
@@ -60,22 +59,12 @@ export default function RootLayout({
 }: Readonly<{
     children: React.ReactNode;
 }>) {
-    const locale = DEFAULT_LOCALE;
-
-    // This is required to pass the messages down the tree as the default export from .json files is not serializable
-    const messages = { ...locales[locale] };
-
     return (
-        <html lang={locale} suppressHydrationWarning>
+        <html lang={DEFAULT_LOCALE} suppressHydrationWarning>
             <Head />
             <body className={`${kalam.variable} ${openSans.variable}`}>
                 <QueryProvider>
-                    <AppProviders
-                        initialTheme="dark"
-                        initialConsent={null}
-                        messages={messages}
-                        locale={locale}
-                    >
+                    <AppProviders initialTheme="dark" initialConsent={null}>
                         <ClientShell />
                         <ConsentBanner />
                         <ScrollToTop />
@@ -108,10 +97,8 @@ export default function RootLayout({
 //|=============================================================================================|//
 
 export async function generateMetadata(): Promise<Metadata> {
-    const locale = DEFAULT_LOCALE;
-
-    const title = tServer(locale, 'meta.site.title');
-    const description = tServer(locale, 'meta.site.description');
+    const title = t('meta.site.title');
+    const description = t('meta.site.description');
 
     return {
         metadataBase: new URL(ENV_CONFIG_PUBLIC.ORIGIN),

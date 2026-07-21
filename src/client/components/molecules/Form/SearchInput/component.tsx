@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useState, type ReactNode } from 'react';
 import { BaseInput, ButtonBase, InputLabel, Loader } from '@/client/components';
 import type { FormInputProps } from '@/client/components/molecules/Form/types';
 import { classNames } from '@/client/utils';
-import { useLocale } from '@/client/store';
+import { t } from '@/client/locales';
 
 export type SearchInputProps = Readonly<{
     children?: ReactNode;
@@ -36,8 +36,6 @@ export const SearchInput: React.FC<SearchInputProps> = ({
     ref,
     value
 }) => {
-    const { t } = useLocale();
-
     const [inputValue, setInputValue] = useState(value ?? defaultValue ?? '');
 
     const handleInputChange = useCallback(

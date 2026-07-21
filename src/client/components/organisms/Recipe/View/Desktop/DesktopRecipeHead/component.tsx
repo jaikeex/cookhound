@@ -11,7 +11,8 @@ import {
     TagList
 } from '@/client/components';
 import { RecipeAuthorLinkDesktop } from '@/client/components';
-import { useAuth, useLocale, useRecipeHandling } from '@/client/store';
+import { useAuth, useRecipeHandling } from '@/client/store';
+import { t } from '@/client/locales';
 
 export type DesktopRecipeHeadProps = Readonly<{
     isPreview?: boolean;
@@ -24,7 +25,6 @@ export const DesktopRecipeHead: React.FC<DesktopRecipeHeadProps> = ({
     onRateRecipe,
     recipe
 }) => {
-    const { t } = useLocale();
     const { user } = useAuth();
 
     const { incrementPortionSize, decrementPortionSize, portionSize } =

@@ -6,8 +6,7 @@ import { classNames } from '@/client/utils';
 import { RecipeSearchInput } from '@/client/components';
 import { type ChangeEvent } from 'react';
 import { Typography } from '@/client/components';
-import { useLocale } from '@/client/store/I18nContext';
-import { BannerSkeleton } from './skeleton';
+import { t } from '@/client/locales';
 import Link from 'next/link';
 import { ROUTES } from '@/common/constants';
 
@@ -30,10 +29,6 @@ export const Banner: React.FC<BannerProps> = ({
     onSearch,
     searchValue
 }) => {
-    const { t, localeResolved } = useLocale();
-
-    if (!localeResolved) return <BannerSkeleton />;
-
     return (
         <React.Fragment>
             <div

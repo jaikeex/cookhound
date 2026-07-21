@@ -1,8 +1,7 @@
 import React from 'react';
 import { AdminApiDocsTemplate } from '@/client/components';
 import type { Metadata } from 'next';
-import { cookies, headers } from 'next/headers';
-import { getLocalizedMetadata } from '@/server/utils/seo';
+import { buildLocalizedMetadata } from '@/server/utils/seo';
 import { collectApiDocs } from '@/server/utils/api-docs';
 
 //|=============================================================================================|//
@@ -18,10 +17,7 @@ export default function AdminApiDocsPage() {
 //|=============================================================================================|//
 
 export async function generateMetadata(): Promise<Metadata> {
-    const cookieStore = await cookies();
-    const headerList = await headers();
-
-    return getLocalizedMetadata(cookieStore, headerList, {
+    return buildLocalizedMetadata({
         titleKey: 'meta.admin.apiDocs.title',
         descriptionKey: 'meta.admin.apiDocs.description',
         noindex: true

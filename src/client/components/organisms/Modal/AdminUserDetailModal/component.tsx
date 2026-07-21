@@ -4,12 +4,13 @@ import React, { useCallback } from 'react';
 import type { ModalProps } from '@/client/components/organisms/Modal/types';
 import { ButtonBase, Chip, Typography } from '@/client/components';
 import { AdminActionConfirmModal } from '@/client/components/organisms/Modal/AdminActionConfirmModal';
-import { useLocale, useSnackbar, useModal } from '@/client/store';
+import { useSnackbar, useModal } from '@/client/store';
 import { chqc } from '@/client/data';
 import { useQueryClient } from '@tanstack/react-query';
 import { ADMIN_QUERY_KEYS } from '@/client/data/admin';
 import { formatDate } from '@/client/utils';
 import { AuthType, Status, UserRole } from '@/common/types';
+import { t } from '@/client/locales';
 
 export type AdminUserDetailModalProps = Readonly<{
     userId: number;
@@ -47,7 +48,6 @@ export const AdminUserDetailModal: React.FC<AdminUserDetailModalProps> = ({
     onClose: _onClose,
     close: _close
 }) => {
-    const { t } = useLocale();
     const { alert } = useSnackbar();
     const { openModal } = useModal();
     const queryClient = useQueryClient();
@@ -251,7 +251,7 @@ export const AdminUserDetailModal: React.FC<AdminUserDetailModalProps> = ({
                 onConfirm={confirmChangeRole}
             />
         ));
-    }, [user, openModal, confirmChangeRole, t]);
+    }, [user, openModal, confirmChangeRole]);
 
     const handleChangeStatus = useCallback(() => {
         if (!user) return;
@@ -281,7 +281,7 @@ export const AdminUserDetailModal: React.FC<AdminUserDetailModalProps> = ({
                 onConfirm={confirmChangeStatus}
             />
         ));
-    }, [user, openModal, confirmChangeStatus, t]);
+    }, [user, openModal, confirmChangeStatus]);
 
     const handleForceLogout = useCallback(() => {
         openModal((modalClose) => (
@@ -294,7 +294,7 @@ export const AdminUserDetailModal: React.FC<AdminUserDetailModalProps> = ({
                 onConfirm={confirmForceLogout}
             />
         ));
-    }, [openModal, confirmForceLogout, t]);
+    }, [openModal, confirmForceLogout]);
 
     const handleForcePasswordReset = useCallback(() => {
         openModal((modalClose) => (
@@ -306,7 +306,7 @@ export const AdminUserDetailModal: React.FC<AdminUserDetailModalProps> = ({
                 onConfirm={confirmForcePasswordReset}
             />
         ));
-    }, [openModal, confirmForcePasswordReset, t]);
+    }, [openModal, confirmForcePasswordReset]);
 
     const handleVerifyEmail = useCallback(() => {
         openModal((modalClose) => (
@@ -318,7 +318,7 @@ export const AdminUserDetailModal: React.FC<AdminUserDetailModalProps> = ({
                 onConfirm={confirmVerifyEmail}
             />
         ));
-    }, [openModal, confirmVerifyEmail, t]);
+    }, [openModal, confirmVerifyEmail]);
 
     const handleScheduleDeletion = useCallback(() => {
         openModal((modalClose) => (
@@ -332,7 +332,7 @@ export const AdminUserDetailModal: React.FC<AdminUserDetailModalProps> = ({
                 onConfirm={confirmScheduleDeletion}
             />
         ));
-    }, [openModal, confirmScheduleDeletion, t]);
+    }, [openModal, confirmScheduleDeletion]);
 
     const handleCancelDeletion = useCallback(() => {
         openModal((modalClose) => (
@@ -345,7 +345,7 @@ export const AdminUserDetailModal: React.FC<AdminUserDetailModalProps> = ({
                 onConfirm={confirmCancelDeletion}
             />
         ));
-    }, [openModal, confirmCancelDeletion, t]);
+    }, [openModal, confirmCancelDeletion]);
 
     //~---------------------------------------------------------------------------------------------~//
     //$                                          RENDER                                              $//

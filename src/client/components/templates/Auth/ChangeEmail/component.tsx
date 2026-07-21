@@ -3,12 +3,13 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import type { ChangeEmailFormErrors } from '@/client/components';
 import { ChangeEmailForm } from '@/client/components';
-import { useLocale, useSnackbar } from '@/client/store';
+import { useSnackbar } from '@/client/store';
 import { validateFormData } from '@/client/utils/form';
 import { z } from 'zod';
 import { chqc } from '@/client/data';
 import type { I18nMessage } from '@/client/locales';
 import { useRouter } from 'next/navigation';
+import { t } from '@/client/locales';
 
 //~---------------------------------------------------------------------------------------------~//
 //$                                          VALIDATION                                         $//
@@ -29,7 +30,6 @@ export type ChangeEmailTemplateProps = NonNullable<unknown>;
 
 export const ChangeEmailTemplate: React.FC<ChangeEmailTemplateProps> = () => {
     const { alert } = useSnackbar();
-    const { t } = useLocale();
     const router = useRouter();
 
     const formRef = React.useRef<HTMLFormElement>(null);

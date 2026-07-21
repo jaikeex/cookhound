@@ -3,7 +3,7 @@
 import React, { useCallback, useRef, useState } from 'react';
 import type { ModalProps } from '@/client/components/organisms/Modal/types';
 import { ButtonBase, TextInput, Typography } from '@/client/components';
-import { useLocale } from '@/client/store';
+import { t } from '@/client/locales';
 
 export type AdminActionConfirmModalProps = Readonly<{
     title: string;
@@ -30,7 +30,6 @@ export const AdminActionConfirmModal: React.FC<
     close,
     children
 }) => {
-    const { t } = useLocale();
     const [isPending, setIsPending] = useState(false);
     const reasonRef = useRef('');
 

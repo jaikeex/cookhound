@@ -11,10 +11,11 @@ import React, { useCallback, useMemo } from 'react';
 import type { RecipeCardProps } from '@/client/components/molecules/Card/types';
 import { chqc, QUERY_KEYS } from '@/client/data';
 import { useQueryClient } from '@tanstack/react-query';
-import { useLocale, useModal, useSnackbar } from '@/client/store';
+import { useModal, useSnackbar } from '@/client/store';
 import { useRouter } from 'next/navigation';
 import { classNames } from '@/client/utils';
 import { ROUTES } from '@/common/constants';
+import { t } from '@/client/locales';
 
 export const RecipeWithHandling: React.FC<RecipeCardProps> = ({
     id,
@@ -29,7 +30,6 @@ export const RecipeWithHandling: React.FC<RecipeCardProps> = ({
 }) => {
     const queryClient = useQueryClient();
     const { alert } = useSnackbar();
-    const { t } = useLocale();
     const { openModal } = useModal();
     const router = useRouter();
 
@@ -114,7 +114,7 @@ export const RecipeWithHandling: React.FC<RecipeCardProps> = ({
             },
             ...editAndDelete
         ];
-    }, [t, router, displayId, handleOpenDeleteRecipeModal, isFlagged]);
+    }, [router, displayId, handleOpenDeleteRecipeModal, isFlagged]);
 
     return (
         <div className="relative">

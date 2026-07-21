@@ -4,7 +4,8 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { chqc, QUERY_KEYS } from '@/client/data';
 import { useQueryClient } from '@tanstack/react-query';
 import { useScreenSize, useUnsavedChangesWarning } from '@/client/hooks';
-import { useSnackbar, useLocale, useCreateRecipeStore } from '@/client/store';
+import { useSnackbar, useCreateRecipeStore } from '@/client/store';
+import { t } from '@/client/locales';
 import {
     recipeFormSchema,
     extractFormData,
@@ -40,7 +41,6 @@ export const useRecipeFormController = ({
     //$                                      STATE & SETUP                                      $//
     //~-----------------------------------------------------------------------------------------~//
 
-    const { t, locale } = useLocale();
     const { alert } = useSnackbar();
     const { isTablet, isMobile } = useScreenSize();
     const queryClient = useQueryClient();
@@ -129,7 +129,7 @@ export const useRecipeFormController = ({
 
             return image_url;
         },
-        [alert, t, uploadImageMutation]
+        [alert, uploadImageMutation]
     );
 
     //~-----------------------------------------------------------------------------------------~//
@@ -160,7 +160,6 @@ export const useRecipeFormController = ({
             isEdit,
             queryClient,
             safePush,
-            t,
             resetSuggestions
         ]
     );
@@ -197,7 +196,7 @@ export const useRecipeFormController = ({
 
             const payload: RecipeForCreatePayload = {
                 ...formData,
-                language: locale || DEFAULT_LOCALE
+                language: DEFAULT_LOCALE
             };
 
             if (isEdit && initialRecipe) {
@@ -209,14 +208,7 @@ export const useRecipeFormController = ({
                 createRecipe(payload);
             }
         },
-        [
-            initialRecipe,
-            isEdit,
-            locale,
-            createRecipe,
-            updateRecipe,
-            uploadRecipeImage
-        ]
+        [initialRecipe, isEdit, createRecipe, updateRecipe, uploadRecipeImage]
     );
 
     //~-----------------------------------------------------------------------------------------~//
@@ -249,7 +241,7 @@ export const useRecipeFormController = ({
                 setChangedFields((prev) => [...prev, name]);
             }
         },
-        [changedFields, t, updateRecipeObject]
+        [changedFields, updateRecipeObject]
     );
 
     /**
@@ -300,21 +292,14 @@ export const useRecipeFormController = ({
             // On the create page, if the store holds a real recipe from a previous
             // session (identifiable by it having an ID), reset it.
             if (recipeObject === null || recipeObject.id) {
-                setRecipeObject(
-                    createRecipePlaceholder(
-                        locale,
-                        t as unknown as (key: string) => string
-                    )
-                );
+                setRecipeObject(createRecipePlaceholder());
                 setChangedFields([]);
             }
         }
     }, [
         initialRecipe,
         isEdit,
-        locale,
         setRecipeObject,
-        t,
         recipeObject?.id,
         recipeObject
     ]);

@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import type { ModalProps } from '@/client/components/organisms/Modal/types';
 import { ButtonBase, Typography } from '@/client/components';
-import { useLocale } from '@/client/store';
+import { t } from '@/client/locales';
 
 type DeleteRecipeConfirmationModalProps = Readonly<{
     recipeTitle: string;
@@ -13,8 +13,6 @@ type DeleteRecipeConfirmationModalProps = Readonly<{
 export const DeleteRecipeConfirmationModal: React.FC<
     DeleteRecipeConfirmationModalProps
 > = ({ recipeTitle, onCancel, onDelete, close }) => {
-    const { t } = useLocale();
-
     const handleClose = useCallback(() => {
         onCancel?.();
         close?.();

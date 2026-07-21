@@ -2,8 +2,7 @@
 
 import { useCallback, useMemo, useState } from 'react';
 import type { RecipeForDisplayDTO } from '@/common/types';
-import { useLocale } from '@/client/store/I18nContext';
-import { SEARCH_QUERY_SEPARATOR } from '@/common/constants';
+import { DEFAULT_LOCALE, SEARCH_QUERY_SEPARATOR } from '@/common/constants';
 import { chqc } from '@/client/data';
 import type { InfiniteData } from '@tanstack/react-query';
 
@@ -40,8 +39,6 @@ export const useRecipeDiscovery = (
     // When provided, all list/search operations will be scoped to the given user.
     userId?: string
 ) => {
-    const { locale } = useLocale();
-
     const [queries, setQueries] = useState<string[]>(
         normaliseToArray(initialQuery)
     );
@@ -91,7 +88,7 @@ export const useRecipeDiscovery = (
     const listInfiniteQuery = userId
         ? chqc.recipe.useUserRecipesInfinite(
               userId,
-              locale,
+              DEFAULT_LOCALE,
               PER_PAGE,
               MAX_BATCHES,
               {
@@ -100,17 +97,22 @@ export const useRecipeDiscovery = (
                   initialDataUpdatedAt: listSeed ? seededAt : undefined
               }
           )
-        : chqc.recipe.useRecipeListInfinite(locale, PER_PAGE, MAX_BATCHES, {
-              enabled: !isSearchMode,
-              initialData: listSeed,
-              initialDataUpdatedAt: listSeed ? seededAt : undefined
-          });
+        : chqc.recipe.useRecipeListInfinite(
+              DEFAULT_LOCALE,
+              PER_PAGE,
+              MAX_BATCHES,
+              {
+                  enabled: !isSearchMode,
+                  initialData: listSeed,
+                  initialDataUpdatedAt: listSeed ? seededAt : undefined
+              }
+          );
 
     const searchInfiniteQuery = userId
         ? chqc.recipe.useUserSearchRecipesInfinite(
               userId,
               queryString,
-              locale,
+              DEFAULT_LOCALE,
               PER_PAGE,
               MAX_BATCHES,
               {
@@ -121,7 +123,7 @@ export const useRecipeDiscovery = (
           )
         : chqc.recipe.useSearchRecipesInfinite(
               queryString,
-              locale,
+              DEFAULT_LOCALE,
               PER_PAGE,
               MAX_BATCHES,
               {

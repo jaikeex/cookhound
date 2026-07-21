@@ -1,6 +1,6 @@
 'use client';
 
-import { useAuth, useLocale } from '@/client/store';
+import { useAuth } from '@/client/store';
 import React, { use } from 'react';
 import { DesktopProfileTemplate } from './Desktop';
 import { MobileProfileTemplate } from './Mobile';
@@ -10,6 +10,7 @@ import { Cookbooks, ProfileBodyInfo, Recipes } from '@/client/components';
 import { useRouter } from 'next/navigation';
 import { GRID_COLS } from '@/client/constants';
 import { useRunOnce } from '@/client/hooks';
+import { t } from '@/client/locales';
 
 type ProfileProps = Readonly<{
     initialTab?: ProfileTab | null;
@@ -22,8 +23,6 @@ export const ProfileTemplate: React.FC<ProfileProps> = ({
 }) => {
     const userResolved = use(user);
     const router = useRouter();
-
-    const { t } = useLocale();
     const { authResolved, user: currentUser } = useAuth();
 
     const isCurrentUser = authResolved && currentUser?.id === userResolved.id;

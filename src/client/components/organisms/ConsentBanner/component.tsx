@@ -5,13 +5,12 @@ import { ButtonBase, Typography } from '@/client/components';
 import { classNames } from '@/client/utils';
 import { useConsent } from '@/client/store';
 import { useModal } from '@/client/store';
-import { useLocale } from '@/client/store';
 import { ConsentSettingsModal } from '@/client/components';
+import { t } from '@/client/locales';
 
 export const ConsentBanner: React.FC = () => {
     const { consent, acceptAll, rejectAll } = useConsent();
     const { openModal } = useModal();
-    const { t, localeResolved } = useLocale();
 
     //?—————————————————————————————————————————————————————————————————————————————————————————?//
     //?                                        SEO FAIL                                         ?//
@@ -37,7 +36,7 @@ export const ConsentBanner: React.FC = () => {
         });
     }, [openModal]);
 
-    if (!isHydrated || !localeResolved || consent) return null;
+    if (!isHydrated || consent) return null;
 
     return (
         <div

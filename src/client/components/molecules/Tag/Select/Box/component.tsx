@@ -5,8 +5,8 @@ import type { RecipeTagDTO } from '@/common/types';
 import { Typography, TagList, ButtonBase, Loader } from '@/client/components';
 import { classNames } from '@/client/utils';
 import { useScreenSize } from '@/client/hooks';
-import { useLocale } from '@/client/store';
 import { MAX_TAGS } from '@/common/constants';
+import { t } from '@/client/locales';
 
 type TagSelectionBoxProps = Readonly<{
     className?: string;
@@ -21,7 +21,6 @@ export const TagSelectionBox: React.FC<TagSelectionBoxProps> = ({
     onSuggest,
     isLoading
 }) => {
-    const { t } = useLocale();
     const { isMobile } = useScreenSize();
 
     return (

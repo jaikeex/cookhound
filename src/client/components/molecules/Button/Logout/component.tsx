@@ -4,13 +4,11 @@ import React from 'react';
 import { ButtonBase, type BaseButtonProps } from '@/client/components';
 import { classNames } from '@/client/utils';
 import { useLogout } from '@/client/hooks';
-import { useLocale } from '@/client/store';
+import { t } from '@/client/locales';
 
 type LogoutButtonProps = BaseButtonProps;
 
 export const LogoutButton: React.FC<LogoutButtonProps> = ({ className }) => {
-    const { t } = useLocale();
-
     const { logout: handleClick, isPending } = useLogout();
 
     return (

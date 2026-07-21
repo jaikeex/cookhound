@@ -1,5 +1,3 @@
-import type { Locale } from '@/common/types';
-
 type TimeUnits = 'year' | 'month' | 'day' | 'hour' | 'minute' | 'second';
 type PluralCategory = 'one' | 'few' | 'many' | 'other';
 
@@ -48,33 +46,24 @@ const cs: LanguagePack = {
     }
 };
 
-const languagePacks: Record<Locale, LanguagePack> = {
-    cs
-};
-
 /**
  * Calculates the difference between a timestamp and now, returning a readable,
- * localized string. This function is now language-agnostic.
+ * localized string.
  *
  * @param createdAt The timestamp to compare with the current time.
- * @param locale The locale to use for the output string.
  * @returns A localized string representing the time difference.
  */
 export function getAgeString(
-    createdAt: Date | string | null | undefined,
-    locale: Locale
+    createdAt: Date | string | null | undefined
 ): string {
-    if (!createdAt || !locale) return '';
+    if (!createdAt) return '';
 
     const timestamp =
         createdAt instanceof Date
             ? createdAt.getTime()
             : new Date(createdAt).getTime();
 
-    const langPack = languagePacks[locale];
-    if (!langPack) {
-        return '';
-    }
+    const langPack = cs;
 
     const difference = Date.now() - timestamp;
 

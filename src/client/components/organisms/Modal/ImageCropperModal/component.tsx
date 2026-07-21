@@ -3,8 +3,9 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { ButtonBase, Typography } from '@/client/components';
 import type { ModalProps } from '@/client/components/organisms/Modal/types';
-import { useLocale, useSnackbar } from '@/client/store';
+import { useSnackbar } from '@/client/store';
 import ReactCrop, { type Crop, type PixelCrop } from 'react-image-crop';
+import { t } from '@/client/locales';
 import 'react-image-crop/dist/ReactCrop.css';
 
 export type ImageCropperModalProps = Readonly<{
@@ -23,7 +24,6 @@ export const ImageCropperModal: React.FC<ImageCropperModalProps> = ({
     circularCrop = false
 }) => {
     const { alert } = useSnackbar();
-    const { t } = useLocale();
     const imgRef = useRef<HTMLImageElement | null>(null);
     const [imageUrl, setImageUrl] = useState<string>('');
 
@@ -133,7 +133,7 @@ export const ImageCropperModal: React.FC<ImageCropperModalProps> = ({
 
             close();
         }
-    }, [crop, getCroppedFile, onComplete, close, alert, t]);
+    }, [crop, getCroppedFile, onComplete, close, alert]);
 
     return (
         <div className="flex flex-col items-center w-full h-full gap-4">

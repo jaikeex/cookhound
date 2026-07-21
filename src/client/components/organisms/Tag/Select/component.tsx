@@ -2,7 +2,9 @@
 
 import { ButtonBase, TagList, TagSelectionModal } from '@/client/components';
 import { chqc } from '@/client/data';
-import { useLocale, useModal } from '@/client/store';
+import { useModal } from '@/client/store';
+import { t } from '@/client/locales';
+import { DEFAULT_LOCALE } from '@/common/constants';
 import { classNames } from '@/client/utils';
 import type { RecipeTagDTO } from '@/common/types';
 import React, { useCallback, useState } from 'react';
@@ -18,14 +20,17 @@ export const TagSelection: React.FC<TagSelectionProps> = ({
     defaultTags,
     onConfirm
 }) => {
-    const { locale, t } = useLocale();
     const { openModal } = useModal();
 
     const [selectedTags, setSelectedTags] = useState<RecipeTagDTO[]>(
         defaultTags ?? []
     );
 
-    const { data: tagLists, isLoading, error } = chqc.tag.useTags(locale);
+    const {
+        data: tagLists,
+        isLoading,
+        error
+    } = chqc.tag.useTags(DEFAULT_LOCALE);
 
     const handleConfirm = useCallback(
         (tags: RecipeTagDTO[]) => {

@@ -13,9 +13,9 @@ import { CookbookRecipeLinkList } from '@/client/components';
 import { chqc } from '@/client/data';
 import type { Cookbook } from '@/common/types';
 import Link from 'next/link';
-import { useLocale } from '@/client/store';
 import { useModal } from '@/client/store/ModalContext';
 import { ROUTES } from '@/common/constants';
+import { t } from '@/client/locales';
 
 const CreateCookbookModal = dynamic(
     () =>
@@ -36,7 +36,6 @@ export const Cookbooks: React.FC<CookbooksProps> = ({
     isCurrentUser,
     userId
 }) => {
-    const { t } = useLocale();
     const { openModal } = useModal();
 
     const handleOpenCreateCookbook = React.useCallback(() => {

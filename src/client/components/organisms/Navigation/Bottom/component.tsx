@@ -4,8 +4,9 @@ import React, { useState } from 'react';
 import { classNames } from '@/client/utils';
 import { Icon, Tooltip } from '@/client/components';
 import Link from 'next/link';
-import { useAuth, useLocale } from '@/client/store';
+import { useAuth } from '@/client/store';
 import { BOTTOM_NAVBAR_ID } from '@/client/constants';
+import { t } from '@/client/locales';
 import { usePathname } from 'next/navigation';
 import { AppEvent } from '@/client/events';
 import { useAppEventListener } from '@/client/hooks';
@@ -40,7 +41,6 @@ type BottomNavigationProps = Readonly<NonNullable<unknown>>;
 
 export const BottomNavigation: React.FC<BottomNavigationProps> = () => {
     const { authResolved, user } = useAuth();
-    const { t, localeResolved } = useLocale();
     const pathname = usePathname();
 
     const [isNotfound, setIsNotfound] = useState<boolean>(false);
@@ -54,7 +54,7 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = () => {
 
     if (isDisabled || isNotfound) return null;
 
-    if (!authResolved || !localeResolved) {
+    if (!authResolved) {
         return <BottomNavigationSkeleton />;
     }
 

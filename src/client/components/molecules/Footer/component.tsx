@@ -2,11 +2,11 @@
 
 import { classNames } from '@/client/utils';
 import React, { useCallback } from 'react';
-import { useModal, useLocale } from '@/client/store';
+import { useModal } from '@/client/store';
 import { ConsentSettingsModal } from '@/client/components';
 import Link from 'next/link';
 import { ROUTES, VERSION } from '@/common/constants';
-import { FooterSkeleton } from './skeleton';
+import { t } from '@/client/locales';
 
 type FooterProps = Readonly<{
     className?: string;
@@ -14,7 +14,6 @@ type FooterProps = Readonly<{
 
 export const Footer: React.FC<FooterProps> = ({ className }) => {
     const { openModal } = useModal();
-    const { t, localeResolved } = useLocale();
 
     const handleCookieSettings = useCallback(() => {
         openModal((close) => <ConsentSettingsModal onClose={close} />, {
@@ -23,8 +22,6 @@ export const Footer: React.FC<FooterProps> = ({ className }) => {
     }, [openModal]);
 
     const currentYear = new Date().getFullYear();
-
-    if (!localeResolved) return <FooterSkeleton className={className} />;
 
     return (
         <footer className={classNames('py-6 px-4 pb-20 md:pb-6', className)}>

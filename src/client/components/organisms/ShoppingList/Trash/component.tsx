@@ -7,8 +7,8 @@ import type { ShoppingListIngredientDTO } from '@/common/types';
 import type { PanInfo } from 'framer-motion';
 import * as React from 'react';
 import { classNames } from '@/client/utils';
-import { useLocale } from '@/client/store';
 import { Divider } from '@/client/components';
+import { t } from '@/client/locales';
 
 type TrashProps = Readonly<{
     className?: string;
@@ -28,8 +28,6 @@ export const Trash: React.FC<TrashProps> = ({
     onDragEnd,
     ref
 }) => {
-    const { t } = useLocale();
-
     return (
         <div
             ref={ref}

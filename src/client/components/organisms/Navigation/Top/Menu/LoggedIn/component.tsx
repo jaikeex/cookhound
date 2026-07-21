@@ -9,9 +9,9 @@ import {
     Typography
 } from '@/client/components';
 import { UserRole, type User } from '@/common/types';
-import { useLocale } from '@/client/store/I18nContext';
 import Link from 'next/link';
 import { ROUTES } from '@/common/constants';
+import { t } from '@/client/locales';
 
 type LoggedInMenuContentProps = Readonly<{
     user: User;
@@ -20,8 +20,6 @@ type LoggedInMenuContentProps = Readonly<{
 export const LoggedInMenuContent: React.FC<LoggedInMenuContentProps> = ({
     user
 }) => {
-    const { t } = useLocale();
-
     return (
         <React.Fragment>
             <Avatar

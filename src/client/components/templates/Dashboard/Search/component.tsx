@@ -13,7 +13,7 @@ import { useRecipeDiscovery } from '@/client/hooks';
 import { useRouter } from 'next/navigation';
 import { classNames } from '@/client/utils';
 import { ROUTES, SEARCH_QUERY_SEPARATOR } from '@/common/constants';
-import { useLocale } from '@/client/store';
+import { t } from '@/client/locales';
 
 type SearchTemplateProps = Readonly<{
     initialRecipes: Promise<RecipeForDisplayDTO[]>;
@@ -25,8 +25,6 @@ export const SearchTemplate: React.FC<SearchTemplateProps> = ({
     initialQuery = ''
 }) => {
     const resolvedRecipes = use(initialRecipes);
-
-    const { t } = useLocale();
     const router = useRouter();
     const [searchInput, setSearchInput] = useState('');
 

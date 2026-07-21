@@ -2,7 +2,7 @@
 
 import React, { useCallback, useMemo } from 'react';
 import { ButtonBase, Icon, Typography } from '@/client/components';
-import { useAuth, useLocale, useModal } from '@/client/store';
+import { useAuth, useModal } from '@/client/store';
 import { useRouter } from 'next/navigation';
 import type { Recipe } from '@/common/types';
 import type { RecipeFlagReason } from '@/common/constants';
@@ -13,6 +13,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useSnackbar } from '@/client/store';
 import { RecipeFlagAppealModal } from '@/client/components';
 import { ROUTES } from '@/common/constants';
+import { t } from '@/client/locales';
 
 export type FlaggedAuthorTemplateProps = Readonly<{
     recipe: Recipe;
@@ -21,7 +22,6 @@ export type FlaggedAuthorTemplateProps = Readonly<{
 export const FlaggedAuthorTemplate: React.FC<FlaggedAuthorTemplateProps> = ({
     recipe
 }) => {
-    const { t } = useLocale();
     const router = useRouter();
     const queryClient = useQueryClient();
     const { openModal } = useModal();

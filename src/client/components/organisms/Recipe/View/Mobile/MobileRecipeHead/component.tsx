@@ -10,8 +10,9 @@ import {
     RecipeViewImage,
     TagList
 } from '@/client/components';
-import { useAuth, useLocale, useRecipeHandling } from '@/client/store';
+import { useAuth, useRecipeHandling } from '@/client/store';
 import { classNames } from '@/client/utils';
+import { t } from '@/client/locales';
 
 export type MobileRecipeHeadProps = Readonly<{
     isPreview?: boolean;
@@ -24,7 +25,6 @@ export const MobileRecipeHead: React.FC<MobileRecipeHeadProps> = ({
     onRateRecipe,
     recipe
 }) => {
-    const { t } = useLocale();
     const { user } = useAuth();
 
     const { incrementPortionSize, decrementPortionSize, portionSize } =

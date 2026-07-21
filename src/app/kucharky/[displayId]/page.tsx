@@ -6,14 +6,13 @@ import { getCurrentUser } from '@/app/actions';
 import { CookbookTemplate, StructuredData } from '@/client/components';
 import type { Metadata } from 'next';
 import { reviveCookbookDates } from '@/client/data/cookbook/revive';
-import { cookies, headers } from 'next/headers';
-import { DEFAULT_LOCALE, ENV_CONFIG_PUBLIC, ROUTES } from '@/common/constants';
+import { ENV_CONFIG_PUBLIC, ROUTES } from '@/common/constants';
 import {
     generateCookbookSchema,
     generateBreadcrumbSchema,
-    getLocalizedMetadata
+    buildLocalizedMetadata
 } from '@/server/utils/seo';
-import { tServer } from '@/server/utils/locales';
+import { t } from '@/client/locales';
 
 type CookbookPageParams = {
     readonly params: Promise<
@@ -38,8 +37,6 @@ export default async function Page({ params }: CookbookPageParams) {
             .then(reviveCookbookDates)
     ]);
 
-    const locale = DEFAULT_LOCALE;
-
     const isOwner = cookbook?.ownerId === user?.id;
     const isPublic = cookbook?.visibility === CookbookVisibility.PUBLIC;
 
@@ -58,7 +55,7 @@ export default async function Page({ params }: CookbookPageParams) {
         isPublic && cookbook
             ? generateBreadcrumbSchema([
                   {
-                      name: tServer(locale, 'app.general.home'),
+                      name: t('app.general.home'),
                       url: ENV_CONFIG_PUBLIC.ORIGIN
                   },
                   {
@@ -95,8 +92,6 @@ export async function generateMetadata({
     params
 }: CookbookPageParams): Promise<Metadata> {
     const { displayId } = await params;
-    const cookieStore = await cookies();
-    const headerList = await headers();
 
     try {
         const cookbook = await apiClient.cookbook
@@ -107,7 +102,7 @@ export async function generateMetadata({
 
         const canonical = `${ENV_CONFIG_PUBLIC.ORIGIN}${ROUTES.cookbook.detail(displayId)}`;
 
-        const metadata = await getLocalizedMetadata(cookieStore, headerList, {
+        const metadata = await buildLocalizedMetadata({
             titleKey: 'meta.cookbook.title',
             descriptionKey: 'meta.cookbook.description',
             images: cookbook.coverImageUrl ? [cookbook.coverImageUrl] : [],
@@ -137,7 +132,7 @@ export async function generateMetadata({
     } catch {
         const canonical = `${ENV_CONFIG_PUBLIC.ORIGIN}${ROUTES.cookbook.detail(displayId)}`;
 
-        const metadata = await getLocalizedMetadata(cookieStore, headerList, {
+        const metadata = await buildLocalizedMetadata({
             titleKey: 'meta.cookbook.fallback.title',
             descriptionKey: 'meta.cookbook.fallback.description',
             canonical

@@ -2,8 +2,8 @@
 
 import React from 'react';
 import { Typography, Chip, Switch } from '@/client/components';
-import { useLocale } from '@/client/store';
 import { useScreenSize } from '@/client/hooks';
+import { t } from '@/client/locales';
 
 type ConsentRowProps =
     | Readonly<{
@@ -23,7 +23,6 @@ type ConsentRowProps =
 
 export const ConsentRow: React.FC<ConsentRowProps> = (props) => {
     const { allwaysOn, description, title, status } = props;
-    const { t } = useLocale();
     const { isMobile } = useScreenSize();
 
     const rightSideContent = allwaysOn ? (

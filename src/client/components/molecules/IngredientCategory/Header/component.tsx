@@ -6,9 +6,9 @@ import {
     Typography,
     IconButton
 } from '@/client/components';
-import { useLocale } from '@/client/store';
 import * as React from 'react';
 import { useCallback, useEffect, useState } from 'react';
+import { t } from '@/client/locales';
 
 type CategoryHeaderProps = Readonly<{
     categoryName: string;
@@ -26,8 +26,6 @@ export const CategoryHeader: React.FC<CategoryHeaderProps> = ({
     onRemove,
     existingCategoryNames = []
 }) => {
-    const { t } = useLocale();
-
     const [isEditing, setIsEditing] = useState(false);
     const [value, setValue] = useState(categoryName);
     const [error, setError] = useState<string | null>(null);
@@ -65,7 +63,7 @@ export const CategoryHeader: React.FC<CategoryHeaderProps> = ({
 
         setIsEditing(false);
         setError(null);
-    }, [value, categoryName, existingCategoryNames, onRename, t]);
+    }, [value, categoryName, existingCategoryNames, onRename]);
 
     const handleKeyDown = useCallback(
         (e: React.KeyboardEvent<HTMLInputElement>) => {
