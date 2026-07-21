@@ -10,7 +10,7 @@ import recipeFlagModel from '@/server/db/model/recipe-flag/model';
 import { InfrastructureError } from '@/server/error/server';
 import { InfrastructureErrorCode } from '@/server/error/codes';
 import { RecipeFlagReason, ROUTES } from '@/common/constants';
-import { zodTextFormat } from '@/server/utils/openai';
+import { zodTextFormat, OPENAI_MODEL } from '@/server/utils/openai';
 import { z } from 'zod';
 import { recipeSearchIndex } from '@/server/search-index/recipeIndex';
 import { revalidateRouteCache } from '@/server/utils/revalidateRouteCache';
@@ -139,8 +139,8 @@ class EvaluateRecipeJob extends BaseJob<EvaluateRecipeJobData> {
         const prompt = this.buildPrompt(recipe);
 
         const response = await openaiClient.responses.parse({
-            model: 'gpt-4.1-mini',
-            temperature: 0,
+            model: OPENAI_MODEL,
+            reasoning: { effort: 'low' },
 
             text: {
                 format: zodTextFormat(EvaluationResponse, 'RecipeEvaluation')

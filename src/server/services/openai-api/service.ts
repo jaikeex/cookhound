@@ -5,7 +5,7 @@ import { JOB_NAMES } from '@/server/queues/jobs/names';
 import type { RecipeForEvaluation } from './types';
 import { openaiClient } from '@/server/integrations';
 import { z } from 'zod';
-import { zodTextFormat } from '@/server/utils/openai';
+import { zodTextFormat, OPENAI_MODEL } from '@/server/utils/openai';
 import {
     RECIPE_CATEGORY_TAGS,
     RECIPE_TAG_CATEGORY_LIMITS_BY_NAME,
@@ -82,8 +82,8 @@ class OpenAIApiService {
         });
 
         const response = await openaiClient.responses.parse({
-            model: 'gpt-4.1-mini',
-            temperature: 0,
+            model: OPENAI_MODEL,
+            reasoning: { effort: 'low' },
             text: {
                 format: zodTextFormat(
                     TagSuggestionResponse,
