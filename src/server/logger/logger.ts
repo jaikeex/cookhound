@@ -301,11 +301,34 @@ export class Logger {
             const userId = ctx.getUserId();
 
             const requestIdMessagePart = requestId ? `[${requestId}]` : '[]';
-            const userIdMessagePart = userId
-                ? `[user id: ${userId}]`
-                : '[anonymous]';
 
-            finalMessage = `${requestIdMessagePart} ${userIdMessagePart.padEnd(14, ' ')} ${finalMessage}`;
+            //?—————————————————————————————————————————————————————————————————————————————————?//
+            //?                                MESSAGE IDENTITY                                 ?//
+            ///
+            //# The identity label is keyed off of execution origin and request scope.
+            //# The categories are as follows:
+            //#   - background queue job                      -> [worker]
+            //#   - no request scope (RSC / build)            -> [server]
+            //#   - request by an authenticated user          -> [user id: N]
+            //#   - request by an unauthenticated visitor     -> [anonymous]
+            ///
+            //?—————————————————————————————————————————————————————————————————————————————————?//
+
+            const origin = ctx.getOrigin?.() ?? null;
+
+            let identityMessagePart: string;
+
+            if (origin === 'worker') {
+                identityMessagePart = '[worker]';
+            } else if (!requestId) {
+                identityMessagePart = '[server]';
+            } else if (userId) {
+                identityMessagePart = `[user id: ${userId}]`;
+            } else {
+                identityMessagePart = '[anonymous]';
+            }
+
+            finalMessage = `${requestIdMessagePart} ${identityMessagePart.padEnd(14, ' ')} ${finalMessage}`;
 
             this.logger.log(level, finalMessage);
         } catch {

@@ -10,7 +10,7 @@ import type {
     UserPreferences
 } from '@/common/types';
 import { createHash, timingSafeEqual, randomUUID } from 'crypto';
-import { mailService } from '@/server/services';
+import { mailService } from '@/server/services/mail/service';
 import {
     AuthErrorForbidden,
     ConflictError,
@@ -40,8 +40,8 @@ import {
 } from '@/server/utils/crypto';
 import { serializeTermsContent } from '@/server/utils/terms';
 import { serializeConsentContent } from '@/server/utils/consent';
-import { assertSelf } from '@/server/utils/reqwest';
-import { sessions } from '@/server/utils/session';
+import { assertSelf } from '@/server/utils/reqwest/guards';
+import { sessions } from '@/server/utils/session/manager';
 import { redisClient } from '@/server/integrations';
 import { ONE_MINUTE_IN_SECONDS } from '@/common/constants/time';
 

@@ -97,7 +97,7 @@ vi.mock('@/server/utils/crypto', async (importOriginal) => {
     };
 });
 
-vi.mock('@/server/utils/session', () => ({
+vi.mock('@/server/utils/session/manager', () => ({
     sessions: {
         invalidateAllUserSessions: vi.fn()
     }
@@ -141,7 +141,7 @@ import {
 } from '@/server/utils/crypto';
 import { RequestContext } from '@/server/utils/reqwest/context';
 import { redisClient } from '@/server/integrations';
-import { sessions } from '@/server/utils/session';
+import { sessions } from '@/server/utils/session/manager';
 import { randomUUID } from 'crypto';
 
 const mockSessions = vi.mocked(sessions);

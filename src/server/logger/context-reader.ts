@@ -19,6 +19,7 @@
 type ContextReader = {
     getRequestId(): string | null;
     getUserId(): number | null;
+    getOrigin?(): 'request' | 'render' | 'worker' | null;
 };
 
 const noop: ContextReader = {

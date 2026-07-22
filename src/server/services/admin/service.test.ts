@@ -21,13 +21,13 @@ vi.mock('@/server/db/model', () => ({
     ADMIN_USER_DETAIL_SELECT: {}
 }));
 
-vi.mock('@/server/utils/session', () => ({
+vi.mock('@/server/utils/session/manager', () => ({
     sessions: {
         invalidateAllUserSessions: vi.fn()
     }
 }));
 
-vi.mock('@/server/utils/reqwest', () => ({
+vi.mock('@/server/utils/reqwest/guards', () => ({
     assertAdmin: vi.fn(() => 99),
     assertAdminAndNotSelf: vi.fn(() => 99)
 }));
@@ -56,8 +56,8 @@ const TARGET_USER_ID = 7;
 
 import { adminService } from './service';
 import db from '@/server/db/model';
-import { sessions } from '@/server/utils/session';
-import { assertAdminAndNotSelf } from '@/server/utils/reqwest';
+import { sessions } from '@/server/utils/session/manager';
+import { assertAdminAndNotSelf } from '@/server/utils/reqwest/guards';
 
 const mockDbUser = vi.mocked(db.user);
 const mockSessions = vi.mocked(sessions);

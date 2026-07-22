@@ -10,7 +10,7 @@ import {
 } from '@/common/constants';
 import { cookies } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
-import { verifySessionFromCookie } from '@/server/utils/session';
+import { verifySessionFromCookie } from '@/server/utils/session/verify-server';
 import React from 'react';
 import { buildLocalizedMetadata } from '@/server/utils/seo';
 import { UserStructuredData } from '@/client/components';

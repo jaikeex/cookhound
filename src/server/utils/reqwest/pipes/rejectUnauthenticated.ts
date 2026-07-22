@@ -1,7 +1,7 @@
 import type { NextResponse } from 'next/server';
 import { AuthErrorUnauthorized } from '@/server/error';
 import { handleServerError } from '@/server/utils/reqwest/handleApiError';
-import { deleteSessionCookie } from '@/server/utils/session';
+import { deleteSessionCookie } from '@/server/utils/session/cookie';
 
 /**
  * Rejects an unauthenticated request and tears down any stale session cookie.

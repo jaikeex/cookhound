@@ -2,7 +2,7 @@ import { Logger, LogServiceMethod } from '@/server/logger';
 import type { Cookbook } from '@/server/db/generated/prisma/client';
 import type { CookbookForCreate } from './types';
 import type { CookbookForCreatePayload, CookbookDTO } from '@/common/types';
-import { assertAuthenticated } from '@/server/utils/reqwest';
+import { assertAuthenticated } from '@/server/utils/reqwest/guards';
 import { randomUUID } from 'crypto';
 import db from '@/server/db/model';
 import { NotFoundError, ServerError } from '@/server/error';

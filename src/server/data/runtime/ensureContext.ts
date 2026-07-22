@@ -1,5 +1,6 @@
 import 'server-only';
 import { RequestContext } from '@/server/utils/reqwest/context';
+import { runContextFromHeaders } from '@/server/utils/reqwest/context/httpContext';
 
 /**
  * Run a function inside a RequestContext, building one from next/headers if none is active.
@@ -14,4 +15,4 @@ import { RequestContext } from '@/server/utils/reqwest/context';
 export const ensureRenderContext = async <T>(
     fn: () => Promise<T>
 ): Promise<T> =>
-    RequestContext.getRequestId() ? fn() : RequestContext.runFromHeaders(fn);
+    RequestContext.getRequestId() ? fn() : runContextFromHeaders(fn);

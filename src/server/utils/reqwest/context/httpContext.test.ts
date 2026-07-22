@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { RequestContext } from './requestContext';
+import { RequestContext } from './store';
+import { runRequestContext, runContextFromHeaders } from './httpContext';
 import { UserRole } from '@/common/types';
 import { createMockSession } from '@/server/utils/tests';
 
@@ -40,7 +41,9 @@ const mockSessions = vi.mocked(sessions);
 //$                                           TESTS                                             $//
 //|=============================================================================================|//
 
-describe('RequestContext', () => {
+// These exercise the edge-only construction functions in ./httpContext together with the pure
+// store getters/setters in ./store that they populate — the context subsystem end-to-end.
+describe('httpContext', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         mockCookieStore.get.mockReturnValue(undefined);
@@ -52,10 +55,10 @@ describe('RequestContext', () => {
     });
 
     //~=========================================================================================~//
-    //$                                      RUN METHOD                                         $//
+    //$                                 runRequestContext (HTTP)                                $//
     //~=========================================================================================~//
 
-    describe('run', () => {
+    describe('runRequestContext', () => {
         it('should initialize context with all values from request', async () => {
             const mockRequest = new Request(
                 'http://localhost:3000/test?query=1',
@@ -72,7 +75,7 @@ describe('RequestContext', () => {
             mockCookieStore.get.mockReturnValue({ value: 'session-token' });
             mockSessions.validateSession.mockResolvedValue(mockSession);
 
-            await RequestContext.run(mockRequest, () => {
+            await runRequestContext(mockRequest, () => {
                 expect(RequestContext.getRequestMethod()).toBe('POST');
                 expect(RequestContext.getRequestPath()).toBe('/test?query=1');
                 expect(RequestContext.getUserAgent()).toBe('Test Browser');
@@ -81,6 +84,7 @@ describe('RequestContext', () => {
                 expect(RequestContext.getUserRole()).toBe('user');
                 expect(RequestContext.getSessionId()).toBe('test-session-id');
                 expect(RequestContext.getRequestId()).toBeTruthy();
+                expect(RequestContext.getOrigin()).toBe('request');
             });
         });
 
@@ -91,7 +95,7 @@ describe('RequestContext', () => {
                 }
             });
 
-            await RequestContext.run(mockRequest, () => {
+            await runRequestContext(mockRequest, () => {
                 expect(RequestContext.getIp()).toBe(
                     '203.0.113.1, 198.51.100.1'
                 );
@@ -105,7 +109,7 @@ describe('RequestContext', () => {
                 }
             });
 
-            await RequestContext.run(mockRequest, () => {
+            await runRequestContext(mockRequest, () => {
                 expect(RequestContext.getIp()).toBe('198.51.100.5');
             });
         });
@@ -118,7 +122,7 @@ describe('RequestContext', () => {
                 }
             });
 
-            await RequestContext.run(mockRequest, () => {
+            await runRequestContext(mockRequest, () => {
                 expect(RequestContext.getUserAgent()).toBe(
                     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
                 );
@@ -130,7 +134,7 @@ describe('RequestContext', () => {
                 'http://localhost:3000/api/users/123?filter=active'
             );
 
-            await RequestContext.run(mockRequest, () => {
+            await runRequestContext(mockRequest, () => {
                 expect(RequestContext.getRequestPath()).toBe(
                     '/api/users/123?filter=active'
                 );
@@ -141,7 +145,7 @@ describe('RequestContext', () => {
             const mockRequest = new Request('http://localhost:3000/');
             mockCookieStore.get.mockReturnValue(undefined);
 
-            await RequestContext.run(mockRequest, () => {
+            await runRequestContext(mockRequest, () => {
                 expect(RequestContext.getUserRole()).toBe(UserRole.Guest);
                 expect(RequestContext.getUserId()).toBeNull();
             });
@@ -152,7 +156,7 @@ describe('RequestContext', () => {
             mockCookieStore.get.mockReturnValue({ value: 'invalid-session' });
             mockSessions.validateSession.mockResolvedValue(null);
 
-            await RequestContext.run(mockRequest, () => {
+            await runRequestContext(mockRequest, () => {
                 expect(RequestContext.getUserRole()).toBe(UserRole.Guest);
                 expect(RequestContext.getUserId()).toBeNull();
             });
@@ -168,7 +172,7 @@ describe('RequestContext', () => {
             mockCookieStore.get.mockReturnValue({ value: 'valid-session' });
             mockSessions.validateSession.mockResolvedValue(mockSession);
 
-            await RequestContext.run(mockRequest, () => {
+            await runRequestContext(mockRequest, () => {
                 expect(RequestContext.getUserId()).toBe(42);
                 expect(RequestContext.getUserRole()).toBe(UserRole.Admin);
                 expect(RequestContext.getSessionId()).toBe('test-session-id');
@@ -182,7 +186,7 @@ describe('RequestContext', () => {
                 headers: new Headers()
             } as Request;
 
-            await RequestContext.run(mockRequest, () => {
+            await runRequestContext(mockRequest, () => {
                 const path = RequestContext.getRequestPath();
                 expect(path).toBe('PATH UNKNOWN');
             });
@@ -196,7 +200,7 @@ describe('RequestContext', () => {
 
             // Should not throw
             await expect(
-                RequestContext.run(mockRequest, () => {
+                runRequestContext(mockRequest, () => {
                     expect(RequestContext.getRequestId()).toBeTruthy();
                 })
             ).resolves.not.toThrow();
@@ -206,12 +210,12 @@ describe('RequestContext', () => {
             const mockRequest = new Request('http://localhost:3000/');
             const requestIds: string[] = [];
 
-            await RequestContext.run(mockRequest, () => {
+            await runRequestContext(mockRequest, () => {
                 const id1 = RequestContext.getRequestId();
                 requestIds.push(id1!);
             });
 
-            await RequestContext.run(mockRequest, () => {
+            await runRequestContext(mockRequest, () => {
                 const id2 = RequestContext.getRequestId();
                 requestIds.push(id2!);
             });
@@ -236,6 +240,7 @@ describe('RequestContext', () => {
             expect(RequestContext.getRequestId()).toBeNull();
             expect(RequestContext.getRequestPath()).toBeUndefined();
             expect(RequestContext.getRequestMethod()).toBeUndefined();
+            expect(RequestContext.getOrigin()).toBeNull();
         });
 
         it('should return correct values from context', async () => {
@@ -254,7 +259,7 @@ describe('RequestContext', () => {
             mockCookieStore.get.mockReturnValue({ value: 'session' });
             mockSessions.validateSession.mockResolvedValue(mockSession);
 
-            await RequestContext.run(mockRequest, () => {
+            await runRequestContext(mockRequest, () => {
                 expect(RequestContext.getUserId()).toBe(99);
                 expect(RequestContext.getUserRole()).toBe(UserRole.User);
                 expect(RequestContext.getIp()).toBe('10.0.0.1');
@@ -273,7 +278,7 @@ describe('RequestContext', () => {
         it('should successfully update context values', async () => {
             const mockRequest = new Request('http://localhost:3000/');
 
-            await RequestContext.run(mockRequest, () => {
+            await runRequestContext(mockRequest, () => {
                 RequestContext.setUserId(123);
                 RequestContext.setUserRole(UserRole.Admin);
                 RequestContext.setIp('1.2.3.4');
@@ -310,11 +315,11 @@ describe('RequestContext', () => {
             const request1 = new Request('http://localhost:3000/request1');
             const request2 = new Request('http://localhost:3000/request2');
 
-            await RequestContext.run(request1, async () => {
+            await runRequestContext(request1, async () => {
                 RequestContext.setUserId(100);
                 expect(RequestContext.getUserId()).toBe(100);
 
-                await RequestContext.run(request2, () => {
+                await runRequestContext(request2, () => {
                     RequestContext.setUserId(200);
                     expect(RequestContext.getUserId()).toBe(200);
                 });
@@ -327,13 +332,13 @@ describe('RequestContext', () => {
             const request1 = new Request('http://localhost:3000/');
             const request2 = new Request('http://localhost:3000/');
 
-            await RequestContext.run(request1, () => {
+            await runRequestContext(request1, () => {
                 RequestContext.setUserId(1);
                 RequestContext.setUserRole(UserRole.Admin);
                 expect(RequestContext.getUserId()).toBe(1);
             });
 
-            await RequestContext.run(request2, () => {
+            await runRequestContext(request2, () => {
                 expect(RequestContext.getUserId()).toBeNull();
             });
         });
@@ -341,7 +346,7 @@ describe('RequestContext', () => {
         it('should maintain context across async operations', async () => {
             const mockRequest = new Request('http://localhost:3000/');
 
-            await RequestContext.run(mockRequest, async () => {
+            await runRequestContext(mockRequest, async () => {
                 RequestContext.setUserId(42);
 
                 await new Promise((resolve) => setTimeout(resolve, 10));
@@ -356,10 +361,10 @@ describe('RequestContext', () => {
     });
 
     //~=========================================================================================~//
-    //$                                 RUN FROM HEADERS (RSC)                                  $//
+    //$                          runContextFromHeaders (RSC render)                            $//
     //~=========================================================================================~//
 
-    describe('runFromHeaders', () => {
+    describe('runContextFromHeaders', () => {
         it('should populate session data from cookies during render', async () => {
             const mockSession = createMockSession({
                 userId: 7,
@@ -368,11 +373,12 @@ describe('RequestContext', () => {
             mockCookieStore.get.mockReturnValue({ value: 'session-token' });
             mockSessions.validateSession.mockResolvedValue(mockSession);
 
-            await RequestContext.runFromHeaders(() => {
+            await runContextFromHeaders(() => {
                 expect(RequestContext.getUserId()).toBe(7);
                 expect(RequestContext.getUserRole()).toBe(UserRole.User);
                 expect(RequestContext.getSessionId()).toBe('test-session-id');
                 expect(RequestContext.getRequestId()).toBeTruthy();
+                expect(RequestContext.getOrigin()).toBe('render');
             });
         });
 
@@ -383,7 +389,7 @@ describe('RequestContext', () => {
                 return null;
             });
 
-            await RequestContext.runFromHeaders(() => {
+            await runContextFromHeaders(() => {
                 expect(RequestContext.getUserAgent()).toBe('RSC Agent');
                 expect(RequestContext.getIp()).toBe('10.1.2.3');
             });
@@ -392,14 +398,14 @@ describe('RequestContext', () => {
         it('should set Guest role when there is no session', async () => {
             mockCookieStore.get.mockReturnValue(undefined);
 
-            await RequestContext.runFromHeaders(() => {
+            await runContextFromHeaders(() => {
                 expect(RequestContext.getUserRole()).toBe(UserRole.Guest);
                 expect(RequestContext.getUserId()).toBeNull();
             });
         });
 
         it('should preserve the context across async boundaries', async () => {
-            await RequestContext.runFromHeaders(async () => {
+            await runContextFromHeaders(async () => {
                 const idBefore = RequestContext.getRequestId();
                 await new Promise((resolve) => setTimeout(resolve, 5));
                 expect(RequestContext.getRequestId()).toBe(idBefore);

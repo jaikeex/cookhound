@@ -6,7 +6,7 @@ import { JOB_NAMES, QUEUE_NAMES } from '@/server/queues/jobs/names';
 import { QUEUE_OPTIONS } from './constants';
 import { InfrastructureError } from '@/server/error/server';
 import { InfrastructureErrorCode } from '@/server/error/codes';
-import { userService } from '@/server/services';
+import { userService } from '@/server/services/user/service';
 
 const log = Logger.getInstance('process-deletions-worker');
 

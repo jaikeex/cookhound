@@ -13,9 +13,12 @@ import { createHash, randomUUID } from 'crypto';
 import db, { ADMIN_USER_DETAIL_SELECT } from '@/server/db/model';
 import type { Prisma } from '@/server/db/generated/prisma/client';
 import { Logger, LogServiceMethod } from '@/server/logger';
-import { assertAdmin, assertAdminAndNotSelf } from '@/server/utils/reqwest';
+import {
+    assertAdmin,
+    assertAdminAndNotSelf
+} from '@/server/utils/reqwest/guards';
 import { RequestContext } from '@/server/utils/reqwest/context';
-import { sessions } from '@/server/utils/session';
+import { sessions } from '@/server/utils/session/manager';
 import { mailService } from '@/server/services/mail/service';
 import { NotFoundError, ValidationError } from '@/server/error';
 import { ApplicationErrorCode } from '@/server/error/codes';

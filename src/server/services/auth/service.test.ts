@@ -39,12 +39,15 @@ vi.mock('@/server/db/model', () => ({
     getUserSelect: vi.fn(() => ({}))
 }));
 
-vi.mock('@/server/utils/session', () => ({
+vi.mock('@/server/utils/session/manager', () => ({
     sessions: {
         createSession: vi.fn(),
         invalidateSession: vi.fn(),
         invalidateAllUserSessions: vi.fn()
-    },
+    }
+}));
+
+vi.mock('@/server/utils/session/cookie', () => ({
     deleteSessionCookie: vi.fn()
 }));
 
@@ -66,7 +69,7 @@ vi.mock('@/server/services/user/service', () => ({
     }
 }));
 
-vi.mock('@/server/utils/reqwest', () => ({
+vi.mock('@/server/utils/reqwest/guards', () => ({
     assertAuthenticated: vi.fn(() => 1)
 }));
 
@@ -81,10 +84,11 @@ vi.mock('@/server/utils/crypto', () => ({
 //|=============================================================================================|//
 
 import db from '@/server/db/model';
-import { sessions, deleteSessionCookie } from '@/server/utils/session';
+import { sessions } from '@/server/utils/session/manager';
+import { deleteSessionCookie } from '@/server/utils/session/cookie';
 import { RequestContext } from '@/server/utils/reqwest/context';
 import { userService } from '@/server/services/user/service';
-import { assertAuthenticated } from '@/server/utils/reqwest';
+import { assertAuthenticated } from '@/server/utils/reqwest/guards';
 import {
     safeVerifyPassword,
     hashPassword,

@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers';
-import { sessions } from '@/server/utils/session';
-import type { ServerSession } from '@/server/utils/session';
+import { sessions } from './manager';
+import type { ServerSession } from './manager';
 import { SESSION_COOKIE_NAME } from '@/common/constants/general';
 
 //§—————————————————————————————————————————————————————————————————————————————————————————————§//

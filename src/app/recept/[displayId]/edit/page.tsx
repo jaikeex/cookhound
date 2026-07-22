@@ -2,7 +2,7 @@ import React from 'react';
 import { serverData } from '@/server/data';
 import { mapServiceErrorForRsc } from '@/server/data/runtime/mapError';
 import { RecipeEditTemplate } from '@/client/components';
-import { verifySessionFromCookie } from '@/server/utils/session';
+import { verifySessionFromCookie } from '@/server/utils/session/verify-server';
 import { ClientRedirect } from '@/client/components';
 import { ROUTES } from '@/common/constants';
 import type { Metadata } from 'next';

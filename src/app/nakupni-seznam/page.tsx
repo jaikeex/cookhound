@@ -1,7 +1,7 @@
 import React from 'react';
 import { serverData } from '@/server/data';
 import { ShoppingListTemplate } from '@/client/components/templates/ShoppingList';
-import { verifySessionFromCookie } from '@/server/utils/session';
+import { verifySessionFromCookie } from '@/server/utils/session/verify-server';
 import { redirectToRestrictedWithLogin } from '@/server/utils/reqwest';
 import { ROUTES } from '@/common/constants';
 import type { Metadata } from 'next';

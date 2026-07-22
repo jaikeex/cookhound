@@ -1,6 +1,7 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { RequestContext } from '@/server/utils/reqwest/context';
+import { runRequestContext } from '@/server/utils/reqwest/context/httpContext';
 import { logRequest, logResponse } from '@/server/logger/wrappers/logRequest';
 import { handleServerError } from '@/server/utils/reqwest/handleApiError';
 
@@ -49,7 +50,7 @@ export function withRequestContext<
         }
 
         // Otherwise create a fresh context and execute.
-        return RequestContext.run(req, execute) as Awaited<ReturnType<T>>;
+        return runRequestContext(req, execute) as Awaited<ReturnType<T>>;
     };
 
     return wrapped as unknown as T;

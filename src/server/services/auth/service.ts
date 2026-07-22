@@ -18,11 +18,12 @@ import { ENV_CONFIG_PRIVATE, ENV_CONFIG_PUBLIC } from '@/common/constants';
 import { userService } from '@/server/services/user/service';
 import db, { getUserSelect } from '@/server/db/model';
 import { Logger, LogServiceMethod } from '@/server/logger';
-import { deleteSessionCookie, sessions } from '@/server/utils/session';
+import { sessions } from '@/server/utils/session/manager';
+import { deleteSessionCookie } from '@/server/utils/session/cookie';
 import { RequestContext } from '@/server/utils/reqwest/context';
 import { ApplicationErrorCode } from '@/server/error/codes';
 import { createUserDTO } from '@/server/services/user/utils';
-import { assertAuthenticated } from '@/server/utils/reqwest';
+import { assertAuthenticated } from '@/server/utils/reqwest/guards';
 import {
     safeVerifyPassword,
     needsRehash,

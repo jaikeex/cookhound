@@ -1,7 +1,9 @@
 import type { Job, JobsOptions, Processor, QueueOptions } from 'bullmq';
+import { randomUUID } from 'crypto';
 import { Logger } from '@/server/logger';
 import { InfrastructureError } from '@/server/error';
 import { InfrastructureErrorCode } from '@/server/error/codes';
+import { runWithContext } from '@/server/utils/reqwest/context/store';
 
 const log = Logger.getInstance('base-job');
 
@@ -77,7 +79,13 @@ export abstract class BaseJob<TData = any, TResult = any> {
         }
 
         const processor: Processor<TData, TResult> = async (job) =>
-            this.handle(job);
+            runWithContext(
+                {
+                    requestId: `job:${ctor.jobName}#${job.id ?? randomUUID()}`,
+                    origin: 'worker'
+                },
+                () => this.handle(job)
+            );
 
         return {
             name: ctor.jobName,
