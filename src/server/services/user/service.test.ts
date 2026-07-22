@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import type * as ServerIntegrations from '@/server/integrations';
 import type * as ServerCrypto from '@/server/utils/crypto';
+import type * as NodeCrypto from 'crypto';
 import { userService } from './service';
 import {
     validUser,
@@ -114,8 +115,9 @@ vi.mock('@/server/utils/reqwest/context', async () => {
     };
 });
 
-vi.mock('uuid', () => ({
-    v4: vi.fn(() => 'mock-uuid-token')
+vi.mock('crypto', async (importOriginal) => ({
+    ...(await importOriginal<typeof NodeCrypto>()),
+    randomUUID: vi.fn(() => 'mock-uuid-token')
 }));
 
 vi.mock('@/server/integrations', async (importOriginal) => ({
@@ -140,7 +142,7 @@ import {
 import { RequestContext } from '@/server/utils/reqwest/context';
 import { redisClient } from '@/server/integrations';
 import { sessions } from '@/server/utils/session';
-import { v4 as uuid } from 'uuid';
+import { randomUUID } from 'crypto';
 
 const mockSessions = vi.mocked(sessions);
 const mockRedis = vi.mocked(redisClient);
@@ -151,7 +153,7 @@ const mockSafeVerifyPassword = vi.mocked(safeVerifyPassword);
 const mockHashPassword = vi.mocked(hashPassword);
 const mockNeedsRehash = vi.mocked(needsRehash);
 const mockRequestContext = vi.mocked(RequestContext);
-const mockUuid = vi.mocked(uuid);
+const mockUuid = vi.mocked(randomUUID);
 
 //|=============================================================================================|//
 //$                                           TESTS                                             $//

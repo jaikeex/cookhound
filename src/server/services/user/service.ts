@@ -9,8 +9,7 @@ import type {
     UserForGoogleCreatePayload,
     UserPreferences
 } from '@/common/types';
-import { v4 as uuid } from 'uuid';
-import { createHash, timingSafeEqual } from 'crypto';
+import { createHash, timingSafeEqual, randomUUID } from 'crypto';
 import { mailService } from '@/server/services';
 import {
     AuthErrorForbidden,
@@ -116,7 +115,7 @@ class UserService {
         }
 
         const hashedPassword = await hashPassword(password);
-        const verificationToken = uuid();
+        const verificationToken = randomUUID();
 
         const userForCreate: UserForLocalCreate = {
             email,
@@ -1027,7 +1026,7 @@ class UserService {
             return;
         }
 
-        const verificationToken = uuid();
+        const verificationToken = randomUUID();
 
         await db.user.updateOneById(user.id, {
             emailVerificationToken: verificationToken
@@ -1102,7 +1101,7 @@ class UserService {
             return;
         }
 
-        const passwordResetToken = uuid();
+        const passwordResetToken = randomUUID();
         const passwordResetTokenExpires = new Date(
             Date.now() + ONE_DAY_IN_MILLISECONDS
         );
@@ -1297,7 +1296,7 @@ class UserService {
         //?                                    TOKEN AND MAIL                                   ?//
         //|-------------------------------------------------------------------------------------|//
 
-        const token = uuid();
+        const token = randomUUID();
         const expiresAt = new Date(Date.now() + ONE_DAY_IN_MILLISECONDS);
 
         await db.user.upsertEmailChangeRequest(

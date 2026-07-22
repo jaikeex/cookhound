@@ -9,8 +9,7 @@ import {
     DEFAULT_LOCALE,
     ONE_DAY_IN_MILLISECONDS
 } from '@/common/constants';
-import { v4 as uuid } from 'uuid';
-import { createHash } from 'crypto';
+import { createHash, randomUUID } from 'crypto';
 import db, { ADMIN_USER_DETAIL_SELECT } from '@/server/db/model';
 import type { Prisma } from '@/server/db/generated/prisma/client';
 import { Logger, LogServiceMethod } from '@/server/logger';
@@ -351,7 +350,7 @@ class AdminService {
             );
         }
 
-        const passwordResetToken = uuid();
+        const passwordResetToken = randomUUID();
         const passwordResetTokenExpires = new Date(
             Date.now() + ONE_DAY_IN_MILLISECONDS
         );

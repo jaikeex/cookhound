@@ -1,6 +1,4 @@
-import { v4 as uuidv4 } from 'uuid';
-
-export const generateUuid = uuidv4;
+export const generateUuid = (): string => crypto.randomUUID();
 
 export const generateRandomId = (length: number) => {
     let result = '';
