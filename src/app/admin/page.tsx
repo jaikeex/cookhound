@@ -4,6 +4,8 @@ import type { Metadata } from 'next';
 import { buildLocalizedMetadata } from '@/server/utils/seo';
 import { serverData } from '@/server/data';
 
+export const dynamic = 'force-dynamic';
+
 //|=============================================================================================|//
 
 export default async function AdminPage() {
