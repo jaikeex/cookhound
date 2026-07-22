@@ -69,18 +69,20 @@ export const Logo: React.FC<LogoProps> = ({
             >
                 <Image
                     src={'/img/logo-light.png'}
-                    className="absolute inset-0 dark:opacity-0"
+                    className="absolute inset-0 object-contain dark:opacity-0"
                     alt="logo"
-                    width={classConfig[size].img}
-                    height={classConfig[size].img}
+                    loading="eager"
+                    fill
+                    sizes={`${classConfig[size].img}px`}
                     priority={priority}
                 />
                 <Image
                     src={'/img/logo-dark.png'}
-                    className="absolute inset-0 opacity-0 dark:opacity-100"
+                    className="absolute inset-0 object-contain opacity-0 dark:opacity-100"
                     alt="logo"
-                    width={classConfig[size].img}
-                    height={classConfig[size].img}
+                    loading="eager"
+                    fill
+                    sizes={`${classConfig[size].img}px`}
                     priority={priority}
                 />
             </div>
