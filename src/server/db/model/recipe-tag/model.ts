@@ -26,12 +26,10 @@ class RecipeTagModel {
      * Get all recipe tags grouped by category
      * Query class -> C2
      */
-    async getAll(language: string, ttl?: number): Promise<TagListDTO[] | null> {
-        log.trace('Getting all recipe tags with categories', { language });
+    async getAll(ttl?: number): Promise<TagListDTO[] | null> {
+        log.trace('Getting all recipe tags with categories');
 
-        const cacheKey = generateCacheKey('recipe-tag', 'findMany', {
-            where: { language }
-        });
+        const cacheKey = generateCacheKey('recipe-tag', 'findMany', {});
 
         const tags = await cachePrismaQuery(
             cacheKey,
@@ -39,11 +37,7 @@ class RecipeTagModel {
                 log.trace('Fetching all recipe tags with categories from db');
                 return prisma.tag.findMany({
                     include: {
-                        category: true,
-                        translations: {
-                            where: { language },
-                            select: { name: true }
-                        }
+                        category: true
                     }
                 });
             },
@@ -56,13 +50,10 @@ class RecipeTagModel {
                 (item) => item.category === category
             );
 
-            const translatedName =
-                tag.translations?.[0]?.name ?? tag.slug ?? tag.slug;
-
             if (existingCategory) {
                 existingCategory.tags.push({
                     id: tag.id,
-                    name: translatedName,
+                    name: tag.name,
                     categoryId: tag.categoryId as CategoryId
                 });
             } else {
@@ -71,7 +62,7 @@ class RecipeTagModel {
                     tags: [
                         {
                             id: tag.id,
-                            name: translatedName,
+                            name: tag.name,
                             categoryId: tag.categoryId as CategoryId
                         }
                     ]
@@ -82,34 +73,23 @@ class RecipeTagModel {
     }
 
     /**
-     * Get a single tag by its unique slug, with the name translated for the given language.
+     * Get a single tag by its unique slug.
      *
      * Query class -> C2
      */
-    async getBySlug(
-        slug: string,
-        language: string,
-        ttl?: number
-    ): Promise<RecipeTagDTO | null> {
-        log.trace('Getting tag by slug', { slug, language });
+    async getBySlug(slug: string, ttl?: number): Promise<RecipeTagDTO | null> {
+        log.trace('Getting tag by slug', { slug });
 
         const cacheKey = generateCacheKey('recipe-tag', 'getBySlug', {
-            slug,
-            language
+            slug
         });
 
         const tag = await cachePrismaQuery(
             cacheKey,
             async () => {
-                log.trace('Fetching tag by slug from db', { slug, language });
+                log.trace('Fetching tag by slug from db', { slug });
                 return prisma.tag.findUnique({
-                    where: { slug },
-                    include: {
-                        translations: {
-                            where: { language },
-                            select: { name: true }
-                        }
-                    }
+                    where: { slug }
                 });
             },
             ttl ?? CACHE_TTL.TTL_2
@@ -119,41 +99,23 @@ class RecipeTagModel {
             return null;
         }
 
-        const translatedName = tag.translations?.[0]?.name;
-
-        if (!translatedName) {
-            log.warn('Tag has no translation, falling back to slug', {
-                slug,
-                language
-            });
-        }
-
         return {
             id: tag.id,
-            name: translatedName ?? tag.slug,
+            name: tag.name,
             categoryId: tag.categoryId as CategoryId
         };
     }
 
-    async getManyBySlugs(
-        slugs: string[],
-        language: string
-    ): Promise<RecipeTagDTO[]> {
-        log.trace('Getting tags by slugs', { slugs, language });
+    async getManyBySlugs(slugs: string[]): Promise<RecipeTagDTO[]> {
+        log.trace('Getting tags by slugs', { slugs });
 
         const tags = await prisma.tag.findMany({
-            where: { slug: { in: slugs } },
-            include: {
-                translations: {
-                    where: { language },
-                    select: { name: true }
-                }
-            }
+            where: { slug: { in: slugs } }
         });
 
         return tags.map((tag) => ({
             id: tag.id,
-            name: tag.translations?.[0]?.name ?? tag.slug,
+            name: tag.name,
             categoryId: tag.categoryId as CategoryId
         }));
     }
@@ -165,14 +127,12 @@ class RecipeTagModel {
      * Query class -> C2
      */
     async getIndexableHubs(
-        language: string,
         threshold: number,
         ttl?: number
     ): Promise<Array<{ slug: string; lastModified: Date }>> {
-        log.trace('Getting indexable hubs', { language, threshold });
+        log.trace('Getting indexable hubs', { threshold });
 
         const cacheKey = generateCacheKey('recipe-tag', 'getIndexableHubs', {
-            language,
             threshold
         });
 
@@ -180,12 +140,9 @@ class RecipeTagModel {
             cacheKey,
             async () => {
                 log.trace('Fetching indexable hubs from db', {
-                    language,
                     threshold
                 });
-                return prisma.$queryRawTyped(
-                    getIndexableHubs(language, threshold)
-                );
+                return prisma.$queryRawTyped(getIndexableHubs(threshold));
             },
             ttl ?? CACHE_TTL.TTL_2
         );

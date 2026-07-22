@@ -483,7 +483,6 @@
     "admin.dashboard.recentUsers": "Poslední registrace",
     "admin.dashboard.table.title": "Název",
     "admin.dashboard.table.author": "Autor",
-    "admin.dashboard.table.language": "Jazyk",
     "admin.dashboard.table.createdAt": "Vytvořeno",
     "admin.dashboard.table.username": "Uživatelské jméno",
     "admin.dashboard.table.email": "E-mail",

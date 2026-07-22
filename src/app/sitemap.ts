@@ -1,7 +1,6 @@
 import type { MetadataRoute } from 'next';
 import {
     ENV_CONFIG_PUBLIC,
-    DEFAULT_LOCALE,
     HUB_SLUGS,
     HUB_INDEXABLE_THRESHOLD,
     ROUTES,
@@ -177,7 +176,6 @@ async function fetchIndexableHubs(): Promise<
         log.trace('Fetching indexable hubs for sitemap');
 
         const rows = await db.recipeTag.getIndexableHubs(
-            DEFAULT_LOCALE,
             HUB_INDEXABLE_THRESHOLD
         );
 

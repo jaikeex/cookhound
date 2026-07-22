@@ -9,7 +9,6 @@ SELECT
     c.owner_id        AS "ownerId",
     c.title,
     c.description,
-    c.language,
     c.cover_image_url AS "coverImageUrl",
     c.visibility,
     c.created_at      AS "createdAt",

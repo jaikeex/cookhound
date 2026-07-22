@@ -23,7 +23,6 @@ const fixtureRecipe: Recipe = {
     displayId: 'rcp_42',
     title: 'Test recipe',
     authorId: 7,
-    language: 'cs',
     time: 30,
     portionSize: 4,
     ingredients: [],

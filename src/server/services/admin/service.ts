@@ -99,7 +99,6 @@ class AdminService {
             displayId: r.displayId,
             title: r.title,
             authorUsername: r.author.username,
-            language: r.language,
             createdAt: r.createdAt.toISOString()
         }));
 

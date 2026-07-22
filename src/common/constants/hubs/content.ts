@@ -123,7 +123,7 @@ const capitalize = (value: string): string =>
  * Builds the hub page title (h1 and <title> without the site suffix).
  *
  * @param dbSlug - The db tag slug
- * @param csName - The czech tag name from TagTranslation (e.g. 'dezert')
+ * @param csName - The czech tag name (Tag.name, e.g. 'dezert')
  * @param categoryId - The tag's category, used to pick a grammatical fallback
  */
 export const buildHubTitle = (

@@ -8,8 +8,7 @@ import { z } from 'zod';
 import { zodTextFormat, OPENAI_MODEL } from '@/server/utils/openai';
 import {
     RECIPE_CATEGORY_TAGS,
-    RECIPE_TAG_CATEGORY_LIMITS_BY_NAME,
-    DEFAULT_LOCALE
+    RECIPE_TAG_CATEGORY_LIMITS_BY_NAME
 } from '@/common/constants';
 import type { RecipeTagDTO } from '@/common/types';
 import recipeTagModel from '@/server/db/model/recipe-tag/model';
@@ -42,7 +41,6 @@ class OpenAIApiService {
 
         const recipeForEvaluation: RecipeForEvaluation = {
             title: recipe.title,
-            language: recipe.language,
             time: recipe.time,
             portionSize: recipe.portionSize,
             ingredients: ingredientsForEvaluation,
@@ -146,10 +144,7 @@ class OpenAIApiService {
             }
         }
 
-        const dbTags = await recipeTagModel.getManyBySlugs(
-            filteredSlugs,
-            DEFAULT_LOCALE
-        );
+        const dbTags = await recipeTagModel.getManyBySlugs(filteredSlugs);
 
         if (filteredSlugs.length === 0) {
             return [];

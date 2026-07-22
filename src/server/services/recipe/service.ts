@@ -8,7 +8,6 @@ import {
 } from '@/common/types';
 import type { RecipeForCreate } from './types';
 import db from '@/server/db/model';
-import type { Locale } from '@/common/types';
 import {
     AuthErrorForbidden,
     AuthErrorUnauthorized,
@@ -22,11 +21,7 @@ import { randomUUID } from 'crypto';
 import { recipeSearchIndex } from '@/server/search-index';
 import { intersectArrays } from '@/common/utils';
 import { revalidateRouteCache } from '@/server/utils/revalidateRouteCache';
-import {
-    SEARCH_QUERY_SEPARATOR,
-    ROUTES,
-    DEFAULT_LOCALE
-} from '@/common/constants';
+import { SEARCH_QUERY_SEPARATOR, ROUTES } from '@/common/constants';
 import { queueManager } from '@/server/queues/QueueManager';
 import { JOB_NAMES } from '@/server/queues/jobs/names';
 import { ApplicationErrorCode } from '@/server/error/codes';
@@ -88,7 +83,6 @@ class RecipeService {
             displayId: recipe.displayId,
             title: recipe.title,
             authorId: recipe.authorId,
-            language: recipe.language as Locale,
             time: recipe.time,
             portionSize: recipe.portionSize,
             description: recipe.description ?? null,
@@ -188,7 +182,6 @@ class RecipeService {
             displayId: recipe.displayId,
             title: recipe.title,
             authorId: recipe.authorId,
-            language: recipe.language as Locale,
             time: recipe.time,
             portionSize: recipe.portionSize,
             description: recipe.description ?? null,
@@ -252,7 +245,6 @@ class RecipeService {
         const recipeforCreate: RecipeForCreate = {
             displayId,
             title: payload.title,
-            language: DEFAULT_LOCALE,
             description: payload.description,
             notes: payload.notes,
             time: payload.time,
@@ -600,7 +592,6 @@ class RecipeService {
 
         for (const threshold of MIN_TIMES_RATED_THRESHOLDS) {
             results = await db.recipe.getManyForFrontPage(
-                DEFAULT_LOCALE,
                 perPage,
                 offset,
                 threshold
@@ -728,7 +719,6 @@ class RecipeService {
 
                 results = await recipeSearchIndex.searchSingleQuery(
                     queryTerms[0],
-                    DEFAULT_LOCALE,
                     perPage,
                     offset
                 );
@@ -755,12 +745,7 @@ class RecipeService {
                 // Set generous limits here, the intersection provides much better results.
                 const searchLimit = Math.max(perPage * 3, 100);
                 const searchPromises = queryTerms.map((term) =>
-                    recipeSearchIndex.searchSingleQuery(
-                        term,
-                        DEFAULT_LOCALE,
-                        searchLimit,
-                        0
-                    )
+                    recipeSearchIndex.searchSingleQuery(term, searchLimit, 0)
                 );
 
                 const searchResults = await Promise.all(searchPromises);
@@ -802,7 +787,6 @@ class RecipeService {
              */
             const dbResults = await db.recipe.searchManyByText(
                 queryTerms[0],
-                DEFAULT_LOCALE,
                 perPage,
                 offset
             );
@@ -857,12 +841,7 @@ class RecipeService {
 
         const offset = (batch - 1) * perPage;
 
-        const recipes = await db.recipe.getManyForUser(
-            userId,
-            DEFAULT_LOCALE,
-            perPage,
-            offset
-        );
+        const recipes = await db.recipe.getManyForUser(userId, perPage, offset);
 
         if (!recipes || !Array.isArray(recipes) || recipes.length === 0) {
             log.info('getUserRecipes - no recipes found');
@@ -922,7 +901,6 @@ class RecipeService {
         const recipes = await db.recipe.searchManyByTextForUser(
             userId,
             query,
-            DEFAULT_LOCALE,
             perPage,
             offset
         );

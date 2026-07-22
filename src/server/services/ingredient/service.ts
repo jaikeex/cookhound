@@ -1,5 +1,4 @@
 import type { IngredientDTO } from '@/common/types';
-import { DEFAULT_LOCALE } from '@/common/constants';
 import db from '@/server/db/model';
 import { Logger, LogServiceMethod } from '@/server/logger';
 
@@ -22,7 +21,7 @@ class IngredientService {
      */
     @LogServiceMethod({ names: [] })
     async getAll(): Promise<IngredientDTO[]> {
-        return db.ingredient.getManyByLanguage(DEFAULT_LOCALE);
+        return db.ingredient.getAll();
     }
 }
 

@@ -1,8 +1,7 @@
 -- Fetch multiple recipes with full details including ingredients, instructions, flags, and tags
 -- Parameters:
---   $1 :: text   – language (recipe language filter)
---   $2 :: int    – limit (maximum number of recipes to return)
---   $3 :: int    – offset (number of recipes to skip)
+--   $1 :: int    – limit (maximum number of recipes to return)
+--   $2 :: int    – offset (number of recipes to skip)
 --
 -- Returns complete recipe data with nested JSON aggregations for related entities.
 -- Excludes recipes with active flags.
@@ -10,7 +9,6 @@ SELECT
     r.id,
     r.display_id AS "displayId",
     r.title,
-    r.language,
     r.author_id AS "authorId",
     r.time,
     r.portion_size AS "portionSize",
@@ -65,14 +63,13 @@ SELECT
         SELECT jsonb_agg(
             jsonb_build_object(
                 'id', t.id,
-                'name', COALESCE(tr.name, t.slug),
+                'name', t.name,
                 'categoryId', t.category_id
             )
-            ORDER BY COALESCE(tr.name, t.slug)
+            ORDER BY t.name
         )
         FROM recipes_tags rt
         JOIN tags t ON rt.tag_id = t.id
-        LEFT JOIN tag_translations tr ON tr.tag_id = t.id AND tr.language = r.language
         WHERE rt.recipe_id = r.id
     ) AS tags
 FROM
@@ -81,9 +78,8 @@ FROM
 LEFT JOIN recipe_flags rf ON rf.recipe_id = r.id AND rf.active = true
 /*--------------------------------------------------------------------------------------------------*/
 WHERE
-    r.language = $1
-    AND rf.recipe_id IS NULL
+    rf.recipe_id IS NULL
 ORDER BY
     r.rating DESC,
     r.created_at DESC
-LIMIT  $2 OFFSET $3;
+LIMIT  $1 OFFSET $2;

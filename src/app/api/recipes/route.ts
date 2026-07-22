@@ -109,9 +109,9 @@ registerRouteDocs('/api/recipes', {
     category: 'Recipes',
     GET: {
         summary: 'List front-page recipes (paginated).',
-        description: `Returns a batch of recipes for the front page,
-            filtered by language. Results are ordered by creation date
-            descending and recipe rating (higher first).`,
+        description: `Returns a batch of recipes for the front page.
+            Results are ordered by creation date descending and recipe
+            rating (higher first).`,
         auth: AuthLevel.PUBLIC,
         querySchema: FrontPageRecipesSchema,
         clientUsage: [

@@ -10,7 +10,7 @@ import { ApplicationErrorCode } from '@/server/error/codes';
 import { prisma } from '@/server/integrations';
 import { Logger } from '@/server/logger';
 import type { Prisma, Recipe } from '@/server/db/generated/prisma/client';
-import type { Locale, RecipeFilterParams } from '@/common/types';
+import type { RecipeFilterParams } from '@/common/types';
 import {
     getRecipeByDisplayId,
     getRecipeById,
@@ -20,7 +20,6 @@ import {
     getUserRecipes,
     searchUserRecipes
 } from '@/server/db/generated/prisma/sql';
-import { DEFAULT_LOCALE } from '@/common/constants';
 
 //|=============================================================================================|//
 
@@ -125,19 +124,16 @@ class RecipeModel {
     }
 
     async getMany(
-        language: string,
         limit: number,
         offset: number,
         ttl?: number
     ): Promise<getManyRecipes.Result[]> {
         const cacheKey = generateCacheKey('recipe', 'findMany', {
-            language,
             limit,
             offset
         });
 
         log.trace('Getting many recipes', {
-            language,
             limit,
             offset
         });
@@ -146,14 +142,11 @@ class RecipeModel {
             cacheKey,
             async () => {
                 log.trace('Fetching many recipes from db', {
-                    language,
                     limit,
                     offset
                 });
 
-                return prisma.$queryRawTyped(
-                    getManyRecipes(language, limit, offset)
-                );
+                return prisma.$queryRawTyped(getManyRecipes(limit, offset));
             },
             ttl ?? CACHE_TTL.TTL_1
         );
@@ -163,21 +156,18 @@ class RecipeModel {
 
     async getManyForUser(
         userId: number,
-        language: string,
         limit: number,
         offset: number,
         ttl?: number
     ): Promise<getUserRecipes.Result[]> {
         const cacheKey = generateCacheKey('recipe', 'findManyForUser', {
             userId,
-            language,
             limit,
             offset
         });
 
         log.trace('Getting many recipes for user', {
             userId,
-            language,
             limit,
             offset
         });
@@ -187,13 +177,12 @@ class RecipeModel {
             async () => {
                 log.trace('Fetching many recipes for user from db', {
                     userId,
-                    language,
                     limit,
                     offset
                 });
 
                 return prisma.$queryRawTyped(
-                    getUserRecipes(userId, language, limit, offset)
+                    getUserRecipes(userId, limit, offset)
                 );
             },
             ttl ?? CACHE_TTL.TTL_1,
@@ -212,21 +201,18 @@ class RecipeModel {
      * Query class -> C1
      */
     async getManyForFrontPage(
-        language: string,
         limit: number,
         offset: number,
         minTimesRated: number,
         ttl?: number
     ): Promise<getFrontPageRecipes.Result[]> {
         const cacheKey = generateCacheKey('recipe', 'findManyFrontPage', {
-            language,
             limit,
             offset,
             minTimesRated
         });
 
         log.trace('Getting front page recipes', {
-            language,
             limit,
             offset,
             minTimesRated
@@ -236,13 +222,12 @@ class RecipeModel {
             cacheKey,
             async () => {
                 log.trace('Fetching front page recipes from db', {
-                    language,
                     limit,
                     offset,
                     minTimesRated
                 });
                 return prisma.$queryRawTyped(
-                    getFrontPageRecipes(minTimesRated, language, limit, offset)
+                    getFrontPageRecipes(minTimesRated, limit, offset)
                 );
             },
             ttl ?? CACHE_TTL.TTL_1
@@ -261,21 +246,18 @@ class RecipeModel {
      */
     async searchManyByText(
         searchTerm: string,
-        language: string,
         limit: number,
         offset: number,
         ttl?: number
     ): Promise<searchRecipes.Result[]> {
         const cacheKey = generateCacheKey('recipe', 'search', {
             searchTerm,
-            language,
             limit,
             offset
         });
 
         log.trace('Searching recipes', {
             searchTerm,
-            language,
             limit,
             offset
         });
@@ -285,13 +267,12 @@ class RecipeModel {
             async () => {
                 log.trace('Fetching searched recipes from db', {
                     searchTerm,
-                    language,
                     limit,
                     offset
                 });
 
                 return prisma.$queryRawTyped(
-                    searchRecipes(language, searchTerm, limit, offset)
+                    searchRecipes(searchTerm, limit, offset)
                 );
             },
             ttl ?? CACHE_TTL.TTL_1
@@ -307,7 +288,6 @@ class RecipeModel {
     async searchManyByTextForUser(
         userId: number,
         searchTerm: string,
-        language: string,
         limit: number,
         offset: number,
         ttl?: number
@@ -315,7 +295,6 @@ class RecipeModel {
         const cacheKey = generateCacheKey('recipe', 'searchForUser', {
             userId,
             searchTerm,
-            language,
             limit,
             offset
         });
@@ -323,7 +302,6 @@ class RecipeModel {
         log.trace('Searching recipes for user', {
             userId,
             searchTerm,
-            language,
             limit,
             offset
         });
@@ -334,19 +312,12 @@ class RecipeModel {
                 log.trace('Fetching searched recipes for user from db', {
                     userId,
                     searchTerm,
-                    language,
                     limit,
                     offset
                 });
 
                 return prisma.$queryRawTyped(
-                    searchUserRecipes(
-                        userId,
-                        language,
-                        searchTerm,
-                        limit,
-                        offset
-                    )
+                    searchUserRecipes(userId, searchTerm, limit, offset)
                 );
             },
             ttl ?? CACHE_TTL.TTL_1,
@@ -367,8 +338,7 @@ class RecipeModel {
      * filterMany, and a drift between the two would produce phantom pages.
      */
     private buildFilterWhere(
-        filters: RecipeFilterParams,
-        language: Locale
+        filters: RecipeFilterParams
     ): Prisma.RecipeWhereInput {
         const andConditions: Prisma.RecipeWhereInput[] = [];
 
@@ -383,7 +353,6 @@ class RecipeModel {
         );
 
         return {
-            language,
             flags: { none: { active: true } },
             ...(andConditions.length && { AND: andConditions }),
             ...(filters.excludesIngredients?.length && {
@@ -413,26 +382,23 @@ class RecipeModel {
      */
     async countFiltered(
         filters: RecipeFilterParams,
-        language: Locale,
         ttl?: number
     ): Promise<number> {
         const cacheKey = generateCacheKey('recipe', 'countFiltered', {
-            filters,
-            language
+            filters
         });
 
-        log.trace('Counting filtered recipes', { language, filters });
+        log.trace('Counting filtered recipes', { filters });
 
         return await cachePrismaQuery(
             cacheKey,
             async () => {
                 log.trace('Fetching filtered recipe count from db', {
-                    language,
                     filters
                 });
 
                 return prisma.recipe.count({
-                    where: this.buildFilterWhere(filters, language)
+                    where: this.buildFilterWhere(filters)
                 });
             },
             ttl ?? CACHE_TTL.TTL_1
@@ -445,7 +411,6 @@ class RecipeModel {
      */
     async filterMany(
         filters: RecipeFilterParams,
-        language: Locale,
         limit: number,
         offset: number,
         ttl?: number
@@ -466,24 +431,22 @@ class RecipeModel {
     > {
         const cacheKey = generateCacheKey('recipe', 'filterMany', {
             filters,
-            language,
             limit,
             offset
         });
 
-        log.trace('Filtering recipes', { language, limit, offset, filters });
+        log.trace('Filtering recipes', { limit, offset, filters });
 
         return await cachePrismaQuery(
             cacheKey,
             async () => {
                 log.trace('Fetching filtered recipes from db', {
-                    language,
                     limit,
                     offset
                 });
 
                 return prisma.recipe.findMany({
-                    where: this.buildFilterWhere(filters, language),
+                    where: this.buildFilterWhere(filters),
                     select: {
                         id: true,
                         displayId: true,
@@ -548,7 +511,6 @@ class RecipeModel {
                 id: true,
                 displayId: true,
                 title: true,
-                language: true,
                 createdAt: true,
                 author: { select: { username: true } }
             },
@@ -581,8 +543,7 @@ class RecipeModel {
     }): Promise<Recipe> {
         log.trace('Creating recipe', {
             title: data.recipe.title,
-            authorId: data.authorId,
-            language: data.recipe.language
+            authorId: data.authorId
         });
 
         return await prisma.$transaction(async (tx) => {
@@ -641,19 +602,13 @@ class RecipeModel {
                     }
 
                     // Only create ingredient if it doesn't already exist
-                    let ingredient = await tx.ingredient.findFirst({
-                        where: {
-                            name: ingredientData.name,
-                            language: data.recipe.language || DEFAULT_LOCALE
-                        }
+                    let ingredient = await tx.ingredient.findUnique({
+                        where: { name: ingredientData.name }
                     });
 
                     if (!ingredient) {
                         ingredient = await tx.ingredient.create({
-                            data: {
-                                name: ingredientData.name,
-                                language: data.recipe.language || DEFAULT_LOCALE
-                            }
+                            data: { name: ingredientData.name }
                         });
                     }
 
@@ -772,11 +727,6 @@ class RecipeModel {
                     where: { recipeId: id }
                 });
 
-                const language =
-                    (recipeData as any).language ??
-                    originalRecipe.language ??
-                    DEFAULT_LOCALE;
-
                 // Calculate orders
                 const categoryOrders =
                     this.calculateCategoryOrders(ingredients);
@@ -793,19 +743,13 @@ class RecipeModel {
                         continue;
                     }
 
-                    let ingredient = await tx.ingredient.findFirst({
-                        where: {
-                            name: ingredientData.name,
-                            language
-                        }
+                    let ingredient = await tx.ingredient.findUnique({
+                        where: { name: ingredientData.name }
                     });
 
                     if (!ingredient) {
                         ingredient = await tx.ingredient.create({
-                            data: {
-                                name: ingredientData.name,
-                                language
-                            }
+                            data: { name: ingredientData.name }
                         });
                     }
 

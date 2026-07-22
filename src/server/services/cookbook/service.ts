@@ -4,7 +4,6 @@ import type { CookbookForCreate } from './types';
 import type { CookbookForCreatePayload, CookbookDTO } from '@/common/types';
 import { assertAuthenticated } from '@/server/utils/reqwest';
 import { randomUUID } from 'crypto';
-import { DEFAULT_LOCALE } from '@/common/constants';
 import db from '@/server/db/model';
 import { NotFoundError, ServerError } from '@/server/error';
 import { InfrastructureErrorCode } from '@/server/error/codes';
@@ -94,7 +93,6 @@ class CookbookService {
 
     /**
      * Creates a new cookbook owned by the authenticated user.
-     * The language is resolved from the request context.
      *
      * @param payload - Cookbook data: title, description, and visibility.
      * @returns The raw Prisma cookbook record.
@@ -104,8 +102,6 @@ class CookbookService {
     async createCookbook(payload: CookbookForCreatePayload): Promise<Cookbook> {
         const userId = assertAuthenticated();
 
-        const language = DEFAULT_LOCALE;
-
         const displayId = randomUUID();
 
         const cookbookForCreate: CookbookForCreate = {
@@ -113,8 +109,7 @@ class CookbookService {
             ownerId: userId,
             title: payload.title,
             description: payload.description,
-            visibility: payload.visibility,
-            language: language
+            visibility: payload.visibility
         };
 
         const cookbook = await db.cookbook.createOne(cookbookForCreate);

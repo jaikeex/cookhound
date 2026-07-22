@@ -1,8 +1,5 @@
-import type { Locale } from '@/common/types';
-
 export type RecipeForCreate = {
     displayId: string;
-    language: Locale;
     title: string;
     description: string | null;
     notes: string | null;

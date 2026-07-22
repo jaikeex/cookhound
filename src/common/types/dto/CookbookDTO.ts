@@ -1,9 +1,4 @@
-import {
-    CookbookVisibility,
-    RecipeForDisplayDTO,
-    type Locale
-} from '@/common/types';
-import { DEFAULT_LOCALE } from '@/common/constants';
+import { CookbookVisibility, RecipeForDisplayDTO } from '@/common/types';
 import { Expose } from 'class-transformer';
 
 export class CookbookDTO {
@@ -21,9 +16,6 @@ export class CookbookDTO {
 
     @Expose()
     description: string | null = null;
-
-    @Expose()
-    language: Locale = DEFAULT_LOCALE;
 
     @Expose()
     visibility: CookbookVisibility = CookbookVisibility.PRIVATE;

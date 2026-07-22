@@ -41,11 +41,6 @@ export const AdminDashboardTemplate: React.FC<AdminDashboardTemplateProps> = ({
                 accessor: 'authorUsername'
             },
             {
-                key: 'language',
-                header: t('admin.dashboard.table.language'),
-                accessor: 'language'
-            },
-            {
                 key: 'createdAt',
                 header: t('admin.dashboard.table.createdAt'),
                 render: (r) => formatDate(r.createdAt)

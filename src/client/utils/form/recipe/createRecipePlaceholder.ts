@@ -1,5 +1,4 @@
 import type { Recipe } from '@/common/types';
-import { DEFAULT_LOCALE } from '@/common/constants';
 import { t } from '@/client/locales';
 
 /**
@@ -13,7 +12,6 @@ export function createRecipePlaceholder(): Recipe {
         rating: null,
         timesRated: 0,
         timesViewed: 0,
-        language: DEFAULT_LOCALE,
         imageUrl: '/img/recipe-placeholder.webp',
         title: t('app.recipe.title'),
         portionSize: null,

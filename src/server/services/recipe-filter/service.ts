@@ -1,5 +1,4 @@
 import type { RecipeForDisplayDTO, RecipeFilterParams } from '@/common/types';
-import { DEFAULT_LOCALE } from '@/common/constants';
 import db from '@/server/db/model';
 import { ValidationError } from '@/server/error';
 import { ApplicationErrorCode } from '@/server/error/codes';
@@ -63,12 +62,7 @@ class RecipeFilterService {
 
         const offset = (batch - 1) * perPage;
 
-        const results = await db.recipe.filterMany(
-            filters,
-            DEFAULT_LOCALE,
-            perPage,
-            offset
-        );
+        const results = await db.recipe.filterMany(filters, perPage, offset);
 
         return results.map((recipe) => ({
             id: recipe.id,
@@ -89,7 +83,7 @@ class RecipeFilterService {
      */
     @LogServiceMethod({ names: [] })
     async countRecipes(filters: RecipeFilterParams): Promise<number> {
-        return db.recipe.countFiltered(filters, DEFAULT_LOCALE);
+        return db.recipe.countFiltered(filters);
     }
 }
 

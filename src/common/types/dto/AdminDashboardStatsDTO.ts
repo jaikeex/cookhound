@@ -12,7 +12,6 @@ export type AdminDashboardStatsDTO = Readonly<{
         displayId: string;
         title: string;
         authorUsername: string;
-        language: string;
         createdAt: string;
     }[];
     recentUsers: {

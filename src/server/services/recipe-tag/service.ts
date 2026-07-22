@@ -1,7 +1,6 @@
 import db from '@/server/db/model';
 import { Logger, LogServiceMethod } from '@/server/logger';
 import type { RecipeTagDTO } from '@/common/types';
-import { DEFAULT_LOCALE } from '@/common/constants';
 
 //|=============================================================================================|//
 
@@ -22,7 +21,7 @@ class RecipeTagService {
      */
     @LogServiceMethod({ names: [] })
     async getAll() {
-        const tags = await db.recipeTag.getAll(DEFAULT_LOCALE);
+        const tags = await db.recipeTag.getAll();
 
         return tags;
     }
@@ -34,7 +33,7 @@ class RecipeTagService {
      */
     @LogServiceMethod({ names: ['slug'] })
     async getBySlug(slug: string): Promise<RecipeTagDTO | null> {
-        return db.recipeTag.getBySlug(slug, DEFAULT_LOCALE);
+        return db.recipeTag.getBySlug(slug);
     }
 }
 

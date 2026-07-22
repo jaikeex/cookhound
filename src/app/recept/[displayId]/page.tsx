@@ -93,8 +93,7 @@ export async function generateMetadata({
 
         const recipeDescription = recipe.description?.trim() || undefined;
 
-        // The metadata language is an intrinsic property of the recipe, not of the visitor.
-        // Getting it from the record keeps this route ISR-eligible.
+        // No dynamic request APIs are used here, which keeps this route ISR-eligible.
         return buildLocalizedMetadata({
             titleKey: 'meta.recipe.title',
             descriptionKey: 'meta.recipe.description',
@@ -113,9 +112,9 @@ export async function generateMetadata({
             tags: recipe.tags?.map((tag) => tag.name) ?? []
         });
     } catch {
-        // Recipe could not be fetched (e.g. not found): we have no record to
-        // read a language from, so fall back to the default locale. Still no
-        // dynamic request APIs, so the route stays statically renderable.
+        // Recipe could not be fetched (e.g. not found): emit generic fallback
+        // metadata. Still no dynamic request APIs, so the route stays
+        // statically renderable.
         return buildLocalizedMetadata({
             titleKey: 'meta.recipe.fallback.title',
             descriptionKey: 'meta.recipe.fallback.description',

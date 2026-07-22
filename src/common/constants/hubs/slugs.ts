@@ -10,7 +10,7 @@ import type { RECIPE_CATEGORY_TAGS } from '@/common/constants/tags';
 //# redirect - so treat edits to existing entries as breaking changes. Adding entries for new
 //# tags is always safe.
 //#
-//# Rules used to derive the slugs (enforced by hubs.test.ts where machine-checkable):
+//# Rules used to derive the slugs:
 //# - ascii-folded lowercase czech tag names, dashes for spaces (dezert -> dezerty)
 //# - plural where that matches how people search (polevky, dorty, salaty)
 //# - cuisine tags suffixed with -kuchyne (italska-kuchyne) to disambiguate and match queries
@@ -146,7 +146,7 @@ export type HubUrlSlug = (typeof HUB_SLUGS)[HubDbSlug];
 
 /**
  * Reverse lookup: hub url slug -> db tag slug. Built once at module
- * scope; hubs.test.ts guarantees the mapping is collision-free so the
+ * scope; the mapping is hand-maintained to be collision-free so the
  * reversal cannot silently drop entries.
  */
 export const HUB_SLUG_TO_DB_SLUG: Readonly<Record<string, HubDbSlug>> =

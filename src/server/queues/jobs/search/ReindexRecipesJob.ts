@@ -5,10 +5,8 @@ import { Logger } from '@/server/logger';
 import type { Job } from 'bullmq';
 import { recipeSearchIndex } from '@/server/search-index';
 import type { Ingredient, Recipe, RecipeTagDTO } from '@/common/types';
-import type { Locale } from '@/common/types';
 import type { RecipeFlagDTO } from '@/common/types/flags/recipe-flag';
 import recipeModel from '@/server/db/model/recipe/model';
-import { SUPPORTED_LOCALES } from '@/common/constants';
 
 const log = Logger.getInstance('recipe-reindex-job');
 
@@ -29,88 +27,80 @@ class ReindexRecipesJob extends BaseJob {
     async handle(_job: Job): Promise<void> {
         log.info('handle - starting full recipe re-index run');
 
-        const languages = [...SUPPORTED_LOCALES];
-
         await recipeSearchIndex.deleteAllDocuments();
 
-        for (const language of languages) {
-            let totalProcessed = 0;
+        let totalProcessed = 0;
 
-            while (true) {
-                const recipes = await recipeModel.getMany(
-                    language,
-                    BATCH_SIZE,
-                    totalProcessed
-                );
+        while (true) {
+            const recipes = await recipeModel.getMany(
+                BATCH_SIZE,
+                totalProcessed
+            );
 
-                if (recipes.length === 0) {
-                    break;
-                }
-
-                for (const recipe of recipes) {
-                    if (
-                        (recipe?.flags as unknown as RecipeFlagDTO[])?.some(
-                            (f) => f.active
-                        )
-                    ) {
-                        log.trace('handle - skipping recipe with active flag', {
-                            recipeId: recipe.id
-                        });
-                        continue;
-                    }
-
-                    const dto: Recipe = {
-                        id: recipe.id ?? 0,
-                        displayId: recipe.displayId ?? '',
-                        title: recipe.title ?? '',
-                        authorId: recipe.authorId ?? 0,
-                        language: recipe.language as Locale,
-                        time: recipe.time,
-                        portionSize: recipe.portionSize,
-                        description: recipe.description ?? null,
-                        notes: recipe.notes,
-                        imageUrl: recipe.imageUrl ?? '',
-                        rating: recipe.rating ? Number(recipe.rating) : null,
-                        flags: recipe.flags as unknown as
-                            RecipeFlagDTO[] | null,
-                        tags: recipe.tags as unknown as RecipeTagDTO[] | null,
-                        timesRated: recipe.timesRated ?? 0,
-                        timesViewed: recipe.timesViewed ?? 0,
-                        ingredients: (recipe?.ingredients as Ingredient[]).map(
-                            (ri) => ({
-                                id: ri.id,
-                                name: ri.name,
-                                quantity: ri.quantity
-                            })
-                        ),
-                        instructions: recipe?.instructions as string[],
-                        createdAt: recipe.createdAt,
-                        updatedAt: recipe.updatedAt
-                    };
-
-                    try {
-                        await recipeSearchIndex.upsert(dto);
-                    } catch (error: unknown) {
-                        // Do not crash the whole batch – log and continue. The job will run again
-                        // later, so a temporary Typesense outage is acceptable.
-                        log.errorWithStack(
-                            'handle - failed to upsert recipe',
-                            error,
-                            {
-                                recipeId: recipe.id
-                            }
-                        );
-                    }
-                }
-
-                totalProcessed += recipes.length;
+            if (recipes.length === 0) {
+                break;
             }
 
-            log.notice('Recipe re-index job finished', {
-                language,
-                totalProcessed
-            });
+            for (const recipe of recipes) {
+                if (
+                    (recipe?.flags as unknown as RecipeFlagDTO[])?.some(
+                        (f) => f.active
+                    )
+                ) {
+                    log.trace('handle - skipping recipe with active flag', {
+                        recipeId: recipe.id
+                    });
+                    continue;
+                }
+
+                const dto: Recipe = {
+                    id: recipe.id ?? 0,
+                    displayId: recipe.displayId ?? '',
+                    title: recipe.title ?? '',
+                    authorId: recipe.authorId ?? 0,
+                    time: recipe.time,
+                    portionSize: recipe.portionSize,
+                    description: recipe.description ?? null,
+                    notes: recipe.notes,
+                    imageUrl: recipe.imageUrl ?? '',
+                    rating: recipe.rating ? Number(recipe.rating) : null,
+                    flags: recipe.flags as unknown as RecipeFlagDTO[] | null,
+                    tags: recipe.tags as unknown as RecipeTagDTO[] | null,
+                    timesRated: recipe.timesRated ?? 0,
+                    timesViewed: recipe.timesViewed ?? 0,
+                    ingredients: (recipe?.ingredients as Ingredient[]).map(
+                        (ri) => ({
+                            id: ri.id,
+                            name: ri.name,
+                            quantity: ri.quantity
+                        })
+                    ),
+                    instructions: recipe?.instructions as string[],
+                    createdAt: recipe.createdAt,
+                    updatedAt: recipe.updatedAt
+                };
+
+                try {
+                    await recipeSearchIndex.upsert(dto);
+                } catch (error: unknown) {
+                    // Do not crash the whole batch – log and continue. The job will run again
+                    // later, so a temporary Typesense outage is acceptable.
+                    log.errorWithStack(
+                        'handle - failed to upsert recipe',
+                        error,
+                        {
+                            recipeId: recipe.id
+                        }
+                    );
+                }
+            }
+
+            totalProcessed += recipes.length;
         }
+
+        log.notice('Recipe re-index job finished', {
+            totalProcessed
+        });
     }
 }
 

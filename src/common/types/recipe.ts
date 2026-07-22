@@ -1,4 +1,3 @@
-import type { Locale } from '@/common/types';
 import type { RecipeFlagDTO } from './flags/recipe-flag';
 import type { RecipeTagDTO } from './tags';
 
@@ -14,7 +13,6 @@ export type Recipe = {
     displayId: string;
     title: string;
     authorId: number;
-    language: Locale;
     time: number | null;
     portionSize: number | null;
     ingredients: Ingredient[];

@@ -7,7 +7,6 @@ SELECT
     r.id,
     r.display_id AS "displayId",
     r.title,
-    r.language,
     r.author_id AS "authorId",
     r.time,
     r.portion_size AS "portionSize",
@@ -62,14 +61,13 @@ SELECT
         SELECT jsonb_agg(
             jsonb_build_object(
                 'id', t.id,
-                'name', COALESCE(tr.name, t.slug),
+                'name', t.name,
                 'categoryId', t.category_id
             )
-            ORDER BY COALESCE(tr.name, t.slug)  
+            ORDER BY t.name
         )
         FROM recipes_tags rt
         JOIN tags t ON rt.tag_id = t.id
-        LEFT JOIN tag_translations tr ON tr.tag_id = t.id AND tr.language = r.language
         WHERE rt.recipe_id = r.id
     ) AS tags
 FROM

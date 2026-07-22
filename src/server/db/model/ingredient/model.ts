@@ -6,7 +6,6 @@ import {
     cachePrismaQuery,
     generateCacheKey
 } from '@/server/db/model/model-cache';
-import type { Locale } from '@/common/types';
 
 //|=============================================================================================|//
 
@@ -39,58 +38,22 @@ class IngredientModel {
 
         return ingredient;
     }
-    /**
-     * Get an ingredient by name
-     * Query class -> C2
-     */
-    async getOneByName(
-        name: string,
-        language: string,
-        ttl?: number
-    ): Promise<Ingredient | null> {
-        log.trace('Getting ingredient by name', { name });
-
-        const cacheKey = generateCacheKey('ingredient', 'findUnique', {
-            where: { name, language }
-        });
-
-        const ingredient = await cachePrismaQuery(
-            cacheKey,
-            async () => {
-                log.trace('Fetching ingredient from db by name', { name });
-                return prisma.ingredient.findFirst({
-                    where: { name, language }
-                });
-            },
-            ttl ?? CACHE_TTL.TTL_2
-        );
-
-        return ingredient;
-    }
 
     /**
-     * Get all ingredients for a language, sorted alphabetically.
+     * Get all ingredients, sorted alphabetically.
      * Query class -> C2
      */
-    async getManyByLanguage(
-        language: Locale,
-        ttl?: number
-    ): Promise<{ id: number; name: string }[]> {
-        log.trace('Getting ingredients by language', { language });
+    async getAll(ttl?: number): Promise<{ id: number; name: string }[]> {
+        log.trace('Getting all ingredients');
 
-        const cacheKey = generateCacheKey('ingredient', 'findManyByLanguage', {
-            language
-        });
+        const cacheKey = generateCacheKey('ingredient', 'findMany', {});
 
         const ingredients = await cachePrismaQuery(
             cacheKey,
             async () => {
-                log.trace('Fetching ingredients from db by language', {
-                    language
-                });
+                log.trace('Fetching all ingredients from db');
 
                 return prisma.ingredient.findMany({
-                    where: { language },
                     select: { id: true, name: true },
                     orderBy: { name: 'asc' },
                     take: 5000

@@ -3,7 +3,6 @@ import { Pool } from 'pg';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '../src/server/db/generated/prisma/client';
 import { RECIPE_CATEGORY_TAGS } from '../src/common/constants/tags/tags';
-import { EN_TAG_CATEGORIES } from '../src/common/constants/tags/en';
 import { CS_TAG_CATEGORIES } from '../src/common/constants/tags/cs';
 
 const pool = new Pool({
@@ -29,20 +28,11 @@ async function main() {
 
     console.log('✅ System user created (id: -1)');
 
-    // Build quick lookup for translations based on index order across category arrays
-    const getTranslation = (
-        category: string,
-        index: number,
-        lang: 'en' | 'cs'
-    ): string | undefined => {
-        if (lang === 'en') {
-            return (EN_TAG_CATEGORIES as any)[category]?.[index];
-        }
-        if (lang === 'cs') {
-            return (CS_TAG_CATEGORIES as any)[category]?.[index];
-        }
-        return undefined;
-    };
+    // Czech display names are index-aligned with RECIPE_CATEGORY_TAGS per category
+    const csNameFor = (category: string, index: number): string | undefined =>
+        (CS_TAG_CATEGORIES as Record<string, readonly string[]>)[category]?.[
+            index
+        ];
 
     for (const [categorySlug, tags] of Object.entries(RECIPE_CATEGORY_TAGS)) {
         const category = await prisma.tagCategory.upsert({
@@ -51,40 +41,21 @@ async function main() {
             create: { name: categorySlug }
         });
 
-        // Upsert each tag under the category
+        // Upsert each tag under the category with its Czech display name.
+        // Name goes into both halves so renames in constants propagate on reseed.
         for (const [index, tagSlug] of tags.entries()) {
-            const tag = await (prisma as any).tag.upsert({
+            const name =
+                csNameFor(categorySlug, index) ?? tagSlug.replace(/-/g, ' ');
+
+            await prisma.tag.upsert({
                 where: { slug: tagSlug },
-                update: { categoryId: category.id },
-                create: { slug: tagSlug, categoryId: category.id }
+                update: { categoryId: category.id, name },
+                create: { slug: tagSlug, categoryId: category.id, name }
             });
-
-            // English translation – from constants (fallback derive from slug)
-            const englishName =
-                getTranslation(categorySlug, index, 'en') ||
-                tagSlug.replace(/-/g, ' ');
-
-            await (prisma as any).tagTranslation.upsert({
-                where: { tagId_language: { tagId: tag.id, language: 'en' } },
-                update: { name: englishName },
-                create: { tagId: tag.id, language: 'en', name: englishName }
-            });
-
-            // Czech translation – attempt to use parsed list if present
-            const csName = getTranslation(categorySlug, index, 'cs');
-            if (csName) {
-                await (prisma as any).tagTranslation.upsert({
-                    where: {
-                        tagId_language: { tagId: tag.id, language: 'cs' }
-                    },
-                    update: { name: csName },
-                    create: { tagId: tag.id, language: 'cs', name: csName }
-                });
-            }
         }
     }
 
-    console.log('✅ Tags, translations and categories seeded successfully');
+    console.log('✅ Tags and categories seeded successfully');
 }
 
 main()

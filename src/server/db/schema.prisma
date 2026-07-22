@@ -156,7 +156,6 @@ model Recipe {
   id          Int      @id @default(autoincrement())
   displayId   String   @unique @map("display_id") @db.VarChar(36)
   authorId    Int      @map("author_id")
-  language    String   @db.VarChar(2)
   title       String   @db.VarChar(255)
   description String?  @map("description") @db.Text
   notes       String?  @map("notes") @db.Text
@@ -183,7 +182,6 @@ model Recipe {
   /// Indexes
   @@index([authorId])
   @@index([displayId])
-  @@index([language])
   @@index([title])
   @@index([rating])
   @@index([time])
@@ -208,19 +206,13 @@ model Instruction {
 }
 
 model Ingredient {
-  id       Int    @id @default(autoincrement())
-  language String @db.VarChar(2)
-  name     String @db.VarChar(50)
+  id   Int    @id @default(autoincrement())
+  name String @unique @db.VarChar(50)
 
   /// Relations
   recipes       RecipeIngredient[]
   shoppingLists ShoppingListIngredient[]
 
-  /// Unique constraint
-  @@unique([language, name], name: "unique_ingredient_language_name")
-  /// Indexes
-  @@index([language])
-  @@index([name])
   @@map("ingredients")
 }
 
@@ -363,12 +355,12 @@ model TagCategory {
 model Tag {
   id         Int    @id @default(autoincrement())
   slug       String @unique @db.VarChar(50)
+  name       String @db.VarChar(50)
   categoryId Int    @map("category_id")
 
   /// Relations
-  category     TagCategory      @relation(fields: [categoryId], references: [id])
-  recipes      RecipeTag[]
-  translations TagTranslation[]
+  category TagCategory @relation(fields: [categoryId], references: [id])
+  recipes  RecipeTag[]
 
   /// Indexes
   @@index([categoryId])
@@ -390,27 +382,12 @@ model RecipeTag {
   @@map("recipes_tags")
 }
 
-model TagTranslation {
-  tagId    Int    @map("tag_id")
-  language String @db.VarChar(2)
-  name     String @db.VarChar(50)
-
-  /// Relations
-  tag Tag @relation(fields: [tagId], references: [id])
-
-  /// Composite primary key
-  @@id([tagId, language])
-  @@index([language])
-  @@map("tag_translations")
-}
-
 model Cookbook {
   id            Int                @id @default(autoincrement())
   displayId     String             @unique @map("display_id") @db.VarChar(36)
   ownerId       Int                @map("owner_id")
   title         String             @db.VarChar(255)
   description   String?            @db.Text
-  language      String             @default("cs") @db.VarChar(2)
   coverImageUrl String?            @map("cover_image_url") @db.VarChar(255)
   visibility    CookbookVisibility @default(PRIVATE)
   ownerOrder    Int?               @map("owner_order")

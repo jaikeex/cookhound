@@ -1,10 +1,9 @@
 -- Search recipes owned by a specific user across multiple fields
 -- Parameters:
 --   $1 :: int    – authorId (user ID of the recipe author)
---   $2 :: text   – language (recipe language filter)
---   $3 :: text   – searchTerm (search query for title, description, notes, ingredients, and instructions)
---   $4 :: int    – limit (maximum number of recipes to return)
---   $5 :: int    – offset (number of recipes to skip)
+--   $2 :: text   – searchTerm (search query for title, description, notes, ingredients, and instructions)
+--   $3 :: int    – limit (maximum number of recipes to return)
+--   $4 :: int    – offset (number of recipes to skip)
 --
 -- Performs case-insensitive search and includes active flags if present.
 SELECT
@@ -49,14 +48,13 @@ LEFT JOIN instructions instr ON instr.recipe_id = r.id
 /*--------------------------------------------------------------------------------------------------*/
 WHERE
     r.author_id = $1
-    AND r.language = $2
     AND (
-        r.title ILIKE '%' || $3 || '%'
-        OR r.description ILIKE '%' || $3 || '%'
-        OR r.notes ILIKE '%' || $3 || '%'
-        OR i.name ILIKE '%' || $3 || '%'
-        OR instr.text ILIKE '%' || $3 || '%'
+        r.title ILIKE '%' || $2 || '%'
+        OR r.description ILIKE '%' || $2 || '%'
+        OR r.notes ILIKE '%' || $2 || '%'
+        OR i.name ILIKE '%' || $2 || '%'
+        OR instr.text ILIKE '%' || $2 || '%'
     )
 ORDER BY
     r.created_at DESC
-LIMIT $4 OFFSET $5;
+LIMIT $3 OFFSET $4;

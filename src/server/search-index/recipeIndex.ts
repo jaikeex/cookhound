@@ -1,7 +1,6 @@
 import { typesenseClient } from '@/server/integrations';
 import { Logger } from '@/server/logger';
 import type { Recipe, RecipeForDisplayDTO } from '@/common/types';
-import type { Locale } from '@/common/types';
 import { redisClient } from '@/server/integrations';
 import { InfrastructureError } from '@/server/error';
 import { InfrastructureErrorCode } from '@/server/error/codes';
@@ -31,7 +30,6 @@ const RESERVED_FIELD_NAMES: ReadonlySet<string> = new Set(['id']);
 const RECIPE_COLLECTION_FIELDS: CollectionFieldSchema[] = [
     { name: 'id', type: 'string' },
     { name: 'displayId', type: 'string' },
-    { name: 'language', type: 'string' },
     { name: 'title', type: 'string' },
     { name: 'description', type: 'string', optional: true },
     { name: 'notes', type: 'string', optional: true },
@@ -61,7 +59,6 @@ const RECIPE_COLLECTION_FIELDS: CollectionFieldSchema[] = [
 interface RecipeDocument {
     id: string;
     displayId: string;
-    language: Locale;
     title: string;
     description: string | null;
     notes: string | null;
@@ -100,13 +97,11 @@ class RecipeSearchIndex {
 
     private generateSearchCacheKey(
         query: string,
-        language: Locale,
         limit: number,
         offset: number
     ): string {
         return `typesense:recipe:search:${JSON.stringify({
             query: query.trim().toLowerCase(),
-            language,
             limit,
             offset
         })}`;
@@ -305,7 +300,6 @@ class RecipeSearchIndex {
         return {
             id: recipe.id.toString(),
             displayId: recipe.displayId,
-            language: recipe.language,
             title: recipe.title,
             description: recipe.description ?? '',
             notes: recipe.notes ?? '',
@@ -384,16 +378,10 @@ class RecipeSearchIndex {
 
     async searchSingleQuery(
         query: string,
-        language: Locale,
         limit: number,
         offset: number
     ): Promise<RecipeForDisplayDTO[]> {
-        const cacheKey = this.generateSearchCacheKey(
-            query,
-            language,
-            limit,
-            offset
-        );
+        const cacheKey = this.generateSearchCacheKey(query, limit, offset);
 
         return await this.cacheSearchQuery(cacheKey, async () => {
             try {
@@ -409,7 +397,6 @@ class RecipeSearchIndex {
                         query_by:
                             'title,description,notes,ingredients,instructions,tags',
                         sort_by: 'rating:desc,timesRated:desc',
-                        filter_by: `language:=${language}`,
                         prefix: true,
                         per_page: limit,
                         page

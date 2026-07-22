@@ -1,5 +1,4 @@
 import type { Cookbook as PrismaCookbook } from '@/server/db/generated/prisma/client';
-import type { Locale } from '@/common/types';
 import type { RecipeForDisplayDTO } from './recipe';
 
 export enum CookbookVisibility {
@@ -14,7 +13,6 @@ export type Cookbook = {
     ownerId: number;
     title: string;
     description: string | null;
-    language: Locale;
     visibility: CookbookVisibility;
     coverImageUrl: string | null;
     recipeCount: number;
