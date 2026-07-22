@@ -5,6 +5,7 @@ import {
     QUEUE_NAME as RECIPES_QUEUE_NAME
 } from './recipes/constants';
 import { QUEUE_NAME as ACCOUNTS_QUEUE_NAME } from './accounts/constants';
+import { QUEUE_NAME as NOTIFICATIONS_QUEUE_NAME } from './notifications/constants';
 
 //?—————————————————————————————————————————————————————————————————————————————————————————————?//
 //?                                       IMPORTANT INFO                                        ?//
@@ -57,7 +58,13 @@ export const JOB_NAMES = Object.freeze({
     //?                                      ACCOUNTS                                       ?//
     //|-------------------------------------------------------------------------------------|//
 
-    PROCESS_ACCOUNT_DELETIONS: 'process-account-deletions'
+    PROCESS_ACCOUNT_DELETIONS: 'process-account-deletions',
+
+    //|-------------------------------------------------------------------------------------|//
+    //?                                   NOTIFICATIONS                                     ?//
+    //|-------------------------------------------------------------------------------------|//
+
+    SEND_NTFY_NOTIFICATION: 'send-ntfy-notification'
 });
 
 export const QUEUE_NAMES = Object.freeze({
@@ -65,5 +72,6 @@ export const QUEUE_NAMES = Object.freeze({
     SEARCH: SEARCH_QUEUE_NAME,
     RECIPES: RECIPES_QUEUE_NAME,
     RECIPE_EVALUATION: EVALUATION_QUEUE_NAME,
-    ACCOUNTS: ACCOUNTS_QUEUE_NAME
+    ACCOUNTS: ACCOUNTS_QUEUE_NAME,
+    NOTIFICATIONS: NOTIFICATIONS_QUEUE_NAME
 });

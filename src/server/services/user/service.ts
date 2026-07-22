@@ -11,6 +11,7 @@ import type {
 } from '@/common/types';
 import { createHash, timingSafeEqual, randomUUID } from 'crypto';
 import { mailService } from '@/server/services/mail/service';
+import { notificationService } from '@/server/services/notification/service';
 import {
     AuthErrorForbidden,
     ConflictError,
@@ -183,6 +184,9 @@ class UserService {
         };
 
         const user = await db.user.createOne(userForCreate);
+
+        // Google accounts are verified at creation, so notify immediately
+        notificationService.notifyNewUser();
 
         const userResponse: UserDTO = createUserDTO(user);
 
@@ -973,6 +977,8 @@ class UserService {
             emailVerificationToken: null
         });
 
+        notificationService.notifyNewUser();
+
         return;
     }
 
@@ -1521,6 +1527,8 @@ class UserService {
             userEmail: user.email,
             userName: user.username
         });
+
+        notificationService.notifyAccountDeletionRequested(Boolean(reason));
 
         // Revoke the user's own sessions so the pending-deletion state takes
         // effect immediately: the middleware restricts PendingDeletion users

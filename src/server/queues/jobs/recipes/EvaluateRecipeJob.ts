@@ -15,6 +15,7 @@ import { z } from 'zod';
 import { recipeSearchIndex } from '@/server/search-index/recipeIndex';
 import { revalidateRouteCache } from '@/server/utils/revalidateRouteCache';
 import { recipeService } from '@/server/services/recipe/service';
+import { notificationService } from '@/server/services/notification/service';
 
 const log = Logger.getInstance('recipe-evaluation-worker');
 
@@ -79,6 +80,11 @@ class EvaluateRecipeJob extends BaseJob<EvaluateRecipeJobData> {
                         userId,
                         clearedFlags: cleared
                     });
+
+                    notificationService.notifyRecipeReinstated(
+                        recipe.title,
+                        cleared
+                    );
                 } else {
                     log.notice('handle - recipe accepted', {
                         recipeId,
@@ -116,6 +122,8 @@ class EvaluateRecipeJob extends BaseJob<EvaluateRecipeJobData> {
                 userId,
                 reason
             });
+
+            notificationService.notifyRecipeFlagged(recipe.title, reason);
         } catch (error: unknown) {
             log.warn('handle - failed to evaluate recipe', {
                 error,

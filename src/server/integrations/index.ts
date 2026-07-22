@@ -3,4 +3,5 @@ export * from './typesense';
 export * from './google';
 export * from './prisma';
 export * from './mail';
+export * from './ntfy';
 export * from './openai';

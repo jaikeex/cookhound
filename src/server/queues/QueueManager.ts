@@ -5,6 +5,8 @@ import { Logger } from '@/server/logger';
 import { ENV_CONFIG_PRIVATE } from '@/common/constants';
 import { InfrastructureError } from '@/server/error';
 import { InfrastructureErrorCode } from '@/server/error/codes';
+import ntfyClient from '@/server/integrations/ntfy/client';
+import { QUEUE_NAME as NOTIFICATIONS_QUEUE_NAME } from './jobs/notifications/constants';
 
 //~=============================================================================================~//
 //$                                            TYPES                                            $//
@@ -34,6 +36,9 @@ export type CronJobConfig<TData = unknown> = Readonly<{
 //|=============================================================================================|//
 
 const log = Logger.getInstance('queue-manager');
+
+const FINAL_FAILURE_ALERT_COOLDOWN_IN_MILLISECONDS = 15 * 60 * 1000;
+const finalFailureAlertedAt = new Map<string, number>();
 
 //~=============================================================================================~//
 //$                                            CLASS                                            $//
@@ -541,12 +546,49 @@ export class QueueManager {
                 queue: queue.name,
                 jobId: job?.id
             });
+
+            //?—————————————————————————————————————————————————————————————————————————————?//
+            //?                          FINAL-FAILURE NTFY ALERT                           ?//
+            ///
+            //# This is a direct ntfy call on purpose, not a queued notification.
+            //# When jobs are failing, having the notification about that go through a job
+            //# of itself seems kind of bad...
+            ///
+            //?—————————————————————————————————————————————————————————————————————————————?//
+
+            const isFinalAttempt =
+                !!job && job.attemptsMade >= (job.opts.attempts ?? 1);
+
+            if (!isFinalAttempt || queue.name === NOTIFICATIONS_QUEUE_NAME) {
+                return;
+            }
+
+            const lastAlertAt = finalFailureAlertedAt.get(job.name) ?? 0;
+
+            if (
+                Date.now() - lastAlertAt <
+                FINAL_FAILURE_ALERT_COOLDOWN_IN_MILLISECONDS
+            ) {
+                return;
+            }
+
+            finalFailureAlertedAt.set(job.name, Date.now());
+
+            // publish must never throw
+            void ntfyClient.publish({
+                title: 'Job failed permanently',
+                message: `${job.name} on queue ${queue.name} (job ${job.id}) exhausted ${job.opts.attempts ?? 1} attempt(s): ${err?.message ?? 'unknown error'}`,
+                priority: 4,
+                tags: ['warning']
+            });
         });
+
         worker.on('error', (err) => {
             log.error('bullWorker - worker errored', err, {
                 queue: queue.name
             });
         });
+
         worker.on('stalled', (jobId) => {
             log.warn('bullWorker - job stalled', { queue: queue.name, jobId });
         });

@@ -26,6 +26,7 @@ import { queueManager } from '@/server/queues/QueueManager';
 import { JOB_NAMES } from '@/server/queues/jobs/names';
 import { ApplicationErrorCode } from '@/server/error/codes';
 import { openaiApiService } from '@/server/services/openai-api/service';
+import { notificationService } from '@/server/services/notification/service';
 import type { RecipeFlagDTO } from '@/common/types/flags/recipe-flag';
 import { getFrontPageRecipes } from '@/server/db/generated/prisma/sql';
 
@@ -267,6 +268,8 @@ class RecipeService {
          * and the content has passed the deterministic app checks.
          */
         openaiApiService.evaluateRecipeContent(recipeDTO);
+
+        notificationService.notifyNewRecipe(recipeDTO.title);
 
         // Index the recipe.
         try {

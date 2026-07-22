@@ -9,5 +9,6 @@ export * from './recipe-flag/service';
 export * from './recipe-tag/service';
 export * from './user/service';
 export * from './mail/service';
+export * from './notification/service';
 export * from './google-api/service';
 export * from './openai-api/service';

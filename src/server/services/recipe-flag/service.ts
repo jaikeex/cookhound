@@ -12,6 +12,7 @@ import {
     type RecipeFlagAppealDTO
 } from '@/common/types/flags/recipe-flag-appeal';
 import { mailService } from '@/server/services/mail/service';
+import { notificationService } from '@/server/services/notification/service';
 import type { RecipeFlagReason } from '@/common/constants';
 
 //|=============================================================================================|//
@@ -114,6 +115,12 @@ class RecipeFlagService {
                 appealId: appeal.id
             });
         }
+
+        notificationService.notifyFlagAppealCreated({
+            appealId: appeal.id,
+            recipeTitle: flag.recipe.title,
+            flagReason: flag.reason
+        });
 
         return this.toAppealDTO(appeal);
     }

@@ -101,7 +101,9 @@ export const ENV_CONFIG_PRIVATE = createConfig(
         ALLOWED_ORIGINS: process.env.ALLOWED_ORIGINS,
         MAIL_DRIVER: process.env.MAIL_DRIVER,
         CONTACT_EMAIL: process.env.CONTACT_EMAIL,
-        CAPTCHA_SECRET_KEY: process.env.CAPTCHA_SECRET_KEY
+        CAPTCHA_SECRET_KEY: process.env.CAPTCHA_SECRET_KEY,
+        NTFY_URL: optional(process.env.NTFY_URL),
+        NTFY_TOPIC: optional(process.env.NTFY_TOPIC)
     },
     'ENV_CONFIG_PRIVATE',
     process.env.NEXT_PUBLIC_ENV !== 'test' && typeof window === 'undefined'
