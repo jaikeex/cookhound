@@ -126,6 +126,7 @@ export class Logger {
              */
             const GUARD = Symbol.for('cookhound.process-guards');
             if ((globalThis as any)[GUARD]) return;
+
             (globalThis as any)[GUARD] = true;
 
             const log = Logger.getInstance('process');

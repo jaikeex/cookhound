@@ -60,7 +60,9 @@ describe('Authorization Guards', () => {
         });
 
         it('should throw AuthErrorUnauthorized for undefined userId', () => {
-            mockRequestContext.getUserId.mockReturnValue(undefined as any);
+            mockRequestContext.getUserId.mockReturnValue(
+                undefined as unknown as null
+            );
 
             expect(() => assertAuthenticated()).toThrow(AuthErrorUnauthorized);
         });

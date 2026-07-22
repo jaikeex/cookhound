@@ -1,13 +1,15 @@
 import { expect } from 'vitest';
+import type { Mock } from 'vitest';
 import type { ApplicationErrorCode } from '@/server/error/codes';
+import { UserRole, Status } from '@/common/types';
 
 //~=============================================================================================~//
 //$                                     ASSERTION HELPERS                                       $//
 //~=============================================================================================~//
 
 export async function expectToThrowWithCode(
-    promise: Promise<any>,
-    errorClass: any,
+    promise: Promise<unknown>,
+    errorClass: new (...args: never[]) => Error,
     code: ApplicationErrorCode,
     message?: string
 ) {
@@ -20,7 +22,7 @@ export async function expectToThrowWithCode(
     }
 }
 
-export function expectNoSensitiveFields(dto: any) {
+export function expectNoSensitiveFields(dto: unknown) {
     expect(dto).not.toHaveProperty('passwordHash');
     expect(dto).not.toHaveProperty('emailVerificationToken');
     expect(dto).not.toHaveProperty('passwordResetToken');
@@ -28,7 +30,7 @@ export function expectNoSensitiveFields(dto: any) {
     expect(dto).not.toHaveProperty('emailVerificationTokenExpires');
 }
 
-export function expectValidUserDTO(dto: any) {
+export function expectValidUserDTO(dto: unknown) {
     expect(dto).toHaveProperty('id');
     expect(dto).toHaveProperty('email');
     expect(dto).toHaveProperty('username');
@@ -37,7 +39,7 @@ export function expectValidUserDTO(dto: any) {
     expectNoSensitiveFields(dto);
 }
 
-export function expectValidPublicUserDTO(dto: any) {
+export function expectValidPublicUserDTO(dto: unknown) {
     expect(dto).toHaveProperty('id');
     expect(dto).toHaveProperty('username');
     expect(dto).toHaveProperty('avatarUrl');
@@ -69,7 +71,12 @@ export function createBeforeEachCleanup(mocks: {
 }
 
 export function setupRequestContextMocks(
-    mockRequestContext: any,
+    mockRequestContext: {
+        getIp: Mock;
+        getUserAgent: Mock;
+        getUserId: Mock;
+        getUserRole: Mock;
+    },
     options: {
         userId?: number;
         userRole?: string;
@@ -91,10 +98,10 @@ export function setupRequestContextMocks(
 }
 
 export function setupPasswordMocks(
-    mockVerifyPassword: any,
-    mockSafeVerifyPassword: any,
-    mockHashPassword: any,
-    mockNeedsRehash: any,
+    mockVerifyPassword: Mock,
+    mockSafeVerifyPassword: Mock,
+    mockHashPassword: Mock,
+    mockNeedsRehash: Mock,
     options: {
         verifyResult?: boolean;
         hashResult?: string;
@@ -115,7 +122,7 @@ export function setupPasswordMocks(
     mockNeedsRehash.mockReturnValue(needsRehashResult);
 }
 
-export function setupUuidMock(mockUuid: any, token = 'mock-uuid-token') {
+export function setupUuidMock(mockUuid: Mock, token = 'mock-uuid-token') {
     mockUuid.mockReturnValue(token);
 }
 
@@ -160,9 +167,9 @@ export function isInPast(date: Date): boolean {
 }
 
 export class MockCallTracker {
-    private calls: Array<{ method: string; args: any[] }> = [];
+    private calls: Array<{ method: string; args: unknown[] }> = [];
 
-    track(method: string, ...args: any[]) {
+    track(method: string, ...args: unknown[]) {
         this.calls.push({ method, args });
     }
 
@@ -230,8 +237,8 @@ export function createMockSession(
     options: {
         sessionId?: string;
         userId?: number;
-        userRole?: any;
-        status?: any;
+        userRole?: UserRole;
+        status?: Status;
         ipAddress?: string;
         userAgent?: string;
         loginMethod?: 'manual' | 'google';
@@ -246,8 +253,8 @@ export function createMockSession(
     return {
         sessionId: options.sessionId || 'test-session-id',
         userId: options.userId || 1,
-        userRole: options.userRole || 'user',
-        status: options.status || 'active',
+        userRole: options.userRole || UserRole.User,
+        status: options.status || Status.Active,
         ipAddress: options.ipAddress || '127.0.0.1',
         userAgent: options.userAgent || 'Mozilla/5.0 Test Browser',
         loginMethod: options.loginMethod || 'manual',
@@ -290,9 +297,19 @@ export function createMockConsent(
 }
 
 export function setupRedisMocks(
-    mockRedis: any,
+    mockRedis: {
+        get: Mock;
+        set: Mock;
+        del: Mock;
+        keys: Mock;
+        sadd?: Mock;
+        srem?: Mock;
+        smembers?: Mock;
+        incr?: Mock;
+        decr?: Mock;
+    },
     options: {
-        getResult?: any;
+        getResult?: unknown;
         setResult?: string;
         delResult?: number;
         keysResult?: string[];

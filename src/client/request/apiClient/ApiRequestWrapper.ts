@@ -14,7 +14,7 @@ export type RequestConfig = {
     /** The URL of the API endpoint. */
     url?: UrlString;
     /** The data to be sent in the request body. */
-    data?: AnyObject;
+    data?: AnyObject | FormData;
     /** The URL parameters to be appended to the URL. Array values are appended as repeated keys. */
     params?: Record<
         string,
@@ -167,7 +167,7 @@ class ApiRequestWrapper {
             throw new Error('URL is required');
         }
 
-        let data: any;
+        let data: unknown;
 
         //?--------------------------------------------------------------?//
         //                       REQUEST CONSTRUCTION                     //
@@ -266,10 +266,10 @@ class ApiRequestWrapper {
                 notFound();
             }
 
-            throw RequestError.fromFetchError(data, response);
+            throw RequestError.fromFetchError(data as ErrorResponse, response);
         }
 
-        return data;
+        return data as R;
     }
 }
 

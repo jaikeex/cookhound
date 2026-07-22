@@ -1,5 +1,5 @@
 declare global {
-    type AnyObject<T = any> = Record<string, T>;
+    type AnyObject<T = unknown> = Record<string, T>;
     type AnyFunction = (...args: any[]) => any;
 
     type MiddlewareStepFunction = (
@@ -17,7 +17,7 @@ declare global {
 
     // Utility type that extracts the resolved value of a promise returned by a FN.
     // If FN does not return a promise, the return type itself is used.
-    type AwaitedReturn<Fn extends (...args: any[]) => any> =
+    type AwaitedReturn<Fn extends AnyFunction> =
         ReturnType<Fn> extends Promise<infer R> ? R : ReturnType<Fn>;
 
     interface Window {

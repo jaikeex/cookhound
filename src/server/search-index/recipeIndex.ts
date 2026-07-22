@@ -6,6 +6,7 @@ import { InfrastructureError } from '@/server/error';
 import { InfrastructureErrorCode } from '@/server/error/codes';
 import { CACHE_TTL } from '@/server/db/model/model-cache';
 import type { CollectionFieldSchema } from 'typesense/lib/Typesense/Collection';
+import type { Client } from 'typesense';
 
 const log = Logger.getInstance('recipe-index');
 
@@ -76,7 +77,7 @@ interface RecipeDocument {
 
 class RecipeSearchIndex {
     private static instance: RecipeSearchIndex | null = null;
-    private client: any;
+    private client: Client;
     private collectionReady: boolean = false;
     private readyPromise: Promise<void> | null = null;
 
@@ -189,12 +190,19 @@ class RecipeSearchIndex {
         } catch (error: unknown) {
             /**
              * This explicit check is needed to detect when the collection is not present in typesense.
-             * The any is needed here because typesense does not care about typescript.
+             * The weird typing is on purpose: typesense error classes may be
+             * duplicated across module instances, so the structural check is the reliable one.
              */
+            const maybeTypesenseError = error as {
+                httpStatus?: unknown;
+                name?: unknown;
+                code?: unknown;
+            } | null;
+
             const isNotFound =
-                (error as any)?.httpStatus === 404 ||
-                (error as any)?.name === 'ObjectNotFound' ||
-                (error as any)?.code === 404;
+                maybeTypesenseError?.httpStatus === 404 ||
+                maybeTypesenseError?.name === 'ObjectNotFound' ||
+                maybeTypesenseError?.code === 404;
 
             if (isNotFound) {
                 await this.createCollection();
@@ -390,7 +398,7 @@ class RecipeSearchIndex {
                 const page = Math.floor(offset / limit) + 1;
 
                 const searchResult = await this.client
-                    .collections(COLLECTION_NAME)
+                    .collections<RecipeDocument>(COLLECTION_NAME)
                     .documents()
                     .search({
                         q: query,
@@ -403,11 +411,13 @@ class RecipeSearchIndex {
                     });
 
                 const hits: RecipeForDisplayDTO[] = (searchResult.hits || [])
-                    .filter((hit: any) => !hit.document.isFlagged)
-                    .map((hit: any) => {
-                        const doc = hit.document as RecipeDocument;
+                    .filter((hit) => !hit.document.isFlagged)
+                    .map((hit) => {
+                        const doc = hit.document;
                         return {
-                            id: doc.id,
+                            // Typesense stores the primary id as a string;
+                            // the DTO (and the rest of the app) uses a number.
+                            id: Number(doc.id),
                             displayId: doc.displayId,
                             title: doc.title,
                             imageUrl: doc.imageUrl ?? '',

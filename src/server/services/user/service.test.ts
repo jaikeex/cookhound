@@ -27,6 +27,7 @@ import {
 import { generateProofHash } from '@/server/utils/crypto';
 import { serializeConsentContent } from '@/server/utils/consent';
 import { ApplicationErrorCode } from '@/server/error/codes';
+import type { CookieConsentForCreate } from '@/common/types/cookie-consent';
 
 //|=============================================================================================|//
 //$                                           MOCKS                                             $//
@@ -881,9 +882,9 @@ describe('UserService', () => {
     //~=========================================================================================~//
 
     describe('createUserCookieConsent', () => {
-        const consentPayload = {
+        const consentPayload: CookieConsentForCreate = {
             consent: true,
-            accepted: ['essential', 'analytics'] as any[],
+            accepted: ['essential', 'analytics'],
             version: '2025-09-15',
             createdAt: new Date(),
             userIpAddress: '127.0.0.1',
@@ -906,10 +907,8 @@ describe('UserService', () => {
         };
 
         it('should successfully create new consent record', async () => {
-            mockDbUser.getOneById.mockResolvedValue(validUser as any);
-            mockDbUser.createUserCookieConsent.mockResolvedValue(
-                mockConsent as any
-            );
+            mockDbUser.getOneById.mockResolvedValue(validUser);
+            mockDbUser.createUserCookieConsent.mockResolvedValue(mockConsent);
 
             const result = await userService.createUserCookieConsent(
                 validUser.id,
@@ -925,10 +924,8 @@ describe('UserService', () => {
         });
 
         it('should capture IP address and user agent from payload', async () => {
-            mockDbUser.getOneById.mockResolvedValue(validUser as any);
-            mockDbUser.createUserCookieConsent.mockResolvedValue(
-                mockConsent as any
-            );
+            mockDbUser.getOneById.mockResolvedValue(validUser);
+            mockDbUser.createUserCookieConsent.mockResolvedValue(mockConsent);
 
             await userService.createUserCookieConsent(
                 validUser.id,
@@ -945,7 +942,7 @@ describe('UserService', () => {
         });
 
         it('should handle database errors properly', async () => {
-            mockDbUser.getOneById.mockResolvedValue(validUser as any);
+            mockDbUser.getOneById.mockResolvedValue(validUser);
             mockDbUser.createUserCookieConsent.mockRejectedValue(
                 new Error('Database error')
             );
@@ -982,14 +979,18 @@ describe('UserService', () => {
         const consentCreatedAt = new Date('2025-10-08T12:00:00.000Z');
         const consentAccepted = ['essential', 'analytics'];
 
+        type StoredCookieConsent = NonNullable<
+            Awaited<ReturnType<typeof db.user.getLatestUserCookieConsent>>
+        >;
+
         /**
          * Builds a stored consent record whose proofHash was generated the
          * same way the creation route does it — from the consent text of the
          * record's version.
          */
         const buildStoredConsent = (
-            overrides: Record<string, unknown> = {}
-        ) => ({
+            overrides: Partial<StoredCookieConsent> = {}
+        ): StoredCookieConsent => ({
             id: 1,
             userId: validUser.id,
             consent: true,
@@ -1011,7 +1012,7 @@ describe('UserService', () => {
 
         it('should verify an untampered record as valid', async () => {
             mockDbUser.getLatestUserCookieConsent.mockResolvedValue(
-                buildStoredConsent() as any
+                buildStoredConsent()
             );
 
             const result = await userService.verifyCookieConsentHash(
@@ -1027,7 +1028,7 @@ describe('UserService', () => {
             mockDbUser.getLatestUserCookieConsent.mockResolvedValue(
                 buildStoredConsent({
                     accepted: ['essential', 'analytics', 'marketing']
-                }) as any
+                })
             );
 
             const result = await userService.verifyCookieConsentHash(
@@ -1041,7 +1042,7 @@ describe('UserService', () => {
 
         it('should report a record with an unverifiable version as invalid without throwing', async () => {
             mockDbUser.getLatestUserCookieConsent.mockResolvedValue(
-                buildStoredConsent({ version: '2025-09-15' }) as any
+                buildStoredConsent({ version: '2025-09-15' })
             );
 
             const result = await userService.verifyCookieConsentHash(
@@ -1054,9 +1055,7 @@ describe('UserService', () => {
         });
 
         it('should throw NotFoundError when no record exists', async () => {
-            mockDbUser.getLatestUserCookieConsent.mockResolvedValue(
-                null as any
-            );
+            mockDbUser.getLatestUserCookieConsent.mockResolvedValue(null);
 
             await expect(
                 userService.verifyCookieConsentHash(validUser.id, 1)

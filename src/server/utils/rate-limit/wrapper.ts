@@ -120,7 +120,7 @@ function getAppRouterClientIdentifier(req: NextRequest): string {
         ip = realIp;
     } else {
         // Fallback to req.ip if available (may not be available in all environments)
-        ip = (req as any).ip || 'unknown';
+        ip = (req as typeof req & { ip?: string }).ip || 'unknown';
     }
 
     // Clean up IPv6 mapped IPv4 addresses

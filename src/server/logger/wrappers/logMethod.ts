@@ -60,16 +60,16 @@ export function LogServiceMethod(
             ? arg1.context
             : undefined;
 
-    return (
+    return <T>(
         target: object,
         propertyKey: string | symbol,
-        descriptor: TypedPropertyDescriptor<any>
-    ): void | TypedPropertyDescriptor<any> => {
+        descriptor: TypedPropertyDescriptor<T>
+    ): void | TypedPropertyDescriptor<T> => {
         const original = descriptor.value;
 
         if (typeof original !== 'function') return descriptor;
 
-        descriptor.value = function (...args: unknown[]) {
+        const wrapped = function (this: unknown, ...args: unknown[]) {
             //?—————————————————————————————————————————————————————————————————————————————————?//
             //?                                 LOGGER CONTEXT                                  ?//
             ///
@@ -117,6 +117,8 @@ export function LogServiceMethod(
             log[successLevel](`${String(propertyKey)} - success`);
             return result;
         };
+
+        descriptor.value = wrapped as unknown as T;
 
         return descriptor;
     };

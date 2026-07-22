@@ -11,6 +11,7 @@ import {
     ONE_MONTH_IN_SECONDS,
     ONE_HOUR_IN_SECONDS
 } from '@/common/constants/time';
+import type { sessions } from './manager';
 
 //|=============================================================================================|//
 //$                                           MOCKS                                             $//
@@ -45,7 +46,7 @@ vi.mock('@/server/logger', () => ({
 //$                                          IMPORTS                                            $//
 //|=============================================================================================|//
 
-let SessionManager: any;
+let SessionManager: typeof sessions;
 
 //|=============================================================================================|//
 //$                                           TESTS                                             $//
@@ -461,8 +462,8 @@ describe('SessionManager', () => {
             const result = await SessionManager.getUserSessions(1);
 
             expect(result).toHaveLength(2);
-            expect(result[0].sessionId).toBe('session-1');
-            expect(result[1].sessionId).toBe('session-2');
+            expect(result[0]?.sessionId).toBe('session-1');
+            expect(result[1]?.sessionId).toBe('session-2');
         });
 
         it('should filter out expired sessions and remove them from set', async () => {
@@ -484,7 +485,7 @@ describe('SessionManager', () => {
             const result = await SessionManager.getUserSessions(1);
 
             expect(result).toHaveLength(1);
-            expect(result[0].sessionId).toBe('valid-session');
+            expect(result[0]?.sessionId).toBe('valid-session');
             expect(mockRedisClient.srem).toHaveBeenCalledWith(
                 'user-sessions:1',
                 'expired-session'
@@ -512,7 +513,7 @@ describe('SessionManager', () => {
             const result = await SessionManager.getUserSessions(1);
 
             expect(result).toHaveLength(1);
-            expect(result[0].sessionId).toBe('session-1');
+            expect(result[0]?.sessionId).toBe('session-1');
 
             // Stale IDs should be removed from the set
             expect(mockRedisClient.srem).toHaveBeenCalledWith(

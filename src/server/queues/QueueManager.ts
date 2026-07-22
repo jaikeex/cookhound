@@ -21,7 +21,7 @@ export interface JobDefinition<TData = any, TResult = any> {
     queueOptions?: Omit<QueueOptions, 'connection' | 'name'>;
 }
 
-export type CronJobConfig<TData = any> = Readonly<{
+export type CronJobConfig<TData = unknown> = Readonly<{
     name: string;
     queueName: string;
     cron: string;
@@ -195,7 +195,7 @@ export class QueueManager {
      *
      * @returns A promise that resolves with the created BullMQ Job instance.
      */
-    public async addJob<TData = any>(
+    public async addJob<TData = unknown>(
         name: string,
         data: TData,
         options: JobsOptions = {}
@@ -257,7 +257,7 @@ export class QueueManager {
      *
      * @returns A promise that resolves with the created repeatable Job instance.
      */
-    public async scheduleCronJob<TData = any>(
+    public async scheduleCronJob<TData = unknown>(
         config: CronJobConfig<TData>
     ): Promise<Job<TData>> {
         const {

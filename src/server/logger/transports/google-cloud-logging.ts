@@ -27,7 +27,8 @@ type WinstonLogInfo = {
     timestamp?: string;
 };
 
-interface GoogleCloudLoggingTransportOptions {
+interface GoogleCloudLoggingTransportOptions
+    extends Transport.TransportStreamOptions {
     allowedLevels?: LogLevel[];
 }
 
@@ -47,7 +48,7 @@ export class GoogleCloudLoggingTransport extends Transport {
     //|-----------------------------------------------------------------------------------------|//
 
     constructor(opts: GoogleCloudLoggingTransportOptions = {}) {
-        super(opts as any);
+        super(opts);
 
         this.allowedLevels = opts.allowedLevels;
 

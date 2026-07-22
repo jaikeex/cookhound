@@ -10,7 +10,7 @@ const log = Logger.getInstance('base-job');
 /**
  * BaseJob is an abstract class that all concrete jobs MUST extend.
  */
-export abstract class BaseJob<TData = any, TResult = any> {
+export abstract class BaseJob<TData = unknown, TResult = unknown> {
     //~—————————————————————————————————————————————————————————————————————————————————————————~//
     //$                                         OPTIONS                                         $//
     ///

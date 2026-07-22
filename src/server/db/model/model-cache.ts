@@ -233,7 +233,7 @@ export async function invalidateTags(tags: readonly string[]): Promise<void> {
 export function generateCacheKey(
     modelName: string,
     operation: string,
-    params?: Record<string, any>
+    params?: Record<string, unknown>
 ): string {
     return `prisma:${modelName}:${operation}:${params ? JSON.stringify(params) : ''}`;
 }

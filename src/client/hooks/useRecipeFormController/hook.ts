@@ -215,11 +215,11 @@ export const useRecipeFormController = ({
     //~-----------------------------------------------------------------------------------------~//
 
     const handleFormChange = useCallback(
-        (name: string, value: any) => {
+        (name: string, value: unknown) => {
             let newValue: unknown = value;
 
-            if (name === 'ingredients' && value) {
-                newValue = value.map((ingredient: Ingredient) => ({
+            if (name === 'ingredients' && Array.isArray(value)) {
+                newValue = (value as Ingredient[]).map((ingredient) => ({
                     quantity: ingredient?.quantity || null,
                     category: ingredient?.category || null,
                     id: null,
@@ -227,7 +227,10 @@ export const useRecipeFormController = ({
                 }));
             }
 
-            if (name === 'title' && (!value || value.length === 0)) {
+            if (
+                name === 'title' &&
+                (!value || (typeof value === 'string' && value.length === 0))
+            ) {
                 newValue = t('app.recipe.title');
             }
 

@@ -1,4 +1,5 @@
 import Typesense from 'typesense';
+import type { Client } from 'typesense';
 import { ENV_CONFIG_PUBLIC, ENV_CONFIG_PRIVATE } from '@/common/constants/env';
 import { Logger } from '@/server/logger';
 import { randomUUID } from 'crypto';
@@ -54,7 +55,7 @@ declare global {
 //~=============================================================================================~//
 
 class TypesenseClient {
-    private client: any; // No ts support for typesense sadly...
+    private client: Client;
     private readonly instanceId: string;
 
     //~-----------------------------------------------------------------------------------------~//
@@ -128,7 +129,7 @@ class TypesenseClient {
         return globalStore.instance;
     }
 
-    getClient(): any {
+    getClient(): Client {
         return this.client;
     }
 

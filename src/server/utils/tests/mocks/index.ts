@@ -8,27 +8,31 @@ import mockUsers from './users.json';
 
 export const TEST_PASSWORD = 'TestPassword123!';
 
-function reviveUserDates(user: any): User {
+/**
+ * The JSON fixtures store dates as ISO strings; convert them back to Date
+ * instances (or null) so the object satisfies the Prisma User type.
+ */
+function toDate(value: unknown): Date | null {
+    return typeof value === 'string' || typeof value === 'number'
+        ? new Date(value)
+        : null;
+}
+
+function reviveUserDates(user: AnyObject): User {
     return {
         ...user,
-        createdAt: user.createdAt ? new Date(user.createdAt) : null,
-        updatedAt: user.updatedAt ? new Date(user.updatedAt) : null,
-        lastLogin: user.lastLogin ? new Date(user.lastLogin) : null,
-        lastVisitedAt: user.lastVisitedAt ? new Date(user.lastVisitedAt) : null,
-        deletedAt: user.deletedAt ? new Date(user.deletedAt) : null,
-        deletionScheduledFor: user.deletionScheduledFor
-            ? new Date(user.deletionScheduledFor)
-            : null,
-        lastPasswordReset: user.lastPasswordReset
-            ? new Date(user.lastPasswordReset)
-            : null,
-        passwordResetTokenExpires: user.passwordResetTokenExpires
-            ? new Date(user.passwordResetTokenExpires)
-            : null,
-        emailVerificationTokenExpires: user.emailVerificationTokenExpires
-            ? new Date(user.emailVerificationTokenExpires)
-            : null
-    } as User;
+        createdAt: toDate(user.createdAt),
+        updatedAt: toDate(user.updatedAt),
+        lastLogin: toDate(user.lastLogin),
+        lastVisitedAt: toDate(user.lastVisitedAt),
+        deletedAt: toDate(user.deletedAt),
+        deletionScheduledFor: toDate(user.deletionScheduledFor),
+        lastPasswordReset: toDate(user.lastPasswordReset),
+        passwordResetTokenExpires: toDate(user.passwordResetTokenExpires),
+        emailVerificationTokenExpires: toDate(
+            user.emailVerificationTokenExpires
+        )
+    } as unknown as User;
 }
 
 export const validUser = reviveUserDates(mockUsers.validUser);

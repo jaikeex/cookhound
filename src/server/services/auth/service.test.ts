@@ -108,7 +108,7 @@ const mockNeedsRehash = vi.mocked(needsRehash);
 
 // Mock global fetch
 const mockFetch = vi.fn();
-global.fetch = mockFetch as any;
+vi.stubGlobal('fetch', mockFetch);
 
 //|=============================================================================================|//
 //$                                           TESTS                                             $//
