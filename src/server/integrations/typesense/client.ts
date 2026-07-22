@@ -5,6 +5,7 @@ import { Logger } from '@/server/logger';
 import { randomUUID } from 'crypto';
 import { InfrastructureError } from '@/server/error';
 import { InfrastructureErrorCode } from '@/server/error/codes';
+import { deferClientInTestMode } from '@/server/integrations/deferClientInTestMode';
 
 const log = Logger.getInstance('typesense-client');
 
@@ -64,7 +65,7 @@ class TypesenseClient {
 
     private constructor() {
         // Generate unique instance ID for tracking
-        this.instanceId = `${process.pid}-${randomUUID}`;
+        this.instanceId = `${process.pid}-${randomUUID()}`;
 
         try {
             this.client = new Typesense.Client({
@@ -158,5 +159,8 @@ class TypesenseClient {
     }
 }
 
-const typesenseClient = TypesenseClient.getInstance();
+const typesenseClient = deferClientInTestMode('Typesense', () =>
+    TypesenseClient.getInstance()
+);
+
 export default typesenseClient;

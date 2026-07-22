@@ -9,7 +9,66 @@ permissions:
     packages: write
 
 jobs:
+    verify:
+        runs-on: ubuntu-latest
+
+        services:
+            # prisma TypedSQL introspects each query against a live db,
+            # and the generated client is what typecheck, eslint and
+            # vitest all compile against, so verification needs a real Postgres.
+            # Running migrate deploy against a fresh DB also proves the migrations
+            # apply cleanly and every sql file still matches the current schema.
+            postgres:
+                image: postgres:16
+                env:
+                    POSTGRES_USER: postgres
+                    POSTGRES_PASSWORD: postgres
+                    POSTGRES_DB: cookhound_ci
+                ports:
+                    - 5432:5432
+                options: >-
+                    --health-cmd "pg_isready -U postgres"
+                    --health-interval 10s
+                    --health-timeout 5s
+                    --health-retries 5
+
+        env:
+            DATABASE_URL: postgresql://postgres:postgres@localhost:5432/cookhound_ci?schema=public
+            NEXT_PUBLIC_ENV: test
+
+        steps:
+            - name: Checkout source
+              uses: actions/checkout@v4
+
+            - name: Set up Node
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 20
+                  cache: 'yarn'
+
+            - name: Install dependencies
+              run: yarn install --immutable --inline-builds
+
+            - name: Apply migrations to CI database
+              run: yarn prisma migrate deploy
+
+            - name: Generate Prisma client (incl. TypedSQL)
+              run: yarn prisma generate --sql
+
+            - name: Typecheck
+              run: yarn typecheck
+
+            - name: Lint
+              run: yarn lint:check
+
+            - name: Format check
+              run: yarn format:check
+
+            - name: Unit tests
+              run: yarn test
+
     deploy:
+        needs: verify
         runs-on: ubuntu-latest
 
         env:
