@@ -165,7 +165,19 @@ jobs:
 
                       cd /cookhound
                       docker compose pull
-                      docker compose up -d --remove-orphans
+
+                      # Post-deploy health gate: --wait blocks until every service is
+                      # running and services with a healthcheck report healthy,
+                      # so a bad startup fails the deploy loudly instead of silently leaving
+                      # a broken image running. Only prune once health is confirmed. 
+
+                      if ! docker compose up -d --remove-orphans --wait --wait-timeout 240; then
+                        echo "ERROR: services did not become healthy in time." >&2
+                        docker compose ps >&2 || true
+                        docker compose logs --tail=80 web >&2 || true
+                        exit 1
+                      fi
+
                       docker image prune -af --filter "until=24h"
               env:
                   GHCR_ACTOR: ${{ github.actor }}
