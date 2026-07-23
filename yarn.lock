@@ -2447,7 +2447,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@prisma/adapter-pg@npm:^7.8.0":
+"@prisma/adapter-pg@npm:7.8.0":
   version: 7.8.0
   resolution: "@prisma/adapter-pg@npm:7.8.0"
   dependencies:
@@ -2466,7 +2466,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@prisma/client@npm:^7.8.0":
+"@prisma/client@npm:7.8.0":
   version: 7.8.0
   resolution: "@prisma/client@npm:7.8.0"
   dependencies:
@@ -4577,8 +4577,8 @@ __metadata:
     "@babel/runtime": "npm:^7.28.6"
     "@eslint/js": "npm:^9.39.2"
     "@playwright/test": "npm:^1.58.1"
-    "@prisma/adapter-pg": "npm:^7.8.0"
-    "@prisma/client": "npm:^7.8.0"
+    "@prisma/adapter-pg": "npm:7.8.0"
+    "@prisma/client": "npm:7.8.0"
     "@svgr/webpack": "npm:^8.1.0"
     "@tailwindcss/postcss": "npm:^4.1.18"
     "@tanstack/react-query": "npm:^5.101.2"
@@ -4615,7 +4615,7 @@ __metadata:
     postcss: "npm:^8.5.6"
     prettier: "npm:^3.8.1"
     prettier-plugin-tailwindcss: "npm:^0.7.2"
-    prisma: "npm:^7.3.0"
+    prisma: "npm:7.8.0"
     react: "npm:^19.2.7"
     react-dom: "npm:^19.2.7"
     react-easy-sort: "npm:^1.8.0"
@@ -6380,9 +6380,9 @@ __metadata:
   linkType: hard
 
 "hono@npm:^4.12.8":
-  version: 4.12.29
-  resolution: "hono@npm:4.12.29"
-  checksum: 10c0/ee56efba993e765088c8e160e3e6fbe28138e0ae84a9f0e810917ef7cbb4dff2c50c947cabad1ec4852a5baf0225354a9e6dc8da9da66af0b0827e842a1870f7
+  version: 4.12.31
+  resolution: "hono@npm:4.12.31"
+  checksum: 10c0/f80be65cd657cc353b3e478d55424a373d11801b2a1ffc96d94def813c6d852e76bea4437f5df252b15caca98742040d26950bc9c865d8720b89a00a9eac5249
   languageName: node
   linkType: hard
 
@@ -8386,7 +8386,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prisma@npm:^7.3.0":
+"prisma@npm:7.8.0":
   version: 7.8.0
   resolution: "prisma@npm:7.8.0"
   dependencies:
