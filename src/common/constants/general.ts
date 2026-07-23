@@ -19,6 +19,11 @@ export const SESSION_COOKIE_NAME = 'session';
 export const OAUTH_STATE_KEY = 'oauth_state';
 
 /**
+ * Header carrying the revalidation secret on the worker → `/api/revalidate` self-call.
+ */
+export const REVALIDATE_TOKEN_HEADER = 'x-revalidate-token';
+
+/**
  * Maximum number of tag suggestions allowed per recipe creation session.
  * There is a rate limit on the route, but as it is currently designed, it would redirect the user
  * to the error page (which is not desired from a form) and there is really not a good way to prevent it
