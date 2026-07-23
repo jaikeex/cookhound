@@ -100,6 +100,8 @@ RUN chmod +x /entrypoint.sh
 
 EXPOSE 3000
 ENV PORT=3000
+
+ENV HOSTNAME=0.0.0.0
 ENTRYPOINT ["/entrypoint.sh"]
 # Default command runs the Next.js server; worker container overrides this
 CMD ["node","server.js"]
