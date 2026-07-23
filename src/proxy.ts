@@ -4,6 +4,7 @@ import { MiddlewareError } from '@/server/error';
 // This needs to be imported explicitly from the verify-client.ts file. NOT the barrel file.
 // Note to self two months after: If only i had written here why the fuck is that needed...
 import { verifyRouteAccess } from '@/server/proxy/steps/verify-route-access';
+import { verifyRecipePathFormat } from '@/server/proxy/steps/verify-recipe-path';
 
 export async function proxy(request: NextRequest) {
     // DEFAULT RESPONSE
@@ -26,6 +27,7 @@ export async function proxy(request: NextRequest) {
         ///
         //?—————————————————————————————————————————————————————————————————————————————————————————?//
 
+        response = (await verifyRecipePathFormat(request)) ?? response;
         response = (await verifyRouteAccess(request)) ?? response;
     } catch (error: unknown) {
         if (error instanceof MiddlewareError && error?.response) {
