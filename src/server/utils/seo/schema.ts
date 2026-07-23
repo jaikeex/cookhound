@@ -1,5 +1,13 @@
 import type { Recipe, User, Cookbook } from '@/common/types';
-import { CATEGORY_IDS, ROUTES } from '@/common/constants';
+import {
+    CATEGORY_IDS,
+    ROUTES,
+    RECIPE_CATEGORY_TAGS,
+    CS_TAG_CATEGORIES,
+    HUB_SLUGS,
+    buildHubTitle,
+    buildHubPath
+} from '@/common/constants';
 import { t } from '@/client/locales';
 
 //?—————————————————————————————————————————————————————————————————————————————————————————————?//
@@ -17,6 +25,25 @@ import { t } from '@/client/locales';
 ///
 //?—————————————————————————————————————————————————————————————————————————————————————————————?//
 
+//# schema.org RestrictedDiet enum members for the diet tags that have one.
+const RESTRICTED_DIET_BY_DB_SLUG: Partial<
+    Record<(typeof RECIPE_CATEGORY_TAGS)['diet'][number], string>
+> = {
+    'gluten-free': 'https://schema.org/GlutenFreeDiet',
+    'lactose-free': 'https://schema.org/LowLactoseDiet',
+    'vegetarian': 'https://schema.org/VegetarianDiet',
+    'vegan': 'https://schema.org/VeganDiet'
+};
+
+const RESTRICTED_DIET_BY_TAG_NAME: ReadonlyMap<string, string> = new Map(
+    RECIPE_CATEGORY_TAGS.diet.flatMap((dbSlug, index) => {
+        const dietUrl = RESTRICTED_DIET_BY_DB_SLUG[dbSlug];
+        const csName = CS_TAG_CATEGORIES.diet[index];
+
+        return dietUrl && csName ? [[csName, dietUrl] as const] : [];
+    })
+);
+
 export function generateRecipeSchema(
     recipe: Recipe,
     baseUrl?: string,
@@ -25,9 +52,23 @@ export function generateRecipeSchema(
     const schema: Record<string, unknown> = {
         '@context': 'https://schema.org',
         '@type': 'Recipe',
-        name: recipe.title,
-        image: recipe.imageUrl ? [recipe.imageUrl] : []
+        name: recipe.title
     };
+
+    // Tie the entity to its canonical url.
+    if (baseUrl) {
+        const canonicalUrl = `${baseUrl}${ROUTES.recipe.detail(recipe.displayId, recipe.title)}`;
+
+        schema['@id'] = `${canonicalUrl}#recipe`;
+        schema.url = canonicalUrl;
+        schema.mainEntityOfPage = canonicalUrl;
+    }
+
+    // image is a REQUIRED property for the recipe rich result. There is no
+    // honest fallback, so imageless recipes omit the property entirely.
+    if (recipe.imageUrl) {
+        schema.image = [recipe.imageUrl];
+    }
 
     if (recipe.createdAt) {
         schema.datePublished = recipe.createdAt;
@@ -37,46 +78,51 @@ export function generateRecipeSchema(
         schema.dateModified = recipe.updatedAt;
     }
 
-    // Map tags to cuisine/category
+    // Map tags to cuisine/category.
     if (recipe.tags) {
         const cuisineTags = recipe.tags.filter(
             (t) => t.categoryId === CATEGORY_IDS.cuisine
         );
         if (cuisineTags.length > 0) {
-            schema.recipeCuisine = cuisineTags.map((t) => t.name).join(', ');
+            schema.recipeCuisine = cuisineTags.map((t) => t.name);
         }
 
         const typeTags = recipe.tags.filter(
             (t) => t.categoryId === CATEGORY_IDS.type
         );
         if (typeTags.length > 0) {
-            schema.recipeCategory = typeTags.map((t) => t.name).join(', ');
+            schema.recipeCategory = typeTags.map((t) => t.name);
+        }
+
+        const dietUrls = recipe.tags
+            .filter((t) => t.categoryId === CATEGORY_IDS.diet)
+            .map((t) => RESTRICTED_DIET_BY_TAG_NAME.get(t.name))
+            .filter((url): url is string => Boolean(url));
+
+        if (dietUrls.length > 0) {
+            schema.suitableForDiet = dietUrls;
         }
     }
 
+    // A Person without a name causes a "missing field" warning.
     if (recipe.authorId && baseUrl) {
         schema.author = {
             '@type': 'Person',
-            ...(authorName ? { name: authorName } : {}),
+            name: authorName || t('meta.recipe.author-fallback'),
             url: `${baseUrl}${ROUTES.user.detail(recipe.authorId)}`
         };
     }
 
+    // Full text on purpose: the 160-char cap belongs to the meta description,
+    // json-ld has no length limit and richer text helps the crawler.
     const authoredDescription = recipe.description?.trim();
+    const fallbackDescription = recipe.instructions
+        ?.find((step) => step?.trim())
+        ?.trim();
+    const description = authoredDescription || fallbackDescription;
 
-    if (authoredDescription) {
-        schema.description =
-            authoredDescription.length > 160
-                ? authoredDescription.substring(0, 157) + '...'
-                : authoredDescription;
-    } else if (recipe.instructions && recipe.instructions.length > 0) {
-        const firstInstruction = recipe.instructions[0];
-        if (firstInstruction) {
-            schema.description =
-                firstInstruction.length > 160
-                    ? firstInstruction.substring(0, 157) + '...'
-                    : firstInstruction;
-        }
+    if (description) {
+        schema.description = description;
     }
 
     if (recipe.time) {
@@ -90,41 +136,117 @@ export function generateRecipeSchema(
                 ? 'meta.recipe.yield-few'
                 : 'meta.recipe.yield-many';
 
-        schema.recipeYield = t(yieldKey, {
-            count: recipe.portionSize
-        });
+        // Bare number first, some consumers only parse the numeric form.
+        schema.recipeYield = [
+            String(recipe.portionSize),
+            t(yieldKey, { count: recipe.portionSize })
+        ];
     }
 
     if (recipe.ingredients && recipe.ingredients.length > 0) {
-        schema.recipeIngredient = recipe.ingredients.map((i) => {
-            const amount = i.quantity ? `${i.quantity} ` : '';
-            return `${amount}${i.name}`.trim();
-        });
+        const ingredientLines = recipe.ingredients
+            .map((i) => {
+                const amount = i.quantity ? `${i.quantity} ` : '';
+                return `${amount}${i.name}`.trim();
+            })
+            .filter(Boolean);
+
+        if (ingredientLines.length > 0) {
+            schema.recipeIngredient = ingredientLines;
+        }
     }
 
     if (recipe.instructions && recipe.instructions.length > 0) {
-        schema.recipeInstructions = recipe.instructions.map((step, idx) => ({
-            '@type': 'HowToStep',
-            position: idx + 1,
-            text: step || ''
-        }));
+        const steps = recipe.instructions
+            .map((step) => step?.trim())
+            .filter((step): step is string => Boolean(step));
+
+        if (steps.length > 0) {
+            schema.recipeInstructions = steps.map((text, idx) => ({
+                '@type': 'HowToStep',
+                position: idx + 1,
+                text
+            }));
+        }
     }
 
     if (recipe.rating && recipe.rating > 0 && recipe.timesRated) {
         schema.aggregateRating = {
             '@type': 'AggregateRating',
-            ratingValue: recipe.rating,
+            ratingValue: Math.round(recipe.rating * 10) / 10,
             ratingCount: recipe.timesRated,
             bestRating: 5,
             worstRating: 1
         };
     }
 
+    // Google: keywords must not repeat tags that belong in recipeCategory
+    // or recipeCuisine, only the remaining categories go here.
     if (recipe.tags && recipe.tags.length > 0) {
-        schema.keywords = recipe.tags.map((t) => t.name).join(', ');
+        const keywordTags = recipe.tags.filter(
+            (t) =>
+                t.categoryId !== CATEGORY_IDS.cuisine &&
+                t.categoryId !== CATEGORY_IDS.type
+        );
+
+        if (keywordTags.length > 0) {
+            schema.keywords = keywordTags.map((t) => t.name).join(', ');
+        }
     }
 
     return schema;
+}
+
+//|=============================================================================================|//
+
+export type RecipeHubCrumb = Readonly<{
+    name: string;
+    path: string;
+}>;
+
+// czech type-tag name -> hub crumb.
+const HUB_CRUMB_BY_TYPE_TAG_NAME: ReadonlyMap<string, RecipeHubCrumb> = new Map(
+    RECIPE_CATEGORY_TAGS.type.flatMap((dbSlug, index) => {
+        const csName = CS_TAG_CATEGORIES.type[index];
+
+        if (!csName) {
+            return [];
+        }
+
+        const crumb: RecipeHubCrumb = {
+            name: buildHubTitle(dbSlug, csName, CATEGORY_IDS.type),
+            path: buildHubPath(HUB_SLUGS[dbSlug], 1)
+        };
+
+        return [[csName, crumb] as const];
+    })
+);
+
+/**
+ * Resolves the hub page a recipe belongs to (via its first type tag) for use
+ * as the middle crumb of the recipe page's BreadcrumbList. Returns null when
+ * the recipe has no type tag with a matching hub.
+ */
+export function resolveRecipeHubCrumb(
+    tags: Recipe['tags']
+): RecipeHubCrumb | null {
+    if (!tags) {
+        return null;
+    }
+
+    for (const tag of tags) {
+        if (tag.categoryId !== CATEGORY_IDS.type) {
+            continue;
+        }
+
+        const crumb = HUB_CRUMB_BY_TYPE_TAG_NAME.get(tag.name);
+
+        if (crumb) {
+            return crumb;
+        }
+    }
+
+    return null;
 }
 
 export function generatePersonSchema(user: User, baseUrl: string) {

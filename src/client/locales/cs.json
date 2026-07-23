@@ -426,6 +426,7 @@
     "meta.recipe.description": "Recept na {{recipeTitle}}",
     "meta.recipe.yield-few": "{{count}} porce",
     "meta.recipe.yield-many": "{{count}} porcí",
+    "meta.recipe.author-fallback": "Cookhound Uživatel",
     "meta.recipe.fallback.title": "Recept | Cookhound",
     "meta.recipe.fallback.description": "Zobrazit recept na Cookhound",
     "meta.recipe.create.title": "Vytvořit Recept | Cookhound",

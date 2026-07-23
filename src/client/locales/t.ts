@@ -1,4 +1,4 @@
-import * as cs from './cs.json';
+import cs from './cs.json';
 
 export type I18nMessage = keyof typeof cs;
 export type Messages = Record<I18nMessage, string>;
