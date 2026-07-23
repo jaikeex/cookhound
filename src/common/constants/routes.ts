@@ -1,3 +1,5 @@
+import { slugifyRecipeTitle } from '@/common/utils/titleSlug';
+
 //?—————————————————————————————————————————————————————————————————————————————————————————————?//
 //?                                    USER-FACING ROUTE PATHS                                  ?//
 ///
@@ -84,9 +86,15 @@ export const ROUTES = {
          * Builds the path for a recipe detail page.
          *
          * @param displayId - The recipe's public display id.
+         * @param title - The recipe title.
          */
-        detail: (displayId: string): RecipePath =>
-            `${SEGMENTS.recipe}/${displayId}`,
+        detail: (displayId: string, title?: string): RecipePath => {
+            const titleSlug = title ? slugifyRecipeTitle(title) : '';
+
+            return titleSlug
+                ? `${SEGMENTS.recipe}/${displayId}/${titleSlug}`
+                : `${SEGMENTS.recipe}/${displayId}`;
+        },
 
         /**
          * Builds the path for a recipe's edit page.

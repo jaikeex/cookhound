@@ -72,7 +72,7 @@ class EvaluateRecipeJob extends BaseJob<EvaluateRecipeJobData> {
                     }
 
                     await revalidateRouteCache(
-                        ROUTES.recipe.detail(recipeDisplayId)
+                        ROUTES.recipe.detail(recipeDisplayId, recipe.title)
                     );
 
                     log.notice('handle - recipe accepted, prior flag cleared', {
@@ -115,7 +115,9 @@ class EvaluateRecipeJob extends BaseJob<EvaluateRecipeJobData> {
 
             recipeSearchIndex.deleteOne(recipeId);
 
-            await revalidateRouteCache(ROUTES.recipe.detail(recipeDisplayId));
+            await revalidateRouteCache(
+                ROUTES.recipe.detail(recipeDisplayId, recipe.title)
+            );
 
             log.notice('handle - recipe rejected and flagged', {
                 recipeId,

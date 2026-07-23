@@ -152,7 +152,7 @@ export const useRecipeFormController = ({
 
             resetSuggestions();
             allowNavigation();
-            safePush(ROUTES.recipe.detail(recipe.displayId));
+            safePush(ROUTES.recipe.detail(recipe.displayId, recipe.title));
         },
         [
             alert,

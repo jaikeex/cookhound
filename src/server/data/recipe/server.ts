@@ -22,6 +22,13 @@ export const recipeServerData = {
         recipeReads.getFreshRecipeByDisplayId(displayId)
     ),
 
+    getByLegacyDisplayId: cache(
+        (
+            legacyDisplayId: string
+        ): Promise<{ displayId: string; title: string } | null> =>
+            recipeReads.getByLegacyDisplayId(legacyDisplayId)
+    ),
+
     list: cache(
         (batch: number, perPage: number): Promise<RecipeForDisplayDTO[]> =>
             recipeReads.getFrontPageRecipes(batch, perPage)

@@ -29,7 +29,7 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({
             style={{ animationDelay: `${index * 1}ms` }}
         >
             <Link
-                href={ROUTES.recipe.detail(displayId)}
+                href={ROUTES.recipe.detail(displayId, title)}
                 className="flex flex-col h-full text-inherit hover:text-blue-900 dark:hover:text-blue-300 transition-colors duration-150"
                 aria-label={title}
             >

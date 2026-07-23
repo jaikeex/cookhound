@@ -34,7 +34,7 @@ export const RecipeStructuredData: React.FC<
         },
         {
             name: recipe.title,
-            url: `${ENV_CONFIG_PUBLIC.ORIGIN}${ROUTES.recipe.detail(recipe.displayId)}`
+            url: `${ENV_CONFIG_PUBLIC.ORIGIN}${ROUTES.recipe.detail(recipe.displayId, recipe.title)}`
         }
     ]);
 

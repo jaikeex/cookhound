@@ -17,7 +17,7 @@ export const RecipeLink = forwardRef<HTMLAnchorElement, RecipeLinkProps>(
     ({ recipe, onClick, onFocus, className }, ref) => (
         <Link
             ref={ref}
-            href={ROUTES.recipe.detail(recipe.displayId)}
+            href={ROUTES.recipe.detail(recipe.displayId, recipe.title)}
             onClick={onClick}
             onFocus={onFocus}
             className={classNames(

@@ -131,17 +131,17 @@ model EmailChangeRequest {
 }
 
 model AccountDeletionRequest {
-  id            Int       @id @default(autoincrement())
-  userId        Int       @map("user_id")
-  requestedAt   DateTime  @default(now()) @map("requested_at") @db.Timestamp(3)
-  completedAt   DateTime? @map("completed_at") @db.Timestamp(3)
-  cancelledAt   DateTime? @map("cancelled_at") @db.Timestamp(3)
-  ipAddress     String?   @map("ip_address") @db.VarChar(45)
-  userAgent     String?   @map("user_agent") @db.VarChar(512)
-  reason        String?   @db.Text
-  proofHash     String    @map("proof_hash") @db.VarChar(255)
-  userEmail     String    @map("user_email") @db.VarChar(255)
-  userName      String    @map("user_name") @db.VarChar(128)
+  id          Int       @id @default(autoincrement())
+  userId      Int       @map("user_id")
+  requestedAt DateTime  @default(now()) @map("requested_at") @db.Timestamp(3)
+  completedAt DateTime? @map("completed_at") @db.Timestamp(3)
+  cancelledAt DateTime? @map("cancelled_at") @db.Timestamp(3)
+  ipAddress   String?   @map("ip_address") @db.VarChar(45)
+  userAgent   String?   @map("user_agent") @db.VarChar(512)
+  reason      String?   @db.Text
+  proofHash   String    @map("proof_hash") @db.VarChar(255)
+  userEmail   String    @map("user_email") @db.VarChar(255)
+  userName    String    @map("user_name") @db.VarChar(128)
 
   /// Relations
   user User @relation(fields: [userId], references: [id])
@@ -153,20 +153,22 @@ model AccountDeletionRequest {
 }
 
 model Recipe {
-  id          Int      @id @default(autoincrement())
-  displayId   String   @unique @map("display_id") @db.VarChar(36)
-  authorId    Int      @map("author_id")
-  title       String   @db.VarChar(255)
-  description String?  @map("description") @db.Text
-  notes       String?  @map("notes") @db.Text
-  time        Int?     @map("time")
-  portionSize Int?     @map("portion_size")
-  imageUrl    String?  @map("image_url") @db.VarChar(255)
-  rating      Decimal? @db.Decimal(2, 1)
-  timesRated  Int      @default(0) @map("times_rated")
-  timesViewed Int      @default(0) @map("times_viewed")
-  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamp(3)
-  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamp(3)
+  id              Int      @id @default(autoincrement())
+  displayId       String   @unique @map("display_id") @db.VarChar(8)
+  /// Pre-refactor uuid display id, kept so old `/recept/<uuid>` urls can 308 forever.
+  legacyDisplayId String?  @unique @map("legacy_display_id") @db.VarChar(36)
+  authorId        Int      @map("author_id")
+  title           String   @db.VarChar(255)
+  description     String?  @map("description") @db.Text
+  notes           String?  @map("notes") @db.Text
+  time            Int?     @map("time")
+  portionSize     Int?     @map("portion_size")
+  imageUrl        String?  @map("image_url") @db.VarChar(255)
+  rating          Decimal? @db.Decimal(2, 1)
+  timesRated      Int      @default(0) @map("times_rated")
+  timesViewed     Int      @default(0) @map("times_viewed")
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamp(3)
+  updatedAt       DateTime @updatedAt @map("updated_at") @db.Timestamp(3)
 
   /// Relations
   author         User                     @relation("AuthoredRecipes", fields: [authorId], references: [id])
@@ -306,8 +308,8 @@ model RecipeFlag {
   createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamp(3)
 
   /// Relations
-  user    User                @relation(fields: [userId], references: [id])
-  recipe  Recipe              @relation(fields: [recipeId], references: [id])
+  user    User               @relation(fields: [userId], references: [id])
+  recipe  Recipe             @relation(fields: [recipeId], references: [id])
   appeals RecipeFlagAppeal[]
 
   /// Indexes
@@ -328,9 +330,9 @@ model RecipeFlagAppeal {
   createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamp(3)
 
   /// Relations
-  flag       RecipeFlag  @relation(fields: [flagId], references: [id])
-  user       User        @relation("RecipeFlagAppealAuthor", fields: [userId], references: [id])
-  reviewedBy User?       @relation("RecipeFlagAppealReviewer", fields: [reviewedById], references: [id])
+  flag       RecipeFlag @relation(fields: [flagId], references: [id])
+  user       User       @relation("RecipeFlagAppealAuthor", fields: [userId], references: [id])
+  reviewedBy User?      @relation("RecipeFlagAppealReviewer", fields: [reviewedById], references: [id])
 
   /// Indexes
   @@index([flagId])

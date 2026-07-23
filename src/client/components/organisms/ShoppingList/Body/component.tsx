@@ -46,7 +46,10 @@ export const ShoppingListBody = forwardRef<
                 <div className="flex items-center justify-between gap-6">
                     <div className="flex items-center gap-4">
                         <Link
-                            href={ROUTES.recipe.detail(list.recipe.displayId)}
+                            href={ROUTES.recipe.detail(
+                                list.recipe.displayId,
+                                list.recipe.title
+                            )}
                         >
                             <Typography variant="heading-xs">
                                 {list.recipe.title}

@@ -5,6 +5,7 @@ import { RecipeEditTemplate } from '@/client/components';
 import { verifySessionFromCookie } from '@/server/utils/session/verify-server';
 import { ClientRedirect } from '@/client/components';
 import { ROUTES } from '@/common/constants';
+import { guardRecipeDisplayId } from '@/app/recept/[displayId]/_lib/displayIdGuard';
 import type { Metadata } from 'next';
 
 type RecipePageParams = {
@@ -30,6 +31,14 @@ type RecipePageParams = {
 export default async function Page({ params }: RecipePageParams) {
     const paramsResolved = await params;
     const recipeDisplayId = paramsResolved.displayId;
+
+    const legacyTarget = await guardRecipeDisplayId(recipeDisplayId);
+
+    if (legacyTarget) {
+        return (
+            <ClientRedirect url={ROUTES.recipe.edit(legacyTarget.displayId)} />
+        );
+    }
 
     const result = await verifySessionFromCookie();
 

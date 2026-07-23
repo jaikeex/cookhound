@@ -87,13 +87,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         log.trace('Generating recipe pages');
 
         const recipePages: MetadataRoute.Sitemap = recipes.map((recipe) => ({
-            url: `${baseUrl}${ROUTES.recipe.detail(recipe.displayId)}`,
+            url: `${baseUrl}${ROUTES.recipe.detail(recipe.displayId, recipe.title)}`,
             lastModified: new Date(recipe.updatedAt || recipe.createdAt),
             changeFrequency: 'weekly',
             priority: 0.9,
             alternates: {
                 languages: {
-                    cs: `${baseUrl}${ROUTES.recipe.detail(recipe.displayId)}`
+                    cs: `${baseUrl}${ROUTES.recipe.detail(recipe.displayId, recipe.title)}`
                 }
             }
         }));
@@ -205,6 +205,7 @@ async function fetchIndexableHubs(): Promise<
 async function fetchPublicRecipes(): Promise<
     Array<{
         displayId: string;
+        title: string;
         updatedAt?: string;
         createdAt: string;
     }>
@@ -213,8 +214,13 @@ async function fetchPublicRecipes(): Promise<
         log.trace('Fetching public recipes for sitemap');
 
         const recipes = await prisma.recipe.findMany({
+            // flagged recipes are hidden from every public list
+            where: {
+                flags: { none: { active: true } }
+            },
             select: {
                 displayId: true,
+                title: true,
                 updatedAt: true,
                 createdAt: true
             },
@@ -227,6 +233,7 @@ async function fetchPublicRecipes(): Promise<
 
         return recipes.map((recipe) => ({
             displayId: recipe.displayId,
+            title: recipe.title,
             updatedAt: recipe.updatedAt.toISOString(),
             createdAt: recipe.createdAt.toISOString()
         }));

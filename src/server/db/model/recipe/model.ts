@@ -87,6 +87,23 @@ class RecipeModel {
     }
 
     /**
+     * Returns recipe based on its legacy display id (if it exists).
+     * Query class -> C3 (this is not updated frequently but should be very rarely used)
+     */
+    async getOneByLegacyDisplayId(
+        legacyDisplayId: string
+    ): Promise<{ displayId: string; title: string } | null> {
+        log.trace('Resolving recipe by legacy display id', {
+            legacyDisplayId
+        });
+
+        return prisma.recipe.findUnique({
+            where: { legacyDisplayId },
+            select: { displayId: true, title: true }
+        });
+    }
+
+    /**
      * List recipe display IDs eligible for static generation.
      * Excludes recipes with an active flag. Bounded to avoid unbounded build cost;
      * the long tail is served via on-demand rendering (Next.js `dynamicParams`).
@@ -95,8 +112,8 @@ class RecipeModel {
     async listDisplayIdsForStaticGeneration(
         limit = 5000,
         ttl?: number
-    ): Promise<Array<{ displayId: string }>> {
-        const cacheKey = generateCacheKey('recipe', 'listDisplayIdsForSSG', {
+    ): Promise<Array<{ displayId: string; title: string }>> {
+        const cacheKey = generateCacheKey('recipe', 'listDisplayIdsForSSG.v2', {
             limit
         });
 
@@ -110,7 +127,7 @@ class RecipeModel {
                 });
                 return prisma.recipe.findMany({
                     where: { flags: { none: { active: true } } },
-                    select: { displayId: true },
+                    select: { displayId: true, title: true },
                     orderBy: [
                         { rating: 'desc' },
                         { timesViewed: 'desc' },

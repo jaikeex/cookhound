@@ -54,7 +54,7 @@ export async function renderHubPage(
             ? generateItemListSchema(
                   recipes.map((recipe) => ({
                       name: recipe.title,
-                      url: `${origin}${ROUTES.recipe.detail(recipe.displayId)}`,
+                      url: `${origin}${ROUTES.recipe.detail(recipe.displayId, recipe.title)}`,
                       image: recipe.imageUrl || undefined
                   })),
                   title

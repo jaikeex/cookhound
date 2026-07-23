@@ -81,7 +81,7 @@ export const RecipeViewImage: React.FC<RecipeViewImageProps> = ({
         openModal((close) => (
             <ShareModal
                 close={close}
-                url={ROUTES.recipe.detail(recipe.displayId)}
+                url={ROUTES.recipe.detail(recipe.displayId, recipe.title)}
                 title={recipe.title}
                 description={t('meta.recipe.description', {
                     recipeTitle: recipe.title

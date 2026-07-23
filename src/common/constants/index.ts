@@ -5,6 +5,7 @@ export * from './flags';
 export * from './general';
 export * from './hubs';
 export * from './privacy';
+export * from './recipe';
 export * from './routes';
 export * from './tags';
 export * from './terms';

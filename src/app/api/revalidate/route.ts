@@ -1,7 +1,6 @@
 import {
     ENV_CONFIG_PRIVATE,
-    REVALIDATE_TOKEN_HEADER,
-    ROUTES
+    REVALIDATE_TOKEN_HEADER
 } from '@/common/constants';
 import { revalidatePath } from 'next/cache';
 import type { NextRequest } from 'next/server';
@@ -10,24 +9,12 @@ import { makeHandler, ok } from '@/server/utils/reqwest';
 import { withRateLimit } from '@/server/utils/rate-limit/wrapper';
 import { AuthErrorUnauthorized, ValidationError } from '@/server/error';
 import { registerRouteDocs } from '@/server/utils/api-docs/registry';
+import { isRevalidatablePath } from '@/server/utils/revalidate/allowlist';
 import { AuthLevel } from '@/common/types';
 
 //|=============================================================================================|//
 //?                                        VALIDATION                                          ?//
 //|=============================================================================================|//
-
-const RECIPE_DETAIL_PREFIX = ROUTES.recipe.detail('');
-const UUID_RE =
-    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-
-const isRevalidatablePath = (path: string): boolean => {
-    if (!path.startsWith(RECIPE_DETAIL_PREFIX)) {
-        return false;
-    }
-
-    const displayId = path.slice(RECIPE_DETAIL_PREFIX.length);
-    return UUID_RE.test(displayId);
-};
 
 const isTokenValid = (provided: string | null): boolean => {
     if (!provided) {
@@ -51,6 +38,7 @@ const isTokenValid = (provided: string | null): boolean => {
  *
  * @param request - The incoming request; carries the token header and a path query parameter.
  * @returns { revalidated: true } on success.
+ *
  * @throws {AuthErrorUnauthorized} If the token is missing or invalid (401).
  * @throws {ValidationError} If the path is missing or not an allowlisted recipe path (400).
  */

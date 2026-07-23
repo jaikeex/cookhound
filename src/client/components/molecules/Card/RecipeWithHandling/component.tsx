@@ -108,13 +108,13 @@ export const RecipeWithHandling: React.FC<RecipeCardProps> = ({
                 icon: 'flag',
                 label: t('recipe.flag.menu.view-details'),
                 onClick: () => {
-                    router.push(ROUTES.recipe.detail(displayId));
+                    router.push(ROUTES.recipe.detail(displayId, title));
                 },
                 color: 'danger'
             },
             ...editAndDelete
         ];
-    }, [router, displayId, handleOpenDeleteRecipeModal, isFlagged]);
+    }, [router, displayId, title, handleOpenDeleteRecipeModal, isFlagged]);
 
     return (
         <div className="relative">

@@ -1,11 +1,18 @@
 import React from 'react';
+import { permanentRedirect } from 'next/navigation';
 import { serverData } from '@/server/data';
 import { mapServiceErrorForRsc } from '@/server/data/runtime/mapError';
 import { RecipeStructuredData, RecipeViewTemplate } from '@/client/components';
 import type { Metadata } from 'next';
 import { buildLocalizedMetadata } from '@/server/utils/seo';
-import { ENV_CONFIG_PUBLIC, ROUTES } from '@/common/constants';
+import {
+    ENV_CONFIG_PUBLIC,
+    ROUTES,
+    RECIPE_DISPLAY_ID_REGEX
+} from '@/common/constants';
+import { slugifyRecipeTitle } from '@/common/utils/titleSlug';
 import db from '@/server/db/model';
+import { guardRecipeDisplayId } from '@/app/recept/[displayId]/_lib/displayIdGuard';
 
 //?—————————————————————————————————————————————————————————————————————————————————————?//
 //?                                    BUILD WARMUP                                     ?//
@@ -28,6 +35,7 @@ type RecipePageParams = {
     readonly params: Promise<
         Readonly<{
             displayId: string;
+            titleSlug?: string[];
         }>
     >;
 };
@@ -37,6 +45,14 @@ type RecipePageParams = {
 export default async function Page({ params }: RecipePageParams) {
     const paramsResolved = await params;
     const recipeDisplayId = paramsResolved.displayId;
+
+    const legacyTarget = await guardRecipeDisplayId(recipeDisplayId);
+
+    if (legacyTarget) {
+        permanentRedirect(
+            ROUTES.recipe.detail(legacyTarget.displayId, legacyTarget.title)
+        );
+    }
 
     const recipePromise = serverData.recipe
         .getByDisplayId(recipeDisplayId)
@@ -53,7 +69,14 @@ export default async function Page({ params }: RecipePageParams) {
     // Resolve the recipe BEFORE returning any JSX. If it only rejected later,
     // deep inside the render, the response status would already be committed
     // as 200 and a missing recipe would be served as a soft 404.
-    await recipePromise;
+    const recipe = await recipePromise;
+
+    const canonicalTitleSlug = slugifyRecipeTitle(recipe.title);
+    const requestTitleSlug = paramsResolved.titleSlug?.join('/') ?? '';
+
+    if (requestTitleSlug !== canonicalTitleSlug) {
+        permanentRedirect(ROUTES.recipe.detail(recipeDisplayId, recipe.title));
+    }
 
     return (
         <React.Fragment>
@@ -69,9 +92,19 @@ export default async function Page({ params }: RecipePageParams) {
 //|=============================================================================================|//
 
 export async function generateStaticParams(): Promise<
-    Array<{ displayId: string }>
+    Array<{ displayId: string; titleSlug: string[] }>
 > {
-    return db.recipe.listDisplayIdsForStaticGeneration(SSG_PREWARM_LIMIT, 0); // no need to cache this
+    const recipes = await db.recipe.listDisplayIdsForStaticGeneration(
+        SSG_PREWARM_LIMIT,
+        0 // no need to cache this
+    );
+
+    // Prewarm the canonical title slug urls — the bare id path is just a cached 308.
+    // Titles that slugify to '' are skipped (their canonical IS the bare path).
+    return recipes.flatMap(({ displayId, title }) => {
+        const titleSlug = slugifyRecipeTitle(title);
+        return titleSlug ? [{ displayId, titleSlug: [titleSlug] }] : [];
+    });
 }
 
 //|=============================================================================================|//
@@ -82,6 +115,19 @@ export async function generateMetadata({
     const paramsResolved = await params;
     const recipeDisplayId = paramsResolved.displayId;
 
+    // Legacy uuids and garbage params answer with a 308/404, whose metadata is
+    // never rendered — skip the db and return the generic fallback.
+    // (`mapServiceErrorForRsc` stays forbidden here: notFound()/redirect() are
+    // no-ops inside generateMetadata.)
+    if (!RECIPE_DISPLAY_ID_REGEX.test(recipeDisplayId)) {
+        return buildLocalizedMetadata({
+            titleKey: 'meta.recipe.fallback.title',
+            descriptionKey: 'meta.recipe.fallback.description',
+            canonical: `${ENV_CONFIG_PUBLIC.ORIGIN}${ROUTES.recipe.detail(recipeDisplayId)}`,
+            noindex: true
+        });
+    }
+
     try {
         const recipe = await serverData.recipe.getByDisplayId(recipeDisplayId);
 
@@ -89,7 +135,8 @@ export async function generateMetadata({
             .getByIdPublic(recipe.authorId)
             .catch(() => null);
 
-        const canonical = `${ENV_CONFIG_PUBLIC.ORIGIN}${ROUTES.recipe.detail(recipeDisplayId)}`;
+        // The canonical always points at the title slug url, whatever path was hit.
+        const canonical = `${ENV_CONFIG_PUBLIC.ORIGIN}${ROUTES.recipe.detail(recipeDisplayId, recipe.title)}`;
 
         const recipeDescription = recipe.description?.trim() || undefined;
 

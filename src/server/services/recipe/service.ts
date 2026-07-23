@@ -17,9 +17,10 @@ import {
 import type { Rating } from '@/server/db/generated/prisma/client';
 import { Logger, LogServiceMethod } from '@/server/logger';
 import { RequestContext } from '@/server/utils/reqwest/context';
-import { randomUUID } from 'crypto';
+import { generateRecipeDisplayId, isDisplayIdCollision } from './utils';
 import { recipeSearchIndex } from '@/server/search-index';
 import { intersectArrays } from '@/common/utils';
+import { slugifyRecipeTitle } from '@/common/utils/titleSlug';
 import { revalidateRouteCache } from '@/server/utils/revalidateRouteCache';
 import { SEARCH_QUERY_SEPARATOR, ROUTES } from '@/common/constants';
 import { queueManager } from '@/server/queues/QueueManager';
@@ -34,6 +35,12 @@ import { getFrontPageRecipes } from '@/server/db/generated/prisma/sql';
 
 const LOG_CONTEXT = 'recipe-service';
 const log = Logger.getInstance(LOG_CONTEXT);
+
+/**
+ * Upper bound on display id generation attempts during recipe creation.
+ * The id space is 9e5 - five attempts is pure paranoia.
+ */
+const MAX_DISPLAY_ID_ATTEMPTS = 5;
 
 /**
  * Manages recipe lifecycle operations including creation, updates, deletion,
@@ -125,7 +132,7 @@ class RecipeService {
      * Retrieves a full recipe by its public-facing display ID.
      * Served from model cache
      *
-     * @param displayId - Public UUID used in recipe URLs.
+     * @param displayId - Public display id used in recipe URLs.
      * @returns The complete recipe DTO.
      * @throws {NotFoundError} If the recipe does not exist or is missing required fields.
      */
@@ -137,7 +144,7 @@ class RecipeService {
     /**
      * Bypasses the cache and returns the currently saved recipe.
      *
-     * @param displayId - Public UUID used in recipe URLs.
+     * @param displayId - Public display id used in recipe URLs.
      * @returns The complete recipe DTO, read past the cache.
      * @throws {NotFoundError} If the recipe does not exist or is missing required fields.
      */
@@ -219,6 +226,20 @@ class RecipeService {
         return recipeDTO;
     }
 
+    /**
+     * Resolves a legacy (uuid-era) display id to its target, if one exists.
+     * Returns null when no recipe was ever published under that id.
+     *
+     * @param legacyDisplayId - The legacy display id from a previously indexed URL.
+     * @returns The current recipe, or null if unknown.
+     */
+    @LogServiceMethod({ names: ['legacyDisplayId'] })
+    async getByLegacyDisplayId(
+        legacyDisplayId: string
+    ): Promise<{ displayId: string; title: string } | null> {
+        return db.recipe.getOneByLegacyDisplayId(legacyDisplayId);
+    }
+
     //~-----------------------------------------------------------------------------------------~//
     //$                                         CREATE                                          $//
     //~-----------------------------------------------------------------------------------------~//
@@ -241,25 +262,45 @@ class RecipeService {
             throw new AuthErrorUnauthorized();
         }
 
-        const displayId = randomUUID();
+        let recipe: Awaited<ReturnType<typeof db.recipe.createOne>> | undefined;
 
-        const recipeforCreate: RecipeForCreate = {
-            displayId,
-            title: payload.title,
-            description: payload.description,
-            notes: payload.notes,
-            time: payload.time,
-            portionSize: payload.portionSize,
-            imageUrl: payload.imageUrl
-        };
+        // Persist the recipe under a freshly generated 6-digit display id,
+        // regenerating the id when it collides with an existing recipe.
+        for (let attempt = 1; ; attempt++) {
+            const recipeForCreate: RecipeForCreate = {
+                displayId: generateRecipeDisplayId(),
+                title: payload.title,
+                description: payload.description,
+                notes: payload.notes,
+                time: payload.time,
+                portionSize: payload.portionSize,
+                imageUrl: payload.imageUrl
+            };
 
-        const recipe = await db.recipe.createOne({
-            recipe: recipeforCreate,
-            authorId: authorId,
-            instructions: payload.instructions,
-            ingredients: payload.ingredients,
-            tags: payload.tags ?? []
-        });
+            try {
+                recipe = await db.recipe.createOne({
+                    recipe: recipeForCreate,
+                    authorId: authorId,
+                    instructions: payload.instructions,
+                    ingredients: payload.ingredients,
+                    tags: payload.tags ?? []
+                });
+                break;
+            } catch (error: unknown) {
+                if (
+                    attempt < MAX_DISPLAY_ID_ATTEMPTS &&
+                    isDisplayIdCollision(error)
+                ) {
+                    log.warn(
+                        'createRecipe - display id collision, regenerating',
+                        { attempt }
+                    );
+                    continue;
+                }
+
+                throw error;
+            }
+        }
 
         const recipeDTO = await this.getRecipeById(recipe.id);
 
@@ -331,6 +372,10 @@ class RecipeService {
             );
         }
 
+        // A title change moves the canonical title slug url; the pre-update title is
+        // needed to also refresh the now stale old paths after the write.
+        const previousTitle = recipe.title;
+
         const { instructions, ingredients, tags, ...recipeData } = payload;
 
         const updateInput = {
@@ -347,10 +392,24 @@ class RecipeService {
         // The recipe was successfully updated, and needs to be evaluated again.
         openaiApiService.evaluateRecipeContent(recipeDTO);
 
-        try {
-            await revalidateRouteCache(
-                ROUTES.recipe.detail(recipeDTO.displayId)
+        const pathsToRevalidate = new Set([
+            ROUTES.recipe.detail(recipeDTO.displayId, recipeDTO.title)
+        ]);
+
+        if (
+            slugifyRecipeTitle(previousTitle) !==
+            slugifyRecipeTitle(recipeDTO.title)
+        ) {
+            pathsToRevalidate.add(ROUTES.recipe.detail(recipeDTO.displayId));
+            pathsToRevalidate.add(
+                ROUTES.recipe.detail(recipeDTO.displayId, previousTitle)
             );
+        }
+
+        try {
+            for (const path of pathsToRevalidate) {
+                await revalidateRouteCache(path);
+            }
         } catch (error: unknown) {
             log.warn('updateRecipe - failed to revalidate recipe route', {
                 error,
@@ -401,6 +460,9 @@ class RecipeService {
 
         try {
             await revalidateRouteCache(ROUTES.recipe.detail(recipe.displayId));
+            await revalidateRouteCache(
+                ROUTES.recipe.detail(recipe.displayId, recipe.title)
+            );
         } catch (error: unknown) {
             log.warn('deleteRecipe - failed to revalidate recipe route', {
                 error,
@@ -524,7 +586,9 @@ class RecipeService {
         });
 
         // no need to await this here
-        revalidateRouteCache(ROUTES.recipe.detail(recipe.displayId));
+        revalidateRouteCache(
+            ROUTES.recipe.detail(recipe.displayId, recipe.title)
+        );
 
         try {
             const updatedRecipe = await this.getRecipeById(recipeId);
@@ -938,6 +1002,9 @@ export interface RecipeReads {
     getRecipeById(id: number): Promise<Recipe>;
     getRecipeByDisplayId(displayId: string): Promise<Recipe>;
     getFreshRecipeByDisplayId(displayId: string): Promise<Recipe>;
+    getByLegacyDisplayId(
+        legacyDisplayId: string
+    ): Promise<{ displayId: string; title: string } | null>;
     getFrontPageRecipes(
         batch: number,
         perPage: number
