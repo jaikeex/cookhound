@@ -3,7 +3,7 @@ import { MiddlewareError } from '@/server/error';
 
 // This needs to be imported explicitly from the verify-client.ts file. NOT the barrel file.
 // Note to self two months after: If only i had written here why the fuck is that needed...
-import { verifyRouteAccess } from '@/server/utils/session/verify-client';
+import { verifyRouteAccess } from '@/server/proxy/steps/verify-route-access';
 
 export async function proxy(request: NextRequest) {
     // DEFAULT RESPONSE

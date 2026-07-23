@@ -1,28 +1,17 @@
 import { NextResponse } from 'next/server';
-import { UserRole, Status } from '@/common/types';
-import { ENV_CONFIG_PUBLIC, ROUTES } from '@/common/constants';
+import { Status, type UserRole } from '@/common/types';
+import { ROUTES } from '@/common/constants';
 import { MiddlewareError } from '@/server/error';
-import { type ServerSession } from './manager';
-import { verifySessionFromCookie } from './verify-server';
-
-interface RouteConfig {
-    path: string;
-    roles: UserRole[] | null;
-}
-
-export const PROTECTED_ROUTES: RouteConfig[] = [
-    { path: ROUTES.admin.root, roles: [UserRole.Admin] },
-    { path: ROUTES.recipe.create, roles: [] },
-    { path: ROUTES.shoppingList, roles: [] },
-    { path: ROUTES.user.changeEmail, roles: [] },
-    { path: ROUTES.auth.login, roles: null },
-    { path: ROUTES.auth.register, roles: null },
-    { path: ROUTES.auth.verifyEmail, roles: null }
-];
-
-export const PROTECTED_ROUTES_LIST = PROTECTED_ROUTES.map(
-    (route) => route.path
-);
+import { type ServerSession } from '@/server/utils/session/manager';
+import { verifySessionFromCookie } from '@/server/utils/session/verify-server';
+import { PROTECTED_ROUTES, type RouteConfig } from '@/server/proxy/routes';
+import {
+    redirectToBanned,
+    redirectToProfile,
+    redirectToRestricted,
+    redirectToRestrictedWithLogin,
+    redirectToRoot
+} from '@/server/proxy/redirects';
 
 //~=============================================================================================~//
 //$                                       HELPER FUNCTIONS                                      $//
@@ -35,56 +24,6 @@ function getRouteConfig(pathname: string) {
         }
     }
     return null;
-}
-
-function redirectToRoot() {
-    throw new MiddlewareError(
-        'Already logged in',
-        NextResponse.redirect(new URL(ROUTES.home, ENV_CONFIG_PUBLIC.ORIGIN))
-    );
-}
-
-function redirectToRestricted() {
-    throw new MiddlewareError(
-        'Unauthorized',
-        NextResponse.redirect(
-            new URL(ROUTES.error.restricted, ENV_CONFIG_PUBLIC.ORIGIN)
-        )
-    );
-}
-
-function redirectToRestrictedWithLogin(pathname: string) {
-    const params = new URLSearchParams();
-    params.set('anonymous', 'true');
-    params.set('target', pathname);
-
-    throw new MiddlewareError(
-        'Unauthorized',
-        NextResponse.redirect(
-            new URL(
-                `${ROUTES.error.restricted}?${params.toString()}`,
-                ENV_CONFIG_PUBLIC.ORIGIN
-            )
-        )
-    );
-}
-
-function redirectToBanned() {
-    throw new MiddlewareError(
-        'Account banned',
-        NextResponse.redirect(
-            new URL(ROUTES.error.banned, ENV_CONFIG_PUBLIC.ORIGIN)
-        )
-    );
-}
-
-function redirectToProfile(userId: number) {
-    throw new MiddlewareError(
-        'Account pending deletion - access restricted to profile only',
-        NextResponse.redirect(
-            new URL(ROUTES.user.detail(userId), ENV_CONFIG_PUBLIC.ORIGIN)
-        )
-    );
 }
 
 function assertValidRouteConfig(
@@ -105,18 +44,17 @@ function assertValidRouteConfig(
 }
 
 //~=============================================================================================~//
-//$                                     MIDDLEWARE FUNCTION                                     $//
+//$                                     PROXY STEP FUNCTION                                     $//
 //~=============================================================================================~//
 
 /**
- * Verifies the user's access to the requested route from the client side.
+ * Verifies the user's access to the requested route.
  *
  *!This is a middleware function. It should not be called from any other context.
  *
  * @param request - The request object.
- * @returns promise that resolves to a NextResponse object or null.
  *
- * @throws MiddlewareError (redirect to '/error/restricted') If some of the checks fail.
+ * @throws MiddlewareError (redirect) if any of the access checks fail.
  * @returns null if the checks pass.
  */
 export const verifyRouteAccess: MiddlewareStepFunction = async (request) => {
