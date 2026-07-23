@@ -1,6 +1,6 @@
 import { InfrastructureError } from '@/server/error';
-import { queueManager } from './QueueManager';
-import { JOB_NAMES, QUEUE_NAMES } from './jobs/names';
+import { queueManager } from '@/server/queues/QueueManager';
+import { JOB_NAMES, QUEUE_NAMES } from '@/server/queues/jobs/names';
 import { Logger } from '@/server/logger';
 import { InfrastructureErrorCode } from '@/server/error/codes';
 

@@ -1,19 +1,19 @@
 #!/usr/bin/env node
-/*
- * Worker bootstrap file — run this as a separate Node.js process (e.g. using PM2
- * or Docker) to start all queue workers in an isolated instance:
- *
- *   $ node dist/src/server/queues/worker.js
- *
- * All concrete job classes should be imported before initializing the
- * QueueManager so that their definitions are registered.
- */
 
 import 'dotenv/config';
-import { queueManager } from './QueueManager';
+import { queueManager } from '@/server/queues/QueueManager';
 import { scheduleRecurringJobs } from './cron';
+import { startHeartbeat, stopHeartbeat } from './heartbeat';
 import { recipeSearchIndex } from '@/server/search-index';
 import { Logger } from '@/server/logger';
+
+/**
+ * Worker bootstrap file. Run this as a separate Node.js process to start all queue workers
+ * in an isolated instance.
+ *
+ *! All concrete job classes should be imported before initializing the
+ *! QueueManager so that their definitions are registered.
+ */
 
 const log = Logger.getInstance('worker-bootstrap');
 
@@ -43,7 +43,12 @@ const log = Logger.getInstance('worker-bootstrap');
 
     await scheduleRecurringJobs();
 
+    // Start last, once queues are live, so the /health server only reports ready after the
+    // worker can actually process jobs.
+    startHeartbeat();
+
     const shutdown = async () => {
+        await stopHeartbeat();
         await queueManager.shutdown();
         process.exit(0);
     };

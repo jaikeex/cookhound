@@ -22,28 +22,73 @@ services:
             retries: 3
             start_period: 90s
         depends_on:
-            - redis
-            - typesense
+            redis:
+                condition: service_healthy
+            typesense:
+                condition: service_started
 
     worker:
         image: ghcr.io/jaikeex/cookhound:latest
-        command: ['tsx', 'src/server/queues/worker.ts']
+        command: ['tsx', 'src/server/queues/runtime/worker.ts']
         restart: always
         env_file: .env
         environment:
             - NODE_ENV=production
         volumes:
             - /var/log/cookhound:/var/log/cookhound
+        healthcheck:
+            test:
+                [
+                    'CMD',
+                    'node',
+                    '-e',
+                    "fetch('http://127.0.0.1:3001/health').then((r) => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"
+                ]
+            interval: 60s
+            timeout: 5s
+            retries: 3
+            start_period: 60s
         depends_on:
-            - redis
-            - typesense
+            redis:
+                condition: service_healthy
+            typesense:
+                condition: service_started
+
+    docker-events-watcher:
+        image: node:22-alpine
+        restart: always
+        init: true
+        entrypoint: ['node', '/watcher/docker-events-watcher.mjs']
+        environment:
+            # Explicit vars only, no env_file
+            - NTFY_URL=${NTFY_URL:-https://ntfy.sh}
+            - NTFY_TOPIC=${NTFY_TOPIC:-}
+            - WATCH_PROJECT=cookhound
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock:ro
+            - ./scripts/docker-events-watcher.mjs:/watcher/docker-events-watcher.mjs:ro
 
     redis:
         image: redis:7-alpine
         restart: always
         volumes:
             - redis-data:/data
+        environment:
+            - REDIS_PASSWORD=${REDIS_PASSWORD}
         command: redis-server --requirepass ${REDIS_PASSWORD}
+        healthcheck:
+            # $$ escapes the compose interpolation so the container shell expands
+            # $REDIS_PASSWORD at runtime. A NOAUTH/WRONGPASS reply is not "PONG",
+            # so this only passes when Redis is up AND authenticating.
+            test:
+                [
+                    'CMD-SHELL',
+                    'redis-cli -a "$$REDIS_PASSWORD" --no-auth-warning ping | grep -q PONG'
+                ]
+            interval: 30s
+            timeout: 5s
+            retries: 3
+            start_period: 10s
 
     typesense:
         image: typesense/typesense:0.25.2
@@ -55,6 +100,21 @@ services:
             - typesense-data:/data
         ports:
             - '127.0.0.1:8108:8108'
+        healthcheck:
+            # The typesense image ships no curl/wget/nc, but it does bundle bash,
+            # so we speak minimal HTTP/1.0 over bash's /dev/tcp and assert the
+            # {"ok":true} body from GET /health.
+            test:
+                [
+                    'CMD',
+                    'bash',
+                    '-c',
+                    'exec 3<>/dev/tcp/127.0.0.1/8108 && printf "GET /health HTTP/1.0\r\nHost: localhost\r\n\r\n" >&3 && grep -q ''"ok":true'' <&3'
+                ]
+            interval: 30s
+            timeout: 5s
+            retries: 3
+            start_period: 15s
 volumes:
     redis-data:
     typesense-data:

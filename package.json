@@ -11,7 +11,7 @@
         "build": "next build --webpack && npm run copy-static",
         "copy-static": "node scripts/copy-standalone.js",
         "start": "node .next/standalone/server.js",
-        "dev-worker": "tsx src/server/queues/worker.ts",
+        "dev-worker": "tsx src/server/queues/runtime/worker.ts",
         "prepare": "husky",
         "test": "vitest run",
         "test:e2e": "playwright test",

@@ -407,6 +407,36 @@ export class QueueManager {
         return Array.from(this.jobDefinitions.values());
     }
 
+    /**
+     * Liveness probe for the worker's own Redis connection.
+     *
+     * Used by the worker heartbeat server to decide whether the process is
+     * actually doing something rather than just existing.
+     */
+    public async pingRedis(timeoutMs: number = 5000): Promise<boolean> {
+        if (!this.redis) {
+            return false;
+        }
+
+        try {
+            const pong = await Promise.race([
+                this.redis.ping(),
+                new Promise<never>((_, reject) => {
+                    const timer = setTimeout(
+                        () => reject(new Error('redis ping timeout')),
+                        timeoutMs
+                    );
+                    timer.unref?.();
+                })
+            ]);
+
+            return pong === 'PONG';
+        } catch (error: unknown) {
+            log.warn('pingRedis - redis liveness probe failed', { error });
+            return false;
+        }
+    }
+
     //~-----------------------------------------------------------------------------------------~//
     //$                                     PRIVATE METHODS                                     $//
     //~-----------------------------------------------------------------------------------------~//
