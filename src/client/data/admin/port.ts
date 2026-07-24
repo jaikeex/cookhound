@@ -1,7 +1,9 @@
 import type {
     AdminDashboardStatsDTO,
     AdminUserDetailDTO,
-    AdminUserListDTO
+    AdminUserListDTO,
+    ContentReportDTO,
+    ContentReportListDTO
 } from '@/common/types';
 
 /**
@@ -54,4 +56,24 @@ export interface AdminRepository {
     }): Promise<void>;
 
     cancelAccountDeletion(args: { userId: number }): Promise<void>;
+
+    //~=========================================================================================~//
+    //$                                       MODERATION                                       $//
+    //~=========================================================================================~//
+
+    listReports(args: {
+        params: Record<string, string | number | undefined>;
+        signal?: AbortSignal;
+    }): Promise<ContentReportListDTO>;
+
+    getReportById(args: {
+        reportId: number;
+        signal?: AbortSignal;
+    }): Promise<ContentReportDTO>;
+
+    resolveReport(args: {
+        reportId: number;
+        status: string;
+        resolution?: string;
+    }): Promise<ContentReportDTO>;
 }

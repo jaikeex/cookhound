@@ -4,14 +4,15 @@ import { IconButton } from '@/client/components/atoms/Button/Icon';
 import { RecipeAuthorLinkMobile } from '@/client/components/molecules/RecipeAuthorLink/Mobile';
 import { RecipeImage } from '@/client/components/atoms/Image/RecipeImage';
 import { ShareModal } from '@/client/components/organisms/Modal/ShareModal';
+import { ReportContentModal } from '@/client/components/organisms/Modal/ReportContentModal';
 import { classNames } from '@/client/utils';
 import React, { useCallback, useMemo } from 'react';
 import dynamic from 'next/dynamic';
-import { useAuth, useModal } from '@/client/store';
+import { useAuth, useModal, useSnackbar } from '@/client/store';
 import { chqc } from '@/client/data';
 import { useScreenSize } from '@/client/hooks';
 import type { Recipe } from '@/common/types';
-import { ROUTES } from '@/common/constants';
+import { ROUTES, ReportTargetType } from '@/common/constants';
 import { t } from '@/client/locales';
 
 const AddRecipeToCookbookModal = dynamic(
@@ -43,6 +44,7 @@ export const RecipeViewImage: React.FC<RecipeViewImageProps> = ({
 
     const { openModal } = useModal();
     const { user } = useAuth();
+    const { alert } = useSnackbar();
     const { isMobile } = useScreenSize();
     const { data: cookbooks = [] } = chqc.cookbook.useCookbooksByUser(
         user?.id ?? 0
@@ -88,6 +90,22 @@ export const RecipeViewImage: React.FC<RecipeViewImageProps> = ({
         ));
     }, [openModal, recipe.displayId, recipe.title]);
 
+    const handleOpenReportModal = useCallback(() => {
+        if (!user) {
+            alert({ message: t('report.login-required'), variant: 'info' });
+            return;
+        }
+
+        openModal((close) => (
+            <ReportContentModal
+                targetType={ReportTargetType.RECIPE}
+                targetId={recipe.id}
+                targetLabel={recipe.title}
+                close={close}
+            />
+        ));
+    }, [user, alert, openModal, recipe.id, recipe.title]);
+
     //|-----------------------------------------------------------------------------------------|//
     //?                                         ACTIONS                                         ?//
     //|-----------------------------------------------------------------------------------------|//
@@ -117,6 +135,16 @@ export const RecipeViewImage: React.FC<RecipeViewImageProps> = ({
             />
         );
 
+        const report = (
+            <IconButton
+                onClick={handleOpenReportModal}
+                aria-label={t('report.button')}
+                icon="flag"
+                size={20}
+                className="bg-white dark:bg-gray-800 w-8 h-8"
+            />
+        );
+
         const author = (
             <RecipeAuthorLinkMobile
                 authorId={recipe.authorId}
@@ -130,12 +158,14 @@ export const RecipeViewImage: React.FC<RecipeViewImageProps> = ({
                     <div className="flex flex-col gap-2">
                         {addToCookbook}
                         {share}
+                        {report}
                         {author}
                     </div>
                 ) : (
                     <div className="flex flex-col gap-2">
                         {addToCookbook}
                         {share}
+                        {report}
                     </div>
                 )}
             </div>
@@ -144,6 +174,7 @@ export const RecipeViewImage: React.FC<RecipeViewImageProps> = ({
         isPreview,
         handleOpenCookbookModal,
         handleOpenShareModal,
+        handleOpenReportModal,
         recipe.authorId,
         isMobile
     ]);

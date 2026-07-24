@@ -2,6 +2,7 @@ import { adminQueryClient, ADMIN_QUERY_KEYS } from '@/client/data/admin';
 import { userQueryClient, USER_QUERY_KEYS } from '@/client/data/user';
 import { authQueryClient, AUTH_QUERY_KEYS } from '@/client/data/auth';
 import { recipeQueryClient, RECIPE_QUERY_KEYS } from '@/client/data/recipe';
+import { reportQueryClient, REPORT_QUERY_KEYS } from '@/client/data/report';
 import { tagQueryClient, TAG_QUERY_KEYS } from '@/client/data/tag';
 import {
     cookbookQueryClient,
@@ -26,6 +27,7 @@ export const chqc = {
     user: userQueryClient,
     auth: authQueryClient,
     recipe: recipeQueryClient,
+    report: reportQueryClient,
     tag: tagQueryClient,
     file: fileQueryClient,
     cookbook: cookbookQueryClient,
@@ -38,6 +40,7 @@ export const QUERY_KEYS = {
     user: USER_QUERY_KEYS,
     auth: AUTH_QUERY_KEYS,
     recipe: RECIPE_QUERY_KEYS,
+    report: REPORT_QUERY_KEYS,
     tag: TAG_QUERY_KEYS,
     cookbook: COOKBOOK_QUERY_KEYS,
     file: FILE_QUERY_KEYS,

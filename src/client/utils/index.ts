@@ -10,3 +10,4 @@ export * from './fileToByteArray';
 export * from './generateRandomId';
 export * from './cookies';
 export * from './content';
+export * from './reportLabels';

@@ -8,6 +8,7 @@ import type { CookbookRepository } from '@/client/data/cookbook/port';
 import type { FileRepository } from '@/client/data/file/port';
 import type { IngredientRepository } from '@/client/data/ingredient/port';
 import type { RecipeRepository } from '@/client/data/recipe/port';
+import type { ReportRepository } from '@/client/data/report/port';
 import type { TagRepository } from '@/client/data/tag/port';
 import type { UserRepository } from '@/client/data/user/port';
 
@@ -22,6 +23,7 @@ export type Repositories = Readonly<{
     fileRepository: FileRepository;
     ingredientRepository: IngredientRepository;
     recipeRepository: RecipeRepository;
+    reportRepository: ReportRepository;
     tagRepository: TagRepository;
     userRepository: UserRepository;
 }>;

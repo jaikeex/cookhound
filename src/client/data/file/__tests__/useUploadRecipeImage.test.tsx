@@ -7,6 +7,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { DataProvider, type Repositories } from '@/client/data';
 import type { AdminRepository } from '@/client/data/admin/port';
 import type { CookbookRepository } from '@/client/data/cookbook/port';
+import type { ReportRepository } from '@/client/data/report/port';
 import type { FileRepository } from '@/client/data/file/port';
 import type { IngredientRepository } from '@/client/data/ingredient/port';
 import type { RecipeRepository } from '@/client/data/recipe/port';
@@ -58,7 +59,8 @@ describe('fileQueryClient', () => {
             tagRepository: buildEmptyRepository<TagRepository>(),
             contactRepository: buildEmptyRepository<ContactRepository>(),
             adminRepository: buildEmptyRepository<AdminRepository>(),
-            cookbookRepository: buildEmptyRepository<CookbookRepository>()
+            cookbookRepository: buildEmptyRepository<CookbookRepository>(),
+            reportRepository: buildEmptyRepository<ReportRepository>()
         });
 
         const { result } = renderHook(
@@ -91,7 +93,8 @@ describe('fileQueryClient', () => {
             tagRepository: buildEmptyRepository<TagRepository>(),
             contactRepository: buildEmptyRepository<ContactRepository>(),
             adminRepository: buildEmptyRepository<AdminRepository>(),
-            cookbookRepository: buildEmptyRepository<CookbookRepository>()
+            cookbookRepository: buildEmptyRepository<CookbookRepository>(),
+            reportRepository: buildEmptyRepository<ReportRepository>()
         });
 
         const { result } = renderHook(

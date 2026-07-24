@@ -5,6 +5,7 @@ import { cookbookRepositoryAdapter } from './cookbook';
 import { fileRepositoryAdapter } from './file';
 import { ingredientRepositoryAdapter } from './ingredient';
 import { recipeRepositoryAdapter } from './recipe';
+import { reportRepositoryAdapter } from './report';
 import { tagRepositoryAdapter } from './tag';
 import { userRepositoryAdapter } from './user';
 
@@ -27,6 +28,7 @@ export const repositories = {
     fileRepository: fileRepositoryAdapter,
     ingredientRepository: ingredientRepositoryAdapter,
     recipeRepository: recipeRepositoryAdapter,
+    reportRepository: reportRepositoryAdapter,
     tagRepository: tagRepositoryAdapter,
     userRepository: userRepositoryAdapter
 };

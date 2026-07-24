@@ -9,6 +9,7 @@ import { classNames } from '@/client/utils';
 export type TextareaProps = Readonly<{
     defaultValue?: string | null;
     onBlur?: FocusEventHandler<HTMLTextAreaElement>;
+    maxLength?: number;
     onChange?: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
     onKeyDown?: (event: React.KeyboardEvent<HTMLTextAreaElement>) => void;
     placeholder?: string;
@@ -23,6 +24,7 @@ export const Textarea: React.FC<TextareaProps> = ({
     error,
     id,
     label,
+    maxLength,
     name,
     onChange,
     onKeyDown,
@@ -45,6 +47,7 @@ export const Textarea: React.FC<TextareaProps> = ({
                 disabled={disabled}
                 autoComplete={name}
                 rows={rows}
+                maxLength={maxLength}
             />
             {error ? <InputError message={error} /> : null}
         </div>

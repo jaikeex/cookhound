@@ -45,5 +45,14 @@ export const httpAdminRepository: AdminRepository = {
 
     cancelAccountDeletion: async ({ userId }) => {
         await adminApiClient.cancelAccountDeletion(userId);
-    }
+    },
+
+    listReports: ({ params, signal }) =>
+        adminApiClient.getReports(params, { signal }),
+
+    getReportById: ({ reportId, signal }) =>
+        adminApiClient.getReportById(reportId, { signal }),
+
+    resolveReport: ({ reportId, status, resolution }) =>
+        adminApiClient.resolveReport(reportId, { status, resolution })
 };

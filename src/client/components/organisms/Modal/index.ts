@@ -12,3 +12,4 @@ export * from './DeleteFromCookbookConfirmationModal';
 export * from './DeleteAccountModal';
 export * from './ShareModal';
 export * from './RecipeFlagAppealModal';
+export * from './ReportContentModal';

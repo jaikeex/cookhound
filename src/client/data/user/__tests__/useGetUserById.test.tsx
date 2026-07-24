@@ -18,6 +18,7 @@ import type { TagRepository } from '@/client/data/tag/port';
 import type { ContactRepository } from '@/client/data/contact/port';
 import type { AdminRepository } from '@/client/data/admin/port';
 import type { CookbookRepository } from '@/client/data/cookbook/port';
+import type { ReportRepository } from '@/client/data/report/port';
 
 const fixtureUser: User = {
     id: 42,
@@ -78,7 +79,8 @@ describe('useGetUserById', () => {
             tagRepository: buildEmptyRepository<TagRepository>(),
             contactRepository: buildEmptyRepository<ContactRepository>(),
             adminRepository: buildEmptyRepository<AdminRepository>(),
-            cookbookRepository: buildEmptyRepository<CookbookRepository>()
+            cookbookRepository: buildEmptyRepository<CookbookRepository>(),
+            reportRepository: buildEmptyRepository<ReportRepository>()
         });
 
         const { result } = renderHook(
@@ -109,7 +111,8 @@ describe('useGetUserById', () => {
             tagRepository: buildEmptyRepository<TagRepository>(),
             contactRepository: buildEmptyRepository<ContactRepository>(),
             adminRepository: buildEmptyRepository<AdminRepository>(),
-            cookbookRepository: buildEmptyRepository<CookbookRepository>()
+            cookbookRepository: buildEmptyRepository<CookbookRepository>(),
+            reportRepository: buildEmptyRepository<ReportRepository>()
         });
 
         renderHook(() => userQueryClient.useGetUserById(0), { wrapper });
