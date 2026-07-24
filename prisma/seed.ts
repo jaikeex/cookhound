@@ -4,6 +4,7 @@ import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '../src/server/db/generated/prisma/client';
 import { RECIPE_CATEGORY_TAGS } from '../src/common/constants/tags/tags';
 import { CS_TAG_CATEGORIES } from '../src/common/constants/tags/cs';
+import { ANONYMOUS_USER_ID } from '../src/common/constants/general';
 
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
@@ -17,7 +18,7 @@ async function main() {
     // Create system user for anonymized content
     await prisma.$executeRaw`
         INSERT INTO users (id, username, email, auth_type, role, status, email_verified, created_at, updated_at)
-        VALUES (-1, 'anonymous', 'anonymous@cookhound.com', 'local', 'user', 'active', true, NOW(), NOW())
+        VALUES (${ANONYMOUS_USER_ID}, 'anonymous', 'anonymous@cookhound.com', 'local', 'user', 'active', true, NOW(), NOW())
         ON CONFLICT (id) DO NOTHING;
     `;
 
@@ -26,7 +27,7 @@ async function main() {
         SELECT setval(pg_get_serial_sequence('users', 'id'), GREATEST(10, (SELECT MAX(id) FROM users WHERE id > 0)), true);
     `;
 
-    console.log('✅ System user created (id: -1)');
+    console.log(`✅ System user created (id: ${ANONYMOUS_USER_ID})`);
 
     // Czech display names are index-aligned with RECIPE_CATEGORY_TAGS per category
     const csNameFor = (category: string, index: number): string | undefined =>

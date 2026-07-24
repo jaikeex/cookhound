@@ -121,7 +121,7 @@ describe('generateRecipeSchema', () => {
 
         expect(schema.author).toEqual({
             '@type': 'Person',
-            name: 'Uživatel Cookhound',
+            name: 'Cookhound Uživatel',
             url: `${BASE_URL}${ROUTES.user.detail(42)}`
         });
     });
