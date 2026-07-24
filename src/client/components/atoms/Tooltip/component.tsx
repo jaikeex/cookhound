@@ -2,7 +2,7 @@
 
 import React, { useCallback, useState, useEffect } from 'react';
 import { classNames } from '@/client/utils';
-import { Typography } from '@/client/components';
+import { Typography } from '@/client/components/atoms/Typography';
 import { useOutsideClick } from '@/client/hooks';
 
 type TooltipProps = Readonly<{

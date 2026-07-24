@@ -2,11 +2,13 @@
 
 import React, { useCallback, useEffect, useState } from 'react';
 import { classNames, convertImgToWebP, verifyImgSize } from '@/client/utils';
-import { Icon, ImageCropperModal, Loader } from '@/client/components';
+import { Icon } from '@/client/components/atoms/Icons';
+import { Loader } from '@/client/components/atoms/Loader';
 import { useSnackbar, useModal } from '@/client/store';
 import Image from 'next/image';
 import type { I18nMessage } from '@/client/locales';
 import { t } from '@/client/locales';
+import { ImageCropperModal } from '@/client/components/organisms/Modal/ImageCropperModal';
 
 type ImageInputProps = Readonly<{
     className?: string;

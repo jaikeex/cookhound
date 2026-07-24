@@ -2,7 +2,11 @@
 
 import React, { useCallback, useEffect, useState } from 'react';
 import type { Ingredient } from '@/common/types';
-import { Icon, Typography, type TypographyVariant } from '@/client/components';
+import { Icon } from '@/client/components/atoms/Icons';
+import {
+    Typography,
+    type TypographyVariant
+} from '@/client/components/atoms/Typography';
 import { classNames } from '@/client/utils';
 
 //~---------------------------------------------------------------------------------------------~//

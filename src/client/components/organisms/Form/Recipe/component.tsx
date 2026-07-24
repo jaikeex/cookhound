@@ -1,19 +1,17 @@
 'use client';
 
 import React, { useCallback } from 'react';
-import {
-    Divider,
-    ImageInput,
-    IngredientsListCreate,
-    InputError,
-    InstructionsListCreate,
-    NumberInput,
-    Submit,
-    TagSelection,
-    Textarea,
-    TextInput,
-    Typography
-} from '@/client/components';
+import { Divider } from '@/client/components/atoms/Divider';
+import { ImageInput } from '@/client/components/molecules/Form/Image';
+import { IngredientsListCreate } from '@/client/components/organisms/IngredientsList/Create';
+import { InputError } from '@/client/components/atoms/Input/InputError';
+import { InstructionsListCreate } from '@/client/components/organisms/InstructionsList/Create';
+import { NumberInput } from '@/client/components/molecules/Form/NumberInput';
+import { Submit } from '@/client/components/molecules/Form/Submit';
+import { TagSelection } from '@/client/components/organisms/Tag/Select';
+import { Textarea } from '@/client/components/molecules/Form/Textarea';
+import { TextInput } from '@/client/components/molecules/Form/TextInput';
+import { Typography } from '@/client/components/atoms/Typography';
 import { useAuth } from '@/client/store';
 import type { Ingredient, Recipe, RecipeTagDTO } from '@/common/types';
 import type { I18nMessage } from '@/client/locales';

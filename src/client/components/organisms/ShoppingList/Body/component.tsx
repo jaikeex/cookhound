@@ -1,13 +1,13 @@
 import React, { forwardRef } from 'react';
-import { Divider, Typography, IconButton } from '@/client/components';
-import {
-    DraggableIngredientRow,
-    IngredientRowView
-} from '@/client/components/molecules';
+import { Divider } from '@/client/components/atoms/Divider';
+import { Typography } from '@/client/components/atoms/Typography';
+import { IconButton } from '@/client/components/atoms/Button/Icon';
+import { DraggableIngredientRow } from '@/client/components/molecules/IngredientRow/Draggable';
+import { IngredientRowView } from '@/client/components/molecules/IngredientRow/View';
 import Link from 'next/link';
 import type { Ingredient, ShoppingListDTO } from '@/common/types';
 import type { PanInfo } from 'framer-motion';
-import { DraggableList } from '@/client/components';
+import { DraggableList } from '@/client/components/molecules/List/DraggableList';
 import { ROUTES } from '@/common/constants';
 
 type ShoppingListBodyProps = Readonly<{

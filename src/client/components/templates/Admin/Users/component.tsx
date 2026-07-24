@@ -1,15 +1,13 @@
 'use client';
 
 import React, { useCallback, useMemo, useRef, useState } from 'react';
-import {
-    Chip,
-    Select,
-    Table,
-    TextInput,
-    Typography
-} from '@/client/components';
-import type { SelectOption } from '@/client/components';
-import type { TableColumn } from '@/client/components';
+import { Chip } from '@/client/components/atoms/Chip';
+import { Select } from '@/client/components/molecules/Form/Select';
+import { Table } from '@/client/components/molecules/Table';
+import { TextInput } from '@/client/components/molecules/Form/TextInput';
+import { Typography } from '@/client/components/atoms/Typography';
+import type { SelectOption } from '@/client/components/molecules/Form/Select';
+import type { TableColumn } from '@/client/components/molecules/Table';
 import { AdminUserDetailModal } from '@/client/components/organisms/Modal/AdminUserDetailModal';
 import { useModal } from '@/client/store';
 import { chqc } from '@/client/data';

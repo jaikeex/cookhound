@@ -8,7 +8,7 @@ import React, {
     useMemo,
     useState
 } from 'react';
-import { Snackbar } from '@/client/components';
+import { Snackbar } from '@/client/components/molecules/Snackbar';
 import type { AlertPayload } from '@/client/types';
 import ReactDOM from 'react-dom';
 import { generateRandomId } from '@/client/utils';

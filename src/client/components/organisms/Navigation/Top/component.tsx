@@ -1,15 +1,13 @@
 'use client';
 
 import React, { Suspense, useCallback, useState } from 'react';
-import {
-    Avatar,
-    ButtonBase,
-    IconLink,
-    Logo,
-    Popup,
-    ThemeSwitcherIcon,
-    Tooltip
-} from '@/client/components';
+import { Avatar } from '@/client/components/atoms/Avatar';
+import { ButtonBase } from '@/client/components/atoms/Button/Base';
+import { IconLink } from '@/client/components/atoms/Link/Icon';
+import { Logo } from '@/client/components/atoms/Logo';
+import { Popup } from '@/client/components/molecules/Popup';
+import { ThemeSwitcherIcon } from '@/client/components/molecules/ThemeSwitcher';
+import { Tooltip } from '@/client/components/atoms/Tooltip';
 import Link from 'next/link';
 import { useAuth } from '@/client/store';
 import { Sidebar } from '@/client/components/molecules/Sidebar';

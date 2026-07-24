@@ -1,7 +1,8 @@
 import React from 'react';
 import { classNames } from '@/client/utils';
-import type { TypographyVariant } from '@/client/components';
-import { Icon, Typography } from '@/client/components';
+import type { TypographyVariant } from '@/client/components/atoms/Typography';
+import { Icon } from '@/client/components/atoms/Icons';
+import { Typography } from '@/client/components/atoms/Typography';
 import type { IconName } from '@/client/types';
 
 //~---------------------------------------------------------------------------------------------~//

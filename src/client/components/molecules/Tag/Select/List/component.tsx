@@ -1,6 +1,7 @@
 'use client';
 
-import { TagSelect, Typography } from '@/client/components';
+import { TagSelect } from '@/client/components/molecules/Tag/Select/Single';
+import { Typography } from '@/client/components/atoms/Typography';
 import { classNames } from '@/client/utils';
 import type { RecipeTagDTO, TagListDTO } from '@/common/types';
 import React, { useCallback } from 'react';

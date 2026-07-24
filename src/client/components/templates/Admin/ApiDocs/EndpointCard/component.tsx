@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useCallback, useState } from 'react';
-import { Typography, Chip } from '@/client/components';
+import { Typography } from '@/client/components/atoms/Typography';
+import { Chip } from '@/client/components/atoms/Chip';
 import type { SerializedEndpointDoc } from '@/common/types';
 import {
     METHOD_COLORS,

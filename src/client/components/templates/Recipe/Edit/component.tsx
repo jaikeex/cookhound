@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { RecipeFormShell } from '@/client/components';
+import { RecipeFormShell } from '@/client/components/templates/Recipe/FormShell';
 import { useRecipeFormController } from '@/client/hooks';
 import type { Recipe } from '@/common/types';
 

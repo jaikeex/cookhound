@@ -1,5 +1,8 @@
 import React from 'react';
-import { BaseSelect, Icon, InputError, InputLabel } from '@/client/components';
+import { BaseSelect } from '@/client/components/atoms/Input/BaseSelect';
+import { Icon } from '@/client/components/atoms/Icons';
+import { InputError } from '@/client/components/atoms/Input/InputError';
+import { InputLabel } from '@/client/components/atoms/Input/InputLabel';
 import type { FormInputProps } from '@/client/components/molecules/Form/types';
 import { classNames } from '@/client/utils';
 

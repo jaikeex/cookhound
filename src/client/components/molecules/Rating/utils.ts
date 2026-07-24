@@ -1,4 +1,5 @@
-import { MAX_RATING, StarState } from '@/client/components';
+import { MAX_RATING } from './component';
+import { StarState } from '@/client/components/atoms/Star';
 
 const VALUE_MAP = {
     [StarState.FULL]: 1,

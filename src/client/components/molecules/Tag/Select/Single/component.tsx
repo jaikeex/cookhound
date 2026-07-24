@@ -1,4 +1,5 @@
-import { Checkbox, Typography } from '@/client/components';
+import { Checkbox } from '@/client/components/atoms/Checkbox';
+import { Typography } from '@/client/components/atoms/Typography';
 import { classNames } from '@/client/utils';
 import React from 'react';
 

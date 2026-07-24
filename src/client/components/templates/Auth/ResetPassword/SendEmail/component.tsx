@@ -1,15 +1,11 @@
 'use client';
 
 import React, { useCallback, useEffect, useState } from 'react';
-import type {
-    LoginFormErrors,
-    SimpleEmailFormErrors
-} from '@/client/components';
-import {
-    CaptchaDisclosure,
-    SimpleEmailForm,
-    Typography
-} from '@/client/components';
+import type { LoginFormErrors } from '@/client/components/organisms/Form/Login';
+import type { SimpleEmailFormErrors } from '@/client/components/organisms/Form/SimpleEmailForm';
+import { CaptchaDisclosure } from '@/client/components/molecules/CaptchaDisclosure';
+import { SimpleEmailForm } from '@/client/components/organisms/Form/SimpleEmailForm';
+import { Typography } from '@/client/components/atoms/Typography';
 import type { ResetPasswordEmailFormData } from '@/common/types';
 import { z } from 'zod';
 import { useCaptcha } from '@/client/hooks';

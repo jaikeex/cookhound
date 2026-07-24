@@ -3,14 +3,12 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import type { UserForCreatePayload } from '@/common/types';
 import { useGoogleSignIn, useCaptcha } from '@/client/hooks';
-import type { RegisterFormErrors } from '@/client/components';
-import {
-    CaptchaDisclosure,
-    Divider,
-    GoogleSigninButton,
-    RegisterForm,
-    Typography
-} from '@/client/components';
+import type { RegisterFormErrors } from '@/client/components/organisms/Form/Register';
+import { CaptchaDisclosure } from '@/client/components/molecules/CaptchaDisclosure';
+import { Divider } from '@/client/components/atoms/Divider';
+import { GoogleSigninButton } from '@/client/components/atoms/Button/GoogleSignin';
+import { RegisterForm } from '@/client/components/organisms/Form/Register';
+import { Typography } from '@/client/components/atoms/Typography';
 import { validateFormData, executeCaptcha } from '@/client/utils';
 import { useRouter } from 'next/navigation';
 import { useAuth, useSnackbar } from '@/client/store';

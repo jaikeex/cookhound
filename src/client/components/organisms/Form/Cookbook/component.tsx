@@ -1,14 +1,12 @@
 'use client';
 
 import React from 'react';
-import {
-    ErrorList,
-    Submit,
-    TextInput,
-    Textarea,
-    Typography,
-    RadioSelect
-} from '@/client/components';
+import { ErrorList } from '@/client/components/molecules/Form/ErrorList';
+import { Submit } from '@/client/components/molecules/Form/Submit';
+import { TextInput } from '@/client/components/molecules/Form/TextInput';
+import { Textarea } from '@/client/components/molecules/Form/Textarea';
+import { Typography } from '@/client/components/atoms/Typography';
+import { RadioSelect } from '@/client/components/molecules/Form/RadioSelect';
 import { CookbookVisibility } from '@/common/types/cookbook';
 import type { I18nMessage } from '@/client/locales';
 import { classNames } from '@/client/utils';

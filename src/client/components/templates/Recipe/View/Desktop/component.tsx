@@ -1,12 +1,10 @@
 'use client';
 
 import React from 'react';
-import {
-    DesktopRecipeBody,
-    DesktopRecipeHead,
-    Divider,
-    Typography
-} from '@/client/components';
+import { DesktopRecipeBody } from '@/client/components/organisms/Recipe/View/Desktop/DesktopRecipeBody';
+import { DesktopRecipeHead } from '@/client/components/organisms/Recipe/View/Desktop/DesktopRecipeHead';
+import { Divider } from '@/client/components/atoms/Divider';
+import { Typography } from '@/client/components/atoms/Typography';
 import { useRecipeHandling } from '@/client/store';
 
 export type DesktopRecipeViewProps = Readonly<{

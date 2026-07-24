@@ -1,11 +1,10 @@
 'use client';
 
 import React, { useCallback, useEffect, useState } from 'react';
-import type {
-    LoginFormErrors,
-    ResetPasswordFormErrors
-} from '@/client/components';
-import { ResetPasswordForm, Typography } from '@/client/components';
+import type { LoginFormErrors } from '@/client/components/organisms/Form/Login';
+import type { ResetPasswordFormErrors } from '@/client/components/organisms/Form/ResetPassword';
+import { ResetPasswordForm } from '@/client/components/organisms/Form/ResetPassword';
+import { Typography } from '@/client/components/atoms/Typography';
 import type { ResetPasswordPayload } from '@/common/types';
 import { z } from 'zod';
 

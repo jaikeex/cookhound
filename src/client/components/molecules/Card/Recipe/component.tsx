@@ -1,11 +1,9 @@
 import * as React from 'react';
-import {
-    Icon,
-    RecipeImage,
-    Typography,
-    RecipeInfo,
-    Rating
-} from '@/client/components';
+import { Icon } from '@/client/components/atoms/Icons';
+import { RecipeImage } from '@/client/components/atoms/Image/RecipeImage';
+import { Typography } from '@/client/components/atoms/Typography';
+import { RecipeInfo } from '@/client/components/molecules/RecipeInfo';
+import { Rating } from '@/client/components/molecules/Rating';
 import Link from 'next/link';
 import type { RecipeCardProps } from '@/client/components/molecules/Card/types';
 import { classNames } from '@/client/utils';

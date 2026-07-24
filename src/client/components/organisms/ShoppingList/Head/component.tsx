@@ -1,7 +1,9 @@
 'use client';
 
 import React from 'react';
-import { Typography, ButtonBase, Loader } from '@/client/components';
+import { Typography } from '@/client/components/atoms/Typography';
+import { ButtonBase } from '@/client/components/atoms/Button/Base';
+import { Loader } from '@/client/components/atoms/Loader';
 import { classNames } from '@/client/utils';
 import { t } from '@/client/locales';
 

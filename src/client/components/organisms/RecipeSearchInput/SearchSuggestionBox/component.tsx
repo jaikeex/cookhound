@@ -7,10 +7,10 @@ import React, {
     useState,
     useCallback
 } from 'react';
-import { Typography } from '@/client/components';
+import { Typography } from '@/client/components/atoms/Typography';
 import { classNames } from '@/client/utils';
 import type { RecipeForDisplayDTO } from '@/common/types';
-import { RecipeLink } from '@/client/components';
+import { RecipeLink } from '@/client/components/molecules/RecipeLink';
 import { useKeyPress } from '@/client/hooks';
 
 export type SearchSuggestionBoxProps = Readonly<{

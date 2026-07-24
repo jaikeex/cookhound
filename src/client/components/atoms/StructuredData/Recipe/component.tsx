@@ -1,5 +1,5 @@
 import React from 'react';
-import { StructuredData } from '@/client/components';
+import { StructuredData } from '@/client/components/atoms/StructuredData/Generic';
 import type { Recipe } from '@/common/types';
 import {
     generateBreadcrumbSchema,

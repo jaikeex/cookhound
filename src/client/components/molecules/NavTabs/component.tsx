@@ -4,8 +4,8 @@ import React, { useMemo } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { classNames } from '@/client/utils';
-import { Typography } from '@/client/components';
-import type { MenuItem } from '@/client/components';
+import { Typography } from '@/client/components/atoms/Typography';
+import type { MenuItem } from '@/client/components/molecules/Menu';
 
 export type NavTabsProps = Readonly<{
     buttonRowClassName?: string;

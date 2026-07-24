@@ -1,6 +1,9 @@
 'use client';
 
-import { ButtonBase, Loader, TextInput, Typography } from '@/client/components';
+import { ButtonBase } from '@/client/components/atoms/Button/Base';
+import { Loader } from '@/client/components/atoms/Loader';
+import { TextInput } from '@/client/components/molecules/Form/TextInput';
+import { Typography } from '@/client/components/atoms/Typography';
 import * as React from 'react';
 import { useCallback, useEffect, useState } from 'react';
 import { t } from '@/client/locales';

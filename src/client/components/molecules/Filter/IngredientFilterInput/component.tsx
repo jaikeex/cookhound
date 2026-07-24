@@ -1,5 +1,6 @@
-import type { ComboInputOption } from '@/client/components';
-import { ComboInput, ChipButton } from '@/client/components';
+import type { ComboInputOption } from '@/client/components/molecules/Form/ComboInput';
+import { ComboInput } from '@/client/components/molecules/Form/ComboInput';
+import { ChipButton } from '@/client/components/atoms/Button/Chip';
 import type { IngredientDTO } from '@/common/types';
 import React from 'react';
 

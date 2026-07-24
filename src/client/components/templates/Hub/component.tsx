@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
-import { Typography } from '@/client/components/atoms';
-import { RecipeCardList } from '@/client/components/molecules';
+import { Typography } from '@/client/components/atoms/Typography';
+import { RecipeCardList } from '@/client/components/molecules/List/RecipeCardList';
 import { HUB_UI, buildHubPath, type HubSibling } from '@/common/constants';
 import { classNames } from '@/client/utils';
 import type { RecipeForDisplayDTO } from '@/common/types';

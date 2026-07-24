@@ -2,7 +2,9 @@
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { classNames } from '@/client/utils';
-import { Star, Tooltip, Typography, type StarState } from '@/client/components';
+import { Star, type StarState } from '@/client/components/atoms/Star';
+import { Tooltip } from '@/client/components/atoms/Tooltip';
+import { Typography } from '@/client/components/atoms/Typography';
 import { generateStars } from '@/client/components/molecules/Rating/utils';
 import { useCooldown, useScreenSize } from '@/client/hooks';
 import { useSnackbar } from '@/client/store';

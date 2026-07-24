@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useCallback, useEffect, useState } from 'react';
-import { BaseTextarea, DraggableInputRow } from '@/client/components';
+import { BaseTextarea } from '@/client/components/atoms/Input/BaseTextarea';
+import { DraggableInputRow } from '@/client/components/molecules/Form/DraggableInputRow';
 import { useCreateRecipeStore } from '@/client/store';
 
 type InstructionRowCreateProps = Readonly<{

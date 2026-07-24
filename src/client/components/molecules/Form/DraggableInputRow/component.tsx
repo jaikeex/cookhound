@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useCallback } from 'react';
-import { Icon, IconButton } from '@/client/components';
+import { Icon } from '@/client/components/atoms/Icons';
+import { IconButton } from '@/client/components/atoms/Button/Icon';
 import { Reorder, useDragControls, type PanInfo } from 'framer-motion';
 import { useDisableMobileScroll, useKeyboardOpen } from '@/client/hooks';
 

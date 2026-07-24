@@ -1,7 +1,10 @@
 'use client';
 
 import React from 'react';
-import { ButtonBase, type BaseButtonProps } from '@/client/components';
+import {
+    ButtonBase,
+    type BaseButtonProps
+} from '@/client/components/atoms/Button/Base';
 import { classNames } from '@/client/utils';
 import { useLogout } from '@/client/hooks';
 import { t } from '@/client/locales';

@@ -1,6 +1,8 @@
 'use client';
 
-import { ButtonBase, Logo, Typography } from '@/client/components';
+import { ButtonBase } from '@/client/components/atoms/Button/Base';
+import { Logo } from '@/client/components/atoms/Logo';
+import { Typography } from '@/client/components/atoms/Typography';
 import { eventBus, AppEvent } from '@/client/events';
 import * as React from 'react';
 import { useCallback, useEffect } from 'react';

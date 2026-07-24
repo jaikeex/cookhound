@@ -1,7 +1,7 @@
 import React from 'react';
 import { classNames } from '@/client/utils';
-import type { ChipProps } from '@/client/components';
-import { Chip } from '@/client/components';
+import type { ChipProps } from '@/client/components/atoms/Chip';
+import { Chip } from '@/client/components/atoms/Chip';
 
 //~---------------------------------------------------------------------------------------------~//
 //$                                           OPTIONS                                           $//

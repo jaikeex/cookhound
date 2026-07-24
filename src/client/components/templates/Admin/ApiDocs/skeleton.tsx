@@ -1,5 +1,5 @@
 import React from 'react';
-import { SkeletonBox } from '@/client/components';
+import { SkeletonBox } from '@/client/components/atoms/Skeleton/SkeletonBox';
 
 export const AdminApiDocsSkeleton: React.FC = () => {
     return (

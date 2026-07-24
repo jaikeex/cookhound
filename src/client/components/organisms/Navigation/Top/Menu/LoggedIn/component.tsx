@@ -1,13 +1,11 @@
 'use client';
 
 import React from 'react';
-import {
-    Avatar,
-    ButtonBase,
-    LogoutButton,
-    ThemeSwitcher,
-    Typography
-} from '@/client/components';
+import { Avatar } from '@/client/components/atoms/Avatar';
+import { ButtonBase } from '@/client/components/atoms/Button/Base';
+import { LogoutButton } from '@/client/components/molecules/Button/Logout';
+import { ThemeSwitcher } from '@/client/components/molecules/ThemeSwitcher';
+import { Typography } from '@/client/components/atoms/Typography';
 import { UserRole, type User } from '@/common/types';
 import Link from 'next/link';
 import { ROUTES } from '@/common/constants';

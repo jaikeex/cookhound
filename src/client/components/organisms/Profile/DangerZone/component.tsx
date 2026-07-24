@@ -1,9 +1,11 @@
 'use client';
 
 import React, { useCallback } from 'react';
-import { ButtonBase, Divider, Typography } from '@/client/components';
+import { ButtonBase } from '@/client/components/atoms/Button/Base';
+import { Divider } from '@/client/components/atoms/Divider';
+import { Typography } from '@/client/components/atoms/Typography';
 import { useModal } from '@/client/store';
-import { DeleteAccountModal } from '@/client/components';
+import { DeleteAccountModal } from '@/client/components/organisms/Modal/DeleteAccountModal';
 import { t } from '@/client/locales';
 
 export type DangerZoneProps = Readonly<{

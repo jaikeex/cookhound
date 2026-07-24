@@ -2,13 +2,11 @@
 
 import * as React from 'react';
 import type { Recipe } from '@/common/types';
-import {
-    Typography,
-    ButtonBase,
-    Divider,
-    InstructionsView,
-    Tabs
-} from '@/client/components';
+import { Typography } from '@/client/components/atoms/Typography';
+import { ButtonBase } from '@/client/components/atoms/Button/Base';
+import { Divider } from '@/client/components/atoms/Divider';
+import { InstructionsView } from '@/client/components/molecules/Instructions/View';
+import { Tabs } from '@/client/components/molecules/Tabs';
 import { IngredientsListView } from '@/client/components/organisms/IngredientsList';
 import { useAuth } from '@/client/store';
 import { classNames } from '@/client/utils';

@@ -1,5 +1,6 @@
 import React from 'react';
-import { ButtonBase, Loader } from '@/client/components';
+import { ButtonBase } from '@/client/components/atoms/Button/Base';
+import { Loader } from '@/client/components/atoms/Loader';
 
 export type SubmitProps = Readonly<{
     className?: string;

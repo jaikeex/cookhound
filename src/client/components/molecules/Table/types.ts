@@ -1,4 +1,4 @@
-import type { PaginationProps } from '@/client/components';
+import type { PaginationProps } from '@/client/components/molecules/Pagination';
 
 export type TablePaginationProps = Omit<PaginationProps, 'className'>;
 

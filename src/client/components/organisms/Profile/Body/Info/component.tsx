@@ -2,20 +2,18 @@
 
 import React, { useCallback } from 'react';
 import { AuthType, type User } from '@/common/types';
-import {
-    ButtonBase,
-    ButtonRow,
-    DangerZone,
-    Divider,
-    LinkRow,
-    PendingDeletionBanner,
-    TextInputRow,
-    Typography
-} from '@/client/components';
+import { ButtonBase } from '@/client/components/atoms/Button/Base';
+import { ButtonRow } from '@/client/components/molecules/Profile/Settings/ButtonRow';
+import { DangerZone } from '@/client/components/organisms/Profile/DangerZone';
+import { Divider } from '@/client/components/atoms/Divider';
+import { LinkRow } from '@/client/components/molecules/Profile/Settings/LinkRow';
+import { PendingDeletionBanner } from '@/client/components/molecules/Banner/PendingDeletionBanner';
+import { TextInputRow } from '@/client/components/molecules/Profile/Settings/TextInputRow';
+import { Typography } from '@/client/components/atoms/Typography';
 import { useSnackbar } from '@/client/store';
 import { useModal } from '@/client/store';
-import { ConsentSettingsModal } from '@/client/components';
-import { LogoutAllConfirmModal } from '@/client/components';
+import { ConsentSettingsModal } from '@/client/components/organisms/Modal/ConsentSettingsModal';
+import { LogoutAllConfirmModal } from '@/client/components/organisms/Modal/LogoutAllConfirmModal';
 import { chqc, QUERY_KEYS } from '@/client/data';
 import { useQueryClient } from '@tanstack/react-query';
 import { useLogout } from '@/client/hooks';

@@ -3,7 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import type { RecipeForDisplayDTO } from '@/common/types';
 import { generateImgPlaceholder, classNames } from '@/client/utils';
-import { Typography } from '@/client/components';
+import { Typography } from '@/client/components/atoms/Typography';
 import { ROUTES } from '@/common/constants';
 
 export type RecipeLinkProps = Readonly<{

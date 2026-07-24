@@ -3,9 +3,9 @@
 import React, { useCallback, useEffect } from 'react';
 import {
     ButtonBase,
-    Typography,
     type BaseButtonProps
-} from '@/client/components';
+} from '@/client/components/atoms/Button/Base';
+import { Typography } from '@/client/components/atoms/Typography';
 
 type ButtonWithCooldownProps = Readonly<{
     cooldown: number;

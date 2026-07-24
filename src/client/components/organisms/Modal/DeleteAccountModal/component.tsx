@@ -2,13 +2,11 @@
 
 import React, { useCallback, useState } from 'react';
 import type { ModalProps } from '@/client/components/organisms/Modal/types';
-import {
-    ButtonBase,
-    Typography,
-    PasswordInput,
-    FormCheckbox,
-    Textarea
-} from '@/client/components';
+import { ButtonBase } from '@/client/components/atoms/Button/Base';
+import { Typography } from '@/client/components/atoms/Typography';
+import { PasswordInput } from '@/client/components/molecules/Form/PasswordInput';
+import { FormCheckbox } from '@/client/components/molecules/Form/FormCheckbox';
+import { Textarea } from '@/client/components/molecules/Form/Textarea';
 import { useSnackbar, useAuth } from '@/client/store';
 import { AuthType } from '@/common/types';
 import { chqc } from '@/client/data';

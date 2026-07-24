@@ -2,14 +2,12 @@
 
 import React from 'react';
 import dynamic from 'next/dynamic';
-import {
-    Accordion,
-    ButtonBase,
-    Divider,
-    Icon,
-    Typography
-} from '@/client/components';
-import { CookbookRecipeLinkList } from '@/client/components';
+import { Accordion } from '@/client/components/molecules/Accordion';
+import { ButtonBase } from '@/client/components/atoms/Button/Base';
+import { Divider } from '@/client/components/atoms/Divider';
+import { Icon } from '@/client/components/atoms/Icons';
+import { Typography } from '@/client/components/atoms/Typography';
+import { CookbookRecipeLinkList } from '@/client/components/molecules/List/CookbookLinkList';
 import { chqc } from '@/client/data';
 import type { Cookbook } from '@/common/types';
 import Link from 'next/link';

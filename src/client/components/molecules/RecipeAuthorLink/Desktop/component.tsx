@@ -1,6 +1,8 @@
 'use client';
 
-import { Avatar, Time, Typography } from '@/client/components';
+import { Avatar } from '@/client/components/atoms/Avatar';
+import { Time } from '@/client/components/atoms/Time';
+import { Typography } from '@/client/components/atoms/Typography';
 import { classNames, getAgeString } from '@/client/utils';
 import React from 'react';
 import { t } from '@/client/locales';

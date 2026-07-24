@@ -2,7 +2,9 @@
 
 import React, { useCallback, useState } from 'react';
 import type { ModalProps } from '@/client/components/organisms/Modal/types';
-import { ButtonBase, Typography, PasswordInput } from '@/client/components';
+import { ButtonBase } from '@/client/components/atoms/Button/Base';
+import { Typography } from '@/client/components/atoms/Typography';
+import { PasswordInput } from '@/client/components/molecules/Form/PasswordInput';
 import { useSnackbar, useAuth } from '@/client/store';
 import { AuthType } from '@/common/types';
 import { useQueryClient } from '@tanstack/react-query';

@@ -2,7 +2,8 @@
 
 import React, { useEffect, useMemo } from 'react';
 import type { Ingredient } from '@/common/types';
-import { IngredientRowView, Typography } from '@/client/components';
+import { IngredientRowView } from '@/client/components/molecules/IngredientRow/View';
+import { Typography } from '@/client/components/atoms/Typography';
 import { useRecipeHandling, useRecipeSelectionStore } from '@/client/store';
 import { scaleIngredientsToPortionSize } from '@/client/utils';
 

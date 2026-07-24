@@ -1,5 +1,5 @@
 import React from 'react';
-import { ButtonBase } from '@/client/components';
+import { ButtonBase } from '@/client/components/atoms/Button/Base';
 
 export type GoogleSigninProps = Readonly<{
     label: string | null;

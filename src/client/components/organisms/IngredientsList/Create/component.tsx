@@ -1,12 +1,10 @@
 'use client';
 
 import React, { useCallback, useEffect, useState, useMemo } from 'react';
-import {
-    ButtonBase,
-    DraggableList,
-    IngredientRowCreate,
-    CategoryHeader
-} from '@/client/components';
+import { ButtonBase } from '@/client/components/atoms/Button/Base';
+import { DraggableList } from '@/client/components/molecules/List/DraggableList';
+import { IngredientRowCreate } from '@/client/components/molecules/IngredientRow/Create';
+import { CategoryHeader } from '@/client/components/molecules/IngredientCategory/Header';
 import type { Ingredient } from '@/common/types';
 import { t } from '@/client/locales';
 

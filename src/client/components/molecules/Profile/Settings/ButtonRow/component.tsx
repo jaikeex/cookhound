@@ -1,4 +1,5 @@
-import { ButtonBase, Typography } from '@/client/components';
+import { ButtonBase } from '@/client/components/atoms/Button/Base';
+import { Typography } from '@/client/components/atoms/Typography';
 import { classNames } from '@/client/utils';
 import React from 'react';
 

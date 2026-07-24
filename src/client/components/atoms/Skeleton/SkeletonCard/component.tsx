@@ -1,5 +1,6 @@
 import React from 'react';
-import { SkeletonBox, SkeletonImage } from '@/client/components';
+import { SkeletonBox } from '@/client/components/atoms/Skeleton/SkeletonBox';
+import { SkeletonImage } from '@/client/components/atoms/Skeleton/SkeletonImage';
 
 type SkeletonCardProps = Readonly<{
     className?: string;

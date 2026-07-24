@@ -2,13 +2,11 @@
 
 import React, { useCallback, useEffect, useState } from 'react';
 import type { ChangeEvent } from 'react';
-import {
-    Banner,
-    RecipeCardList,
-    Typography,
-    RecipeFilters,
-    SkeletonCard
-} from '@/client/components';
+import { Banner } from '@/client/components/organisms/Banner';
+import { RecipeCardList } from '@/client/components/molecules/List/RecipeCardList';
+import { Typography } from '@/client/components/atoms/Typography';
+import { RecipeFilters } from '@/client/components/organisms/Filter/RecipeFilters';
+import { SkeletonCard } from '@/client/components/atoms/Skeleton/SkeletonCard';
 import type { RecipeFilterParams } from '@/common/types';
 import { useRecipeFilters } from '@/client/hooks';
 import { useRouter } from 'next/navigation';

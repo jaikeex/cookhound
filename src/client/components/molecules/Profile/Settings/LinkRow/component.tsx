@@ -1,4 +1,4 @@
-import { Typography } from '@/client/components';
+import { Typography } from '@/client/components/atoms/Typography';
 import Link from 'next/link';
 import * as React from 'react';
 

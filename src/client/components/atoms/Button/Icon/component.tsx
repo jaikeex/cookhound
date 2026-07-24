@@ -1,5 +1,6 @@
 import React from 'react';
-import { Icon, Loader } from '@/client/components';
+import { Icon } from '@/client/components/atoms/Icons';
+import { Loader } from '@/client/components/atoms/Loader';
 import type { IconName } from '@/client/types';
 import { classNames } from '@/client/utils';
 

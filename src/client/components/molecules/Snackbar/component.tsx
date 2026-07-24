@@ -1,5 +1,7 @@
 import React from 'react';
-import { Icon, IconButton, Typography } from '@/client/components';
+import { Icon } from '@/client/components/atoms/Icons';
+import { IconButton } from '@/client/components/atoms/Button/Icon';
+import { Typography } from '@/client/components/atoms/Typography';
 import type { IconName, SnackbarVariant } from '@/client/types';
 import { classNames } from '@/client/utils';
 

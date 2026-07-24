@@ -1,6 +1,6 @@
 import { classNames } from '@/client/utils';
 import React from 'react';
-import { Typography } from '@/client/components';
+import { Typography } from '@/client/components/atoms/Typography';
 
 export type InputLabelProps = Readonly<{
     className?: string;

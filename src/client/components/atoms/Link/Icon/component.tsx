@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Icon } from '@/client/components';
+import { Icon } from '@/client/components/atoms/Icons';
 import type { IconName } from '@/client/types';
 import { classNames } from '@/client/utils';
 import Link, { type LinkProps } from 'next/link';

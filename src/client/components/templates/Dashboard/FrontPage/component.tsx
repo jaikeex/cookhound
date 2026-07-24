@@ -2,7 +2,8 @@
 
 import React, { use, useCallback, useState } from 'react';
 import type { RecipeForDisplayDTO } from '@/common/types';
-import { Banner, RecipeCardList } from '@/client/components';
+import { Banner } from '@/client/components/organisms/Banner';
+import { RecipeCardList } from '@/client/components/molecules/List/RecipeCardList';
 import { useRecipeDiscovery } from '@/client/hooks';
 import { useRouter } from 'next/navigation';
 import { ROUTES } from '@/common/constants';

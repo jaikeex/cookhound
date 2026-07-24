@@ -1,7 +1,9 @@
 'use client';
 
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
-import { Typography, ConsentRow, ButtonBase } from '@/client/components';
+import { Typography } from '@/client/components/atoms/Typography';
+import { ConsentRow } from '@/client/components/molecules/ConsentRow';
+import { ButtonBase } from '@/client/components/atoms/Button/Base';
 import { useConsent } from '@/client/store';
 import { t } from '@/client/locales';
 import { DEFAULT_LOCALE } from '@/common/constants';

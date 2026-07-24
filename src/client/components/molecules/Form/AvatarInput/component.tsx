@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useCallback } from 'react';
-import { ImageInput } from '@/client/components';
+import { ImageInput } from '@/client/components/molecules/Form/Image';
 import { chqc, QUERY_KEYS } from '@/client/data';
 import { useAuth, useSnackbar } from '@/client/store';
 import { generateUuid } from '@/client/utils';

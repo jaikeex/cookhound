@@ -2,12 +2,10 @@
 
 import React, { use, useCallback, useState } from 'react';
 import type { ChangeEvent } from 'react';
-import {
-    Banner,
-    RecipeCardList,
-    Typography,
-    ChipButton
-} from '@/client/components';
+import { Banner } from '@/client/components/organisms/Banner';
+import { RecipeCardList } from '@/client/components/molecules/List/RecipeCardList';
+import { Typography } from '@/client/components/atoms/Typography';
+import { ChipButton } from '@/client/components/atoms/Button/Chip';
 import type { RecipeForDisplayDTO } from '@/common/types';
 import { useRecipeDiscovery } from '@/client/hooks';
 import { useRouter } from 'next/navigation';

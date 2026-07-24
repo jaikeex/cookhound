@@ -1,7 +1,9 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { ButtonBase, Loader, Typography } from '@/client/components';
+import { ButtonBase } from '@/client/components/atoms/Button/Base';
+import { Loader } from '@/client/components/atoms/Loader';
+import { Typography } from '@/client/components/atoms/Typography';
 import Link from 'next/link';
 import { chqc, QUERY_KEYS } from '@/client/data';
 import type { RequestError } from '@/client/error';

@@ -3,12 +3,10 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import type { RecipeTagDTO, TagListDTO } from '@/common/types';
 import type { ModalProps } from '@/client/components/organisms/Modal/types';
-import {
-    ButtonBase,
-    Loader,
-    TagSelectionList,
-    TagSelectionBox
-} from '@/client/components';
+import { ButtonBase } from '@/client/components/atoms/Button/Base';
+import { Loader } from '@/client/components/atoms/Loader';
+import { TagSelectionList } from '@/client/components/molecules/Tag/Select/List';
+import { TagSelectionBox } from '@/client/components/molecules/Tag/Select/Box';
 import { useSnackbar } from '@/client/store';
 import type { RequestError } from '@/client/error';
 import { t } from '@/client/locales';

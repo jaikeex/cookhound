@@ -1,12 +1,10 @@
 'use client';
 
 import React from 'react';
-import {
-    Divider,
-    MobileRecipeBody,
-    MobileRecipeHead,
-    Typography
-} from '@/client/components';
+import { Divider } from '@/client/components/atoms/Divider';
+import { MobileRecipeBody } from '@/client/components/organisms/Recipe/View/Mobile/MobileRecipeBody';
+import { MobileRecipeHead } from '@/client/components/organisms/Recipe/View/Mobile/MobileRecipeHead';
+import { Typography } from '@/client/components/atoms/Typography';
 import { useRecipeHandling } from '@/client/store';
 
 export type MobileRecipeViewProps = Readonly<{

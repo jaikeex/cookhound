@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useMemo, useState, useCallback } from 'react';
-import { ChipButton, Typography } from '@/client/components';
+import { ChipButton } from '@/client/components/atoms/Button/Chip';
+import { Typography } from '@/client/components/atoms/Typography';
 import type { SerializedRouteDoc } from '@/common/types';
 import { CategoryChipButton } from './CategoryChipButton';
 import { EndpointCard } from './EndpointCard';

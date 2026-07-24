@@ -1,5 +1,7 @@
 import React from 'react';
-import { SkeletonBox, SkeletonImage, SkeletonList } from '@/client/components';
+import { SkeletonBox } from '@/client/components/atoms/Skeleton/SkeletonBox';
+import { SkeletonImage } from '@/client/components/atoms/Skeleton/SkeletonImage';
+import { SkeletonList } from '@/client/components/atoms/Skeleton/SkeletonList';
 
 export type MobileRecipeViewSkeletonProps = Readonly<{
     className?: string;

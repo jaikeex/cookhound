@@ -3,12 +3,10 @@
 import * as React from 'react';
 import { useAuth } from '@/client/store';
 import type { Recipe } from '@/common/types/recipe';
-import {
-    Typography,
-    ButtonBase,
-    Divider,
-    InstructionsView
-} from '@/client/components';
+import { Typography } from '@/client/components/atoms/Typography';
+import { ButtonBase } from '@/client/components/atoms/Button/Base';
+import { Divider } from '@/client/components/atoms/Divider';
+import { InstructionsView } from '@/client/components/molecules/Instructions/View';
 import { IngredientsListView } from '@/client/components/organisms/IngredientsList';
 import { t } from '@/client/locales';
 

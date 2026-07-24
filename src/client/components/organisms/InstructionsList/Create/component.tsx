@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useCallback, useEffect, useState, useMemo } from 'react';
-import { ButtonBase, DraggableList } from '@/client/components';
+import { ButtonBase } from '@/client/components/atoms/Button/Base';
+import { DraggableList } from '@/client/components/molecules/List/DraggableList';
 import { InstructionRowCreate } from '@/client/components/molecules/InstructionRow';
 import { t } from '@/client/locales';
 

@@ -1,6 +1,7 @@
 import React, { useCallback } from 'react';
 import type { ModalProps } from '@/client/components/organisms/Modal/types';
-import { ButtonBase, Typography } from '@/client/components';
+import { ButtonBase } from '@/client/components/atoms/Button/Base';
+import { Typography } from '@/client/components/atoms/Typography';
 import { t } from '@/client/locales';
 
 type DeleteRecipeConfirmationModalProps = Readonly<{

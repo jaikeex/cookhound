@@ -1,5 +1,7 @@
 import React from 'react';
-import { BaseInput, InputError, InputLabel } from '@/client/components';
+import { BaseInput } from '@/client/components/atoms/Input/Base';
+import { InputError } from '@/client/components/atoms/Input/InputError';
+import { InputLabel } from '@/client/components/atoms/Input/InputLabel';
 import type { FormInputProps } from '@/client/components/molecules/Form/types';
 import { classNames } from '@/client/utils';
 

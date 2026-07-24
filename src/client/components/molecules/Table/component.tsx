@@ -1,5 +1,6 @@
 import React, { useCallback } from 'react';
-import { Typography, Pagination } from '@/client/components';
+import { Typography } from '@/client/components/atoms/Typography';
+import { Pagination } from '@/client/components/molecules/Pagination';
 import { classNames } from '@/client/utils';
 import { TableHead } from './TableHead';
 import { TableRow } from './TableRow';

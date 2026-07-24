@@ -1,7 +1,9 @@
 'use client';
 
 import React from 'react';
-import { Submit, TextInput, Typography } from '@/client/components';
+import { Submit } from '@/client/components/molecules/Form/Submit';
+import { TextInput } from '@/client/components/molecules/Form/TextInput';
+import { Typography } from '@/client/components/atoms/Typography';
 import type { I18nMessage } from '@/client/locales';
 import { t } from '@/client/locales';
 // import { useFormStatus } from 'react-dom';

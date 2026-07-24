@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useCallback, useMemo } from 'react';
-import { Typography, ButtonBase } from '@/client/components';
+import { Typography } from '@/client/components/atoms/Typography';
+import { ButtonBase } from '@/client/components/atoms/Button/Base';
 import { useSnackbar } from '@/client/store';
 import { chqc } from '@/client/data';
 import { classNames } from '@/client/utils';

@@ -1,12 +1,10 @@
 'use client';
 
 import React from 'react';
-import {
-    Avatar,
-    ButtonBase,
-    ThemeSwitcher,
-    Typography
-} from '@/client/components';
+import { Avatar } from '@/client/components/atoms/Avatar';
+import { ButtonBase } from '@/client/components/atoms/Button/Base';
+import { ThemeSwitcher } from '@/client/components/molecules/ThemeSwitcher';
+import { Typography } from '@/client/components/atoms/Typography';
 import Link from 'next/link';
 import { ROUTES } from '@/common/constants';
 import { t } from '@/client/locales';

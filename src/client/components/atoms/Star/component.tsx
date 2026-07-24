@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useCallback, useRef } from 'react';
-import { Icon } from '@/client/components';
+import { Icon } from '@/client/components/atoms/Icons';
 import { classNames } from '@/client/utils';
 
 export type StarProps = Readonly<{

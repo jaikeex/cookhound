@@ -1,14 +1,12 @@
 'use client';
 
-import {
-    RangeSlider,
-    Typography,
-    ButtonBase,
-    ChipButton,
-    FilterTagSelectionModal,
-    FormCheckbox,
-    IngredientFilterInput
-} from '@/client/components';
+import { RangeSlider } from '@/client/components/molecules/Form/RangeSlider';
+import { Typography } from '@/client/components/atoms/Typography';
+import { ButtonBase } from '@/client/components/atoms/Button/Base';
+import { ChipButton } from '@/client/components/atoms/Button/Chip';
+import { FilterTagSelectionModal } from '@/client/components/organisms/Modal/FilterTagSelectionModal';
+import { FormCheckbox } from '@/client/components/molecules/Form/FormCheckbox';
+import { IngredientFilterInput } from '@/client/components/molecules/Filter/IngredientFilterInput';
 import { chqc } from '@/client/data';
 import { useModal, useSnackbar } from '@/client/store';
 import { t } from '@/client/locales';

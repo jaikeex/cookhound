@@ -3,7 +3,7 @@
 import React, { Suspense, useCallback, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { classNames } from '@/client/utils';
-import { TabButton } from '@/client/components';
+import { TabButton } from '@/client/components/atoms/Button/Tab';
 import { useParamsChangeListener } from '@/client/hooks/routingListeners';
 
 export type TabContent = {

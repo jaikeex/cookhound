@@ -2,14 +2,12 @@
 
 import * as React from 'react';
 import type { Recipe } from '@/common/types';
-import {
-    Rating,
-    Tooltip,
-    Typography,
-    RecipeInfo,
-    RecipeViewImage,
-    TagList
-} from '@/client/components';
+import { Rating } from '@/client/components/molecules/Rating';
+import { Tooltip } from '@/client/components/atoms/Tooltip';
+import { Typography } from '@/client/components/atoms/Typography';
+import { RecipeInfo } from '@/client/components/molecules/RecipeInfo';
+import { RecipeViewImage } from '@/client/components/molecules/Image/RecipeView';
+import { TagList } from '@/client/components/molecules/Tag/Display/List';
 import { useAuth, useRecipeHandling } from '@/client/store';
 import { classNames } from '@/client/utils';
 import { t } from '@/client/locales';

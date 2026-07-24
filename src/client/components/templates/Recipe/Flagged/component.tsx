@@ -1,17 +1,19 @@
 'use client';
 
 import React, { useCallback, useMemo } from 'react';
-import { ButtonBase, Icon, Typography } from '@/client/components';
+import { ButtonBase } from '@/client/components/atoms/Button/Base';
+import { Icon } from '@/client/components/atoms/Icons';
+import { Typography } from '@/client/components/atoms/Typography';
 import { useAuth, useModal } from '@/client/store';
 import { useRouter } from 'next/navigation';
 import type { Recipe } from '@/common/types';
 import type { RecipeFlagReason } from '@/common/constants';
 import { bucketForReason, RecipeFlagBucket } from '@/client/constants';
-import { DeleteRecipeConfirmationModal } from '@/client/components';
+import { DeleteRecipeConfirmationModal } from '@/client/components/organisms/Modal/DeleteRecipeConfirmationModal';
 import { chqc, QUERY_KEYS } from '@/client/data';
 import { useQueryClient } from '@tanstack/react-query';
 import { useSnackbar } from '@/client/store';
-import { RecipeFlagAppealModal } from '@/client/components';
+import { RecipeFlagAppealModal } from '@/client/components/organisms/Modal/RecipeFlagAppealModal';
 import { ROUTES } from '@/common/constants';
 import { t } from '@/client/locales';
 

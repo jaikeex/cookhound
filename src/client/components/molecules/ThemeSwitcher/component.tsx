@@ -4,10 +4,9 @@ import React, { useCallback, useMemo, useEffect, useState } from 'react';
 import { useTheme } from '@/client/store';
 import {
     IconButton,
-    Switch,
-    type IconButtonProps,
-    type SwitchProps
-} from '@/client/components';
+    type IconButtonProps
+} from '@/client/components/atoms/Button/Icon';
+import { Switch, type SwitchProps } from '@/client/components/molecules/Switch';
 import { t } from '@/client/locales';
 
 type ThemeSwitcherIconProps = Omit<IconButtonProps, 'icon' | 'onClick'>;

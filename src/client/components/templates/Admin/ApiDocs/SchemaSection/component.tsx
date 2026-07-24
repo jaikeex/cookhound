@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo } from 'react';
-import { Typography, Table } from '@/client/components';
-import type { TableColumn } from '@/client/components';
+import { Typography } from '@/client/components/atoms/Typography';
+import { Table } from '@/client/components/molecules/Table';
+import type { TableColumn } from '@/client/components/molecules/Table';
 import {
     formatSchemaType,
     formatConstraints,

@@ -1,5 +1,5 @@
 import React from 'react';
-import { SkeletonBox } from '@/client/components';
+import { SkeletonBox } from '@/client/components/atoms/Skeleton/SkeletonBox';
 
 export const SkeletonStatCard: React.FC = () => (
     <div className="rounded-lg border border-gray-200 bg-sheet p-4 shadow-sm dark:border-gray-700">

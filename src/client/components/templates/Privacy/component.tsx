@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useCallback } from 'react';
-import { Typography, ConsentSettingsModal } from '@/client/components';
+import { Typography } from '@/client/components/atoms/Typography';
+import { ConsentSettingsModal } from '@/client/components/organisms/Modal/ConsentSettingsModal';
 import {
     PRIVACY_CONTENT,
     PRIVACY_TIMESTAMP,

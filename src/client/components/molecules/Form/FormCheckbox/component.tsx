@@ -1,6 +1,7 @@
 import React from 'react';
 import type { FormInputProps } from '@/client/components/molecules/Form/types';
-import { Checkbox, InputLabel } from '@/client/components';
+import { Checkbox } from '@/client/components/atoms/Checkbox';
+import { InputLabel } from '@/client/components/atoms/Input/InputLabel';
 import { classNames } from '@/client/utils';
 
 export type FormCheckboxProps = Readonly<{

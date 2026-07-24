@@ -2,7 +2,7 @@
 
 import React, { useCallback, useEffect, useState } from 'react';
 import { classNames } from '@/client/utils';
-import { Typography } from '@/client/components';
+import { Typography } from '@/client/components/atoms/Typography';
 import { useKeyPress } from '@/client/hooks';
 
 export type SwitchProps = Readonly<{

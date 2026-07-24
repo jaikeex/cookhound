@@ -1,5 +1,5 @@
 import React from 'react';
-import { Icon } from '@/client/components';
+import { Icon } from '@/client/components/atoms/Icons';
 import { classNames } from '@/client/utils';
 
 //~---------------------------------------------------------------------------------------------~//

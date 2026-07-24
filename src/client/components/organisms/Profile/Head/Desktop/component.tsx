@@ -2,7 +2,10 @@
 
 import React, { useMemo } from 'react';
 import type { User } from '@/common/types';
-import { Avatar, AvatarInput, Time, Typography } from '@/client/components';
+import { Avatar } from '@/client/components/atoms/Avatar';
+import { AvatarInput } from '@/client/components/molecules/Form/AvatarInput';
+import { Time } from '@/client/components/atoms/Time';
+import { Typography } from '@/client/components/atoms/Typography';
 import { t } from '@/client/locales';
 import { getAgeString } from '@/client/utils';
 

@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { SkeletonCard, SkeletonBox } from '@/client/components';
+import { SkeletonCard } from '@/client/components/atoms/Skeleton/SkeletonCard';
+import { SkeletonBox } from '@/client/components/atoms/Skeleton/SkeletonBox';
 import { classNames } from '@/client/utils';
 
 export const FrontPageSkeleton: React.FC = () => {

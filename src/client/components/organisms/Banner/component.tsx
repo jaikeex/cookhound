@@ -3,9 +3,9 @@
 import React from 'react';
 import Image from 'next/image';
 import { classNames } from '@/client/utils';
-import { RecipeSearchInput } from '@/client/components';
+import { RecipeSearchInput } from '@/client/components/organisms/RecipeSearchInput';
 import { type ChangeEvent } from 'react';
-import { Typography } from '@/client/components';
+import { Typography } from '@/client/components/atoms/Typography';
 import { t } from '@/client/locales';
 import Link from 'next/link';
 import { ROUTES } from '@/common/constants';

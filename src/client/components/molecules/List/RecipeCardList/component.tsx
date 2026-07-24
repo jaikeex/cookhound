@@ -1,10 +1,11 @@
 'use client';
 
-import { Loader, RecipeCard } from '@/client/components';
+import { Loader } from '@/client/components/atoms/Loader';
+import { RecipeCard } from '@/client/components/molecules/Card/Recipe';
 import { useInfinityScroll } from '@/client/hooks';
 import type { RecipeForDisplayDTO } from '@/common/types';
 import * as React from 'react';
-import { RecipeWithHandling } from '@/client/components/molecules';
+import { RecipeWithHandling } from '@/client/components/molecules/Card/RecipeWithHandling';
 import { GRID_COLS } from '@/client/constants';
 
 export type RecipeCardListGridColumns = {

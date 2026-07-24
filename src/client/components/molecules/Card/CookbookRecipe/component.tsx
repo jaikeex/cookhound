@@ -2,7 +2,8 @@
 
 import React, { useCallback } from 'react';
 import dynamic from 'next/dynamic';
-import { IconButton, RecipeCard } from '@/client/components';
+import { IconButton } from '@/client/components/atoms/Button/Icon';
+import { RecipeCard } from '@/client/components/molecules/Card/Recipe';
 import type { RecipeCardProps } from '@/client/components/molecules/Card/types';
 import { useModal, useSnackbar } from '@/client/store';
 import { chqc, QUERY_KEYS } from '@/client/data';

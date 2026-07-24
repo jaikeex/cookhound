@@ -2,12 +2,12 @@
 
 import React, { useCallback, useState } from 'react';
 import type { ModalProps } from '@/client/components/organisms/Modal/types';
+import { ButtonBase } from '@/client/components/atoms/Button/Base';
 import {
-    ButtonBase,
     Select,
-    Typography,
     type SelectOption
-} from '@/client/components';
+} from '@/client/components/molecules/Form/Select';
+import { Typography } from '@/client/components/atoms/Typography';
 import { useModal, useSnackbar } from '@/client/store';
 import { chqc, QUERY_KEYS } from '@/client/data';
 import { useQueryClient } from '@tanstack/react-query';

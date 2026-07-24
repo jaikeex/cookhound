@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useCallback, useState } from 'react';
-import { InputLabel, NumberInput } from '@/client/components';
+import { InputLabel } from '@/client/components/atoms/Input/InputLabel';
+import { NumberInput } from '@/client/components/molecules/Form/NumberInput';
 import type { FormInputProps } from '@/client/components/molecules/Form/types';
 import { classNames } from '@/client/utils';
 

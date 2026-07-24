@@ -1,7 +1,9 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import { Menu, NavTabs, Typography, type MenuItem } from '@/client/components';
+import { Menu, type MenuItem } from '@/client/components/molecules/Menu';
+import { NavTabs } from '@/client/components/molecules/NavTabs';
+import { Typography } from '@/client/components/atoms/Typography';
 import { ROUTES } from '@/common/constants';
 import { t } from '@/client/locales';
 

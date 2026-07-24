@@ -1,5 +1,5 @@
 import React from 'react';
-import { Tag } from '@/client/components';
+import { Tag } from '@/client/components/molecules/Tag/Display/Single';
 import type { RecipeTagDTO } from '@/common/types';
 import { classNames } from '@/client/utils';
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { Avatar } from '@/client/components';
+import { Avatar } from '@/client/components/atoms/Avatar';
 import React from 'react';
 import { chqc } from '@/client/data';
 import Link from 'next/link';

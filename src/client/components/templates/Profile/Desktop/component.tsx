@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { type ProfileNavigationItem, ProfileTab } from '@/client/types/core';
-import { Menu } from '@/client/components/molecules';
+import { Menu } from '@/client/components/molecules/Menu';
 import { useParams, useSearchParams } from 'next/navigation';
 import type { User } from '@/common/types';
 import { classNames } from '@/client/utils';

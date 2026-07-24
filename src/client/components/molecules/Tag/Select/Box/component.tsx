@@ -2,7 +2,10 @@
 
 import React from 'react';
 import type { RecipeTagDTO } from '@/common/types';
-import { Typography, TagList, ButtonBase, Loader } from '@/client/components';
+import { Typography } from '@/client/components/atoms/Typography';
+import { TagList } from '@/client/components/molecules/Tag/Display/List';
+import { ButtonBase } from '@/client/components/atoms/Button/Base';
+import { Loader } from '@/client/components/atoms/Loader';
 import { classNames } from '@/client/utils';
 import { useScreenSize } from '@/client/hooks';
 import { MAX_TAGS } from '@/common/constants';

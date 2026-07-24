@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { classNames } from '@/client/utils';
 import { useOutsideClick } from '@/client/hooks';
 import type { IconName } from '@/client/types';
-import { Icon } from '@/client/components';
+import { Icon } from '@/client/components/atoms/Icons';
 
 const classConfig = {
     colors: {

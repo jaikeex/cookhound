@@ -1,9 +1,7 @@
 import * as React from 'react';
-import {
-    SkeletonStatCard,
-    SkeletonTable,
-    SkeletonBox
-} from '@/client/components';
+import { SkeletonStatCard } from '@/client/components/atoms/Skeleton/SkeletonStatCard';
+import { SkeletonTable } from '@/client/components/atoms/Skeleton/SkeletonTable';
+import { SkeletonBox } from '@/client/components/atoms/Skeleton/SkeletonBox';
 
 export const AdminDashboardSkeleton: React.FC = () => {
     return (

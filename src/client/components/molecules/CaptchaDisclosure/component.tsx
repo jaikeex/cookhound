@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Typography } from '@/client/components';
+import { Typography } from '@/client/components/atoms/Typography';
 import { t } from '@/client/locales';
 
 export type CaptchaDisclosureProps = Readonly<{

@@ -1,7 +1,8 @@
 import React from 'react';
 import type { ProfileNavigationItem } from '@/client/types/core';
-import type { TabContent } from '@/client/components';
-import { ProfileHeadMobile, Tabs } from '@/client/components';
+import type { TabContent } from '@/client/components/molecules/Tabs';
+import { ProfileHeadMobile } from '@/client/components/organisms/Profile/Head/Mobile';
+import { Tabs } from '@/client/components/molecules/Tabs';
 import type { User } from '@/common/types';
 import { classNames } from '@/client/utils';
 

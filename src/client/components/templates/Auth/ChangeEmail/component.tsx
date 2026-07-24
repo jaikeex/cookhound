@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useCallback, useEffect, useState } from 'react';
-import type { ChangeEmailFormErrors } from '@/client/components';
-import { ChangeEmailForm } from '@/client/components';
+import type { ChangeEmailFormErrors } from '@/client/components/organisms/Form/ChangeEmail';
+import { ChangeEmailForm } from '@/client/components/organisms/Form/ChangeEmail';
 import { useSnackbar } from '@/client/store';
 import { validateFormData } from '@/client/utils/form';
 import { z } from 'zod';

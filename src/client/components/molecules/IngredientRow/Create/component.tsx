@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useCallback, useEffect, useState } from 'react';
-import { BaseInput, DraggableInputRow } from '@/client/components';
+import { BaseInput } from '@/client/components/atoms/Input/Base';
+import { DraggableInputRow } from '@/client/components/molecules/Form/DraggableInputRow';
 import type { Ingredient } from '@/common/types';
 import { useCreateRecipeStore } from '@/client/store';
 import { t } from '@/client/locales';

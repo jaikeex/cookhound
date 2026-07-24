@@ -1,7 +1,9 @@
 'use client';
 
 import React, { useCallback, useMemo } from 'react';
-import { BaseSelect, IconButton, Typography } from '@/client/components';
+import { BaseSelect } from '@/client/components/atoms/Input/BaseSelect';
+import { IconButton } from '@/client/components/atoms/Button/Icon';
+import { Typography } from '@/client/components/atoms/Typography';
 import { classNames } from '@/client/utils';
 import { t } from '@/client/locales';
 

@@ -1,7 +1,9 @@
 'use client';
 
 import React from 'react';
-import { Typography, Chip, Switch } from '@/client/components';
+import { Typography } from '@/client/components/atoms/Typography';
+import { Chip } from '@/client/components/atoms/Chip';
+import { Switch } from '@/client/components/molecules/Switch';
 import { useScreenSize } from '@/client/hooks';
 import { t } from '@/client/locales';
 

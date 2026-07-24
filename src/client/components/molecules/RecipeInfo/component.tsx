@@ -1,12 +1,12 @@
 'use client';
 
 import React from 'react';
+import { Icon } from '@/client/components/atoms/Icons';
+import { Stepper } from '@/client/components/atoms/Stepper';
 import {
-    Icon,
-    Stepper,
     Typography,
     type TypographyVariant
-} from '@/client/components';
+} from '@/client/components/atoms/Typography';
 import { classNames } from '@/client/utils';
 import { t } from '@/client/locales';
 

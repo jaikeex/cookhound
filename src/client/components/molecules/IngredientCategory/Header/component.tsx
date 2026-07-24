@@ -1,11 +1,9 @@
 'use client';
 
-import {
-    ButtonBase,
-    BaseInput,
-    Typography,
-    IconButton
-} from '@/client/components';
+import { ButtonBase } from '@/client/components/atoms/Button/Base';
+import { BaseInput } from '@/client/components/atoms/Input/Base';
+import { Typography } from '@/client/components/atoms/Typography';
+import { IconButton } from '@/client/components/atoms/Button/Icon';
 import * as React from 'react';
 import { useCallback, useEffect, useState } from 'react';
 import { t } from '@/client/locales';

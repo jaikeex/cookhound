@@ -2,7 +2,9 @@
 
 import React, { useCallback, useState } from 'react';
 import type { ModalProps } from '@/client/components/organisms/Modal/types';
-import { ButtonBase, ShareButton, Typography } from '@/client/components';
+import { ButtonBase } from '@/client/components/atoms/Button/Base';
+import { ShareButton } from '@/client/components/molecules/Button/Share';
+import { Typography } from '@/client/components/atoms/Typography';
 import { useSnackbar } from '@/client/store';
 import {
     DEFAULT_SHARE_PLATFORMS,

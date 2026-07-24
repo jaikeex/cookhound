@@ -7,7 +7,10 @@ import React, {
     useState,
     useMemo
 } from 'react';
-import { BaseInput, Icon, InputError, InputLabel } from '@/client/components';
+import { BaseInput } from '@/client/components/atoms/Input/Base';
+import { Icon } from '@/client/components/atoms/Icons';
+import { InputError } from '@/client/components/atoms/Input/InputError';
+import { InputLabel } from '@/client/components/atoms/Input/InputLabel';
 import type { FormInputProps } from '@/client/components/molecules/Form/types';
 import { classNames } from '@/client/utils';
 import { t } from '@/client/locales';

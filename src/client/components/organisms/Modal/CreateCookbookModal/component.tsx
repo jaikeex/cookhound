@@ -4,10 +4,10 @@ import React, { useCallback, useState } from 'react';
 import type { ModalProps } from '@/client/components/organisms/Modal/types';
 import {
     CookbookForm,
-    type CookbookFormErrors,
-    ButtonBase,
-    Submit
-} from '@/client/components';
+    type CookbookFormErrors
+} from '@/client/components/organisms/Form/Cookbook';
+import { ButtonBase } from '@/client/components/atoms/Button/Base';
+import { Submit } from '@/client/components/molecules/Form/Submit';
 import { useSnackbar } from '@/client/store';
 import type { I18nMessage } from '@/client/locales';
 import { chqc, QUERY_KEYS } from '@/client/data';

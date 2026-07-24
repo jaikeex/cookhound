@@ -1,5 +1,6 @@
 import React from 'react';
-import { Radio, Typography } from '@/client/components';
+import { Radio } from '@/client/components/atoms/Radio';
+import { Typography } from '@/client/components/atoms/Typography';
 import { classNames } from '@/client/utils';
 
 //~---------------------------------------------------------------------------------------------~//

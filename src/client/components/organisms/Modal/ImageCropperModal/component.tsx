@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { ButtonBase, Typography } from '@/client/components';
+import { ButtonBase } from '@/client/components/atoms/Button/Base';
+import { Typography } from '@/client/components/atoms/Typography';
 import type { ModalProps } from '@/client/components/organisms/Modal/types';
 import { useSnackbar } from '@/client/store';
 import ReactCrop, { type Crop, type PixelCrop } from 'react-image-crop';

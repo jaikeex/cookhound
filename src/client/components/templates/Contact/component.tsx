@@ -1,12 +1,10 @@
 'use client';
 
 import React, { useCallback, useEffect, useState } from 'react';
-import type { ContactFormErrors } from '@/client/components';
-import {
-    CaptchaDisclosure,
-    ContactForm,
-    Typography
-} from '@/client/components';
+import type { ContactFormErrors } from '@/client/components/organisms/Form/Contact';
+import { CaptchaDisclosure } from '@/client/components/molecules/CaptchaDisclosure';
+import { ContactForm } from '@/client/components/organisms/Form/Contact';
+import { Typography } from '@/client/components/atoms/Typography';
 import type { ContactFormData } from '@/common/types';
 import { z } from 'zod';
 import { validateFormData, executeCaptcha } from '@/client/utils';

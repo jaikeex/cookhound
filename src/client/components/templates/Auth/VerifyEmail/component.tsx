@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useCallback } from 'react';
-import { ButtonWithCooldown, Typography } from '@/client/components';
+import { ButtonWithCooldown } from '@/client/components/molecules/Button/WithCooldown';
+import { Typography } from '@/client/components/atoms/Typography';
 import { chqc } from '@/client/data';
 import type { I18nMessage } from '@/client/locales';
 import { t } from '@/client/locales';

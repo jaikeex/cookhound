@@ -1,8 +1,10 @@
 'use client';
 
 import React, { useCallback, use, useMemo } from 'react';
-import { Table, StatCard, Typography } from '@/client/components';
-import type { TableColumn } from '@/client/components';
+import { Table } from '@/client/components/molecules/Table';
+import { StatCard } from '@/client/components/molecules/Card/Stat';
+import { Typography } from '@/client/components/atoms/Typography';
+import type { TableColumn } from '@/client/components/molecules/Table';
 import { formatDate } from '@/client/utils';
 import type { AdminDashboardStatsDTO } from '@/common/types';
 import { t } from '@/client/locales';

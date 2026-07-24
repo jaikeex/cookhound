@@ -1,11 +1,11 @@
 import React from 'react';
-import { RecipeCardList } from '@/client/components';
-import { SkeletonCard } from '@/client/components';
+import { RecipeCardList } from '@/client/components/molecules/List/RecipeCardList';
+import { SkeletonCard } from '@/client/components/atoms/Skeleton/SkeletonCard';
 import { GRID_COLS } from '@/client/constants';
 import { classNames } from '@/client/utils';
 import { useRecipeDiscovery } from '@/client/hooks/useRecipeDiscovery/hook';
 import { useMemo } from 'react';
-import type { RecipeCardListGridColumns } from '@/client/components';
+import type { RecipeCardListGridColumns } from '@/client/components/molecules/List/RecipeCardList';
 
 export type RecipesProps = Readonly<{
     className?: string;

@@ -8,7 +8,9 @@ import { useAuth } from '@/client/store';
 import { t } from '@/client/locales';
 import { ROUTES, SEARCH_QUERY_SEPARATOR } from '@/common/constants';
 import type { SearchInputProps } from '@/client/components/molecules/Form/SearchInput/component';
-import { Chip, Typography, SearchInput } from '@/client/components';
+import { Chip } from '@/client/components/atoms/Chip';
+import { Typography } from '@/client/components/atoms/Typography';
+import { SearchInput } from '@/client/components/molecules/Form/SearchInput';
 import { chqc } from '@/client/data';
 import Link from 'next/link';
 

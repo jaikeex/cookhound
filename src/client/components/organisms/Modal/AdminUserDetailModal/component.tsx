@@ -2,7 +2,9 @@
 
 import React, { useCallback } from 'react';
 import type { ModalProps } from '@/client/components/organisms/Modal/types';
-import { ButtonBase, Chip, Typography } from '@/client/components';
+import { ButtonBase } from '@/client/components/atoms/Button/Base';
+import { Chip } from '@/client/components/atoms/Chip';
+import { Typography } from '@/client/components/atoms/Typography';
 import { AdminActionConfirmModal } from '@/client/components/organisms/Modal/AdminActionConfirmModal';
 import { useSnackbar, useModal } from '@/client/store';
 import { chqc } from '@/client/data';

@@ -1,13 +1,11 @@
 'use client';
 
 import React, { useCallback, useState } from 'react';
-import {
-    ButtonBase,
-    ErrorList,
-    Submit,
-    Textarea,
-    Typography
-} from '@/client/components';
+import { ButtonBase } from '@/client/components/atoms/Button/Base';
+import { ErrorList } from '@/client/components/molecules/Form/ErrorList';
+import { Submit } from '@/client/components/molecules/Form/Submit';
+import { Textarea } from '@/client/components/molecules/Form/Textarea';
+import { Typography } from '@/client/components/atoms/Typography';
 import { useSnackbar } from '@/client/store';
 import { chqc } from '@/client/data';
 import type { ModalProps } from '@/client/components/organisms/Modal/types';

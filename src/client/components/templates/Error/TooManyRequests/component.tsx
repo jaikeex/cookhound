@@ -1,6 +1,7 @@
 'use client';
 
-import { ButtonBase, Typography } from '@/client/components';
+import { ButtonBase } from '@/client/components/atoms/Button/Base';
+import { Typography } from '@/client/components/atoms/Typography';
 import Link from 'next/link';
 import * as React from 'react';
 import { t } from '@/client/locales';

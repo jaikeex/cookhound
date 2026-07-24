@@ -2,7 +2,9 @@
 
 import React, { useCallback, useRef, useState } from 'react';
 import type { ModalProps } from '@/client/components/organisms/Modal/types';
-import { ButtonBase, TextInput, Typography } from '@/client/components';
+import { ButtonBase } from '@/client/components/atoms/Button/Base';
+import { TextInput } from '@/client/components/molecules/Form/TextInput';
+import { Typography } from '@/client/components/atoms/Typography';
 import { t } from '@/client/locales';
 
 export type AdminActionConfirmModalProps = Readonly<{

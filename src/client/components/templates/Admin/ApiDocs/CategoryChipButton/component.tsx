@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { ChipButton } from '@/client/components';
+import { ChipButton } from '@/client/components/atoms/Button/Chip';
 
 export type CategoryChipButtonProps = Readonly<{
     category: string;

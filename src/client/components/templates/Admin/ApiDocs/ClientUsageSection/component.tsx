@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Typography } from '@/client/components';
+import { Typography } from '@/client/components/atoms/Typography';
 import type { ClientUsageEntry } from '@/common/types';
 import { t } from '@/client/locales';
 

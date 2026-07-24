@@ -1,6 +1,6 @@
 import React from 'react';
 import { classNames } from '@/client/utils';
-import { Typography } from '@/client/components';
+import { Typography } from '@/client/components/atoms/Typography';
 
 type TabButtonProps = Readonly<{
     active?: boolean;

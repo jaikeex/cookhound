@@ -7,13 +7,11 @@ import type {
     ShoppingListIngredientDTO,
     ShoppingListPayload
 } from '@/common/types';
-import {
-    ButtonBase,
-    ShoppingListBody,
-    ShoppingListHead,
-    Trash,
-    Typography
-} from '@/client/components';
+import { ButtonBase } from '@/client/components/atoms/Button/Base';
+import { ShoppingListBody } from '@/client/components/organisms/ShoppingList/Body';
+import { ShoppingListHead } from '@/client/components/organisms/ShoppingList/Head';
+import { Trash } from '@/client/components/organisms/ShoppingList/Trash';
+import { Typography } from '@/client/components/atoms/Typography';
 import { useAuth, useModal } from '@/client/store';
 import { useShoppingList } from '@/client/hooks';
 import Link from 'next/link';

@@ -1,13 +1,11 @@
 'use client';
 
 import React from 'react';
-import {
-    ErrorList,
-    PasswordInput,
-    Submit,
-    TextInput,
-    Typography
-} from '@/client/components';
+import { ErrorList } from '@/client/components/molecules/Form/ErrorList';
+import { PasswordInput } from '@/client/components/molecules/Form/PasswordInput';
+import { Submit } from '@/client/components/molecules/Form/Submit';
+import { TextInput } from '@/client/components/molecules/Form/TextInput';
+import { Typography } from '@/client/components/atoms/Typography';
 import type { I18nMessage } from '@/client/locales';
 import { t } from '@/client/locales';
 

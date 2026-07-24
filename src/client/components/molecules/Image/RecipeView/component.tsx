@@ -1,11 +1,9 @@
 'use client';
 
-import {
-    IconButton,
-    RecipeAuthorLinkMobile,
-    RecipeImage,
-    ShareModal
-} from '@/client/components';
+import { IconButton } from '@/client/components/atoms/Button/Icon';
+import { RecipeAuthorLinkMobile } from '@/client/components/molecules/RecipeAuthorLink/Mobile';
+import { RecipeImage } from '@/client/components/atoms/Image/RecipeImage';
+import { ShareModal } from '@/client/components/organisms/Modal/ShareModal';
 import { classNames } from '@/client/utils';
 import React, { useCallback, useMemo } from 'react';
 import dynamic from 'next/dynamic';

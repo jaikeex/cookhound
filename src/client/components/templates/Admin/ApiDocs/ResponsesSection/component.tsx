@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Typography } from '@/client/components';
+import { Typography } from '@/client/components/atoms/Typography';
 import type { SerializedResponseDoc } from '@/common/types';
 import { SchemaSection } from '@/client/components/templates/Admin/ApiDocs/SchemaSection';
 import { getStatusColor } from '@/client/components/templates/Admin/ApiDocs/utils';

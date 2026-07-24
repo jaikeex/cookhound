@@ -2,7 +2,8 @@
 
 import React, { useState } from 'react';
 import { classNames } from '@/client/utils';
-import { Icon, Tooltip } from '@/client/components';
+import { Icon } from '@/client/components/atoms/Icons';
+import { Tooltip } from '@/client/components/atoms/Tooltip';
 import Link from 'next/link';
 import { useAuth } from '@/client/store';
 import { BOTTOM_NAVBAR_ID } from '@/client/constants';

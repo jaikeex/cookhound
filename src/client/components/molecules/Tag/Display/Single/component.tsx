@@ -1,6 +1,6 @@
 'use client';
 
-import { Typography } from '@/client/components';
+import { Typography } from '@/client/components/atoms/Typography';
 import { classNames } from '@/client/utils';
 import React from 'react';
 

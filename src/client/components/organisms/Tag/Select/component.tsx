@@ -1,6 +1,8 @@
 'use client';
 
-import { ButtonBase, TagList, TagSelectionModal } from '@/client/components';
+import { ButtonBase } from '@/client/components/atoms/Button/Base';
+import { TagList } from '@/client/components/molecules/Tag/Display/List';
+import { TagSelectionModal } from '@/client/components/organisms/Modal/TagSelectionModal';
 import { chqc } from '@/client/data';
 import { useModal } from '@/client/store';
 import { t } from '@/client/locales';

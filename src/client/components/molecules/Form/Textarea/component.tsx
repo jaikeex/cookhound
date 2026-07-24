@@ -1,6 +1,8 @@
 import React from 'react';
 import type { FocusEventHandler } from 'react';
-import { InputError, InputLabel, BaseTextarea } from '@/client/components';
+import { InputError } from '@/client/components/atoms/Input/InputError';
+import { InputLabel } from '@/client/components/atoms/Input/InputLabel';
+import { BaseTextarea } from '@/client/components/atoms/Input/BaseTextarea';
 import type { FormInputProps } from '@/client/components/molecules/Form/types';
 import { classNames } from '@/client/utils';
 

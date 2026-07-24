@@ -1,11 +1,12 @@
 'use client';
 
 import React, { useCallback, useState, useEffect } from 'react';
-import { ButtonBase, Typography } from '@/client/components';
+import { ButtonBase } from '@/client/components/atoms/Button/Base';
+import { Typography } from '@/client/components/atoms/Typography';
 import { classNames } from '@/client/utils';
 import { useConsent } from '@/client/store';
 import { useModal } from '@/client/store';
-import { ConsentSettingsModal } from '@/client/components';
+import { ConsentSettingsModal } from '@/client/components/organisms/Modal/ConsentSettingsModal';
 import { t } from '@/client/locales';
 
 export const ConsentBanner: React.FC = () => {

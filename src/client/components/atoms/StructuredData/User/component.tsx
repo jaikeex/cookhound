@@ -1,4 +1,4 @@
-import { StructuredData } from '@/client/components';
+import { StructuredData } from '@/client/components/atoms/StructuredData/Generic';
 import { ENV_CONFIG_PUBLIC, ROUTES } from '@/common/constants';
 import type { User } from '@/common/types';
 import React from 'react';

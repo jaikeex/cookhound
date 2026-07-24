@@ -1,7 +1,9 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { Loader, Typography, ButtonBase } from '@/client/components';
+import { Loader } from '@/client/components/atoms/Loader';
+import { Typography } from '@/client/components/atoms/Typography';
+import { ButtonBase } from '@/client/components/atoms/Button/Base';
 import { chqc, QUERY_KEYS } from '@/client/data';
 import type { RequestError } from '@/client/error';
 import { useQueryClient } from '@tanstack/react-query';

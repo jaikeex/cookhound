@@ -1,15 +1,17 @@
 'use client';
 
 import React from 'react';
+import { MobileRecipeViewTemplate } from '@/client/components/templates/Recipe/View/Mobile';
+import { Sidebar } from '@/client/components/molecules/Sidebar';
+import { SidebarHandle } from '@/client/components/molecules/Sidebar/Handle';
 import {
-    MobileRecipeViewTemplate,
-    Sidebar,
-    SidebarHandle,
     DesktopRecipeViewTemplate,
-    DesktopRecipeViewSkeleton,
+    DesktopRecipeViewSkeleton
+} from '@/client/components/templates/Recipe/View/Desktop';
+import {
     RecipeForm,
     type RecipeFormErrors
-} from '@/client/components';
+} from '@/client/components/organisms/Form/Recipe';
 import { classNames } from '@/client/utils';
 import type { Recipe } from '@/common/types';
 import type { RecipeFormMode } from '@/client/types/core';

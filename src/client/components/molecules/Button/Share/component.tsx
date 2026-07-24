@@ -1,7 +1,8 @@
 'use client';
 
 import React from 'react';
-import { Icon, Typography } from '@/client/components';
+import { Icon } from '@/client/components/atoms/Icons';
+import { Typography } from '@/client/components/atoms/Typography';
 import { type SocialPlatform, SOCIAL_PLATFORMS } from '@/client/constants';
 import { classNames } from '@/client/utils';
 import { t } from '@/client/locales';

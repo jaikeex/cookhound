@@ -179,12 +179,26 @@ Recipe search uses Typesense (`src/server/search-index/`) with results cached in
 
 ```typescript
 // Use absolute imports with @ alias
-import { ComponentName } from '@/client/components';
 import type { TypeName } from '@/common/types';
 
 // Export from index files for clean imports
 export { ComponentName } from './component';
 export * from './subfolder';
+```
+
+#### Component imports: deep paths, not the barrel
+
+Inside `src/client/components/**`, import components from their own
+module path, **not** from the `@/client/components` barrel (nor the
+`atoms`/`molecules`/`organisms` sub-barrels):
+
+```typescript
+// Do this, deep, module-specific import
+import { Typography } from '@/client/components/atoms/Typography';
+import { ButtonBase } from '@/client/components/atoms/Button/Base';
+
+// Not this, the barrel pulls the whole component tree
+import { Typography, ButtonBase } from '@/client/components';
 ```
 
 ### Component Patterns

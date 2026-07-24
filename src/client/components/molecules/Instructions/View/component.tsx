@@ -1,5 +1,8 @@
 import React from 'react';
-import { Typography, type TypographyVariant } from '@/client/components';
+import {
+    Typography,
+    type TypographyVariant
+} from '@/client/components/atoms/Typography';
 import type { Recipe } from '@/common/types';
 import type { ViewPortVariant } from '@/client/types';
 

@@ -1,12 +1,12 @@
 'use client';
 
+import { DeleteRecipeConfirmationModal } from '@/client/components/organisms/Modal/DeleteRecipeConfirmationModal';
 import {
-    DeleteRecipeConfirmationModal,
     Dropdown,
-    type DropdownItem,
-    IconButton,
-    RecipeCard
-} from '@/client/components';
+    type DropdownItem
+} from '@/client/components/organisms/Dropdown';
+import { IconButton } from '@/client/components/atoms/Button/Icon';
+import { RecipeCard } from '@/client/components/molecules/Card/Recipe';
 import React, { useCallback, useMemo } from 'react';
 import type { RecipeCardProps } from '@/client/components/molecules/Card/types';
 import { chqc, QUERY_KEYS } from '@/client/data';

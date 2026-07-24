@@ -1,13 +1,11 @@
 'use client';
 
 import React, { useCallback, useEffect, useState } from 'react';
-import type { LoginFormErrors } from '@/client/components';
-import {
-    Divider,
-    GoogleSigninButton,
-    LoginForm,
-    Typography
-} from '@/client/components';
+import type { LoginFormErrors } from '@/client/components/organisms/Form/Login';
+import { Divider } from '@/client/components/atoms/Divider';
+import { GoogleSigninButton } from '@/client/components/atoms/Button/GoogleSignin';
+import { LoginForm } from '@/client/components/organisms/Form/Login';
+import { Typography } from '@/client/components/atoms/Typography';
 import type { User, UserForLogin } from '@/common/types';
 import { z } from 'zod';
 import { validateFormData } from '@/client/utils/form';

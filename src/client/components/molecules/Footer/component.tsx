@@ -3,8 +3,8 @@
 import { classNames } from '@/client/utils';
 import React, { useCallback } from 'react';
 import { useModal } from '@/client/store';
-import { ConsentSettingsModal } from '@/client/components';
 import Link from 'next/link';
+import { ConsentSettingsModal } from '@/client/components/organisms/Modal/ConsentSettingsModal';
 import { ROUTES, VERSION } from '@/common/constants';
 import { t } from '@/client/locales';
 
