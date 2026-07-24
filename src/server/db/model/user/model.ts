@@ -21,6 +21,7 @@ import {
     getUserLastViewedRecipes,
     upsertUserPreference
 } from '@/server/db/generated/prisma/sql';
+import { ANONYMOUS_USER_ID } from '@/common/constants';
 import { ADMIN_USER_LIST_SELECT } from './projections';
 
 //|=============================================================================================|//
@@ -844,7 +845,7 @@ class UserModel {
 
         await prisma.recipe.updateMany({
             where: { authorId: userId },
-            data: { authorId: -1 }
+            data: { authorId: ANONYMOUS_USER_ID }
         });
 
         return;
@@ -859,7 +860,7 @@ class UserModel {
 
         await prisma.cookbook.updateMany({
             where: { ownerId: userId },
-            data: { ownerId: -1 }
+            data: { ownerId: ANONYMOUS_USER_ID }
         });
 
         return;
@@ -903,16 +904,16 @@ class UserModel {
                 });
             }
 
-            // Anonymize recipes (change authorId to -1)
+            // Anonymize recipes (reparent to the system user)
             await tx.recipe.updateMany({
                 where: { authorId: userId },
-                data: { authorId: -1 }
+                data: { authorId: ANONYMOUS_USER_ID }
             });
 
-            // Anonymize cookbooks (change ownerId to -1)
+            // Anonymize cookbooks (reparent to the system user)
             await tx.cookbook.updateMany({
                 where: { ownerId: userId },
-                data: { ownerId: -1 }
+                data: { ownerId: ANONYMOUS_USER_ID }
             });
 
             await tx.shoppingListIngredient.deleteMany({
@@ -962,6 +963,11 @@ class UserModel {
 
             await tx.accountDeletionRequest.deleteMany({
                 where: { userId }
+            });
+
+            await tx.contentReport.updateMany({
+                where: { reporterId: userId },
+                data: { reporterId: ANONYMOUS_USER_ID }
             });
 
             await tx.user.delete({

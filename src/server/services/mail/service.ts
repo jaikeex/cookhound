@@ -271,6 +271,65 @@ class MailService {
             ...payload
         });
     }
+
+    /**
+     * Enqueues the email sent to a reporter right after they file a content report.
+     *
+     * @param email - Reporter's email address.
+     * @param username - Reporter's username.
+     * @param targetLabel - Label of the reported content.
+     */
+    @LogServiceMethod({ names: ['email', 'username'] })
+    async sendReportReceipt(
+        email: string,
+        username: string,
+        targetLabel: string
+    ) {
+        await queueManager.addJob(JOB_NAMES.SEND_REPORT_RECEIPT, {
+            targetLabel,
+            to: { name: username, address: email }
+        });
+    }
+
+    /**
+     * Enqueues the decision email sent to a reporter once their report is resolved.
+     *
+     * @param email - Reporter's email address.
+     * @param username - Reporter's username (used in the greeting).
+     * @param payload - Reported content label, whether the report was upheld,
+     *   and the moderator's free-text resolution note.
+     */
+    @LogServiceMethod({ names: ['email', 'username'] })
+    async sendReportDecision(
+        email: string,
+        username: string,
+        payload: { targetLabel: string; upheld: boolean; resolution: string }
+    ) {
+        await queueManager.addJob(JOB_NAMES.SEND_REPORT_DECISION, {
+            ...payload,
+            to: { name: username, address: email }
+        });
+    }
+
+    /**
+     * Enqueues the internal notification for a newly filed content report.
+     *
+     * @param payload - Structured report context for the email body.
+     */
+    @LogServiceMethod({ names: ['payload'] })
+    async sendAdminReportNotification(payload: {
+        reportId: number;
+        targetType: string;
+        targetLabel: string;
+        targetUrl: string;
+        reason: string;
+        details: string;
+        reporterId: number;
+    }) {
+        await queueManager.addJob(JOB_NAMES.SEND_ADMIN_REPORT_NOTIFICATION, {
+            ...payload
+        });
+    }
 }
 
 export const mailService = new MailService();

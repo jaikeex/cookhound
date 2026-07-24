@@ -12,3 +12,6 @@ export * from './account-deleted';
 export * from './admin-account-deletion-notice';
 export * from './contact-form';
 export * from './flag-appeal-notification';
+export * from './report-receipt';
+export * from './report-decision';
+export * from './admin-report-notification';

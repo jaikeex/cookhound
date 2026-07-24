@@ -44,6 +44,9 @@ export * from './emails/SendAccountDeletionCancelledJob';
 export * from './emails/SendAccountDeletedJob';
 export * from './emails/SendContactFormJob';
 export * from './emails/SendFlagAppealNotificationJob';
+export * from './emails/SendReportReceiptJob';
+export * from './emails/SendReportDecisionJob';
+export * from './emails/SendAdminReportNotificationJob';
 
 //|-----------------------------------------------------------------------------------------|//
 //?                                         SEARCH                                          ?//

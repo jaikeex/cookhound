@@ -66,6 +66,21 @@ export const ntfyMessages = Object.freeze({
         };
     },
 
+    contentReported(payload: {
+        reportId: number;
+        targetType: string;
+        targetLabel: string;
+        reason: string;
+    }): NtfyNotificationJobData {
+        return {
+            event: 'content_reported',
+            title: 'Content reported',
+            message: `Report #${payload.reportId} on ${payload.targetType} "${truncate(payload.targetLabel, MAX_DYNAMIC_TEXT_LENGTH)}" (${payload.reason})`,
+            priority: 4,
+            tags: ['rotating_light']
+        };
+    },
+
     accountDeletionRequested(hasReason: boolean): NtfyNotificationJobData {
         return {
             event: 'account_deletion_requested',

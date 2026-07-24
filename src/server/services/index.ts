@@ -1,5 +1,6 @@
 export * from './admin/service';
 export * from './auth/service';
+export * from './content-report/service';
 export * from './cookbook/service';
 export * from './hub/service';
 export * from './ingredient/service';

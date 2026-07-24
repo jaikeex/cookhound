@@ -6,6 +6,7 @@ export type NtfyEvent =
     | 'recipe_flagged'
     | 'recipe_reinstated'
     | 'flag_appeal_created'
+    | 'content_reported'
     | 'account_deletion_requested';
 
 export type NtfyNotificationJobData = NtfyMessage &

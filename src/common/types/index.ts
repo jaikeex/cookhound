@@ -4,6 +4,7 @@ export * from './contact';
 export * from './file';
 export * from './ingredient';
 export * from './recipe';
+export * from './reports/report';
 export * from './shopping-list';
 export * from './tags';
 export * from './user';

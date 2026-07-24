@@ -50,6 +50,8 @@ model User {
   cookbooks                 Cookbook[]
   bookmarks                 CookbookBookmark[]
   accountDeletionRequest    AccountDeletionRequest[]
+  contentReports            ContentReport[]          @relation("ContentReportReporter")
+  reviewedContentReports    ContentReport[]          @relation("ContentReportReviewer")
 
   /// Indexes
   @@index([username])
@@ -340,6 +342,41 @@ model RecipeFlagAppeal {
   @@index([userId])
   @@index([status])
   @@map("recipe_flag_appeals")
+}
+
+model ContentReport {
+  id           Int       @id @default(autoincrement())
+  reporterId   Int       @map("reporter_id")
+  targetType   String    @map("target_type") @db.VarChar(32)
+  targetId     Int       @map("target_id")
+  targetLabel  String    @map("target_label") @db.VarChar(255)
+  targetUrl    String    @map("target_url") @db.VarChar(512)
+  reason       String    @db.VarChar(64)
+  details      String?   @db.Text
+  status       String    @default("pending") @db.VarChar(32)
+  reviewedById Int?      @map("reviewed_by_id")
+  reviewedAt   DateTime? @map("reviewed_at") @db.Timestamp(3)
+  resolution   String?   @db.Text
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamp(3)
+
+  /// Relations
+  reporter   User  @relation("ContentReportReporter", fields: [reporterId], references: [id])
+  reviewedBy User? @relation("ContentReportReviewer", fields: [reviewedById], references: [id])
+
+  /// Indexes
+  @@index([targetType, targetId])
+  @@index([status])
+  @@index([reporterId])
+  @@index([reporterId, targetType, targetId, status])
+
+  /// a PARTIAL UNIQUE index also exists on this table but is NOT declared here.
+  /// Prisma schema cannot express a filtered (WHERE) index.
+  ///
+  ///   CREATE UNIQUE INDEX content_reports_one_open_per_target
+  ///     ON content_reports (reporter_id, target_type, target_id)
+  ///     WHERE status IN ('pending', 'reviewing') AND reporter_id <> -1;
+  
+  @@map("content_reports")
 }
 
 model TagCategory {

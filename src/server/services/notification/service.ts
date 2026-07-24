@@ -55,6 +55,16 @@ class NotificationService {
         await this.enqueue(ntfyMessages.flagAppealCreated(payload));
     }
 
+    @LogServiceMethod({ names: ['payload'] })
+    async notifyContentReported(payload: {
+        reportId: number;
+        targetType: string;
+        targetLabel: string;
+        reason: string;
+    }): Promise<void> {
+        await this.enqueue(ntfyMessages.contentReported(payload));
+    }
+
     @LogServiceMethod({ names: ['hasReason'] })
     async notifyAccountDeletionRequested(hasReason: boolean): Promise<void> {
         await this.enqueue(ntfyMessages.accountDeletionRequested(hasReason));
