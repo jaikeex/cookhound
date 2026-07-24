@@ -205,6 +205,20 @@ class AuthService {
         }
 
         const userInfoData: UserFromGoogle = await userInfoResponse.json();
+
+        // Never trust a Google-supplied email for account lookup or creation
+        // unless Google itself has verified ownership.
+        if (userInfoData.email_verified !== true) {
+            log.warn('loginWithGoogle - email not verified by Google', {
+                email: userInfoData.email
+            });
+
+            throw new AuthErrorForbidden(
+                'auth.error.google-email-not-verified',
+                ApplicationErrorCode.EMAIL_NOT_VERIFIED
+            );
+        }
+
         const dbUser = await db.user.getOneByEmail(
             userInfoData.email,
             AUTH_USER_SELECT
@@ -237,7 +251,8 @@ class AuthService {
             user = await userService.createUserFromGoogle({
                 email: userInfoData.email,
                 username: userInfoData.name,
-                avatarUrl: userInfoData.picture
+                avatarUrl: userInfoData.picture,
+                emailVerified: userInfoData.email_verified
             });
         }
 

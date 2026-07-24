@@ -359,7 +359,8 @@ describe('AuthService', () => {
             expect(mockUserService.createUserFromGoogle).toHaveBeenCalledWith({
                 email: mockNewGoogleUserInfo.email,
                 username: mockNewGoogleUserInfo.name,
-                avatarUrl: mockNewGoogleUserInfo.picture
+                avatarUrl: mockNewGoogleUserInfo.picture,
+                emailVerified: mockNewGoogleUserInfo.email_verified
             });
         });
 
@@ -392,6 +393,42 @@ describe('AuthService', () => {
             );
 
             expect(mockFetch).not.toHaveBeenCalled();
+        });
+
+        it('should reject a Google sign-in whose email is not verified', async () => {
+            mockFetch.mockImplementation((url: string) => {
+                if (url.includes('oauth2.googleapis.com/token')) {
+                    return Promise.resolve({
+                        ok: true,
+                        json: () =>
+                            Promise.resolve(mockGoogleAccessTokenResponse)
+                    });
+                }
+                if (url.includes('www.googleapis.com/oauth2/v3/userinfo')) {
+                    return Promise.resolve({
+                        ok: true,
+                        json: () =>
+                            Promise.resolve({
+                                ...mockGoogleUserInfo,
+                                email_verified: false
+                            })
+                    });
+                }
+                return Promise.reject(new Error('Unknown URL'));
+            });
+
+            await expectToThrowWithCode(
+                authService.loginWithGoogle({ code: mockCode }),
+                AuthErrorForbidden,
+                ApplicationErrorCode.EMAIL_NOT_VERIFIED,
+                'auth.error.google-email-not-verified'
+            );
+
+            // The unverified email must never reach lookup, account creation, or
+            // session minting - this is the account-takeover guard.
+            expect(mockDbUser.getOneByEmail).not.toHaveBeenCalled();
+            expect(mockUserService.createUserFromGoogle).not.toHaveBeenCalled();
+            expect(mockSessions.createSession).not.toHaveBeenCalled();
         });
 
         it('should throw AuthErrorUnauthorized when user info request fails', async () => {

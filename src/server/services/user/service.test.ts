@@ -293,7 +293,8 @@ describe('UserService', () => {
         const googleUserPayload = {
             email: 'newgoogle@example.com',
             username: 'New Google User',
-            avatarUrl: 'https://example.com/avatar.jpg'
+            avatarUrl: 'https://example.com/avatar.jpg',
+            emailVerified: true
         };
 
         it('should successfully create Google user', async () => {
@@ -361,6 +362,23 @@ describe('UserService', () => {
                 'auth.error.user-already-exists'
             );
 
+            expect(mockDbUser.createOne).not.toHaveBeenCalled();
+        });
+
+        it('should refuse an unverified Google email (defense in depth)', async () => {
+            await expectToThrowWithCode(
+                userService.createUserFromGoogle({
+                    ...googleUserPayload,
+                    emailVerified: false
+                }),
+                AuthErrorForbidden,
+                ApplicationErrorCode.EMAIL_NOT_VERIFIED,
+                'auth.error.google-email-not-verified'
+            );
+
+            // Neither the taken-email lookup nor the write should run once the
+            // verification guard trips - it is the very first check.
+            expect(mockDbUser.getOneByEmail).not.toHaveBeenCalled();
             expect(mockDbUser.createOne).not.toHaveBeenCalled();
         });
     });

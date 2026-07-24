@@ -147,18 +147,31 @@ class UserService {
     //|-----------------------------------------------------------------------------------------|//
 
     /**
-     * Registers a new user from a Google OAuth sign-in.
-     * The user's email is marked as verified automatically.
+     * Registers a new user from a Google OAuth sign-in. Verification status supplied by Google.
      *
-     * @param payload - Google profile data: email, username, and avatar URL.
+     * @param payload - Google profile data: email, username, avatar URL and verification status.
      * @returns The created user DTO.
+     * @throws {AuthErrorForbidden} If the google identity email is not verified.
      * @throws {ConflictError} If a user with the same email already exists.
      */
     @LogServiceMethod({ success: 'notice', names: ['payload'] })
     async createUserFromGoogle(
         payload: UserForGoogleCreatePayload
     ): Promise<UserDTO> {
-        const { email, username, avatarUrl } = payload;
+        const { email, username, avatarUrl, emailVerified } = payload;
+
+        if (emailVerified !== true) {
+            log.error(
+                'createUserFromGoogle - refusing unverified google email',
+                {
+                    email
+                }
+            );
+            throw new AuthErrorForbidden(
+                'auth.error.google-email-not-verified',
+                ApplicationErrorCode.EMAIL_NOT_VERIFIED
+            );
+        }
 
         // This method only cares whether the email is already taken
         const userSelect = getUserSelect(['public']);
@@ -180,7 +193,7 @@ class UserService {
             authType: AuthType.Google,
             role: UserRole.User,
             status: Status.Active,
-            emailVerified: true
+            emailVerified
         };
 
         const user = await db.user.createOne(userForCreate);

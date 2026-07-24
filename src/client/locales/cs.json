@@ -85,6 +85,7 @@
     "auth.error.google-oauth-code-required": "Google OAuth kód je povinný",
     "auth.error.failed-to-get-access-token": "Nepodařilo se získat přístupový token",
     "auth.error.failed-to-get-user-info": "Nepodařilo se získat informace o uživateli",
+    "auth.error.google-email-not-verified": "Váš e-mail nebyl ověřen společností Google",
     "auth.error.user-already-exists": "Uživatel již existuje",
     "auth.error.google-auth-not-supported": "Tato možnost není dostupná pro účty vytvořené přes Google",
     "auth.error.password-reset-token-expired": "Token pro obnovení hesla vypršel",

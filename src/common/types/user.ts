@@ -31,6 +31,7 @@ export type UserForGoogleCreatePayload = {
     email: string;
     username: string;
     avatarUrl: string;
+    emailVerified: boolean;
 };
 
 export type UserForUpdatePayload = {
