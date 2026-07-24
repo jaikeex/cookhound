@@ -1,5 +1,9 @@
 import { useAppQuery, useAppMutation } from '@/client/data/queryFactories';
 import { useRepositories } from '@/client/data';
+import { getCookie } from '@/client/utils/cookies';
+import { RequestError } from '@/client/error';
+import { SESSION_HINT_COOKIE_NAME } from '@/common/constants/general';
+import type { User } from '@/common/types';
 import {
     AUTH_QUERY_KEYS,
     type CurrentUserOptions,
@@ -14,7 +18,7 @@ export const authQueryClient = {
      *
      * Key: AUTH_QUERY_KEYS.currentUser
      * Stale time: 0 (see below)
-     * Retry: 1
+     * Retry: 1 (except 401s)
      * refetchOnMount: true
      *
      * This query is NOT hydrated from the server. The root layout is
@@ -36,10 +40,25 @@ export const authQueryClient = {
 
         return useAppQuery(
             AUTH_QUERY_KEYS.currentUser,
-            ({ signal }) => authRepository.getCurrentUser({ signal }),
+            ({ signal }) => {
+                // This check must be part of the logic itself, not be passed as
+                // enabled prop in react query options. getCookie() returns null during
+                // prerender and the root layout is static, so gating enabled
+                // on the hint produced a load of hydration errors, all about
+                // the loading state of th ui.
+                if (getCookie(SESSION_HINT_COOKIE_NAME) === null) {
+                    return Promise.resolve<User | null>(null);
+                }
+
+                return authRepository.getCurrentUser({ signal });
+            },
             {
                 staleTime: 0,
-                retry: 1,
+                // absolutely no point in retrying resolved 401s
+                retry: (failureCount, error) =>
+                    error instanceof RequestError && error.status === 401
+                        ? false
+                        : failureCount < 1,
                 refetchOnMount: true,
                 ...options
             }

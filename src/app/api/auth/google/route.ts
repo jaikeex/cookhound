@@ -4,7 +4,7 @@ import { makeHandler, readJson, validatePayload } from '@/server/utils/reqwest';
 import { AuthErrorForbidden } from '@/server/error';
 import { z } from 'zod';
 import { ApplicationErrorCode } from '@/server/error/codes';
-import { createSessionCookie } from '@/server/utils/session/cookie';
+import { createSessionCookieHeaders } from '@/server/utils/session/cookie';
 import { assertAnonymous, ok } from '@/server/utils/reqwest';
 import { withRateLimit } from '@/server/utils/rate-limit';
 import { registerRouteDocs, UserResponseSchema } from '@/server/utils/api-docs';
@@ -53,16 +53,9 @@ async function postHandler(request: NextRequest) {
         code: payload.code
     });
 
-    const cookie = createSessionCookie(user.token, false);
+    const headers = createSessionCookieHeaders(user.token, false);
 
-    return ok(
-        { ...user.user },
-        {
-            headers: {
-                'Set-Cookie': cookie
-            }
-        }
-    );
+    return ok({ ...user.user }, { headers });
 }
 
 export const POST = makeHandler(

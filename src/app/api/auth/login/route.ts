@@ -10,7 +10,7 @@ import {
 } from '@/server/utils/reqwest';
 import { z } from 'zod';
 import { ApplicationErrorCode } from '@/server/error/codes';
-import { createSessionCookie } from '@/server/utils/session/cookie';
+import { createSessionCookieHeaders } from '@/server/utils/session/cookie';
 import { withRateLimit } from '@/server/utils/rate-limit';
 import { registerRouteDocs, UserResponseSchema } from '@/server/utils/api-docs';
 import { AuthLevel } from '@/common/types';
@@ -62,19 +62,12 @@ async function postHandler(request: NextRequest) {
         keepLoggedIn: payload.keepLoggedIn ?? false
     });
 
-    const cookie = createSessionCookie(
+    const headers = createSessionCookieHeaders(
         user.token,
         payload.keepLoggedIn ?? false
     );
 
-    return ok(
-        { ...user.user },
-        {
-            headers: {
-                'Set-Cookie': cookie
-            }
-        }
-    );
+    return ok({ ...user.user }, { headers });
 }
 
 export const POST = makeHandler(

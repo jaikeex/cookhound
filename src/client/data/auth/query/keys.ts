@@ -22,9 +22,9 @@ export const AUTH_QUERY_KEYS = Object.freeze({
 
 export type CurrentUserOptions = Omit<
     UseQueryOptions<
-        User,
+        User | null,
         RequestError,
-        User,
+        User | null,
         typeof AUTH_QUERY_KEYS.currentUser
     >,
     'queryKey' | 'queryFn'

@@ -15,6 +15,7 @@ export const GOOGLE_SIGNIN_REDIRECT_URL = `https://accounts.google.com/o/oauth2/
 export const SEARCH_QUERY_SEPARATOR = '|';
 
 export const SESSION_COOKIE_NAME = 'session';
+export const SESSION_HINT_COOKIE_NAME = 'has_session';
 
 export const OAUTH_STATE_KEY = 'oauth_state';
 
