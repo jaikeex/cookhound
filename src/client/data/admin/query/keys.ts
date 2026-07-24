@@ -1,7 +1,9 @@
 import type {
     AdminDashboardStatsDTO,
     AdminUserDetailDTO,
-    AdminUserListDTO
+    AdminUserListDTO,
+    ContentReportDTO,
+    ContentReportListDTO
 } from '@/common/types';
 import type {
     UseMutationOptions,
@@ -24,7 +26,13 @@ export const ADMIN_QUERY_KEYS = Object.freeze({
         [ADMIN_NAMESPACE_QUERY_KEY, 'users', params] as const,
 
     userDetail: (userId: number) =>
-        [ADMIN_NAMESPACE_QUERY_KEY, 'user-detail', userId] as const
+        [ADMIN_NAMESPACE_QUERY_KEY, 'user-detail', userId] as const,
+
+    reports: (params: Record<string, string | number | undefined>) =>
+        [ADMIN_NAMESPACE_QUERY_KEY, 'reports', params] as const,
+
+    reportDetail: (reportId: number) =>
+        [ADMIN_NAMESPACE_QUERY_KEY, 'report-detail', reportId] as const
 });
 
 //~---------------------------------------------------------------------------------------------~//
@@ -97,5 +105,34 @@ export type ScheduleAccountDeletionOptions = Omit<
 
 export type CancelAccountDeletionOptions = Omit<
     UseMutationOptions<void, RequestError, { userId: number }>,
+    'mutationFn'
+>;
+
+export type AdminReportsOptions = Omit<
+    UseQueryOptions<
+        ContentReportListDTO,
+        RequestError,
+        ContentReportListDTO,
+        ReturnType<typeof ADMIN_QUERY_KEYS.reports>
+    >,
+    'queryKey' | 'queryFn'
+>;
+
+export type AdminReportDetailOptions = Omit<
+    UseQueryOptions<
+        ContentReportDTO,
+        RequestError,
+        ContentReportDTO,
+        ReturnType<typeof ADMIN_QUERY_KEYS.reportDetail>
+    >,
+    'queryKey' | 'queryFn'
+>;
+
+export type ResolveReportOptions = Omit<
+    UseMutationOptions<
+        ContentReportDTO,
+        RequestError,
+        { reportId: number; status: string; resolution?: string }
+    >,
     'mutationFn'
 >;

@@ -72,6 +72,7 @@ class AdminService {
             totalUsers,
             totalRecipes,
             openFlags,
+            openReports,
             newUsersLast30Days,
             newRecipesLast30Days,
             totalRatings,
@@ -81,6 +82,7 @@ class AdminService {
             db.user.countActive(),
             db.recipe.countAll(),
             db.recipeFlag.countOpen(),
+            db.contentReport.countOpen(),
             db.user.countCreatedSince(thirtyDaysAgo),
             db.recipe.countCreatedSince(thirtyDaysAgo),
             db.rating.countAll(),
@@ -92,6 +94,7 @@ class AdminService {
             totalUsers,
             totalRecipes,
             openFlags,
+            openReports,
             newUsersLast30Days,
             newRecipesLast30Days,
             totalRatings

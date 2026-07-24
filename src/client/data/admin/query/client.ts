@@ -2,6 +2,8 @@ import { useAppMutation, useAppQuery } from '@/client/data/queryFactories';
 import { useRepositories } from '@/client/data';
 import {
     ADMIN_QUERY_KEYS,
+    type AdminReportDetailOptions,
+    type AdminReportsOptions,
     type AdminUserDetailOptions,
     type AdminUsersOptions,
     type CancelAccountDeletionOptions,
@@ -10,6 +12,7 @@ import {
     type DashboardStatsOptions,
     type ForceLogoutOptions,
     type ForcePasswordResetOptions,
+    type ResolveReportOptions,
     type ScheduleAccountDeletionOptions,
     type VerifyEmailOptions
 } from './keys';
@@ -116,5 +119,50 @@ export const adminQueryClient = {
         const { adminRepository } = useRepositories();
 
         return useAppMutation(adminRepository.cancelAccountDeletion, options);
+    },
+
+    //~=========================================================================================~//
+    //$                                       MODERATION                                       $//
+    //~=========================================================================================~//
+
+    /**
+     * Fetches a paginated, filterable list of content reports.
+     */
+    useAdminReports: (
+        params: Record<string, string | number | undefined>,
+        options?: Partial<AdminReportsOptions>
+    ) => {
+        const { adminRepository } = useRepositories();
+
+        return useAppQuery(
+            ADMIN_QUERY_KEYS.reports(params),
+            ({ signal }) => adminRepository.listReports({ params, signal }),
+            { staleTime: 10_000, ...options }
+        );
+    },
+
+    /**
+     * Fetches a single content report for the admin detail view.
+     */
+    useAdminReportDetail: (
+        reportId: number,
+        options?: Partial<AdminReportDetailOptions>
+    ) => {
+        const { adminRepository } = useRepositories();
+
+        return useAppQuery(
+            ADMIN_QUERY_KEYS.reportDetail(reportId),
+            ({ signal }) => adminRepository.getReportById({ reportId, signal }),
+            { staleTime: 10_000, ...options }
+        );
+    },
+
+    /**
+     * Records a moderation decision on a report.
+     */
+    useResolveReport: (options?: Partial<ResolveReportOptions>) => {
+        const { adminRepository } = useRepositories();
+
+        return useAppMutation(adminRepository.resolveReport, options);
     }
 };

@@ -3,6 +3,7 @@ export type AdminDashboardStatsDTO = Readonly<{
         totalUsers: number;
         totalRecipes: number;
         openFlags: number;
+        openReports: number;
         newUsersLast30Days: number;
         newRecipesLast30Days: number;
         totalRatings: number;

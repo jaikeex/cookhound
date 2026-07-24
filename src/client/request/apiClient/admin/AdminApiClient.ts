@@ -3,7 +3,9 @@ import { apiRequestWrapper } from '@/client/request/apiClient/ApiRequestWrapper'
 import type {
     AdminDashboardStatsDTO,
     AdminUserDetailDTO,
-    AdminUserListDTO
+    AdminUserListDTO,
+    ContentReportDTO,
+    ContentReportListDTO
 } from '@/common/types';
 
 /**
@@ -121,6 +123,50 @@ class AdminApiClient {
     async cancelAccountDeletion(userId: number): Promise<void> {
         await apiRequestWrapper.post({
             url: `/admin/users/${userId}/cancel-deletion`
+        });
+    }
+
+    //~=========================================================================================~//
+    //$                                       MODERATION                                       $//
+    //~=========================================================================================~//
+
+    /**
+     * Fetches a paginated, filterable list of content reports.
+     */
+    async getReports(
+        params: Record<string, string | number | undefined>,
+        config?: RequestConfig
+    ): Promise<ContentReportListDTO> {
+        return await apiRequestWrapper.get<ContentReportListDTO>({
+            url: '/admin/reports',
+            params,
+            ...config
+        });
+    }
+
+    /**
+     * Fetches a single content report.
+     */
+    async getReportById(
+        reportId: number,
+        config?: RequestConfig
+    ): Promise<ContentReportDTO> {
+        return await apiRequestWrapper.get<ContentReportDTO>({
+            url: `/admin/reports/${reportId}`,
+            ...config
+        });
+    }
+
+    /**
+     * Records a moderation decision on a report by calling. Returns the updated report.
+     */
+    async resolveReport(
+        reportId: number,
+        data: { status: string; resolution?: string }
+    ): Promise<ContentReportDTO> {
+        return await apiRequestWrapper.patch<ContentReportDTO>({
+            url: `/admin/reports/${reportId}`,
+            data
         });
     }
 }

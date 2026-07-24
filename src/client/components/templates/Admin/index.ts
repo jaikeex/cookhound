@@ -1,4 +1,5 @@
 export * from './ApiDocs';
 export * from './Dashboard';
 export * from './Layout';
+export * from './Reports';
 export * from './Users';

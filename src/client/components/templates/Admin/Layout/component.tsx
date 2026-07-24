@@ -14,6 +14,7 @@ type AdminLayoutShellProps = Readonly<{
 const NAV_ITEM_KEYS = [
     { href: ROUTES.admin.root, labelKey: 'admin.nav.dashboard' as const },
     { href: ROUTES.admin.users, labelKey: 'admin.nav.users' as const },
+    { href: ROUTES.admin.reports, labelKey: 'admin.nav.reports' as const },
     {
         href: ROUTES.admin.apiDocs,
         labelKey: 'admin.nav.apiDocs' as const

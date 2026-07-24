@@ -163,6 +163,7 @@ export const ROUTES = {
     admin: {
         root: SEGMENTS.admin,
         users: `${SEGMENTS.admin}/users`,
+        reports: `${SEGMENTS.admin}/reports`,
         apiDocs: `${SEGMENTS.admin}/api-docs`
     },
 

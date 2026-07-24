@@ -121,6 +121,11 @@ export const AdminDashboardTemplate: React.FC<AdminDashboardTemplateProps> = ({
                             label={t('admin.dashboard.stat.openFlags')}
                             value={data.counts.openFlags}
                         />
+
+                        <StatCard
+                            label={t('admin.dashboard.stat.openReports')}
+                            value={data.counts.openReports}
+                        />
                     </>
                 ) : null}
             </div>
