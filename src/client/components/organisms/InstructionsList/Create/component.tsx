@@ -3,7 +3,7 @@
 import React, { useCallback, useEffect, useState, useMemo } from 'react';
 import { ButtonBase } from '@/client/components/atoms/Button/Base';
 import { DraggableList } from '@/client/components/molecules/List/DraggableList';
-import { InstructionRowCreate } from '@/client/components/molecules/InstructionRow';
+import { InstructionRowCreate } from '@/client/components/molecules/InstructionRow/Create';
 import { t } from '@/client/locales';
 
 type InstructionsListCreateProps = Readonly<{

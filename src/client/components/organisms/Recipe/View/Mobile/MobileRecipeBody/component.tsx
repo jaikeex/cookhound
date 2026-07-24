@@ -7,7 +7,7 @@ import { ButtonBase } from '@/client/components/atoms/Button/Base';
 import { Divider } from '@/client/components/atoms/Divider';
 import { InstructionsView } from '@/client/components/molecules/Instructions/View';
 import { Tabs } from '@/client/components/molecules/Tabs';
-import { IngredientsListView } from '@/client/components/organisms/IngredientsList';
+import { IngredientsListView } from '@/client/components/organisms/IngredientsList/View';
 import { useAuth } from '@/client/store';
 import { classNames } from '@/client/utils';
 import { t } from '@/client/locales';

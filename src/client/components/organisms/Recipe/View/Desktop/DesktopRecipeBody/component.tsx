@@ -7,7 +7,7 @@ import { Typography } from '@/client/components/atoms/Typography';
 import { ButtonBase } from '@/client/components/atoms/Button/Base';
 import { Divider } from '@/client/components/atoms/Divider';
 import { InstructionsView } from '@/client/components/molecules/Instructions/View';
-import { IngredientsListView } from '@/client/components/organisms/IngredientsList';
+import { IngredientsListView } from '@/client/components/organisms/IngredientsList/View';
 import { t } from '@/client/locales';
 
 export type DesktopRecipeBodyProps = Readonly<{

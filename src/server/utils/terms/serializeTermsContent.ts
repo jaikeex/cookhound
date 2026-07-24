@@ -2,7 +2,7 @@ import {
     TERMS_TITLE,
     TERMS_TIMESTAMP,
     TERMS_CONTENT
-} from '@/common/constants';
+} from '@/common/constants/terms';
 
 /**
  * Serializes the terms content into a consistent, deterministic string

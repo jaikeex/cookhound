@@ -10,7 +10,7 @@ import {
 import { AuthErrorForbidden, ValidationError } from '@/server/error';
 import { z } from 'zod';
 import { ApplicationErrorCode } from '@/server/error/codes';
-import { TERMS_VERSION } from '@/common/constants';
+import { TERMS_VERSION } from '@/common/constants/terms';
 import type { TermsAcceptanceForCreate } from '@/common/types';
 import { RequestContext } from '@/server/utils/reqwest/context';
 import { generateProofHash } from '@/server/utils/crypto';
