@@ -1,9 +1,10 @@
 'use client';
 
 import React, { useCallback, useMemo, useState } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, m } from 'framer-motion';
 import { classNames } from '@/client/utils';
-import { Icon, Typography } from '@/client/components';
+import { Icon } from '@/client/components/atoms/Icons';
+import { Typography } from '@/client/components/atoms/Typography';
 
 export type AccordionItem = Readonly<{
     id?: string | number;
@@ -109,7 +110,7 @@ export const Accordion: React.FC<AccordionProps> = ({
 
                         <AnimatePresence initial={false}>
                             {isOpen && (
-                                <motion.div
+                                <m.div
                                     key="content"
                                     initial={{ height: 0, opacity: 0 }}
                                     animate={{ height: 'auto', opacity: 1 }}
@@ -121,7 +122,7 @@ export const Accordion: React.FC<AccordionProps> = ({
                                     className="overflow-hidden px-2 pb-3 md:px-4"
                                 >
                                     <div className="py-1">{content}</div>
-                                </motion.div>
+                                </m.div>
                             )}
                         </AnimatePresence>
                     </div>

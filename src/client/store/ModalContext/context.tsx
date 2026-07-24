@@ -11,9 +11,9 @@ import React, {
     useTransition
 } from 'react';
 import ReactDOM from 'react-dom';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, m } from 'framer-motion';
 import { classNames } from '@/client/utils';
-import { IconButton } from '@/client/components';
+import { IconButton } from '@/client/components/atoms/Button/Icon';
 import { generateRandomId } from '@/client/utils';
 import { useRouter } from 'next/navigation';
 import { useParamsChangeListener } from '@/client/hooks';
@@ -265,21 +265,21 @@ const ModalWrapper: React.FC<ModalWrapperProps> = ({
     disableBackdropClick
 }) => {
     return (
-        <motion.div
+        <m.div
             className="fixed inset-0 z-1000 flex items-center justify-center"
             initial="hidden"
             animate="visible"
             exit="exit"
         >
             {/* Overlay */}
-            <motion.div
+            <m.div
                 variants={backdropVariants}
                 className="absolute inset-0 bg-black/80"
                 onClick={disableBackdropClick ? undefined : onClose}
             />
 
             {/* Modal */}
-            <motion.div
+            <m.div
                 variants={modalVariants}
                 className={classNames(
                     'relative z-10 overflow-y-auto rounded-md py-8 px-2 md:px-6',
@@ -296,7 +296,7 @@ const ModalWrapper: React.FC<ModalWrapperProps> = ({
                     />
                 )}
                 {children}
-            </motion.div>
-        </motion.div>
+            </m.div>
+        </m.div>
     );
 };

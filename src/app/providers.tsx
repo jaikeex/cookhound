@@ -4,6 +4,7 @@ import {
     AuthProvider,
     SnackbarProvider,
     ModalProvider,
+    MotionProvider,
     ConsentProvider
 } from '@/client/store';
 import { DataProvider, repositories } from '@/client/data';
@@ -20,17 +21,19 @@ export const AppProviders: React.FC<AppProvidersProps> = ({
     initialConsent,
     children
 }) => (
-    <ThemeProvider defaultTheme={initialTheme}>
-        <DataProvider value={repositories}>
-            <AuthProvider>
-                <SnackbarProvider>
-                    <ConsentProvider initialConsent={initialConsent}>
-                        <ModalProvider>{children}</ModalProvider>
-                    </ConsentProvider>
-                </SnackbarProvider>
-            </AuthProvider>
-        </DataProvider>
-    </ThemeProvider>
+    <MotionProvider>
+        <ThemeProvider defaultTheme={initialTheme}>
+            <DataProvider value={repositories}>
+                <AuthProvider>
+                    <SnackbarProvider>
+                        <ConsentProvider initialConsent={initialConsent}>
+                            <ModalProvider>{children}</ModalProvider>
+                        </ConsentProvider>
+                    </SnackbarProvider>
+                </AuthProvider>
+            </DataProvider>
+        </ThemeProvider>
+    </MotionProvider>
 );
 
 export default AppProviders;
