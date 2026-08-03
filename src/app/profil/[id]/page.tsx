@@ -37,6 +37,13 @@ export default async function UserProfilePage({
 
     if (isNaN(id)) notFound();
 
+    // Resolve the user BEFORE any redirect or JSX. If the fetch only failed
+    // later, deep inside the render, the response status would already be
+    // committed as 200 and a missing user would be served as a soft 404.
+    const user = await serverData.user
+        .getById(id)
+        .catch((error) => mapServiceErrorForRsc(error, ROUTES.user.detail(id)));
+
     const cookieStore = await cookies();
     const sessionId = cookieStore.get(SESSION_COOKIE_NAME)?.value;
 
@@ -65,14 +72,10 @@ export default async function UserProfilePage({
         redirect(`${ROUTES.user.detail(id)}?tab=${resolvedTab}`);
     }
 
-    const user = serverData.user
-        .getById(id)
-        .catch((error) => mapServiceErrorForRsc(error, ROUTES.user.detail(id)));
-
     return (
         <React.Fragment>
             <ProfileTemplate user={user} initialTab={resolvedTab} />
-            <UserStructuredData userPromise={user} />
+            <UserStructuredData user={user} />
         </React.Fragment>
     );
 }

@@ -10,18 +10,14 @@ import { ENV_CONFIG_PUBLIC, ROUTES } from '@/common/constants';
 import { t } from '@/client/locales';
 
 type RecipeStructuredDataProps = Readonly<{
-    recipePromise: Promise<Recipe>;
-    authorNamePromise?: Promise<string | undefined>;
+    recipe: Recipe;
+    authorName?: string;
 }>;
 
-export const RecipeStructuredData: React.FC<
-    RecipeStructuredDataProps
-> = async ({ recipePromise, authorNamePromise }) => {
-    const [recipe, authorName] = await Promise.all([
-        recipePromise,
-        authorNamePromise
-    ]);
-
+export const RecipeStructuredData: React.FC<RecipeStructuredDataProps> = ({
+    recipe,
+    authorName
+}) => {
     const recipeSchema = generateRecipeSchema(
         recipe,
         ENV_CONFIG_PUBLIC.ORIGIN,

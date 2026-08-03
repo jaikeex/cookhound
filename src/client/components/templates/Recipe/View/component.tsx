@@ -1,6 +1,6 @@
 'use client';
 
-import React, { use } from 'react';
+import React from 'react';
 import { DesktopRecipeViewTemplate } from './Desktop';
 import { MobileRecipeViewTemplate } from './Mobile';
 import type { Recipe } from '@/common/types';
@@ -12,15 +12,14 @@ import { FlaggedTemplate } from '@/client/components/templates/Error/Flagged';
 import { FlaggedAuthorTemplate } from '@/client/components/templates/Recipe/Flagged';
 
 export type RecipeViewProps = Readonly<{
-    recipe: Promise<Recipe>;
+    recipe: Recipe;
 }>;
 
 export const RecipeViewTemplate: React.FC<RecipeViewProps> = ({ recipe }) => {
-    const recipeResolved = use(recipe);
     const queryClient = useQueryClient();
     const { user } = useAuth();
 
-    const isFlagged = recipeResolved.flags?.some((flag) => flag.active);
+    const isFlagged = recipe.flags?.some((flag) => flag.active);
 
     const { mutate: registerRecipeVisit } = chqc.recipe.useRegisterRecipeVisit({
         onSuccess: () => {
@@ -33,21 +32,21 @@ export const RecipeViewTemplate: React.FC<RecipeViewProps> = ({ recipe }) => {
     });
 
     useRunOnce(() => {
-        if (recipeResolved?.id) {
+        if (recipe?.id) {
             // Neither await this, nor catch any errors, if the recipe was loaded,
             // this will work too, if it does not, it does not matter the visit is not
             // recorded anyway
             registerRecipeVisit({
-                id: recipeResolved.id.toString()
+                id: recipe.id.toString()
             });
         }
-    }, [recipeResolved?.id]);
+    }, [recipe?.id]);
 
     if (isFlagged) {
-        const isAuthor = !!user?.id && user.id === recipeResolved.authorId;
+        const isAuthor = !!user?.id && user.id === recipe.authorId;
 
         return isAuthor ? (
-            <FlaggedAuthorTemplate recipe={recipeResolved} />
+            <FlaggedAuthorTemplate recipe={recipe} />
         ) : (
             <FlaggedTemplate />
         );
@@ -69,7 +68,7 @@ export const RecipeViewTemplate: React.FC<RecipeViewProps> = ({ recipe }) => {
     //?—————————————————————————————————————————————————————————————————————————————————————————?//
 
     return (
-        <RecipeHandlingProvider recipe={recipeResolved}>
+        <RecipeHandlingProvider recipe={recipe}>
             <MobileRecipeViewTemplate className={'md:hidden'} />
             <DesktopRecipeViewTemplate className={'hidden md:block'} />
         </RecipeHandlingProvider>

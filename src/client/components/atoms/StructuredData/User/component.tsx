@@ -9,13 +9,12 @@ import {
 import { t } from '@/client/locales';
 
 type UserStructuredDataProps = Readonly<{
-    userPromise: Promise<User>;
+    user: User;
 }>;
 
-export const UserStructuredData: React.FC<UserStructuredDataProps> = async ({
-    userPromise
+export const UserStructuredData: React.FC<UserStructuredDataProps> = ({
+    user
 }) => {
-    const user = await userPromise;
     const userSchema = generatePersonSchema(user, ENV_CONFIG_PUBLIC.ORIGIN);
 
     const breadcrumbSchema = generateBreadcrumbSchema([

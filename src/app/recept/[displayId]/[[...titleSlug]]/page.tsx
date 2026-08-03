@@ -54,22 +54,14 @@ export default async function Page({ params }: RecipePageParams) {
         );
     }
 
-    const recipePromise = serverData.recipe
+    // Resolve the recipe BEFORE returning any JSX. If the fetch only failed
+    // later, deep inside the render, the response status would already be
+    // committed as 200 and a missing recipe would be served as a soft 404.
+    const recipe = await serverData.recipe
         .getByDisplayId(recipeDisplayId)
         .catch((error) =>
             mapServiceErrorForRsc(error, ROUTES.recipe.detail(recipeDisplayId))
         );
-
-    // A missing author must not break the schema block.
-    const authorNamePromise = recipePromise
-        .then((recipe) => serverData.user.getByIdPublic(recipe.authorId))
-        .then((author) => author.username)
-        .catch(() => undefined);
-
-    // Resolve the recipe BEFORE returning any JSX. If it only rejected later,
-    // deep inside the render, the response status would already be committed
-    // as 200 and a missing recipe would be served as a soft 404.
-    const recipe = await recipePromise;
 
     const canonicalTitleSlug = slugifyRecipeTitle(recipe.title);
     const requestTitleSlug = paramsResolved.titleSlug?.join('/') ?? '';
@@ -78,13 +70,16 @@ export default async function Page({ params }: RecipePageParams) {
         permanentRedirect(ROUTES.recipe.detail(recipeDisplayId, recipe.title));
     }
 
+    // A missing author must not break the schema block.
+    const authorName = await serverData.user
+        .getByIdPublic(recipe.authorId)
+        .then((author) => author.username)
+        .catch(() => undefined);
+
     return (
         <React.Fragment>
-            <RecipeViewTemplate recipe={recipePromise} />
-            <RecipeStructuredData
-                recipePromise={recipePromise}
-                authorNamePromise={authorNamePromise}
-            />
+            <RecipeViewTemplate recipe={recipe} />
+            <RecipeStructuredData recipe={recipe} authorName={authorName} />
         </React.Fragment>
     );
 }

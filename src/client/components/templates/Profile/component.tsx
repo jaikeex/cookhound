@@ -1,7 +1,7 @@
 'use client';
 
 import { useAuth } from '@/client/store';
-import React, { use } from 'react';
+import React from 'react';
 import { DesktopProfileTemplate } from './Desktop';
 import { MobileProfileTemplate } from './Mobile';
 import { ProfileTab, type ProfileNavigationItem } from '@/client/types/core';
@@ -16,18 +16,17 @@ import { t } from '@/client/locales';
 
 type ProfileProps = Readonly<{
     initialTab?: ProfileTab | null;
-    user: Promise<User>;
+    user: User;
 }>;
 
 export const ProfileTemplate: React.FC<ProfileProps> = ({
     user,
     initialTab = null
 }) => {
-    const userResolved = use(user);
     const router = useRouter();
     const { authResolved, user: currentUser } = useAuth();
 
-    const isCurrentUser = authResolved && currentUser?.id === userResolved.id;
+    const isCurrentUser = authResolved && currentUser?.id === user.id;
 
     const profileNavigationItems: ProfileNavigationItem[] = [
         ...(isCurrentUser
@@ -35,7 +34,7 @@ export const ProfileTemplate: React.FC<ProfileProps> = ({
                   {
                       param: ProfileTab.Dashboard,
                       label: t('app.profile.dashboard'),
-                      content: <ProfileBodyInfo user={userResolved} />
+                      content: <ProfileBodyInfo user={user} />
                   }
               ]
             : []),
@@ -52,7 +51,7 @@ export const ProfileTemplate: React.FC<ProfileProps> = ({
                         xl: GRID_COLS[3] ?? 'grid-cols-3'
                     }}
                     isCurrentUser={isCurrentUser}
-                    userId={userResolved.id}
+                    userId={user.id}
                 />
             )
         },
@@ -60,10 +59,7 @@ export const ProfileTemplate: React.FC<ProfileProps> = ({
             param: ProfileTab.Cookbooks,
             label: t('app.profile.cookbooks'),
             content: (
-                <Cookbooks
-                    isCurrentUser={isCurrentUser}
-                    userId={userResolved.id}
-                />
+                <Cookbooks isCurrentUser={isCurrentUser} userId={user.id} />
             )
         }
     ];
@@ -102,14 +98,14 @@ export const ProfileTemplate: React.FC<ProfileProps> = ({
             <DesktopProfileTemplate
                 className={'hidden md:block'}
                 items={profileNavigationItems}
-                user={userResolved}
+                user={user}
                 isCurrentUser={isCurrentUser}
                 initialTab={initialTab}
             />
             <MobileProfileTemplate
                 className={'md:hidden'}
                 items={profileNavigationItems}
-                user={userResolved}
+                user={user}
                 isCurrentUser={isCurrentUser}
             />
         </React.Fragment>
