@@ -585,10 +585,17 @@ class RecipeService {
             timesRated: allRatings.length
         });
 
-        // no need to await this here
-        revalidateRouteCache(
-            ROUTES.recipe.detail(recipe.displayId, recipe.title)
-        );
+        try {
+            await revalidateRouteCache(ROUTES.recipe.detail(recipe.displayId));
+            await revalidateRouteCache(
+                ROUTES.recipe.detail(recipe.displayId, recipe.title)
+            );
+        } catch (error: unknown) {
+            log.warn('rateRecipe - failed to revalidate recipe route', {
+                error,
+                recipeId
+            });
+        }
 
         try {
             const updatedRecipe = await this.getRecipeById(recipeId);

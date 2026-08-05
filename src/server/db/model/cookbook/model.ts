@@ -43,7 +43,10 @@ class CookbookModel {
                 return prisma.$queryRawTyped(getCookbookById(id));
             },
             ttl ?? CACHE_TTL.TTL_2,
-            [CACHE_TAGS.cookbook.entity(id)]
+            (rows) => [
+                CACHE_TAGS.cookbook.entity(id),
+                ...this.containsRecipeTags(rows[0])
+            ]
         );
 
         return this.reviveCookbookDates(cookbook[0] ?? null);
@@ -59,9 +62,16 @@ class CookbookModel {
             where: { displayId }
         });
         /**
-         * Keyed by displayId, but tagged with the numeric id so it shares
+         * Keyed by displayId but tagged with the numeric id so it shares
          * getOneById's invalidation: every writer already drops
          * cookbook.entity(id), so any write clears this entry too.
+         *
+         * A miss is deliberately not cached (ttl 0). The raw-SQL not-found
+         * resolves to [], which would cache and serve like any other value,
+         * and this read backs an unauthenticated route keyed by a
+         * caller-supplied UUID, so every cached miss would pin a value key
+         * plus a tag set per probed id. Skipping the cache also means a
+         * not-found can never go stale, so no identity tag is needed for it.
          */
         const cookbook = await cachePrismaQuery(
             cacheKey,
@@ -71,8 +81,14 @@ class CookbookModel {
                 });
                 return prisma.$queryRawTyped(getCookbookByDisplayId(displayId));
             },
-            ttl ?? CACHE_TTL.TTL_2,
-            (rows) => (rows[0] ? [CACHE_TAGS.cookbook.entity(rows[0].id)] : [])
+            (rows) => (rows.length === 0 ? 0 : (ttl ?? CACHE_TTL.TTL_2)),
+            (rows) =>
+                rows[0]
+                    ? [
+                          CACHE_TAGS.cookbook.entity(rows[0].id),
+                          ...this.containsRecipeTags(rows[0])
+                      ]
+                    : []
         );
 
         return this.reviveCookbookDates(cookbook[0] ?? null);
@@ -113,9 +129,7 @@ class CookbookModel {
             ownerId: data.ownerId
         });
 
-        await invalidateTags([CACHE_TAGS.cookbook.ownedBy(data.ownerId)]);
-
-        return await prisma.$transaction(async (tx) => {
+        const cookbook = await prisma.$transaction(async (tx) => {
             const { _max } = (await tx.cookbook.aggregate({
                 where: { ownerId: data.ownerId },
                 _max: { ownerOrder: true }
@@ -123,15 +137,33 @@ class CookbookModel {
 
             const nextPos = Number(_max.ownerOrder ?? 0) + 1;
 
-            const cookbook = await tx.cookbook.create({
+            return tx.cookbook.create({
                 data: {
                     ...data,
                     ownerOrder: nextPos
                 }
             });
-
-            return cookbook;
         });
+
+        //?—————————————————————————————————————————————————————————————————————————————————————?//
+        //?                         WHY A CREATE DROPS ITS OWN IDENTITY                         ?//
+        ///
+        //# Invalidate AFTER the transaction commits, otherwise a concurrent reader can
+        //# repopulate the entry with pre-write data and it survives its full ttl.
+        //#
+        //# The entity tag is dropped even though the row is brand new: getOneById resolves
+        //# a miss to [], which caches and serves like any other value, so a pre-creation
+        //# probe of this id may have cached a not-found. Leaving it in place would 404 the
+        //# freshly created cookbook for the rest of its ttl.
+        ///
+        //?—————————————————————————————————————————————————————————————————————————————————————?//
+
+        await invalidateTags([
+            CACHE_TAGS.cookbook.ownedBy(data.ownerId),
+            CACHE_TAGS.cookbook.entity(cookbook.id)
+        ]);
+
+        return cookbook;
     }
 
     async deleteOne(id: number): Promise<void> {
@@ -325,6 +357,29 @@ class CookbookModel {
     //~=========================================================================================~//
     //$                                          HELPERS                                        $//
     //~=========================================================================================~//
+
+    /**
+     * Cross-model tags for the recipe cards embedded in a cookbook entity
+     * payload. Registering one containsRecipe tag per embedded recipe lets
+     * recipe.updateOneById / deleteOneById clear every cookbook entry that
+     * renders the touched recipe.
+     */
+    private containsRecipeTags(
+        row: { recipes: unknown } | undefined
+    ): readonly string[] {
+        const recipes = row?.recipes;
+
+        if (!Array.isArray(recipes)) {
+            return [];
+        }
+
+        return recipes.flatMap((recipe) => {
+            const id = (recipe as { id?: unknown } | null)?.id;
+            return typeof id === 'number'
+                ? [CACHE_TAGS.cookbook.containsRecipe(id)]
+                : [];
+        });
+    }
 
     private reviveCookbookDates<T extends { createdAt: Date; updatedAt: Date }>(
         cookbook: T | null

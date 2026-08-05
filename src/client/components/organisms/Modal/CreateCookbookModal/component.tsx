@@ -63,7 +63,7 @@ export const CreateCookbookModal: React.FC<CreateCookbookModalProps> = ({
             onSuccess: (cookbook) => {
                 queryClient.invalidateQueries({
                     predicate: (query) =>
-                        query.queryKey[0] !== QUERY_KEYS.cookbook.namespace
+                        query.queryKey[0] === QUERY_KEYS.cookbook.namespace
                 });
 
                 alert({

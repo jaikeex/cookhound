@@ -21,7 +21,7 @@ const log = Logger.getInstance('recipe-evaluation-worker');
 
 type EvaluateRecipeJobData = {
     data: RecipeForEvaluation;
-    userId: number;
+    authorId: number;
     recipeId: number;
     recipeDisplayId: string;
 };
@@ -43,18 +43,19 @@ class EvaluateRecipeJob extends BaseJob<EvaluateRecipeJobData> {
     //|-----------------------------------------------------------------------------------------|//
 
     async handle(job: Job<EvaluateRecipeJobData>) {
-        const { data: recipe, userId, recipeId, recipeDisplayId } = job.data;
+        const { data: recipe, authorId, recipeId, recipeDisplayId } = job.data;
 
-        log.trace('handle - evaluating recipe', { recipeId, userId });
+        log.trace('handle - evaluating recipe', { recipeId, authorId });
 
         try {
             const evaluationResponse = await this.evaluateRecipeWithAI(recipe);
 
             if (evaluationResponse.accepted) {
-                const cleared = await recipeFlagModel.clearActiveFlags(
+                const cleared = await recipeFlagModel.clearActiveFlags({
                     recipeId,
-                    recipeDisplayId
-                );
+                    recipeDisplayId,
+                    authorId
+                });
 
                 if (cleared > 0) {
                     // Recipe was previously flagged but is now accepted.
@@ -77,7 +78,7 @@ class EvaluateRecipeJob extends BaseJob<EvaluateRecipeJobData> {
 
                     log.notice('handle - recipe accepted, prior flag cleared', {
                         recipeId,
-                        userId,
+                        authorId,
                         clearedFlags: cleared
                     });
 
@@ -88,7 +89,7 @@ class EvaluateRecipeJob extends BaseJob<EvaluateRecipeJobData> {
                 } else {
                     log.notice('handle - recipe accepted', {
                         recipeId,
-                        userId
+                        authorId
                     });
                 }
 
@@ -100,18 +101,19 @@ class EvaluateRecipeJob extends BaseJob<EvaluateRecipeJobData> {
             if (!reason) {
                 log.warn('handle - recipe rejected but no reason provided', {
                     recipeId,
-                    userId,
+                    authorId,
                     evaluationResponse
                 });
                 return;
             }
 
-            await recipeFlagModel.flagRecipe(
+            await recipeFlagModel.flagRecipe({
                 recipeId,
                 recipeDisplayId,
-                userId,
-                reason
-            );
+                flaggedByUserId: authorId,
+                reason,
+                authorId
+            });
 
             recipeSearchIndex.deleteOne(recipeId);
 
@@ -121,7 +123,7 @@ class EvaluateRecipeJob extends BaseJob<EvaluateRecipeJobData> {
 
             log.notice('handle - recipe rejected and flagged', {
                 recipeId,
-                userId,
+                authorId,
                 reason
             });
 
@@ -130,7 +132,7 @@ class EvaluateRecipeJob extends BaseJob<EvaluateRecipeJobData> {
             log.warn('handle - failed to evaluate recipe', {
                 error,
                 recipeId,
-                userId,
+                authorId,
                 jobId: job.id
             });
 

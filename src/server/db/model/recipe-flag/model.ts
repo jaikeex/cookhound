@@ -12,6 +12,24 @@ import { CACHE_TAGS, invalidateTags } from '@/server/db/model/model-cache';
 
 const log = Logger.getInstance('recipe-flag-model');
 
+//~=============================================================================================~//
+//$                                            TYPES                                            $//
+//~=============================================================================================~//
+
+type RecipeFlagTarget = Readonly<{
+    recipeId: number;
+    recipeDisplayId: string;
+    authorId: number;
+}>;
+
+export type FlagRecipeArgs = RecipeFlagTarget &
+    Readonly<{
+        flaggedByUserId: number;
+        reason: RecipeFlagReason;
+    }>;
+
+export type ClearActiveFlagsArgs = RecipeFlagTarget;
+
 class RecipeFlagModel {
     //~=========================================================================================~//
     //$                                          QUERIES                                        $//
@@ -116,15 +134,17 @@ class RecipeFlagModel {
     /**
      * Flag a recipe with the provided reason. Any pre-existing active flag
      * on the same recipe is deactivated first.
+     *
      * Write class -> W1
      */
-    async flagRecipe(
-        recipeId: number,
-        recipeDisplayId: string,
-        userId: number,
-        reason: RecipeFlagReason
-    ): Promise<void> {
-        log.trace('Flagging a recipe', { recipeId, userId, reason });
+    async flagRecipe({
+        recipeId,
+        recipeDisplayId,
+        flaggedByUserId,
+        reason,
+        authorId
+    }: FlagRecipeArgs): Promise<void> {
+        log.trace('Flagging a recipe', { recipeId, flaggedByUserId, reason });
 
         await prisma.$transaction(async (tx) => {
             await tx.recipeFlag.updateMany({
@@ -139,7 +159,7 @@ class RecipeFlagModel {
             await tx.recipeFlag.create({
                 data: {
                     recipeId,
-                    userId,
+                    userId: flaggedByUserId,
                     reason
                 }
             });
@@ -147,18 +167,21 @@ class RecipeFlagModel {
 
         await invalidateTags([
             CACHE_TAGS.recipe.entity(recipeId),
-            CACHE_TAGS.recipe.byDisplayId(recipeDisplayId)
+            CACHE_TAGS.recipe.byDisplayId(recipeDisplayId),
+            CACHE_TAGS.recipe.ownedBy(authorId)
         ]);
     }
 
     /**
      * Resolve and deactivate all currently active flags for a recipe.
+     *
      * Write class -> W1
      */
-    async clearActiveFlags(
-        recipeId: number,
-        recipeDisplayId: string
-    ): Promise<number> {
+    async clearActiveFlags({
+        recipeId,
+        recipeDisplayId,
+        authorId
+    }: ClearActiveFlagsArgs): Promise<number> {
         log.trace('Clearing active flags for recipe', { recipeId });
 
         const result = await prisma.recipeFlag.updateMany({
@@ -173,7 +196,8 @@ class RecipeFlagModel {
         if (result.count > 0) {
             await invalidateTags([
                 CACHE_TAGS.recipe.entity(recipeId),
-                CACHE_TAGS.recipe.byDisplayId(recipeDisplayId)
+                CACHE_TAGS.recipe.byDisplayId(recipeDisplayId),
+                CACHE_TAGS.recipe.ownedBy(authorId)
             ]);
         }
 

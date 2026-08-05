@@ -70,7 +70,7 @@ class UserModel {
                 log.trace('Fetching user from db by email', { email });
                 return prisma.user.findUnique({ where: { email }, select });
             },
-            ttl ?? CACHE_TTL.TTL_2,
+            (result) => this.lookupTtl(ttl ?? CACHE_TTL.TTL_2, result),
             (result) => this.userTagsFor(result)
         );
 
@@ -100,7 +100,7 @@ class UserModel {
 
                 return prisma.user.findUnique({ where: { id }, select });
             },
-            ttl ?? CACHE_TTL.TTL_2,
+            (result) => this.lookupTtl(ttl ?? CACHE_TTL.TTL_2, result),
             [CACHE_TAGS.user.entity(id)]
         );
 
@@ -128,7 +128,7 @@ class UserModel {
 
                 return prisma.user.findUnique({ where: { username } });
             },
-            ttl ?? CACHE_TTL.TTL_2,
+            (result) => this.lookupTtl(ttl ?? CACHE_TTL.TTL_2, result),
             (result) => this.userTagsFor(result)
         );
 
@@ -162,7 +162,7 @@ class UserModel {
                     where: { OR: [{ email }, { username }] }
                 });
             },
-            ttl ?? CACHE_TTL.TTL_2,
+            (result) => this.lookupTtl(ttl ?? CACHE_TTL.TTL_2, result),
             (result) => this.userTagsFor(result)
         );
 
@@ -403,7 +403,7 @@ class UserModel {
      * Ensures there is at most one active request per user by using the unique
      * constraint on `userId`. Any previous request for the same user will be
      * overwritten.
-     * Write class -> W2
+     * Write class -> W1
      */
     async upsertEmailChangeRequest(
         userId: number,
@@ -416,6 +416,12 @@ class UserModel {
             newEmail,
             token,
             expiresAt
+        });
+
+        // Capture the token being replaced so its cached lookup entry can be dropped too.
+        const previous = await prisma.emailChangeRequest.findUnique({
+            where: { userId },
+            select: { token: true }
         });
 
         const request = await prisma.emailChangeRequest.upsert({
@@ -436,6 +442,13 @@ class UserModel {
         // No user fields change yet, but still invalidate cache in case callers
         // read user relations that depend on email change requests.
         await this.invalidateUserCache({ id: userId });
+
+        await invalidateTags([
+            CACHE_TAGS.emailChangeRequest.byToken(token),
+            ...(previous && previous.token !== token
+                ? [CACHE_TAGS.emailChangeRequest.byToken(previous.token)]
+                : [])
+        ]);
 
         return request;
     }
@@ -838,30 +851,44 @@ class UserModel {
 
     /**
      * Anonymize user's recipes by changing authorId to -1
-     * Write class -> W2
+     * Write class -> W1
      */
     async anonymizeUserRecipes(userId: number): Promise<void> {
         log.trace('Anonymizing user recipes', { userId });
+
+        const recipes = await prisma.recipe.findMany({
+            where: { authorId: userId },
+            select: { id: true, displayId: true }
+        });
 
         await prisma.recipe.updateMany({
             where: { authorId: userId },
             data: { authorId: ANONYMOUS_USER_ID }
         });
 
+        await invalidateTags(this.reparentedRecipeTags(userId, recipes));
+
         return;
     }
 
     /**
      * Anonymize user's cookbooks by changing ownerId to -1
-     * Write class -> W2
+     * Write class -> W1
      */
     async anonymizeUserCookbooks(userId: number): Promise<void> {
         log.trace('Anonymizing user cookbooks', { userId });
+
+        const cookbooks = await prisma.cookbook.findMany({
+            where: { ownerId: userId },
+            select: { id: true }
+        });
 
         await prisma.cookbook.updateMany({
             where: { ownerId: userId },
             data: { ownerId: ANONYMOUS_USER_ID }
         });
+
+        await invalidateTags(this.reparentedCookbookTags(userId, cookbooks));
 
         return;
     }
@@ -889,6 +916,17 @@ class UserModel {
      */
     async executeHardDeletion(userId: number): Promise<void> {
         log.trace('Executing hard deletion for user', { userId });
+
+        const [recipes, cookbooks] = await Promise.all([
+            prisma.recipe.findMany({
+                where: { authorId: userId },
+                select: { id: true, displayId: true }
+            }),
+            prisma.cookbook.findMany({
+                where: { ownerId: userId },
+                select: { id: true }
+            })
+        ]);
 
         await prisma.$transaction(async (tx) => {
             // Mark audit record as completed before deletion
@@ -977,6 +1015,11 @@ class UserModel {
 
         await this.invalidateUserCache({ id: userId });
 
+        await invalidateTags([
+            ...this.reparentedRecipeTags(userId, recipes),
+            ...this.reparentedCookbookTags(userId, cookbooks)
+        ]);
+
         return;
     }
 
@@ -989,12 +1032,58 @@ class UserModel {
      * regardless of whether it was fetched by email, username, token etc
      * is tagged with the user id, so a single invalidation clears all of them.
      *
-     * Every user projection includes id, so a non-null
-     * result always returns a tag; a null not-found result returns none.
+     * Every user projection includes id, so a non-null result always returns
+     * a tag; a null not-found result returns none.
      */
     private userTagsFor(result: unknown): readonly string[] {
         const id = (result as { id?: number } | null)?.id;
         return typeof id === 'number' ? [CACHE_TAGS.user.entity(id)] : [];
+    }
+
+    /**
+     * Resolve the ttl for a lookup keyed by a caller-supplied value.
+     *
+     * A hit keeps the C2 tier; a miss is not cached at all (ttl 0). A cached
+     * null could never be served anyway — redisClient.get maps a stored null
+     * back to "key absent", so cachePrismaQuery always treats it as a miss.
+     * Caching it would only pin a value key plus a tag set per probed value,
+     * which matters because these reads are reachable by anyone hitting the
+     * login, availability or profile endpoints.
+     */
+    private lookupTtl(hitTtl: number, result: unknown): number {
+        return result === null ? 0 : hitTtl;
+    }
+
+    /**
+     * Tags to drop after reparenting a user's recipes to the anonymous user:
+     * both single-recipe lookups per recipe plus the author's collections.
+     */
+    private reparentedRecipeTags(
+        userId: number,
+        recipes: ReadonlyArray<{ id: number; displayId: string }>
+    ): readonly string[] {
+        return [
+            CACHE_TAGS.recipe.ownedBy(userId),
+            ...recipes.flatMap((recipe) => [
+                CACHE_TAGS.recipe.entity(recipe.id),
+                CACHE_TAGS.recipe.byDisplayId(recipe.displayId)
+            ])
+        ];
+    }
+
+    /**
+     * Tags to drop after reparenting a user's cookbooks to the anonymous user.
+     */
+    private reparentedCookbookTags(
+        userId: number,
+        cookbooks: ReadonlyArray<{ id: number }>
+    ): readonly string[] {
+        return [
+            CACHE_TAGS.cookbook.ownedBy(userId),
+            ...cookbooks.map((cookbook) =>
+                CACHE_TAGS.cookbook.entity(cookbook.id)
+            )
+        ];
     }
 
     /**

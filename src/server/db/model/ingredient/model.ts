@@ -2,6 +2,7 @@ import type { Ingredient } from '@/server/db/generated/prisma/client';
 import { prisma } from '@/server/integrations';
 import { Logger } from '@/server/logger';
 import {
+    CACHE_TAGS,
     CACHE_TTL,
     cachePrismaQuery,
     generateCacheKey
@@ -41,6 +42,7 @@ class IngredientModel {
 
     /**
      * Get all ingredients, sorted alphabetically.
+     *
      * Query class -> C2
      */
     async getAll(ttl?: number): Promise<{ id: number; name: string }[]> {
@@ -59,7 +61,8 @@ class IngredientModel {
                     take: 5000
                 });
             },
-            ttl ?? CACHE_TTL.TTL_2
+            ttl ?? CACHE_TTL.TTL_2,
+            [CACHE_TAGS.ingredient.all()]
         );
 
         return ingredients;

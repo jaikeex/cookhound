@@ -79,7 +79,7 @@ class RecipeModel {
                 });
                 return prisma.$queryRawTyped(getRecipeByDisplayId(displayId));
             },
-            ttl ?? CACHE_TTL.TTL_2,
+            (rows) => (rows.length === 0 ? 0 : (ttl ?? CACHE_TTL.TTL_2)),
             [CACHE_TAGS.recipe.byDisplayId(displayId)]
         );
 
@@ -563,118 +563,153 @@ class RecipeModel {
             authorId: data.authorId
         });
 
-        return await prisma.$transaction(async (tx) => {
-            log.trace('Creating recipe object', {
-                title: data.recipe.title,
-                authorId: data.authorId
-            });
+        let createdNewIngredient = false;
 
-            const recipe = await tx.recipe.create({
-                data: {
-                    ...data.recipe,
-                    author: {
-                        connect: {
-                            id: data.authorId
+        const { payload: createdRecipe, identity } = await prisma.$transaction(
+            async (tx) => {
+                log.trace('Creating recipe object', {
+                    title: data.recipe.title,
+                    authorId: data.authorId
+                });
+
+                const recipe = await tx.recipe.create({
+                    data: {
+                        ...data.recipe,
+                        author: {
+                            connect: {
+                                id: data.authorId
+                            }
                         }
                     }
-                }
-            });
-
-            log.trace('Creating instructions', { recipeId: recipe.id });
-
-            if (data.instructions.length > 0) {
-                await tx.instruction.createMany({
-                    data: data.instructions.map((text, index) => ({
-                        recipeId: recipe.id,
-                        step: index + 1,
-                        text
-                    }))
                 });
-            }
 
-            log.trace('Creating ingredients', { recipeId: recipe.id });
+                const identity = {
+                    id: recipe.id,
+                    displayId: recipe.displayId
+                };
 
-            if (data.ingredients.length > 0) {
-                // Calculate orders
-                const categoryOrders = this.calculateCategoryOrders(
-                    data.ingredients
-                );
+                log.trace('Creating instructions', { recipeId: recipe.id });
 
-                const ingredientOrders = this.calculateIngredientOrders(
-                    data.ingredients
-                );
-
-                if (!ingredientOrders || !Array.isArray(ingredientOrders)) {
-                    return recipe;
+                if (data.instructions.length > 0) {
+                    await tx.instruction.createMany({
+                        data: data.instructions.map((text, index) => ({
+                            recipeId: recipe.id,
+                            step: index + 1,
+                            text
+                        }))
+                    });
                 }
 
-                for (let i = 0; i < data.ingredients.length; i++) {
-                    const ingredientData = data.ingredients[i];
+                log.trace('Creating ingredients', { recipeId: recipe.id });
 
-                    const categoryOrder = categoryOrders[i];
-                    const ingredientOrder = ingredientOrders[i];
+                if (data.ingredients.length > 0) {
+                    // Calculate orders
+                    const categoryOrders = this.calculateCategoryOrders(
+                        data.ingredients
+                    );
 
-                    if (!ingredientData || ingredientOrder === undefined) {
-                        continue;
+                    const ingredientOrders = this.calculateIngredientOrders(
+                        data.ingredients
+                    );
+
+                    if (!ingredientOrders || !Array.isArray(ingredientOrders)) {
+                        return { payload: recipe, identity };
                     }
 
-                    // Only create ingredient if it doesn't already exist
-                    let ingredient = await tx.ingredient.findUnique({
-                        where: { name: ingredientData.name }
-                    });
+                    for (let i = 0; i < data.ingredients.length; i++) {
+                        const ingredientData = data.ingredients[i];
 
-                    if (!ingredient) {
-                        ingredient = await tx.ingredient.create({
-                            data: { name: ingredientData.name }
+                        const categoryOrder = categoryOrders[i];
+                        const ingredientOrder = ingredientOrders[i];
+
+                        if (!ingredientData || ingredientOrder === undefined) {
+                            continue;
+                        }
+
+                        // Only create ingredient if it doesn't already exist
+                        let ingredient = await tx.ingredient.findUnique({
+                            where: { name: ingredientData.name }
+                        });
+
+                        if (!ingredient) {
+                            ingredient = await tx.ingredient.create({
+                                data: { name: ingredientData.name }
+                            });
+                            createdNewIngredient = true;
+                        }
+
+                        // Create recipe-ingredient relation
+                        await tx.recipeIngredient.create({
+                            data: {
+                                recipeId: recipe.id,
+                                ingredientId: ingredient.id,
+                                quantity: ingredientData.quantity,
+                                category: ingredientData.category || null,
+                                categoryOrder,
+                                ingredientOrder
+                            }
                         });
                     }
+                }
 
-                    // Create recipe-ingredient relation
-                    await tx.recipeIngredient.create({
-                        data: {
+                log.trace('Creating tags', { recipeId: recipe.id });
+
+                if (data.tags.length > 0) {
+                    await tx.recipeTag.createMany({
+                        data: data.tags.map((tag) => ({
                             recipeId: recipe.id,
-                            ingredientId: ingredient.id,
-                            quantity: ingredientData.quantity,
-                            category: ingredientData.category || null,
-                            categoryOrder,
-                            ingredientOrder
-                        }
+                            tagId: tag.id
+                        }))
                     });
                 }
-            }
 
-            log.trace('Creating tags', { recipeId: recipe.id });
-
-            if (data.tags.length > 0) {
-                await tx.recipeTag.createMany({
-                    data: data.tags.map((tag) => ({
-                        recipeId: recipe.id,
-                        tagId: tag.id
-                    }))
+                log.trace('Recipe successfully created', {
+                    recipeId: recipe.id
                 });
-            }
 
-            log.trace('Recipe successfully created', {
-                recipeId: recipe.id
-            });
-
-            await invalidateTags([CACHE_TAGS.recipe.ownedBy(data.authorId)]);
-
-            return (await tx.recipe.findUnique({
-                where: { id: recipe.id },
-                include: {
-                    ingredients: {
+                return {
+                    payload: (await tx.recipe.findUnique({
+                        where: { id: recipe.id },
                         include: {
-                            ingredient: true
-                        },
-                        orderBy: {
-                            ingredientOrder: 'asc'
+                            ingredients: {
+                                include: {
+                                    ingredient: true
+                                },
+                                orderBy: {
+                                    ingredientOrder: 'asc'
+                                }
+                            },
+                            instructions: true
                         }
-                    },
-                    instructions: true
-                }
-            })) as Recipe;
-        });
+                    })) as Recipe,
+                    identity
+                };
+            }
+        );
+
+        //?—————————————————————————————————————————————————————————————————————————————————————?//
+        //?                         WHY A CREATE DROPS ITS OWN IDENTITY                         ?//
+        ///
+        //# Invalidate AFTER the transaction commits, otherwise a concurrent reader can
+        //# repopulate the entry with pre-write data and it survives its full ttl.
+        //#
+        //# The identity tags are dropped even though the row is brand new. A lookup for a
+        //# recipe that does not exist yet caches a not-found: the raw-SQL reads resolve a miss
+        //# to [], which caches and serves like any other value. displayIds are drawn from a
+        //# 900k space (generateRecipeDisplayId), small enough to enumerate, so a crawler can
+        //# leave a cached not-found sitting on an id this recipe then draws, 404ing a live
+        //# recipe for the rest of the entry's ttl. Dropping both identity tags here closes it.
+        ///
+        //?—————————————————————————————————————————————————————————————————————————————————————?//
+
+        await invalidateTags([
+            CACHE_TAGS.recipe.ownedBy(data.authorId),
+            CACHE_TAGS.recipe.entity(identity.id),
+            CACHE_TAGS.recipe.byDisplayId(identity.displayId),
+            ...(createdNewIngredient ? [CACHE_TAGS.ingredient.all()] : [])
+        ]);
+
+        return createdRecipe;
     }
 
     /**
@@ -715,6 +750,8 @@ class RecipeModel {
                 ApplicationErrorCode.RECIPE_NOT_FOUND
             );
         }
+
+        let createdNewIngredient = false;
 
         const updatedRecipe = await prisma.$transaction(async (tx) => {
             if (Object.keys(recipeData).length > 0) {
@@ -768,6 +805,8 @@ class RecipeModel {
                         ingredient = await tx.ingredient.create({
                             data: { name: ingredientData.name }
                         });
+
+                        createdNewIngredient = true;
                     }
 
                     await tx.recipeIngredient.create({
@@ -811,7 +850,9 @@ class RecipeModel {
         await invalidateTags([
             CACHE_TAGS.recipe.entity(id),
             CACHE_TAGS.recipe.byDisplayId(originalRecipe.displayId),
-            CACHE_TAGS.recipe.ownedBy(originalRecipe.authorId)
+            CACHE_TAGS.recipe.ownedBy(originalRecipe.authorId),
+            CACHE_TAGS.cookbook.containsRecipe(id),
+            ...(createdNewIngredient ? [CACHE_TAGS.ingredient.all()] : [])
         ]);
 
         return updatedRecipe;
@@ -877,6 +918,7 @@ class RecipeModel {
 
         await invalidateTags([
             CACHE_TAGS.recipe.entity(id),
+            CACHE_TAGS.cookbook.containsRecipe(id),
             ...(identity
                 ? [
                       CACHE_TAGS.recipe.byDisplayId(identity.displayId),

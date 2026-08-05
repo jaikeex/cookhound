@@ -1,6 +1,5 @@
 import { redisClient } from '@/server/integrations';
 import {
-    ENV_CONFIG_PRIVATE,
     ONE_DAY_IN_SECONDS,
     ONE_HOUR_IN_SECONDS,
     ONE_MINUTE_IN_SECONDS
@@ -86,10 +85,15 @@ export const CACHE_TAGS = {
     },
     cookbook: {
         entity: (id: number) => `tag:cookbook:id:${id}`,
-        ownedBy: (ownerId: number) => `tag:cookbook:owner:${ownerId}`
+        ownedBy: (ownerId: number) => `tag:cookbook:owner:${ownerId}`,
+        containsRecipe: (recipeId: number) =>
+            `tag:cookbook:containsRecipe:${recipeId}`
     },
     bookmark: {
         ownedBy: (userId: number) => `tag:bookmark:user:${userId}`
+    },
+    ingredient: {
+        all: () => `tag:ingredient:all`
     },
     user: {
         entity: (id: number) => `tag:user:${id}`
@@ -111,20 +115,37 @@ export type CacheTagsInput<T> =
     readonly string[] | ((result: T) => readonly string[]);
 
 /**
+ * The ttl for a cache entry. Either a fixed number of seconds, or a function
+ * of the fetched value.
+ *
+ * The function form exists for reads keyed by a caller-supplied value (an
+ * email, a username). A miss on those pins a cache entry plus a
+ * tag set, so a not-found must not be allowed to hold the ttl a real hit gets.
+ * Return 0 to skip caching that result.
+ *
+ * Whichever branch is taken MUST stay below CACHE_TAG_TTL.
+ */
+export type CacheTtlInput<T> = number | ((result: T) => number);
+
+/**
  * Generic cache wrapper for Prisma queries.
  *
  * @param key - Unique cache key
  * @param fetchFn - Function that returns the data to cache
- * @param ttl - Time to live in seconds (default: REDIS_TTL env)
+ * @param ttl - Time to live in seconds, or a function of the result
+ *              (default: TTL_1). The default is the short tier on purpose: it
+ *              must always stay below CACHE_TAG_TTL, otherwise an entry could
+ *              outlive the tag set tracking it and become unreachable by
+ *              invalidation.
  * @param tags - Tag set membership for this entry, used for targeted invalidation.
  */
 export async function cachePrismaQuery<T>(
     key: string,
     fetchFn: () => Promise<T>,
-    ttl: number = Number(ENV_CONFIG_PRIVATE.REDIS_TTL),
+    ttl: CacheTtlInput<T> = CACHE_TTL.TTL_1,
     tags?: CacheTagsInput<T>
 ): Promise<T> {
-    if (ttl <= 0) {
+    if (typeof ttl === 'number' && ttl <= 0) {
         return fetchFn();
     }
 
@@ -152,6 +173,12 @@ export async function cachePrismaQuery<T>(
     log.trace(`Cache miss for key: ${key}`);
     const data = await fetchFn();
 
+    const resolvedTtl = typeof ttl === 'function' ? ttl(data) : ttl;
+
+    if (resolvedTtl <= 0) {
+        return data;
+    }
+
     try {
         //?—————————————————————————————————————————————————————————————————————————————————————?//
         //?                                 ORDER MATTERS HERE                                  ?//
@@ -176,7 +203,7 @@ export async function cachePrismaQuery<T>(
             }
         }
 
-        await redisClient.set(key, data, ttl);
+        await redisClient.set(key, data, resolvedTtl);
     } catch (error: unknown) {
         log.warn('Redis write failed, skipping cache population', {
             key,
