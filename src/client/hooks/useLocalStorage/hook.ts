@@ -33,7 +33,6 @@ type UseLocalStorageReturn<T> = {
  *
  * ~If the user does not provide an onError callback inside the options, all errors will be rethrown.
  *
- * I shamelessly copied this from my job, then made it better, but did not tell them.
  * @template T - The type of the value to be stored in localStorage.
  * @param {string} key - The key under which the value will be stored in localStorage.
  * @param {T} initialValue - The initial value to use if no value exists in localStorage.

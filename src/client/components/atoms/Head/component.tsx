@@ -18,7 +18,7 @@ export const Head: React.FC = () => {
                 sizes="16x16"
                 href="/favicon-16x16.png"
             />
-            <link rel="shortcut icon" href="/favicon.ico" />
+            <link rel="shortcut icon" href="/favicon.png" />
         </>
     );
 };

@@ -68,6 +68,7 @@ You can start everything at once by running the compose config in `docker-compos
 - `yarn seed` to seed the db
 - `yarn setup-typesense` copy the returned api key into .env
 - `yarn dev`
+- `yarn dev-worker` for the bullmq worker
 
 #### Markdown styling
 
@@ -96,6 +97,13 @@ Substitute the date with the date of the logs you want to download.
 ```bash
 scp -i ssh/cookhound-digitalocean root@<IP>:/var/log/cookhound/cookhound-api-2025-10-08.log logs-droplet/cookhound-api-2025-10-08.log
 ```
+### Pull nginx logs from the droplet
+
+The file rotates
+
+```bash
+scp -i ssh/cookhound-digitalocean root@<IP>:/var/log/nginx/access.log logs-droplet/nginx/access.log
+```
 
 ### bash into a container
 
@@ -111,20 +119,14 @@ The password must be surrounded by single quotes.
 redis-cli -h localhost -p 6379 -a '<password>'
 ```
 
-### edit site nginx config
+### nginx config
 
 ```bash
-nano etc/nginx/sites-available/cookhound.com
-```
+# deploy from repo 
+DROPLET_IP=<ip> ./scripts/deploy-nginx.sh
 
-### edit global nginx config
-
-```bash
-nano etc/nginx/nginx.conf
-```
-
-### restart nginx
-
-```bash
+# live edit
+nano /etc/nginx/sites-available/cookhound.com
+nano /etc/nginx/nginx.conf
 systemctl restart nginx
 ```

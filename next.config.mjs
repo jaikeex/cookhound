@@ -164,7 +164,34 @@ const nextConfig = {
         outgoingResponses: false
     },
 
-    webpack(config) {
+    webpack(config, { isServer }) {
+        //I used this for bundle size investigations. Leaving it here for reference.
+        if (process.env.DUMP_STATS && !isServer) {
+            config.plugins.push({
+                apply(compiler) {
+                    compiler.hooks.done.tap('DumpStats', (stats) => {
+                        const json = stats.toJson({
+                            all: false,
+                            chunks: true,
+                            chunkModules: true,
+                            modules: true,
+                            cachedModules: true,
+                            reasons: true,
+                            entrypoints: true,
+                            ids: true,
+                            nestedModules: true
+                        });
+                        import('fs').then((fs) =>
+                            fs.writeFileSync(
+                                process.env.DUMP_STATS,
+                                JSON.stringify(json)
+                            )
+                        );
+                    });
+                }
+            });
+        }
+
         // Grab the existing rule that handles SVG imports
         const fileLoaderRule = config.module.rules.find((rule) =>
             rule.test?.test?.('.svg')
