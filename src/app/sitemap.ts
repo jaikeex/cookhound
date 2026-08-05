@@ -8,7 +8,7 @@ import {
 } from '@/common/constants';
 import type { HubDbSlug } from '@/common/constants';
 import { prisma } from '@/server/integrations';
-import db from '@/server/db/model';
+import { recipeTagService } from '@/server/services';
 import { Logger } from '@/server/logger';
 
 export const revalidate = 86400; // 24 hours
@@ -21,18 +21,23 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     try {
         log.trace('Generating sitemap');
 
-        const [recipes, cookbooks, users, hubs] = await Promise.all([
+        const [recipes, cookbooks, users, hubLookup] = await Promise.all([
             fetchPublicRecipes(),
             fetchPublicCookbooks(),
             fetchPublicUsers(),
             fetchIndexableHubs()
         ]);
 
+        // null means the lookup itself failed, which is not the same statement
+        // as "no hub qualifies" - see the index entry below.
+        const hubs = hubLookup ?? [];
+
         log.trace('Fetched sitemap data', {
             recipesCount: recipes.length,
             cookbooksCount: cookbooks.length,
             usersCount: users.length,
-            hubsCount: hubs.length
+            hubsCount: hubs.length,
+            hubLookupFailed: hubLookup === null
         });
 
         log.trace('Generating static pages');
@@ -60,6 +65,26 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
                     }
                 }
             },
+            // Submitted only while it has something to list. With no hub past
+            // the threshold the index renders an empty state and marks itself
+            // noindex (see its generateMetadata), and submitting a url the
+            // page itself tells crawlers to drop is a contradiction that costs
+            // crawl budget on a thin page.
+            ...(hubLookup === null || hubs.length > 0
+                ? [
+                      {
+                          url: `${baseUrl}${ROUTES.hub.index}`,
+                          lastModified: new Date(),
+                          changeFrequency: 'weekly' as const,
+                          priority: 0.7,
+                          alternates: {
+                              languages: {
+                                  cs: `${baseUrl}${ROUTES.hub.index}`
+                              }
+                          }
+                      }
+                  ]
+                : []),
             {
                 url: `${baseUrl}${ROUTES.terms}`,
                 lastModified: new Date(),
@@ -166,16 +191,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
 }
 
-async function fetchIndexableHubs(): Promise<
-    Array<{
-        hubSlug: string;
-        lastModified: string;
-    }>
-> {
+async function fetchIndexableHubs(): Promise<Array<{
+    hubSlug: string;
+    lastModified: string;
+}> | null> {
     try {
         log.trace('Fetching indexable hubs for sitemap');
 
-        const rows = await db.recipeTag.getIndexableHubs(
+        const rows = await recipeTagService.listIndexableHubs(
             HUB_INDEXABLE_THRESHOLD
         );
 
@@ -198,7 +221,7 @@ async function fetchIndexableHubs(): Promise<
         });
     } catch (error: unknown) {
         log.error('Failed to fetch indexable hubs for sitemap', { error });
-        return [];
+        return null;
     }
 }
 

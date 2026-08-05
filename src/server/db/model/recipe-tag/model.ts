@@ -121,19 +121,27 @@ class RecipeTagModel {
     }
 
     /**
-     * Get tag slugs eligible for indexing as hub pages, together with the most
-     * recent update time among their non-flagged recipes.
+     * Get tag slugs eligible for indexing as hub pages, together with their
+     * non-flagged recipe count and the most recent update time among those
+     * recipes.
      *
      * Query class -> C2
      */
     async getIndexableHubs(
         threshold: number,
         ttl?: number
-    ): Promise<Array<{ slug: string; lastModified: Date }>> {
+    ): Promise<
+        Array<{ slug: string; recipeCount: number; lastModified: Date }>
+    > {
         log.trace('Getting indexable hubs', { threshold });
 
+        // v2: the cached row shape gained recipeCount. Entries written by the
+        // previous release lack the field and would be dropped wholesale by the
+        // guard below, so the shape change gets its own key.
+        // This is temporary and can be reverted in a future release.
         const cacheKey = generateCacheKey('recipe-tag', 'getIndexableHubs', {
-            threshold
+            threshold,
+            v: 2
         });
 
         const rows = await cachePrismaQuery(
@@ -147,11 +155,31 @@ class RecipeTagModel {
             ttl ?? CACHE_TTL.TTL_2
         );
 
-        return rows.flatMap((row) =>
-            row.lastModified
-                ? [{ slug: row.slug, lastModified: row.lastModified }]
+        // The cache round-trips through JSON, so lastModified is a Date on a
+        // miss but an ISO string on a hit. Revived here so the declared Date
+        // holds on both paths - callers do call Date methods on it,
+        // the sitemap needs toISOString.
+        const hubs = rows.flatMap((row) =>
+            row.lastModified != null && row.recipeCount != null
+                ? [
+                      {
+                          slug: row.slug,
+                          recipeCount: row.recipeCount,
+                          lastModified: new Date(row.lastModified)
+                      }
+                  ]
                 : []
         );
+
+        if (hubs.length !== rows.length) {
+            log.warn('Dropped malformed indexable hub rows', {
+                threshold,
+                fetched: rows.length,
+                kept: hubs.length
+            });
+        }
+
+        return hubs;
     }
 }
 

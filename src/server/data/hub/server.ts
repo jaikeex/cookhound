@@ -2,6 +2,7 @@ import 'server-only';
 import { cache } from 'react';
 import { hubReads } from '@/server/services';
 import type { HubData } from '@/server/services/hub/types';
+import type { HubIndexGroup } from '@/common/constants';
 import type { RecipeForDisplayDTO } from '@/common/types';
 
 /**
@@ -24,5 +25,12 @@ export const hubServerData = {
     listRecipes: cache(
         (tagId: number, page: number): Promise<RecipeForDisplayDTO[]> =>
             hubReads.listRecipes(tagId, page)
+    ),
+
+    /**
+     * Lists the indexable hubs grouped by category, for the /recepty index.
+     */
+    getIndexGroups: cache((): Promise<readonly HubIndexGroup[]> =>
+        hubReads.getIndexGroups()
     )
 };

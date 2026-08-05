@@ -15,6 +15,7 @@ import { slugifyRecipeTitle } from '@/common/utils/titleSlug';
 
 const SEGMENTS = {
     recipe: '/recept',
+    hub: '/recepty',
     cookbook: '/kucharky',
     user: '/profil',
     auth: '/auth',
@@ -38,6 +39,9 @@ export type RecipePath = `${typeof SEGMENTS.recipe}/${string}`;
 
 /** A recipe edit path, e.g. `/recept/abc123/edit`. */
 export type RecipeEditPath = `${RecipePath}/edit`;
+
+/** A tag hub path, e.g. `/recepty` or `/recepty/dezerty/strana/2`. */
+export type HubPath = typeof SEGMENTS.hub | `${typeof SEGMENTS.hub}/${string}`;
 
 /** A cookbook detail path, e.g. `/kucharky/abc123`. */
 export type CookbookPath = `${typeof SEGMENTS.cookbook}/${string}`;
@@ -103,6 +107,29 @@ export const ROUTES = {
          */
         edit: (displayId: string): RecipeEditPath =>
             `${SEGMENTS.recipe}/${displayId}/edit`
+    },
+
+    //|-----------------------------------------------------------------------------------------|//
+    //?                                        TAG HUBS                                         ?//
+    //|-----------------------------------------------------------------------------------------|//
+
+    hub: {
+        index: SEGMENTS.hub,
+
+        /**
+         * Builds the path for a tag hub page. Page 1 lives at the bare hub url,
+         * pages >= 2 live under /strana/<page>.
+         *
+         * Prefer `buildHubPath` at call sites that already import from the hub
+         * constants, it delegates here, so both return the same url.
+         *
+         * @param hubSlug - The hub's url slug (e.g. 'dezerty').
+         * @param page - 1-based page number, defaults to the first page.
+         */
+        detail: (hubSlug: string, page = 1): HubPath =>
+            page <= 1
+                ? `${SEGMENTS.hub}/${hubSlug}`
+                : `${SEGMENTS.hub}/${hubSlug}/strana/${page}`
     },
 
     //|-----------------------------------------------------------------------------------------|//

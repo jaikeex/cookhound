@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { Typography } from '@/client/components/atoms/Typography';
 import { classNames } from '@/client/utils';
 import React from 'react';
@@ -69,7 +70,9 @@ type TagProps = Readonly<{
     name: string;
     categoryId: 1 | 2 | 3 | 4 | 5 | 6;
     className?: string;
+    href?: string;
     outlined?: boolean;
+    prefetch?: boolean;
     size?: 'xs' | 'sm' | 'md' | 'lg';
 }>;
 
@@ -78,26 +81,41 @@ export const Tag: React.FC<TagProps> = ({
     categoryId,
     outlined = false,
     className,
+    href,
+    prefetch = false,
     size = 'md'
 }) => {
-    return (
-        <div
-            className={classNames(
-                'inline-flex items-center justify-center rounded-xs',
-                classConfig.colors[categoryId].bgColor,
-                classConfig.colors[categoryId].color,
-                outlined && classConfig.colors[categoryId].outline,
-                classConfig.sizes[size].dimensions,
-                className
-            )}
-        >
-            <Typography
-                as="span"
-                variant="label"
-                className={classNames(classConfig.sizes[size].text)}
-            >
-                {name}
-            </Typography>
-        </div>
+    const rootClassName = classNames(
+        'inline-flex items-center justify-center rounded-xs',
+        classConfig.colors[categoryId].bgColor,
+        classConfig.colors[categoryId].color,
+        outlined && classConfig.colors[categoryId].outline,
+        classConfig.sizes[size].dimensions,
+        href &&
+            classNames(
+                'transition-[filter] hover:brightness-95 dark:hover:brightness-125',
+                'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current'
+            ),
+        className
     );
+
+    const label = (
+        <Typography
+            as="span"
+            variant="label"
+            className={classNames(classConfig.sizes[size].text)}
+        >
+            {name}
+        </Typography>
+    );
+
+    if (href) {
+        return (
+            <Link className={rootClassName} href={href} prefetch={prefetch}>
+                {label}
+            </Link>
+        );
+    }
+
+    return <div className={rootClassName}>{label}</div>;
 };

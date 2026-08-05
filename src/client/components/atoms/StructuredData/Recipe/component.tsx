@@ -2,12 +2,11 @@ import React from 'react';
 import { StructuredData } from '@/client/components/atoms/StructuredData/Generic';
 import type { Recipe } from '@/common/types';
 import {
+    buildRecipeCrumbs,
     generateBreadcrumbSchema,
-    generateRecipeSchema,
-    resolveRecipeHubCrumb
+    generateRecipeSchema
 } from '@/server/utils/seo';
-import { ENV_CONFIG_PUBLIC, ROUTES } from '@/common/constants';
-import { t } from '@/client/locales';
+import { ENV_CONFIG_PUBLIC } from '@/common/constants';
 
 type RecipeStructuredDataProps = Readonly<{
     recipe: Recipe;
@@ -24,26 +23,9 @@ export const RecipeStructuredData: React.FC<RecipeStructuredDataProps> = ({
         authorName
     );
 
-    const hubCrumb = resolveRecipeHubCrumb(recipe.tags);
-
-    const breadcrumbSchema = generateBreadcrumbSchema([
-        {
-            name: t('app.general.home'),
-            url: ENV_CONFIG_PUBLIC.ORIGIN
-        },
-        ...(hubCrumb
-            ? [
-                  {
-                      name: hubCrumb.name,
-                      url: `${ENV_CONFIG_PUBLIC.ORIGIN}${hubCrumb.path}`
-                  }
-              ]
-            : []),
-        {
-            name: recipe.title,
-            url: `${ENV_CONFIG_PUBLIC.ORIGIN}${ROUTES.recipe.detail(recipe.displayId, recipe.title)}`
-        }
-    ]);
+    const breadcrumbSchema = generateBreadcrumbSchema(
+        buildRecipeCrumbs(recipe, ENV_CONFIG_PUBLIC.ORIGIN)
+    );
 
     return (
         <React.Fragment>

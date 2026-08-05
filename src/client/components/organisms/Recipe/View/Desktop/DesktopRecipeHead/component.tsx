@@ -70,6 +70,7 @@ export const DesktopRecipeHead: React.FC<DesktopRecipeHeadProps> = ({
 
                     <TagList
                         className="mt-2"
+                        linkToHubs={!isPreview}
                         size="sm"
                         tags={recipe.tags ?? []}
                     />

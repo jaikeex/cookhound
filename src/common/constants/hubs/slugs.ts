@@ -1,3 +1,4 @@
+import { ROUTES } from '@/common/constants/routes';
 import type { RECIPE_CATEGORY_TAGS } from '@/common/constants/tags';
 
 //?—————————————————————————————————————————————————————————————————————————————————————————————?//
@@ -169,4 +170,4 @@ export const resolveHubSlug = (hubSlug: string): HubDbSlug | null =>
  * live under /strana/<page>.
  */
 export const buildHubPath = (hubSlug: string, page: number): string =>
-    page <= 1 ? `/recepty/${hubSlug}` : `/recepty/${hubSlug}/strana/${page}`;
+    ROUTES.hub.detail(hubSlug, page);

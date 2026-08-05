@@ -35,6 +35,19 @@ class RecipeTagService {
     async getBySlug(slug: string): Promise<RecipeTagDTO | null> {
         return db.recipeTag.getBySlug(slug);
     }
+
+    /**
+     * Returns the tags carrying at least threshold non-flagged recipes, with
+     * that count and the newest recipe update among them.
+     */
+    @LogServiceMethod({ names: ['threshold'] })
+    async listIndexableHubs(
+        threshold: number
+    ): Promise<
+        Array<{ slug: string; recipeCount: number; lastModified: Date }>
+    > {
+        return db.recipeTag.getIndexableHubs(threshold);
+    }
 }
 
 export const recipeTagService = new RecipeTagService();

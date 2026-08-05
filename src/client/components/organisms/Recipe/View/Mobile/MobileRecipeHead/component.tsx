@@ -48,6 +48,7 @@ export const MobileRecipeHead: React.FC<MobileRecipeHeadProps> = ({
 
             <TagList
                 tags={recipe.tags ?? []}
+                linkToHubs={!isPreview}
                 size="xs"
                 className="justify-center mt-2"
             />

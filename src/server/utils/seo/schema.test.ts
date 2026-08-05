@@ -1,5 +1,9 @@
 import { describe, it, expect } from 'vitest';
 import {
+    buildHubClusterCrumbs,
+    buildRecipeCrumbs,
+    generateCollectionPageSchema,
+    generateItemListSchema,
     generateRecipeSchema,
     resolveRecipeHubCrumb,
     serializeSchema
@@ -9,6 +13,8 @@ import {
     CATEGORY_IDS,
     ROUTES,
     HUB_SLUGS,
+    HUB_UI,
+    HUB_INDEX_UI,
     buildHubTitle,
     buildHubPath
 } from '@/common/constants';
@@ -263,6 +269,129 @@ describe('resolveRecipeHubCrumb', () => {
                 { id: 1, name: 'neexistuje', categoryId: CATEGORY_IDS.type }
             ])
         ).toBeNull();
+    });
+});
+
+//|=============================================================================================|//
+
+describe('buildHubClusterCrumbs', () => {
+    it('puts the hub index between the site root and whatever follows', () => {
+        expect(buildHubClusterCrumbs(BASE_URL)).toEqual([
+            { name: HUB_UI.breadcrumbHome, url: BASE_URL },
+            {
+                name: HUB_INDEX_UI.title,
+                url: `${BASE_URL}${ROUTES.hub.index}`
+            }
+        ]);
+    });
+});
+
+//|=============================================================================================|//
+
+describe('buildRecipeCrumbs', () => {
+    it('runs root -> hub index -> hub -> recipe for a recipe with a type tag', () => {
+        expect(buildRecipeCrumbs(buildRecipe(), BASE_URL)).toEqual([
+            { name: HUB_UI.breadcrumbHome, url: BASE_URL },
+            {
+                name: HUB_INDEX_UI.title,
+                url: `${BASE_URL}${ROUTES.hub.index}`
+            },
+            {
+                name: buildHubTitle('soup', 'polévka', CATEGORY_IDS.type),
+                url: `${BASE_URL}${buildHubPath(HUB_SLUGS.soup, 1)}`
+            },
+            { name: 'Testovací polévka', url: CANONICAL_URL }
+        ]);
+    });
+
+    it('omits the hub index along with the hub when the recipe has neither', () => {
+        // /recepty lists categories, not recipes - naming it as the parent of a
+        // hubless recipe would claim a path that does not exist.
+        const crumbs = buildRecipeCrumbs(
+            buildRecipe({
+                tags: [
+                    { id: 1, name: 'italská', categoryId: CATEGORY_IDS.cuisine }
+                ]
+            }),
+            BASE_URL
+        );
+
+        expect(crumbs).toEqual([
+            { name: HUB_UI.breadcrumbHome, url: BASE_URL },
+            { name: 'Testovací polévka', url: CANONICAL_URL }
+        ]);
+    });
+});
+
+//|=============================================================================================|//
+
+describe('generateCollectionPageSchema', () => {
+    const COLLECTION = {
+        name: 'Recepty podle kategorií',
+        description: 'Všechny kategorie receptů na jednom místě.',
+        url: `${BASE_URL}${ROUTES.hub.index}`
+    };
+
+    it('identifies itself by url without claiming to be its own main entity', () => {
+        const schema = generateCollectionPageSchema(COLLECTION);
+
+        expect(schema).toEqual({
+            '@context': 'https://schema.org',
+            '@type': 'CollectionPage',
+            '@id': COLLECTION.url,
+            name: COLLECTION.name,
+            description: COLLECTION.description,
+            url: COLLECTION.url
+        });
+
+        // mainEntityOfPage points from a Thing to the page about it, so a
+        // WebPage naming its own url states nothing.
+        expect(schema).not.toHaveProperty('mainEntityOfPage');
+    });
+
+    it('omits mainEntity entirely when there is no list to nest', () => {
+        expect(
+            generateCollectionPageSchema({
+                ...COLLECTION,
+                mainEntity: undefined
+            })
+        ).not.toHaveProperty('mainEntity');
+    });
+
+    it('nests the item list and drops its redundant @context', () => {
+        const itemList = generateItemListSchema(
+            [
+                {
+                    name: 'Polévky',
+                    url: `${BASE_URL}${buildHubPath(HUB_SLUGS.soup, 1)}`
+                }
+            ],
+            COLLECTION.name
+        );
+
+        const schema = generateCollectionPageSchema({
+            ...COLLECTION,
+            mainEntity: itemList
+        });
+
+        expect(schema.mainEntity).toEqual({
+            '@type': 'ItemList',
+            name: COLLECTION.name,
+            itemListElement: [
+                {
+                    '@type': 'ListItem',
+                    position: 1,
+                    name: 'Polévky',
+                    url: `${BASE_URL}${buildHubPath(HUB_SLUGS.soup, 1)}`,
+                    image: undefined
+                }
+            ]
+        });
+
+        // A nested node inherits the enclosing context, and the caller's
+        // standalone list object must not be mutated on its way in.
+        expect(schema.mainEntity).not.toHaveProperty('@context');
+        expect(itemList['@context']).toBe('https://schema.org');
     });
 });
 

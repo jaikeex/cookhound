@@ -15,6 +15,9 @@ type FooterProps = Readonly<{
 export const Footer: React.FC<FooterProps> = ({ className }) => {
     const { openModal } = useModal();
 
+    const linkClasses =
+        'text-sm text-gray-800 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors underline';
+
     const handleCookieSettings = useCallback(() => {
         openModal((close) => <ConsentSettingsModal onClose={close} />, {
             hideCloseButton: true
@@ -26,18 +29,19 @@ export const Footer: React.FC<FooterProps> = ({ className }) => {
     return (
         <footer className={classNames('py-6 px-4 pb-20 md:pb-6', className)}>
             <div className="flex items-center justify-center flex-wrap gap-x-4 sm:gap-x-6 gap-y-2 sm:gap-y-3 max-w-7xl mx-auto">
-                <button
-                    onClick={handleCookieSettings}
-                    className="text-sm text-gray-800 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors underline"
-                >
+                <button onClick={handleCookieSettings} className={linkClasses}>
                     {t('app.footer.cookie-settings')}
                 </button>
+
+                <Link href={ROUTES.hub.index} className={linkClasses}>
+                    {t('app.footer.recipe-categories')}
+                </Link>
 
                 <Link
                     href={ROUTES.terms}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-sm text-gray-800 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors underline"
+                    className={linkClasses}
                 >
                     {t('app.footer.terms-of-use')}
                 </Link>
@@ -46,7 +50,7 @@ export const Footer: React.FC<FooterProps> = ({ className }) => {
                     href={ROUTES.privacy}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-sm text-gray-800 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors underline"
+                    className={linkClasses}
                 >
                     {t('app.footer.privacy-policy')}
                 </Link>
@@ -55,7 +59,7 @@ export const Footer: React.FC<FooterProps> = ({ className }) => {
                     href={ROUTES.contact}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-sm text-gray-800 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors underline"
+                    className={linkClasses}
                 >
                     {t('app.footer.contact')}
                 </Link>

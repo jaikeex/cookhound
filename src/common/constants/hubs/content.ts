@@ -1,5 +1,5 @@
 import { CATEGORY_IDS } from '@/common/constants/tags';
-import type { CategoryId } from '@/common/types';
+import type { CategoryId, RecipeTagCategory } from '@/common/types';
 import type { HubDbSlug } from './slugs';
 
 //?—————————————————————————————————————————————————————————————————————————————————————————————?//
@@ -15,6 +15,7 @@ import type { HubDbSlug } from './slugs';
 export type HubContent = Readonly<{
     title?: string;
     intro?: string;
+    shortLabel?: string;
 }>;
 
 export const HUB_CONTENT: Partial<Record<HubDbSlug, HubContent>> = {
@@ -91,7 +92,8 @@ export const HUB_CONTENT: Partial<Record<HubDbSlug, HubContent>> = {
         intro: 'Itálie na vašem talíři: těstoviny, rizoto, pizza i dolce. Recepty italské kuchyně z běžně dostupných surovin.'
     },
     'middle-eastern': {
-        title: 'Kuchyně Blízkého východu — recepty'
+        title: 'Kuchyně Blízkého východu — recepty',
+        shortLabel: 'Kuchyně Blízkého východu'
     },
     'spring': { title: 'Jarní recepty' },
     'summer': { title: 'Letní recepty' },
@@ -115,6 +117,48 @@ export const HUB_UI = {
     paginationLabel: 'Stránkování',
     breadcrumbHome: 'Domů'
 } as const;
+
+//|=============================================================================================|//
+
+/**
+ * Copy for the hub index at /recepty. The category headings are deliberately
+ * not CATEGORY_TRANSLATIONS - those are the tag picker's labels ('Druh jídla'),
+ * which read as form fields rather than as page sections.
+ */
+export const HUB_INDEX_UI = {
+    title: 'Recepty podle kategorií',
+    intro: 'Všechny kategorie receptů na jednom místě. Vyberte si podle druhu jídla, kuchyně, hlavní ingredience, sezóny, náročnosti nebo diety.',
+    emptyState:
+        'Kategorie se objeví, jakmile v nich bude dost receptů. Zkuste to prosím později, nebo buďte první, kdo sem recept přidá.',
+    categoryHeadings: {
+        cuisine: 'Recepty podle kuchyně',
+        difficulty: 'Recepty podle náročnosti',
+        season: 'Recepty podle sezóny',
+        definedBy: 'Recepty podle hlavní ingredience',
+        type: 'Recepty podle druhu jídla',
+        diet: 'Recepty podle diety'
+    }
+} as const satisfies {
+    title: string;
+    intro: string;
+    emptyState: string;
+    categoryHeadings: Record<RecipeTagCategory, string>;
+};
+
+/**
+ * Accessible label for a hub link on the index, where the recipe count renders
+ * as a bare number next to the hub's short label.
+ */
+export const buildHubIndexLinkLabel = (
+    label: string,
+    recipeCount: number
+): string => {
+    // Czech: 1 "recept", 2-4 "recepty", 5+ "receptů".
+    const noun =
+        recipeCount === 1 ? 'recept' : recipeCount < 5 ? 'recepty' : 'receptů';
+
+    return `${label} — ${recipeCount} ${noun}`;
+};
 
 const capitalize = (value: string): string =>
     value.charAt(0).toUpperCase() + value.slice(1);
@@ -141,6 +185,35 @@ export const buildHubTitle = (
     }
 
     return `Recepty — ${capitalize(csName)}`;
+};
+
+/**
+ * Builds the short label for a hub's link on the /recepty index, where the full
+ * title ('Recepty na dezerty') would repeat the section heading in every chip.
+ *
+ * The czech tag name is not usable on its own: it is stored lowercase, and the
+ * cuisine names are bare adjectives ('italská') that need their noun to read as
+ * a category. Hubs whose name does not fit that rule carry a `shortLabel`.
+ *
+ * @param dbSlug - The db tag slug
+ * @param csName - The czech tag name (Tag.name, e.g. 'dezert')
+ * @param categoryId - The tag's category, used to pick a grammatical fallback
+ */
+export const buildHubShortLabel = (
+    dbSlug: HubDbSlug,
+    csName: string,
+    categoryId: CategoryId
+): string => {
+    const override = HUB_CONTENT[dbSlug]?.shortLabel;
+    if (override) {
+        return override;
+    }
+
+    if (categoryId === CATEGORY_IDS.cuisine) {
+        return `${capitalize(csName)} kuchyně`;
+    }
+
+    return capitalize(csName);
 };
 
 /**

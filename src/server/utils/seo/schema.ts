@@ -4,9 +4,10 @@ import {
     ROUTES,
     RECIPE_CATEGORY_TAGS,
     CS_TAG_CATEGORIES,
-    HUB_SLUGS,
+    resolveTagHub,
     buildHubTitle,
-    buildHubPath
+    HUB_UI,
+    HUB_INDEX_UI
 } from '@/common/constants';
 import { t } from '@/client/locales';
 
@@ -204,28 +205,15 @@ export type RecipeHubCrumb = Readonly<{
     path: string;
 }>;
 
-// czech type-tag name -> hub crumb.
-const HUB_CRUMB_BY_TYPE_TAG_NAME: ReadonlyMap<string, RecipeHubCrumb> = new Map(
-    RECIPE_CATEGORY_TAGS.type.flatMap((dbSlug, index) => {
-        const csName = CS_TAG_CATEGORIES.type[index];
-
-        if (!csName) {
-            return [];
-        }
-
-        const crumb: RecipeHubCrumb = {
-            name: buildHubTitle(dbSlug, csName, CATEGORY_IDS.type),
-            path: buildHubPath(HUB_SLUGS[dbSlug], 1)
-        };
-
-        return [[csName, crumb] as const];
-    })
-);
-
 /**
  * Resolves the hub page a recipe belongs to (via its first type tag) for use
  * as the middle crumb of the recipe page's BreadcrumbList. Returns null when
  * the recipe has no type tag with a matching hub.
+ *
+ * Shares `resolveTagHub` with the tag links rendered on the recipe page, so
+ * the crumb and those links can never point at different hubs. The title is
+ * built here rather than carried on the TagHub, so `HUB_CONTENT` stays out of
+ * the client bundles that only need the hub's path (see resolve.ts).
  */
 export function resolveRecipeHubCrumb(
     tags: Recipe['tags']
@@ -239,15 +227,80 @@ export function resolveRecipeHubCrumb(
             continue;
         }
 
-        const crumb = HUB_CRUMB_BY_TYPE_TAG_NAME.get(tag.name);
+        const hub = resolveTagHub(tag);
 
-        if (crumb) {
-            return crumb;
+        if (hub) {
+            return {
+                name: buildHubTitle(hub.dbSlug, hub.name, hub.categoryId),
+                path: hub.path
+            };
         }
     }
 
     return null;
 }
+
+//|=============================================================================================|//
+//?                                    BREADCRUMB TRAILS                                        ?//
+///
+//# Every page in the tag hub cluster hangs off the same two crumbs - the site root and the hub
+//# index at /recepty - so they are built in one place. google renders the breadcrumb rich result
+//# straight from this markup, and it is also how a crawler learns that /recepty is the parent of
+//# all hubs rather than just another page carrying a lot of links.
+///
+//|=============================================================================================|//
+
+export type BreadcrumbItem = Readonly<{
+    name: string;
+    url: string;
+}>;
+
+/**
+ * The crumbs the hub cluster hangs off: site root, then the hub index.
+ */
+export function buildHubClusterCrumbs(origin: string): BreadcrumbItem[] {
+    return [
+        { name: HUB_UI.breadcrumbHome, url: origin },
+        { name: HUB_INDEX_UI.title, url: `${origin}${ROUTES.hub.index}` }
+    ];
+}
+
+/**
+ * The full crumb trail for a recipe page.
+ *
+ * The hub index and the recipe's own hub are included as a pair or not at all:
+ * a recipe with no type tag has no hub, and /recepty lists categories rather
+ * than recipes, so naming it as the parent of a hubless recipe would claim a
+ * path that does not exist.
+ *
+ * @param recipe - The recipe being rendered.
+ * @param origin - The site origin, without a trailing slash.
+ */
+export function buildRecipeCrumbs(
+    recipe: Recipe,
+    origin: string
+): BreadcrumbItem[] {
+    const hubCrumb = resolveRecipeHubCrumb(recipe.tags);
+
+    return [
+        { name: HUB_UI.breadcrumbHome, url: origin },
+        ...(hubCrumb
+            ? [
+                  {
+                      name: HUB_INDEX_UI.title,
+                      url: `${origin}${ROUTES.hub.index}`
+                  },
+                  { name: hubCrumb.name, url: `${origin}${hubCrumb.path}` }
+              ]
+            : []),
+        {
+            name: recipe.title,
+            url: `${origin}${ROUTES.recipe.detail(recipe.displayId, recipe.title)}`
+        }
+    ];
+}
+
+//|=============================================================================================|//
 
 export function generatePersonSchema(user: User, baseUrl: string) {
     return {
@@ -259,9 +312,7 @@ export function generatePersonSchema(user: User, baseUrl: string) {
     };
 }
 
-export function generateBreadcrumbSchema(
-    items: Array<{ name: string; url: string }>
-) {
+export function generateBreadcrumbSchema(items: ReadonlyArray<BreadcrumbItem>) {
     return {
         '@context': 'https://schema.org',
         '@type': 'BreadcrumbList',
@@ -300,6 +351,40 @@ export function generateOrganizationSchema(baseUrl: string) {
         url: baseUrl,
         logo: `${baseUrl}/img/logo-light.png`
     };
+}
+
+/**
+ * A page whose purpose is to list other pages (the hub index, for one), as
+ * opposed to a page that is itself the content.
+ *
+ * @param args.mainEntity - The list this page exists to present. Nested rather
+ * than emitted as a second top-level node, so a crawler reads the collection
+ * and its contents as one statement about one url instead of two unrelated
+ * ones. Its @context is stripped: a nested node inherits the enclosing one.
+ */
+export function generateCollectionPageSchema(args: {
+    name: string;
+    description: string;
+    url: string;
+    mainEntity?: Record<string, unknown>;
+}) {
+    const schema: Record<string, unknown> = {
+        '@context': 'https://schema.org',
+        '@type': 'CollectionPage',
+        '@id': args.url,
+        name: args.name,
+        description: args.description,
+        url: args.url
+    };
+
+    if (args.mainEntity) {
+        const nested = { ...args.mainEntity };
+        delete nested['@context'];
+
+        schema.mainEntity = nested;
+    }
+
+    return schema;
 }
 
 export function generateItemListSchema(

@@ -1,6 +1,12 @@
 import { recipeTagService } from '@/server/services/recipe-tag/service';
 import { recipeFilterService } from '@/server/services/recipe-filter/service';
-import { resolveHubSlug, HUB_PAGE_SIZE } from '@/common/constants';
+import {
+    resolveHubSlug,
+    buildHubIndexGroups,
+    HUB_PAGE_SIZE,
+    HUB_INDEXABLE_THRESHOLD,
+    type HubIndexGroup
+} from '@/common/constants';
 import { LogServiceMethod } from '@/server/logger';
 import type { RecipeForDisplayDTO } from '@/common/types';
 import type { HubData } from './types';
@@ -61,6 +67,21 @@ class HubService {
     }
 
     /**
+     * Builds the /recepty listing: every hub at or above
+     * HUB_INDEXABLE_THRESHOLD, grouped by category and ordered by recipe count.
+     */
+    @LogServiceMethod({ names: [] })
+    async getIndexGroups(): Promise<readonly HubIndexGroup[]> {
+        const rows = await recipeTagService.listIndexableHubs(
+            HUB_INDEXABLE_THRESHOLD
+        );
+
+        return buildHubIndexGroups(
+            new Map(rows.map((row) => [row.slug, row.recipeCount]))
+        );
+    }
+
+    /**
      * Derives the paginated depth for a recipe count, always at least one page
      * and capped at the filter service's pagination limit.
      */
@@ -80,6 +101,7 @@ class HubService {
 export interface HubReads {
     getHubData(hubSlug: string): Promise<HubData | null>;
     listRecipes(tagId: number, page: number): Promise<RecipeForDisplayDTO[]>;
+    getIndexGroups(): Promise<readonly HubIndexGroup[]>;
 }
 
 export const hubService = new HubService();

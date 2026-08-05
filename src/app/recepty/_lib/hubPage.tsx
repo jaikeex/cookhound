@@ -8,13 +8,13 @@ import {
     buildHubIntro,
     buildHubPath,
     getHubSiblings,
-    HUB_UI,
     HUB_INDEXABLE_THRESHOLD,
     ENV_CONFIG_PUBLIC,
     ROUTES
 } from '@/common/constants';
 import {
     buildLocalizedMetadata,
+    buildHubClusterCrumbs,
     generateBreadcrumbSchema,
     generateItemListSchema
 } from '@/server/utils/seo';
@@ -44,7 +44,7 @@ export async function renderHubPage(
     const origin = ENV_CONFIG_PUBLIC.ORIGIN;
 
     const breadcrumbSchema = generateBreadcrumbSchema([
-        { name: HUB_UI.breadcrumbHome, url: origin },
+        ...buildHubClusterCrumbs(origin),
         { name: title, url: `${origin}${buildHubPath(hubSlug, 1)}` }
     ]);
 
