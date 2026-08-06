@@ -1,7 +1,7 @@
 import React from 'react';
 import { AdminReportsTemplate } from '@/client/components';
 import type { Metadata } from 'next';
-import { buildLocalizedMetadata } from '@/server/utils/seo';
+import { buildLocalizedMetadata } from '@/common/utils/seo';
 
 //|=============================================================================================|//
 

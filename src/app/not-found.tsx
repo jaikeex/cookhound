@@ -1,6 +1,6 @@
 import { NotFoundTemplate } from '@/client/components';
 import React from 'react';
-import { buildLocalizedMetadata } from '@/server/utils/seo';
+import { buildLocalizedMetadata } from '@/common/utils/seo';
 import type { Metadata } from 'next';
 
 //|=============================================================================================|//

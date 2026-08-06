@@ -5,7 +5,7 @@ import React from 'react';
 import {
     generateBreadcrumbSchema,
     generatePersonSchema
-} from '@/server/utils/seo';
+} from '@/common/utils/seo';
 import { t } from '@/client/locales';
 
 type UserStructuredDataProps = Readonly<{

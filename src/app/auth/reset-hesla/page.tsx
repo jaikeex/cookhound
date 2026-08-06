@@ -1,7 +1,7 @@
 import React from 'react';
 import { SendResetPasswordEmailTemplate } from '@/client/components';
 import type { Metadata } from 'next';
-import { buildLocalizedMetadata } from '@/server/utils/seo';
+import { buildLocalizedMetadata } from '@/common/utils/seo';
 
 type ResetPasswordPageParams = {
     readonly searchParams: Promise<{ email: string }>;

@@ -5,7 +5,7 @@ import { verifySessionFromCookie } from '@/server/utils/session/verify-server';
 import { redirectToRestrictedWithLogin } from '@/server/utils/reqwest';
 import { ROUTES } from '@/common/constants';
 import type { Metadata } from 'next';
-import { buildLocalizedMetadata } from '@/server/utils/seo';
+import { buildLocalizedMetadata } from '@/common/utils/seo';
 
 export const dynamic = 'force-dynamic';
 

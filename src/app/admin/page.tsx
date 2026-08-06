@@ -1,7 +1,7 @@
 import React from 'react';
 import { AdminDashboardTemplate } from '@/client/components';
 import type { Metadata } from 'next';
-import { buildLocalizedMetadata } from '@/server/utils/seo';
+import { buildLocalizedMetadata } from '@/common/utils/seo';
 import { serverData } from '@/server/data';
 
 export const dynamic = 'force-dynamic';

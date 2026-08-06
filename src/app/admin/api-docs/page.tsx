@@ -1,7 +1,7 @@
 import React from 'react';
 import { AdminApiDocsTemplate } from '@/client/components';
 import type { Metadata } from 'next';
-import { buildLocalizedMetadata } from '@/server/utils/seo';
+import { buildLocalizedMetadata } from '@/common/utils/seo';
 import { collectApiDocs } from '@/server/utils/api-docs';
 
 //|=============================================================================================|//

@@ -4,7 +4,7 @@ import { serverData } from '@/server/data';
 import { mapServiceErrorForRsc } from '@/server/data/runtime/mapError';
 import { RecipeStructuredData, RecipeViewTemplate } from '@/client/components';
 import type { Metadata } from 'next';
-import { buildLocalizedMetadata } from '@/server/utils/seo';
+import { buildLocalizedMetadata } from '@/common/utils/seo';
 import {
     ENV_CONFIG_PUBLIC,
     ROUTES,

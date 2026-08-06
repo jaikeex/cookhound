@@ -12,7 +12,7 @@ import { cookies } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
 import { verifySessionFromCookie } from '@/server/utils/session/verify-server';
 import React from 'react';
-import { buildLocalizedMetadata } from '@/server/utils/seo';
+import { buildLocalizedMetadata } from '@/common/utils/seo';
 import { UserStructuredData } from '@/client/components';
 
 type UserProfilePageParams = {

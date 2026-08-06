@@ -1,4 +1,4 @@
-import { serializeSchema } from '@/server/utils/seo';
+import { serializeSchema } from '@/common/utils/seo';
 import React from 'react';
 
 type StructuredDataProps = Readonly<{

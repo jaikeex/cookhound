@@ -1,7 +1,7 @@
 import React from 'react';
 import type { Metadata } from 'next';
 import { TermsTemplate } from '@/client/components';
-import { buildLocalizedMetadata } from '@/server/utils/seo';
+import { buildLocalizedMetadata } from '@/common/utils/seo';
 
 //|=============================================================================================|//
 

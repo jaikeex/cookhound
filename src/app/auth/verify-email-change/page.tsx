@@ -1,7 +1,7 @@
 import React, { Suspense } from 'react';
 import { VerifyEmailChangeTemplate, Loader } from '@/client/components';
 import type { Metadata } from 'next';
-import { buildLocalizedMetadata } from '@/server/utils/seo';
+import { buildLocalizedMetadata } from '@/common/utils/seo';
 
 //|=============================================================================================|//
 

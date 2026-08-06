@@ -17,7 +17,7 @@ import {
     buildHubClusterCrumbs,
     generateBreadcrumbSchema,
     generateItemListSchema
-} from '@/server/utils/seo';
+} from '@/common/utils/seo';
 import { serializeFilterParams } from '@/common/utils';
 
 /**

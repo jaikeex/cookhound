@@ -9,7 +9,7 @@ import {
     generateBreadcrumbSchema,
     generateCollectionPageSchema,
     generateItemListSchema
-} from '@/server/utils/seo';
+} from '@/common/utils/seo';
 import { Logger } from '@/server/logger';
 import {
     ALL_HUB_INDEX_GROUPS,

@@ -11,7 +11,7 @@ import {
     generateCookbookSchema,
     generateBreadcrumbSchema,
     buildLocalizedMetadata
-} from '@/server/utils/seo';
+} from '@/common/utils/seo';
 import { t } from '@/client/locales';
 
 type CookbookPageParams = {

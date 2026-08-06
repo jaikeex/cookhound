@@ -5,7 +5,7 @@ import {
     buildRecipeCrumbs,
     generateBreadcrumbSchema,
     generateRecipeSchema
-} from '@/server/utils/seo';
+} from '@/common/utils/seo';
 import { ENV_CONFIG_PUBLIC } from '@/common/constants';
 
 type RecipeStructuredDataProps = Readonly<{

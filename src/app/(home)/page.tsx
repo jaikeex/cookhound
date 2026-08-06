@@ -6,7 +6,7 @@ import {
     generateWebSiteSchema,
     generateOrganizationSchema,
     buildLocalizedMetadata
-} from '@/server/utils/seo';
+} from '@/common/utils/seo';
 import { StructuredData } from '@/client/components';
 import { ENV_CONFIG_PUBLIC } from '@/common/constants';
 import { mapServiceErrorForRsc } from '@/server/data/runtime/mapError';

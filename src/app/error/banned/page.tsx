@@ -1,6 +1,6 @@
 import React from 'react';
 import { BannedTemplate } from '@/client/components';
-import { buildLocalizedMetadata } from '@/server/utils/seo';
+import { buildLocalizedMetadata } from '@/common/utils/seo';
 import type { Metadata } from 'next';
 
 //|=============================================================================================|//

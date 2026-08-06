@@ -6,7 +6,7 @@ import { ENV_CONFIG_PUBLIC, ROUTES } from '@/common/constants';
 import {
     generateBreadcrumbSchema,
     buildLocalizedMetadata
-} from '@/server/utils/seo';
+} from '@/common/utils/seo';
 import { StructuredData } from '@/client/components';
 import { t } from '@/client/locales';
 
