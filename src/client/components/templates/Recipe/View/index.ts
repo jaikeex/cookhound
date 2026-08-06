@@ -1,5 +1,5 @@
 export * from './component';
-export * from './Desktop';
 export * from './FlaggedGate';
-export * from './Mobile';
 export * from './VisitPing';
+export * from './Layout';
+export * from './Skeletons';

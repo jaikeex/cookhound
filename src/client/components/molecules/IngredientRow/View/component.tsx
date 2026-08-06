@@ -16,7 +16,14 @@ import { classNames } from '@/client/utils';
 const classConfig = {
     typography: {
         'desktop': 'body-sm',
-        'mobile': 'body'
+        'mobile': 'body',
+        'responsive': 'body'
+    },
+
+    typographyOverride: {
+        'desktop': '',
+        'mobile': '',
+        'responsive': '@recipe:text-sm'
     }
 };
 //~---------------------------------------------------------------------------------------------~//
@@ -30,7 +37,7 @@ export type IngredientRowViewProps = Readonly<{
     onDeselected?: (ingredient: Ingredient) => void;
     onSelected?: (ingredient: Ingredient) => void;
     selected?: boolean;
-    variant?: 'desktop' | 'mobile';
+    variant?: 'desktop' | 'mobile' | 'responsive';
 }>;
 
 export const IngredientRowView: React.FC<IngredientRowViewProps> = ({
@@ -45,6 +52,8 @@ export const IngredientRowView: React.FC<IngredientRowViewProps> = ({
     const typographyVariant = classConfig.typography[
         variant
     ] as TypographyVariant;
+
+    const typographyOverride = classConfig.typographyOverride[variant];
 
     const [checked, setChecked] = useState<boolean>(selected || false);
 
@@ -82,7 +91,10 @@ export const IngredientRowView: React.FC<IngredientRowViewProps> = ({
             >
                 <Typography
                     variant={typographyVariant}
-                    className={`font-bold w-fit`}
+                    className={classNames(
+                        'font-bold w-fit',
+                        typographyOverride
+                    )}
                 >
                     {ingredient.name}
                 </Typography>
@@ -90,11 +102,17 @@ export const IngredientRowView: React.FC<IngredientRowViewProps> = ({
                     <React.Fragment>
                         <Typography
                             variant={typographyVariant}
-                            className={`font-bold align-middle mx-2`}
+                            className={classNames(
+                                'font-bold align-middle mx-2',
+                                typographyOverride
+                            )}
                         >
                             &ndash;
                         </Typography>
-                        <Typography variant={typographyVariant}>
+                        <Typography
+                            variant={typographyVariant}
+                            className={typographyOverride}
+                        >
                             {ingredient.quantity}
                         </Typography>
                     </React.Fragment>

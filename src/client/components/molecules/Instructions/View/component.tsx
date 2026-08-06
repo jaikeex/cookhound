@@ -1,26 +1,8 @@
 import React from 'react';
-import {
-    Typography,
-    type TypographyVariant
-} from '@/client/components/atoms/Typography';
+import { Typography } from '@/client/components/atoms/Typography';
 import type { Recipe } from '@/common/types';
-import type { ViewPortVariant } from '@/client/types';
 
-//~---------------------------------------------------------------------------------------------~//
-//$                                           OPTIONS                                           $//
-//~---------------------------------------------------------------------------------------------~//
-
-const classConfig = {
-    typography: {
-        'desktop': 'body-md',
-        'mobile': 'body'
-    },
-
-    spacing: {
-        'desktop': 'space-y-4',
-        'mobile': 'space-y-3'
-    }
-};
+const SPACING = 'space-y-3 @recipe:space-y-4';
 
 //~---------------------------------------------------------------------------------------------~//
 //$                                          COMPONENT                                          $//
@@ -29,22 +11,16 @@ const classConfig = {
 type InstructionsViewProps = Readonly<{
     className?: string;
     recipe: Recipe;
-    variant: ViewPortVariant;
 }>;
 
 export const InstructionsView: React.FC<InstructionsViewProps> = ({
     className,
-    recipe,
-    variant
+    recipe
 }) => {
-    const typographyVariant = classConfig.typography[
-        variant
-    ] as TypographyVariant;
-
     return (
-        <div className={`${classConfig.spacing[variant]} ${className}`}>
+        <div className={`${SPACING} ${className}`}>
             {recipe.instructions.map((instruction, index) => (
-                <Typography key={index} variant={typographyVariant}>
+                <Typography key={index} variant="body">
                     {instruction}
                 </Typography>
             ))}

@@ -6,45 +6,74 @@ import { Typography } from '@/client/components/atoms/Typography';
 import { ButtonBase } from '@/client/components/atoms/Button/Base';
 import { Divider } from '@/client/components/atoms/Divider';
 import { InstructionsView } from '@/client/components/molecules/Instructions/View';
-import { Tabs } from '@/client/components/molecules/Tabs';
+import { TabBar } from '@/client/components/molecules/Tabs/Bar';
 import { IngredientsListView } from '@/client/components/organisms/IngredientsList/View';
 import { useAuth } from '@/client/store';
 import { classNames } from '@/client/utils';
 import { t } from '@/client/locales';
 
-export type MobileRecipeBodyProps = Readonly<{
+export type RecipeViewBodyProps = Readonly<{
     isPreview?: boolean;
     onShoppingListCreate?: () => void;
     recipe: Recipe;
 }>;
 
-export const MobileRecipeBody: React.FC<MobileRecipeBodyProps> = ({
+export const RecipeViewBody: React.FC<RecipeViewBodyProps> = ({
     isPreview,
     onShoppingListCreate,
     recipe
 }) => {
     const { user } = useAuth();
 
+    const [activeSection, setActiveSection] = React.useState(0);
+
     const displayShoppingListButton = user && !isPreview;
 
-    const tabs = [
-        {
-            title: t('app.recipe.ingredients'),
-            content: (
-                <React.Fragment>
+    return (
+        <div>
+            <TabBar
+                titles={[
+                    t('app.recipe.ingredients'),
+                    t('app.recipe.instructions')
+                ]}
+                activeIndex={activeSection}
+                onTabSelect={setActiveSection}
+                className={classNames(
+                    'z-10 @recipe:hidden',
+                    isPreview ? '' : 'sticky top-14'
+                )}
+            />
+
+            <div
+                className={
+                    'mt-3 min-h-16 @recipe:mt-0 @recipe:flex @recipe:gap-12'
+                }
+            >
+                <section
+                    className={classNames(
+                        activeSection !== 0 && 'hidden',
+                        '@recipe:block @recipe:w-[35%]'
+                    )}
+                >
+                    <Typography
+                        as="h2"
+                        variant={'heading-sm'}
+                        className={'sr-only @recipe:not-sr-only'}
+                    >
+                        {t('app.recipe.ingredients')}
+                    </Typography>
+
                     <IngredientsListView
                         isPreview={isPreview}
-                        key={`${recipe.id}-ingredients-list-view-mobile`}
                         ingredients={recipe.ingredients}
-                        className={'py-4'}
-                        variant={'mobile'}
+                        className={'py-4 @recipe:py-0 @recipe:mt-4'}
                     />
 
                     {displayShoppingListButton ? (
                         <React.Fragment>
                             <Typography
                                 variant={'label'}
-                                className="px-12 mt-8 text-center text-gray-600 dark:text-gray-400"
+                                className="px-12 @recipe:px-0 mt-8 text-center text-gray-600 dark:text-gray-400"
                             >
                                 {t(
                                     'app.recipe.create-shopping-list-description'
@@ -63,18 +92,27 @@ export const MobileRecipeBody: React.FC<MobileRecipeBodyProps> = ({
                             </ButtonBase>
                         </React.Fragment>
                     ) : null}
-                </React.Fragment>
-            )
-        },
-        {
-            title: t('app.recipe.instructions'),
-            content: (
-                <React.Fragment>
+                </section>
+
+                <section
+                    className={classNames(
+                        activeSection !== 1 && 'hidden',
+                        '@recipe:block @recipe:w-[65%] @recipe:space-y-2'
+                    )}
+                >
+                    <Typography
+                        as="h2"
+                        variant={'heading-sm'}
+                        className={'sr-only @recipe:not-sr-only'}
+                    >
+                        {t('app.recipe.instructions')}
+                    </Typography>
+
                     <InstructionsView
-                        className={'pt-4'}
+                        className={'pt-4 @recipe:pt-0'}
                         recipe={recipe}
-                        variant={'mobile'}
                     />
+
                     {recipe.notes ? (
                         <React.Fragment>
                             <Divider dashed={true} className={'mt-8!'} />
@@ -88,18 +126,8 @@ export const MobileRecipeBody: React.FC<MobileRecipeBodyProps> = ({
                             </div>
                         </React.Fragment>
                     ) : null}
-                </React.Fragment>
-            )
-        }
-    ];
-
-    return (
-        <Tabs
-            tabs={tabs}
-            buttonRowClassName={classNames(
-                'z-10',
-                isPreview ? '' : 'sticky top-14 '
-            )}
-        />
+                </section>
+            </div>
+        </div>
     );
 };

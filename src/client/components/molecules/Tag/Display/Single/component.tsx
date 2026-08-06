@@ -39,27 +39,23 @@ const classConfig = {
     sizes: {
         xs: {
             dimensions: 'py-0.5 px-2',
-            text: 'text-xs',
-            icon: 12,
-            iconMargin: 'ml-1'
+            text: 'text-xs'
+        },
+        responsive: {
+            dimensions: 'py-0.5 px-2',
+            text: 'text-xs @recipe:text-sm'
         },
         sm: {
             dimensions: 'py-0.5 px-2',
-            text: 'text-sm',
-            icon: 14,
-            iconMargin: 'ml-1'
+            text: 'text-sm'
         },
         md: {
             dimensions: 'py-1.5 px-3',
-            text: 'text-sm',
-            icon: 16,
-            iconMargin: 'ml-1'
+            text: 'text-sm'
         },
         lg: {
             dimensions: 'py-2 px-4',
-            text: 'text-sm',
-            icon: 20,
-            iconMargin: 'ml-1'
+            text: 'text-sm'
         }
     }
 };
@@ -71,7 +67,7 @@ type TagProps = Readonly<{
     href?: string;
     outlined?: boolean;
     prefetch?: boolean;
-    size?: 'xs' | 'sm' | 'md' | 'lg';
+    size?: 'xs' | 'sm' | 'md' | 'lg' | 'responsive';
 }>;
 
 export const Tag: React.FC<TagProps> = ({

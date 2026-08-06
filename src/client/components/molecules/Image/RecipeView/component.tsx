@@ -10,7 +10,6 @@ import React, { useCallback, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import { useAuth, useModal, useSnackbar } from '@/client/store';
 import { chqc } from '@/client/data';
-import { useScreenSize } from '@/client/hooks';
 import type { Recipe } from '@/common/types';
 import { ROUTES, ReportTargetType } from '@/common/constants';
 import { t } from '@/client/locales';
@@ -23,13 +22,17 @@ const AddRecipeToCookbookModal = dynamic(
     { ssr: false }
 );
 
-const HERO_IMAGE_SIZES = '(min-width: 768px) 320px, 480px';
+const HERO_IMAGE_SIZES =
+    '(min-width: 736px) 320px, (min-width: 496px) 480px, 100vw';
+
+const HERO_IMAGE_SIZES_PREVIEW = '480px';
 
 export type RecipeViewImageProps = Readonly<{
     className?: string;
     isPreview?: boolean;
     recipe: Recipe;
     priority?: boolean;
+    showAuthorLink?: boolean;
     wrapperClassName?: string;
 }>;
 
@@ -38,6 +41,7 @@ export const RecipeViewImage: React.FC<RecipeViewImageProps> = ({
     isPreview,
     recipe,
     priority = false,
+    showAuthorLink = false,
     wrapperClassName
 }) => {
     //|-----------------------------------------------------------------------------------------|//
@@ -47,7 +51,6 @@ export const RecipeViewImage: React.FC<RecipeViewImageProps> = ({
     const { openModal } = useModal();
     const { user } = useAuth();
     const { alert } = useSnackbar();
-    const { isMobile } = useScreenSize();
     const { data: cookbooks = [] } = chqc.cookbook.useCookbooksByUser(
         user?.id ?? 0
     );
@@ -150,26 +153,18 @@ export const RecipeViewImage: React.FC<RecipeViewImageProps> = ({
         const author = (
             <RecipeAuthorLinkMobile
                 authorId={recipe.authorId}
-                className="w-8 h-8"
+                className="w-8 h-8 @recipe:hidden"
             />
         );
 
         return (
             <div className="absolute top-1 right-1">
-                {isMobile ? (
-                    <div className="flex flex-col gap-2">
-                        {addToCookbook}
-                        {share}
-                        {report}
-                        {author}
-                    </div>
-                ) : (
-                    <div className="flex flex-col gap-2">
-                        {addToCookbook}
-                        {share}
-                        {report}
-                    </div>
-                )}
+                <div className="flex flex-col gap-2">
+                    {addToCookbook}
+                    {share}
+                    {report}
+                    {showAuthorLink ? author : null}
+                </div>
             </div>
         );
     }, [
@@ -178,7 +173,7 @@ export const RecipeViewImage: React.FC<RecipeViewImageProps> = ({
         handleOpenShareModal,
         handleOpenReportModal,
         recipe.authorId,
-        isMobile
+        showAuthorLink
     ]);
 
     //|-----------------------------------------------------------------------------------------|//
@@ -191,7 +186,7 @@ export const RecipeViewImage: React.FC<RecipeViewImageProps> = ({
                 alt={recipe.title}
                 className={classNames('', className)}
                 src={recipe.imageUrl}
-                sizes={HERO_IMAGE_SIZES}
+                sizes={isPreview ? HERO_IMAGE_SIZES_PREVIEW : HERO_IMAGE_SIZES}
                 priority={priority}
             />
 

@@ -1,17 +1,24 @@
 'use client';
 
 import { useAuth } from '@/client/store';
-import React from 'react';
-import { DesktopProfileTemplate } from './Desktop';
-import { MobileProfileTemplate } from './Mobile';
+import React, { useCallback, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { ProfileTab, type ProfileNavigationItem } from '@/client/types/core';
 import type { Cookbook, RecipeForDisplayDTO, User } from '@/common/types';
+import type { TabContent } from '@/client/components/molecules/Tabs';
 import { Cookbooks } from '@/client/components/organisms/Profile/Body/Cookbooks';
+import { Menu } from '@/client/components/molecules/Menu';
 import { ProfileBodyInfo } from '@/client/components/organisms/Profile/Body/Info';
+import { ProfileHead } from '@/client/components/organisms/Profile/Head';
 import { Recipes } from '@/client/components/organisms/Profile/Body/Recipes';
-import { useRouter } from 'next/navigation';
+import { Tabs } from '@/client/components/molecules/Tabs';
+import { useParamsChangeListener } from '@/client/hooks';
 import { GRID_COLS } from '@/client/constants';
-import { PROFILE_FALLBACK_TAB } from '@/client/components/templates/Profile/tabs';
+import { ROUTES } from '@/common/constants';
+import {
+    PROFILE_FALLBACK_TAB,
+    resolveProfileTabIndex
+} from '@/client/components/templates/Profile/tabs';
 import { t } from '@/client/locales';
 
 type ProfileProps = Readonly<{
@@ -30,6 +37,7 @@ export const ProfileTemplate: React.FC<ProfileProps> = ({
     initialRecipes
 }) => {
     const router = useRouter();
+    const searchParams = useSearchParams();
     const { authResolved, user: currentUser } = useAuth();
 
     //~-----------------------------------------------------------------------------------------~//
@@ -40,7 +48,7 @@ export const ProfileTemplate: React.FC<ProfileProps> = ({
     // cosmetic delay:
     //
     //   - the dashboard tab is absent from the tab set, so the tab the server selected cannot be
-    //     mounted. Mobile falls back to index 0 and the recipes tab mounts and fetches page one
+    //     mounted. The tab state falls back and the recipes tab mounts and fetches page one
     //     over http - work the server neither seeded nor asked for.
     //   - the correction effect below sees "dashboard requested by a non-owner" and bounces to
     //     ?tab=recipes, which is a second render whose seed the recipes query then ignores,
@@ -55,52 +63,94 @@ export const ProfileTemplate: React.FC<ProfileProps> = ({
         ? currentUser?.id === user.id
         : initialIsCurrentUser;
 
-    // Resolved once, here, so both viewport templates mount the same tab. They render the same
-    // content elements, so disagreeing would mount two tabs and fetch for the invisible one.
     // The raw prop is kept for the correction effect below, which needs to tell "no tab in the
     // url" apart from "the fallback tab".
     const resolvedInitialTab = initialTab ?? PROFILE_FALLBACK_TAB;
+    const [tab, setTab] = useState<ProfileTab>(resolvedInitialTab);
 
-    const profileNavigationItems: ProfileNavigationItem[] = [
-        ...(isCurrentUser
-            ? [
-                  {
-                      param: ProfileTab.Dashboard,
-                      label: t('app.profile.dashboard'),
-                      content: <ProfileBodyInfo user={user} />
-                  }
-              ]
-            : []),
+    const profileNavigationItems: ProfileNavigationItem[] = React.useMemo(
+        () => [
+            ...(isCurrentUser
+                ? [
+                      {
+                          param: ProfileTab.Dashboard,
+                          label: t('app.profile.dashboard'),
+                          content: <ProfileBodyInfo user={user} />
+                      }
+                  ]
+                : []),
 
-        {
-            param: ProfileTab.Recipes,
-            label: t('app.profile.recipes'),
-            content: (
-                <Recipes
-                    cols={{
-                        sm: GRID_COLS[2] ?? 'grid-cols-2',
-                        md: GRID_COLS[2] ?? 'grid-cols-2',
-                        lg: GRID_COLS[3] ?? 'grid-cols-3',
-                        xl: GRID_COLS[3] ?? 'grid-cols-3'
-                    }}
-                    initialRecipes={initialRecipes}
-                    isCurrentUser={isCurrentUser}
-                    userId={user.id}
-                />
-            )
+            {
+                param: ProfileTab.Recipes,
+                label: t('app.profile.recipes'),
+                content: (
+                    <Recipes
+                        cols={{
+                            sm: GRID_COLS[2] ?? 'grid-cols-2',
+                            md: GRID_COLS[2] ?? 'grid-cols-2',
+                            lg: GRID_COLS[3] ?? 'grid-cols-3',
+                            xl: GRID_COLS[3] ?? 'grid-cols-3'
+                        }}
+                        initialRecipes={initialRecipes}
+                        isCurrentUser={isCurrentUser}
+                        userId={user.id}
+                    />
+                )
+            },
+            {
+                param: ProfileTab.Cookbooks,
+                label: t('app.profile.cookbooks'),
+                content: (
+                    <Cookbooks
+                        initialCookbooks={initialCookbooks}
+                        isCurrentUser={isCurrentUser}
+                        userId={user.id}
+                    />
+                )
+            }
+        ],
+        [isCurrentUser, user, initialRecipes, initialCookbooks]
+    );
+
+    const handleParamChange = useCallback(() => {
+        setTab(
+            (searchParams.get('tab') as ProfileTab | null) ??
+                PROFILE_FALLBACK_TAB
+        );
+    }, [searchParams]);
+
+    useParamsChangeListener({
+        key: 'tab',
+        onChange: handleParamChange
+    });
+
+    const handleTabSelect = useCallback(
+        (index: number) => {
+            const item = profileNavigationItems[index];
+
+            if (item) {
+                setTab(item.param);
+            }
         },
-        {
-            param: ProfileTab.Cookbooks,
-            label: t('app.profile.cookbooks'),
-            content: (
-                <Cookbooks
-                    initialCookbooks={initialCookbooks}
-                    isCurrentUser={isCurrentUser}
-                    userId={user.id}
-                />
-            )
-        }
-    ];
+        [profileNavigationItems]
+    );
+
+    const activeIndex = resolveProfileTabIndex(profileNavigationItems, tab);
+    const initialTabIndex = resolveProfileTabIndex(
+        profileNavigationItems,
+        resolvedInitialTab
+    );
+
+    const menuItems = profileNavigationItems.map((item) => ({
+        href: `${ROUTES.user.detail(String(user.id))}?tab=${item.param}`,
+        label: item.label
+    }));
+
+    const tabBarItems: TabContent[] = profileNavigationItems.map((item) => ({
+        title: item.label,
+        param: item.param,
+        content: null
+    }));
 
     //~-----------------------------------------------------------------------------------------~//
     //$                                     TAB CORRECTION                                      $//
@@ -149,21 +199,27 @@ export const ProfileTemplate: React.FC<ProfileProps> = ({
     }, [authResolved, initialTab, isCurrentUser, router]);
 
     return (
-        <React.Fragment>
-            <DesktopProfileTemplate
-                className={'hidden md:block'}
-                items={profileNavigationItems}
-                user={user}
-                isCurrentUser={isCurrentUser}
-                initialTab={resolvedInitialTab}
+        <article className="md:page-wrapper md:px-4">
+            <ProfileHead user={user} isCurrentUser={isCurrentUser} />
+
+            <Tabs
+                tabs={tabBarItems}
+                activeTab={initialTabIndex}
+                enableNavigation
+                onTabChange={handleTabSelect}
+                className="mt-4 md:hidden"
+                buttonRowClassName="sticky top-14 z-10"
             />
-            <MobileProfileTemplate
-                className={'md:hidden'}
-                items={profileNavigationItems}
-                user={user}
-                isCurrentUser={isCurrentUser}
-                initialTab={resolvedInitialTab}
-            />
-        </React.Fragment>
+
+            <div className="mt-3 min-h-16 md:mt-10 md:grid md:grid-cols-4 md:gap-12">
+                <div className="hidden md:block md:col-span-1">
+                    <Menu items={menuItems} />
+                </div>
+
+                <div className="md:col-span-3">
+                    {profileNavigationItems[activeIndex]?.content}
+                </div>
+            </div>
+        </article>
     );
 };

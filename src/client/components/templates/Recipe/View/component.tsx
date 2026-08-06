@@ -1,8 +1,7 @@
 import React from 'react';
-import { DesktopRecipeViewTemplate } from './Desktop';
-import { MobileRecipeViewTemplate } from './Mobile';
 import { RecipeFlaggedGate } from './FlaggedGate';
 import { RecipeVisitPing } from './VisitPing';
+import { RecipeViewLayout } from './Layout';
 import type { Recipe } from '@/common/types';
 import { RecipeHandlingProvider } from '@/client/store/RecipeHandlingContext';
 import { FlaggedAuthorTemplate } from '@/client/components/templates/Recipe/Flagged';
@@ -42,8 +41,7 @@ export const RecipeViewTemplate: React.FC<RecipeViewProps> = ({ recipe }) => {
             <RecipeVisitPing recipeId={recipe.id} />
 
             <RecipeHandlingProvider recipe={recipe}>
-                <MobileRecipeViewTemplate className={'md:hidden'} />
-                <DesktopRecipeViewTemplate className={'hidden md:block'} />
+                <RecipeViewLayout />
             </RecipeHandlingProvider>
         </React.Fragment>
     );

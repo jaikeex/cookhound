@@ -3,7 +3,7 @@
 import React, { Suspense, useCallback, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { classNames } from '@/client/utils';
-import { TabButton } from '@/client/components/atoms/Button/Tab';
+import { TabBar } from '@/client/components/molecules/Tabs/Bar';
 import { useParamsChangeListener } from '@/client/hooks/routingListeners';
 
 export type TabContent = {
@@ -129,7 +129,9 @@ export const Tabs: React.FC<TabsProps> = ({
 }) => {
     const router = useRouter();
 
-    const tabWidth = 100 / tabs.length;
+    const tabTitles = tabs.map((tab) => tab.title);
+
+    const hasContent = tabs.some((tab) => tab.content != null);
 
     const [currentIdentity, setCurrentIdentity] = useState<string>(() =>
         tabIdentity(tabs[activeTab], activeTab)
@@ -163,8 +165,8 @@ export const Tabs: React.FC<TabsProps> = ({
         [enableNavigation, router, paramKey, tabs]
     );
 
-    const handleTabChange = useCallback(
-        (index: number) => () => {
+    const handleTabSelect = useCallback(
+        (index: number) => {
             setCurrentIdentity(tabIdentity(tabs[index], index));
             updateUrlParam(index);
             onTabChange?.(index);
@@ -196,38 +198,18 @@ export const Tabs: React.FC<TabsProps> = ({
                 </Suspense>
             )}
 
-            <div
-                className={classNames(
-                    'relative flex flex-row items-center w-full rounded-md',
-                    'bg-gray-200 dark:bg-gray-800',
-                    buttonRowClassName
-                )}
-            >
-                {tabs.map((tab, index) => (
-                    <TabButton
-                        onClick={handleTabChange(index)}
-                        key={index}
-                        active={currentTab === index}
-                        tabWidth={tabWidth}
-                        ariaLabel={tab.title}
-                    >
-                        {tab.title}
-                    </TabButton>
-                ))}
-                {/* highlighter which moves to the active tab position */}
-                <div
-                    className={classNames(
-                        'absolute w-1/3 h-full bg-blue-600 rounded-md opacity-20',
-                        `transition-transform duration-200 ease-in-out`,
-                        'top-0 z-0 pointer-events-none'
-                    )}
-                    style={{
-                        width: `${tabWidth}%`,
-                        transform: `translateX(${currentTab * 100}%)`
-                    }}
-                />
-            </div>
-            <div className={'mt-3 min-h-16'}>{tabs[currentTab]?.content}</div>
+            <TabBar
+                titles={tabTitles}
+                activeIndex={currentTab}
+                onTabSelect={handleTabSelect}
+                className={buttonRowClassName}
+            />
+
+            {hasContent ? (
+                <div className={'mt-3 min-h-16'}>
+                    {tabs[currentTab]?.content}
+                </div>
+            ) : null}
         </div>
     );
 };

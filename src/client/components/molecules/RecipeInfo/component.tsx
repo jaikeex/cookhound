@@ -37,7 +37,7 @@ type RecipeInfoProps = Readonly<{
     size?: RecipeInfoSize;
     time?: number | null;
     typographyVariant?: TypographyVariant;
-    verbose?: boolean;
+    verbose?: boolean | 'responsive';
 }>;
 
 export const RecipeInfo: React.FC<RecipeInfoProps> = ({
@@ -65,14 +65,39 @@ export const RecipeInfo: React.FC<RecipeInfoProps> = ({
                     className={`flex items-center ${classConfig.innerGap[size]}`}
                 >
                     <Icon name={'time'} size={classConfig.iconSize[size]} />
-                    <Typography variant={typographyVariant} disableLinkStyles>
-                        {verbose
-                            ? `${t('app.recipe.preparation-time')}: `
-                            : null}
+                    <Typography
+                        variant={typographyVariant}
+                        disableLinkStyles
+                        className={
+                            verbose === 'responsive'
+                                ? '@recipe:text-sm'
+                                : undefined
+                        }
+                    >
+                        {verbose === 'responsive' ? (
+                            <span className={'hidden @recipe:inline'}>
+                                {t('app.recipe.preparation-time')}:{' '}
+                            </span>
+                        ) : verbose ? (
+                            `${t('app.recipe.preparation-time')}: `
+                        ) : null}
                         {time}
-                        {verbose
-                            ? ` ${t('app.recipe.minutes')}`
-                            : ` ${t('app.recipe.minutes-short')}`}
+                        {verbose === 'responsive' ? (
+                            <React.Fragment>
+                                <span className={'@recipe:hidden'}>
+                                    {' '}
+                                    {t('app.recipe.minutes-short')}
+                                </span>
+                                <span className={'hidden @recipe:inline'}>
+                                    {' '}
+                                    {t('app.recipe.minutes')}
+                                </span>
+                            </React.Fragment>
+                        ) : verbose ? (
+                            ` ${t('app.recipe.minutes')}`
+                        ) : (
+                            ` ${t('app.recipe.minutes-short')}`
+                        )}
                     </Typography>
                 </div>
             ) : null}
@@ -82,8 +107,22 @@ export const RecipeInfo: React.FC<RecipeInfoProps> = ({
                     className={`flex items-center ${classConfig.innerGap[size]}`}
                 >
                     <Icon name={'servings'} size={classConfig.iconSize[size]} />
-                    <Typography variant={typographyVariant} disableLinkStyles>
-                        {verbose ? `${t('app.recipe.servings')}: ` : null}
+                    <Typography
+                        variant={typographyVariant}
+                        disableLinkStyles
+                        className={
+                            verbose === 'responsive'
+                                ? '@recipe:text-sm'
+                                : undefined
+                        }
+                    >
+                        {verbose === 'responsive' ? (
+                            <span className={'hidden @recipe:inline'}>
+                                {t('app.recipe.servings')}:{' '}
+                            </span>
+                        ) : verbose ? (
+                            `${t('app.recipe.servings')}: `
+                        ) : null}
                         {portionSize}
                     </Typography>
 

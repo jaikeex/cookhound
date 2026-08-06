@@ -1,13 +1,10 @@
 'use client';
 
 import React from 'react';
-import { MobileRecipeViewTemplate } from '@/client/components/templates/Recipe/View/Mobile';
 import { Sidebar } from '@/client/components/molecules/Sidebar';
 import { SidebarHandle } from '@/client/components/molecules/Sidebar/Handle';
-import {
-    DesktopRecipeViewTemplate,
-    DesktopRecipeViewSkeleton
-} from '@/client/components/templates/Recipe/View/Desktop';
+import { RecipeViewLayout } from '@/client/components/templates/Recipe/View/Layout';
+import { DesktopRecipeViewSkeleton } from '@/client/components/templates/Recipe/View/Skeletons';
 import {
     RecipeForm,
     type RecipeFormErrors
@@ -17,6 +14,20 @@ import type { Recipe } from '@/common/types';
 import type { RecipeFormMode } from '@/client/types/core';
 import { RecipeHandlingProvider } from '@/client/store';
 import { t } from '@/client/locales';
+
+/**
+ * RecipeViewLayout picks its shape from the width of its own container, not the viewport.
+ * That is what makes one tree serve both the public page and these panels, but it means a
+ * panel has to be desktop-width to preview the desktop layout, and this one never is. The
+ * grid is capped at max-w-screen-xl (1200px) and this column is 4/7 of it, so the panel
+ * tops out at 669.7px inside its px-2 - well under the threshold, however wide the monitor
+ * gets. Left alone the column previews the mobile layout on every screen.
+ *
+ * So the preview is pinned to a 768px box - max-w-3xl, the same width the article gets on
+ * a wide public page, so this is pixel-faithful rather than merely desktop-shaped - and
+ * scaled to fit.
+ */
+const PREVIEW_VIEWPORT = 'w-[768px] origin-top-left scale-[0.82]';
 
 export type RecipeFormShellProps = Readonly<{
     recipeObject: Recipe | null;
@@ -123,7 +134,7 @@ export const RecipeFormShell: React.FC<RecipeFormShellProps> = ({
                     >
                         {recipeObject && (
                             <RecipeHandlingProvider recipe={recipeObject}>
-                                <MobileRecipeViewTemplate isPreview={true} />
+                                <RecipeViewLayout isPreview={true} />
                             </RecipeHandlingProvider>
                         )}
                     </Sidebar>
@@ -153,7 +164,7 @@ export const RecipeFormShell: React.FC<RecipeFormShellProps> = ({
                 >
                     {recipeObject && (
                         <RecipeHandlingProvider recipe={recipeObject}>
-                            <DesktopRecipeViewTemplate isPreview={true} />
+                            <RecipeViewLayout isPreview={true} />
                         </RecipeHandlingProvider>
                     )}
                 </Sidebar>
@@ -163,17 +174,18 @@ export const RecipeFormShell: React.FC<RecipeFormShellProps> = ({
             {/*                                   DESKTOP PREVIEW                                   */}
             {/*-------------------------------------------------------------------------------------*/}
 
-            <div className={'hidden col-span-4 px-2 xl:block'}>
-                {recipeObject ? (
-                    <RecipeHandlingProvider recipe={recipeObject}>
-                        <DesktopRecipeViewTemplate
-                            isPreview={true}
-                            className="hidden xl:block"
-                        />
-                    </RecipeHandlingProvider>
-                ) : (
-                    <DesktopRecipeViewSkeleton />
-                )}
+            <div
+                className={'hidden col-span-4 px-2 overflow-x-hidden xl:block'}
+            >
+                <div className={PREVIEW_VIEWPORT}>
+                    {recipeObject ? (
+                        <RecipeHandlingProvider recipe={recipeObject}>
+                            <RecipeViewLayout isPreview={true} />
+                        </RecipeHandlingProvider>
+                    ) : (
+                        <DesktopRecipeViewSkeleton />
+                    )}
+                </div>
             </div>
         </div>
     );

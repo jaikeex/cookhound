@@ -66,12 +66,16 @@ export const RecipeAuthorLinkDesktop: React.FC<
                         />
                     </Link>
 
-                    <div className="flex flex-col">
-                        <Typography variant="body-sm">
+                    <div className="flex flex-col min-w-0">
+                        <Typography variant="body-sm" className="truncate">
                             {author.username}
                         </Typography>
 
-                        <Typography variant="body-xs" color="muted">
+                        <Typography
+                            variant="body-xs"
+                            color="muted"
+                            className="truncate"
+                        >
                             {ageLabel}
                         </Typography>
                     </div>

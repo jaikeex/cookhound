@@ -7,16 +7,7 @@ import { Typography } from '@/client/components/atoms/Typography';
 import { useRecipeHandling, useRecipeSelectionStore } from '@/client/store';
 import { scaleIngredientsToPortionSize } from '@/client/utils';
 
-//~---------------------------------------------------------------------------------------------~//
-//$                                           OPTIONS                                           $//
-//~---------------------------------------------------------------------------------------------~//
-
-const classConfig = {
-    spacing: {
-        'desktop': 'space-y-2',
-        'mobile': 'space-y-4'
-    }
-};
+const ROW_SPACING = 'space-y-4 @recipe:space-y-2';
 
 const EMPTY_SELECTION: readonly number[] = Object.freeze([]);
 
@@ -28,14 +19,12 @@ type IngredientsListViewProps = Readonly<{
     className?: string;
     ingredients: Ingredient[];
     isPreview?: boolean;
-    variant?: 'desktop' | 'mobile';
 }>;
 
 export const IngredientsListView: React.FC<IngredientsListViewProps> = ({
     className,
     ingredients,
-    isPreview = false,
-    variant = 'desktop'
+    isPreview = false
 }) => {
     const { recipe, portionSize } = useRecipeHandling();
 
@@ -135,7 +124,7 @@ export const IngredientsListView: React.FC<IngredientsListViewProps> = ({
             ingredient={ingredient}
             onDeselected={deselectIngredient}
             onSelected={selectIngredient}
-            variant={variant}
+            variant={'responsive'}
             selected={selectedIngredientIds.includes(ingredient.id)}
         />
     );
@@ -143,7 +132,7 @@ export const IngredientsListView: React.FC<IngredientsListViewProps> = ({
     return (
         <div className={`space-y-6 ${className}`}>
             {grouped.uncategorized.length > 0 && (
-                <div className={classConfig.spacing[variant]}>
+                <div className={ROW_SPACING}>
                     {grouped.uncategorized.map(renderIngredient)}
                 </div>
             )}
@@ -162,7 +151,7 @@ export const IngredientsListView: React.FC<IngredientsListViewProps> = ({
                             {categoryName}
                         </Typography>
 
-                        <div className={classConfig.spacing[variant]}>
+                        <div className={ROW_SPACING}>
                             {categoryIngredients.map(renderIngredient)}
                         </div>
                     </div>

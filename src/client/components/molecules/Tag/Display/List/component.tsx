@@ -8,7 +8,7 @@ import { t } from '@/client/locales';
 type TagListProps = Readonly<{
     className?: string;
     linkToHubs?: boolean;
-    size?: 'xs' | 'sm' | 'md' | 'lg';
+    size?: 'xs' | 'sm' | 'md' | 'lg' | 'responsive';
     tags: RecipeTagDTO[];
 }>;
 

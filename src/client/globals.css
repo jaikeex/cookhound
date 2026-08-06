@@ -22,6 +22,8 @@ arises that can be hotfixed by simply uncommenting this import. I will try and r
     --font-open-sans: var(--font-open-sans-var), sans-serif;
     --font-kalam: var(--font-kalam-var), cursive;
 
+    --container-recipe: 45rem;
+
     --breakpoint-sm: 640px;
     --breakpoint-md: 768px;
     --breakpoint-lg: 1024px;
