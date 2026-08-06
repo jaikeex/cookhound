@@ -1,5 +1,5 @@
 import { useAppMutation, useAppQuery } from '@/client/data/queryFactories';
-import { useRepositories } from '@/client/data';
+import { useRepositories } from '@/client/data/DataProvider';
 import {
     ADMIN_QUERY_KEYS,
     type AdminReportDetailOptions,

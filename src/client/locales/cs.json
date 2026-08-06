@@ -180,7 +180,7 @@
     "app.profile.pendingDeletion.cancel.modal.cancel": "Ne, nechat smazání naplánované",
     "app.recipe.title": "Název receptu",
     "app.recipe.description": "Popis",
-    "app.recipe.description-placeholder": "Krátké shrnutí zobrazené na stránce receptu a v náhledech vyhledávání.",
+    "app.recipe.description-placeholder": "Krátké shrnutí",
     "app.recipe.ingredients": "Ingredience",
     "app.recipe.instructions": "Postup",
     "app.recipe.notes": "Poznámky",

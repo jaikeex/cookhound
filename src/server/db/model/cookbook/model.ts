@@ -116,7 +116,13 @@ class CookbookModel {
             ttl ?? CACHE_TTL.TTL_1,
             [CACHE_TAGS.cookbook.ownedBy(ownerId)]
         );
-        return cookbooks;
+
+        return cookbooks.map(
+            (cookbook) =>
+                this.reviveCookbookDates(
+                    cookbook
+                ) as getCookbooksByOwnerId.Result
+        );
     }
 
     //~=========================================================================================~//

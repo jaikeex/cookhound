@@ -1,5 +1,5 @@
 import { useAppMutation } from '@/client/data/queryFactories';
-import { useRepositories } from '@/client/data';
+import { useRepositories } from '@/client/data/DataProvider';
 import type { SubmitReportOptions } from './keys';
 
 export const reportQueryClient = {

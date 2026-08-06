@@ -1,5 +1,5 @@
 import { useAppQuery, useAppMutation } from '@/client/data/queryFactories';
-import { useRepositories } from '@/client/data';
+import { useRepositories } from '@/client/data/DataProvider';
 import { getCookie } from '@/client/utils/cookies';
 import { RequestError } from '@/client/error';
 import { SESSION_HINT_COOKIE_NAME } from '@/common/constants/general';

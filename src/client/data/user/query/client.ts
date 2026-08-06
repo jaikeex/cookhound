@@ -1,5 +1,5 @@
 import { useAppQuery, useAppMutation } from '@/client/data/queryFactories';
-import { useRepositories } from '@/client/data';
+import { useRepositories } from '@/client/data/DataProvider';
 import {
     USER_QUERY_KEYS,
     type CancelAccountDeletionOptions,

@@ -1,6 +1,6 @@
 import { useInfiniteQuery, keepPreviousData } from '@tanstack/react-query';
 import { useAppQuery, useAppMutation } from '@/client/data/queryFactories';
-import { useRepositories } from '@/client/data';
+import { useRepositories } from '@/client/data/DataProvider';
 import {
     RECIPE_QUERY_KEYS,
     type RecipeByDisplayIdOptions,

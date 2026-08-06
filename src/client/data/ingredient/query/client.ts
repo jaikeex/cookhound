@@ -1,5 +1,5 @@
 import { useAppQuery } from '@/client/data/queryFactories';
-import { useRepositories } from '@/client/data';
+import { useRepositories } from '@/client/data/DataProvider';
 import { INGREDIENT_QUERY_KEYS, type IngredientListOptions } from './keys';
 
 export const ingredientQueryClient = {
