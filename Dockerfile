@@ -8,7 +8,11 @@ RUN corepack enable
 
 # -------- Dependencies layer -----------------------------------------------------
 FROM base AS deps
-COPY package.json yarn.lock ./
+# .yarnrc.yml and the pinned release must be part of this layer: without them
+# Yarn falls back to its own defaults (PnP linker, install scripts disabled)
+# instead of the project's node-modules install.
+COPY package.json yarn.lock .yarnrc.yml ./
+COPY .yarn/releases ./.yarn/releases
 COPY libs ./libs
 # Install dependencies (prod+dev, we keep dev so that tsx is available for the worker)
 RUN yarn install --immutable --inline-builds
@@ -25,6 +29,7 @@ ARG NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID
 ARG NEXT_PUBLIC_ORIGIN
 ARG NEXT_PUBLIC_COOKIE_DOMAIN
 ARG NEXT_PUBLIC_CAPTCHA_SITE_KEY
+ARG NEXT_PUBLIC_GA_MEASUREMENT_ID
 ARG NEXT_PUBLIC_TYPESENSE_HOST
 ARG NEXT_PUBLIC_TYPESENSE_PORT
 ARG NEXT_PUBLIC_TYPESENSE_PROTOCOL

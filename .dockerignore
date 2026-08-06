@@ -1,3 +1,41 @@
 Dockerfile
 .dockerignore
 docker-compose.yml
+docker-compose-local.yml
+
+# Dependencies are installed in the deps layer; copying host node_modules over
+# them would defeat that layer and drag host-built native binaries into the image.
+node_modules
+**/node_modules
+.yarn/install-state.gz
+
+# Build output — regenerated inside the builder layer
+.next
+out
+build
+src/server/db/generated
+*.tsbuildinfo
+
+# Local-only files that must never reach an image layer
+.env
+.env*.local
+ssh
+logs
+logs-droplet
+requirements
+src/server/integrations/google/gsa/accounts
+
+# Test, tooling and editor artifacts
+coverage
+test-results
+playwright-report
+blob-report
+playwright/.cache
+playwright/.auth
+.git
+.github
+.husky
+.vscode
+.cursor
+.claude
+.VSCodeCounter

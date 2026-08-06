@@ -21,7 +21,7 @@ I was (of course) using llms for various tasks when writing this project, mainly
 
 Cookhound is a full-stack web application built on a modern stack.
 
-- **Frontend** – Next.js 15 app router with React 19, TailwindCSS for styling and atomic design for component organization.
+- **Frontend** – Next.js 16 app router with React 19, TailwindCSS for styling and atomic design for component organization.
 - **Backend** – Next.js api routes with dedicated service and model layers.
 - **Database** – PostgreSQL with Prisma.
 - **Caching & Jobs** – Redis handles rate-limiting, caching, sessions and BullMQ job queues.
@@ -43,11 +43,11 @@ You can download and install Node.js from the official website: https://nodejs.o
 
 #### Yarn
 
-Default package manager is yarn v 4.1.0. On most systems, you can follow these steps:
+Default package manager is yarn v 4.18.0. On most systems, you can follow these steps:
 
 - `corepack enable`
-- `yarn set version 4.1.0`
-- `yarn -v` should show 4.1.0
+- `yarn set version 4.18.0`
+- `yarn -v` should show 4.18.0
 
 If this does not work, google it or switch to other manager.
 

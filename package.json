@@ -91,5 +91,5 @@
         "defaults and fully supports es6-module",
         "maintained node versions"
     ],
-    "packageManager": "yarn@4.1.1"
+    "packageManager": "yarn@4.18.0"
 }

@@ -43,7 +43,7 @@ jobs:
             - name: Set up Node
               uses: actions/setup-node@v4
               with:
-                  node-version: 20
+                  node-version: 22
                   cache: 'yarn'
 
             - name: Install dependencies
@@ -76,7 +76,7 @@ jobs:
             - name: Set up Node
               uses: actions/setup-node@v4
               with:
-                  node-version: 20
+                  node-version: 22
                   cache: 'yarn'
 
             - name: Install dependencies
@@ -105,6 +105,7 @@ jobs:
                       NEXT_PUBLIC_ORIGIN=${{ secrets.NEXT_PUBLIC_ORIGIN }}
                       NEXT_PUBLIC_COOKIE_DOMAIN=${{ secrets.NEXT_PUBLIC_COOKIE_DOMAIN }}
                       NEXT_PUBLIC_CAPTCHA_SITE_KEY=${{ secrets.NEXT_PUBLIC_CAPTCHA_SITE_KEY }}
+                      NEXT_PUBLIC_GA_MEASUREMENT_ID=${{ secrets.NEXT_PUBLIC_GA_MEASUREMENT_ID }}
                       NEXT_PUBLIC_TYPESENSE_HOST=${{ secrets.NEXT_PUBLIC_TYPESENSE_HOST }}
                       NEXT_PUBLIC_TYPESENSE_PORT=${{ secrets.NEXT_PUBLIC_TYPESENSE_PORT }}
                       NEXT_PUBLIC_TYPESENSE_PROTOCOL=${{ secrets.NEXT_PUBLIC_TYPESENSE_PROTOCOL }}
