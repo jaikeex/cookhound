@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { Status, type UserRole } from '@/common/types';
-import { ROUTES } from '@/common/constants';
 import { MiddlewareError } from '@/server/error';
 import { type ServerSession } from '@/server/utils/session/manager';
 import { verifySessionFromCookie } from '@/server/utils/session/verify-server';
@@ -17,9 +16,16 @@ import {
 //$                                       HELPER FUNCTIONS                                      $//
 //~=============================================================================================~//
 
+/**
+ * Resolves the protection policy for a pathname.
+ * Matching is on segment boundaries, a simple startsWith is not sufficient.
+ */
 function getRouteConfig(pathname: string) {
     for (const route of PROTECTED_ROUTES) {
-        if (pathname.startsWith(route.path)) {
+        const isExactMatch = pathname === route.path;
+        const isChildMatch = pathname.startsWith(`${route.path}/`);
+
+        if (isExactMatch || isChildMatch) {
             return route;
         }
     }
@@ -109,18 +115,31 @@ export const verifyRouteAccess: MiddlewareStepFunction = async (request) => {
         return redirectToBanned();
     }
 
-    // Check if user has pending deletion status
+    /**
+     * Users pending deletion are confined to their profile until the request resolves.
+     *
+     * The commented code is an exception for the profile page and for /api/*, but
+     * neither can ever be reached as the policies are currently set: /profil/[id]
+     * carries no policy, so it returns above, and the proxy matcher never forwards
+     * api routes here at all.
+     *
+     *? Should /profil ever gain a policy, uncomment the code. Without it,
+     *? a user already sitting on their profile would be redirected to it forever.
+     */
     if (session && session.status === Status.PendingDeletion) {
         // Allow access to profile page and API routes
-        const isProfilePage = pathname.startsWith(
-            ROUTES.user.detail(session.userId)
-        );
-        const isApiRoute = pathname.startsWith('/api/');
+        // const isProfilePage = pathname.startsWith(
+        //     ROUTES.user.detail(session.userId)
+        // );
 
-        if (!isProfilePage && !isApiRoute) {
-            // Redirect to profile page for all other routes
-            return redirectToProfile(session.userId);
-        }
+        // const isApiRoute = pathname.startsWith('/api/');
+
+        // if (!isProfilePage && !isApiRoute) {
+        //     Redirect to profile page for all other routes
+        //     return redirectToProfile(session.userId);
+        // }
+
+        return redirectToProfile(session.userId);
     }
 
     if (!requiresAuth) {
