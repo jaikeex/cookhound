@@ -1,44 +1,34 @@
 'use client';
 
-import React, { useEffect } from 'react';
-import { ButtonBase, Logo, Typography } from '@/client/components';
-import Link from 'next/link';
-import { t } from '@/client/locales';
+import '@/client/globals.css';
+
+import React from 'react';
+import { ErrorBoundaryTemplate } from '@/client/components/templates/Error/Boundary';
 import { DEFAULT_LOCALE } from '@/common/constants';
+
+const FALLBACK_THEME = 'dark';
 
 type ErrorPageProps = Readonly<{
     error: Error & { digest?: string };
     reset: () => void;
 }>;
 
-export default function GlobalError({ error }: ErrorPageProps) {
-    useEffect(() => {
-        console.error('Global error:', error);
-    }, [error]);
-
+export default function GlobalError({ error, reset }: ErrorPageProps) {
     return (
-        <html lang={DEFAULT_LOCALE}>
-            <body>
-                <div className="flex flex-col items-center min-h-screen pt-10 text-center">
-                    <Logo className="logo-md mb-8" />
-
-                    <Typography as="h1" variant="heading-lg" className="mb-4">
-                        {t('app.error.global')}
-                    </Typography>
-
-                    <Typography
-                        variant="body"
-                        className="mb-6 text-gray-700 dark:text-gray-300"
-                    >
-                        {t('app.error.global.description')}
-                    </Typography>
-
-                    <Link href={'/'} className="mx-auto">
-                        <ButtonBase className="mx-auto w-52" color="primary">
-                            {t('app.general.home')}
-                        </ButtonBase>
-                    </Link>
-                </div>
+        <html
+            lang={DEFAULT_LOCALE}
+            className={FALLBACK_THEME}
+            style={{ colorScheme: FALLBACK_THEME }}
+        >
+            <body className="min-h-screen bg-green-50 dark:bg-gray-950 typography-base">
+                <ErrorBoundaryTemplate
+                    error={error}
+                    reset={reset}
+                    titleKey="app.error.global"
+                    descriptionKey="app.error.global.description"
+                    logLabel="Global error"
+                    withLogo
+                />
             </body>
         </html>
     );
