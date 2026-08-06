@@ -5,7 +5,7 @@ import { GRID_COLS } from '@/client/constants';
 import { classNames } from '@/client/utils';
 import { useRecipeDiscovery } from '@/client/hooks/useRecipeDiscovery/hook';
 import { useMemo } from 'react';
-import type { RecipeCardListGridColumns } from '@/client/components/molecules/List/RecipeCardList';
+import type { RecipeCardListGridColumns } from '@/client/components/molecules/List/RecipeCardGrid';
 
 export type RecipesProps = Readonly<{
     className?: string;

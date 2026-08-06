@@ -1,5 +1,3 @@
-'use client';
-
 import Link from 'next/link';
 import { Typography } from '@/client/components/atoms/Typography';
 import { classNames } from '@/client/utils';

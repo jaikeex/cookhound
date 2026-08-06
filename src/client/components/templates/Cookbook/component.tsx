@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import type { Cookbook } from '@/common/types';
 import { DraggableGrid } from '@/client/components/molecules/List/DraggableGrid';
 import { CookbookRecipeCard } from '@/client/components/molecules/Card/CookbookRecipe';
-import { RecipeCardList } from '@/client/components/molecules/List/RecipeCardList';
+import { RecipeCardGrid } from '@/client/components/molecules/List/RecipeCardGrid';
 import { chqc, QUERY_KEYS } from '@/client/data';
 import { useDebounce } from '@/client/hooks';
 import { useQueryClient } from '@tanstack/react-query';
@@ -171,7 +171,7 @@ export const CookbookTemplate: React.FC<CookbookTemplateProps> = ({
                     })}
                 </DraggableGrid>
             ) : (
-                <RecipeCardList recipes={cookbook.recipes} hasMore={false} />
+                <RecipeCardGrid recipes={cookbook.recipes} />
             )}
         </article>
     );

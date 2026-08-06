@@ -1,5 +1,3 @@
-'use client';
-
 import React from 'react';
 import { ErrorList } from '@/client/components/molecules/Form/ErrorList';
 import { PasswordInput } from '@/client/components/molecules/Form/PasswordInput';

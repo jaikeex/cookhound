@@ -1,14 +1,10 @@
-'use client';
-
 import React from 'react';
 import { DesktopRecipeViewTemplate } from './Desktop';
 import { MobileRecipeViewTemplate } from './Mobile';
+import { RecipeFlaggedGate } from './FlaggedGate';
+import { RecipeVisitPing } from './VisitPing';
 import type { Recipe } from '@/common/types';
-import { useAuth, RecipeHandlingProvider } from '@/client/store';
-import { useRunOnce } from '@/client/hooks';
-import { chqc, QUERY_KEYS } from '@/client/data';
-import { useQueryClient } from '@tanstack/react-query';
-import { FlaggedTemplate } from '@/client/components/templates/Error/Flagged';
+import { RecipeHandlingProvider } from '@/client/store/RecipeHandlingContext';
 import { FlaggedAuthorTemplate } from '@/client/components/templates/Recipe/Flagged';
 
 export type RecipeViewProps = Readonly<{
@@ -16,39 +12,13 @@ export type RecipeViewProps = Readonly<{
 }>;
 
 export const RecipeViewTemplate: React.FC<RecipeViewProps> = ({ recipe }) => {
-    const queryClient = useQueryClient();
-    const { user } = useAuth();
-
     const isFlagged = recipe.flags?.some((flag) => flag.active);
 
-    const { mutate: registerRecipeVisit } = chqc.recipe.useRegisterRecipeVisit({
-        onSuccess: () => {
-            if (!user?.id) return;
-
-            queryClient.invalidateQueries({
-                queryKey: QUERY_KEYS.user.lastViewedRecipes(user.id)
-            });
-        }
-    });
-
-    useRunOnce(() => {
-        if (recipe?.id) {
-            // Neither await this, nor catch any errors, if the recipe was loaded,
-            // this will work too, if it does not, it does not matter the visit is not
-            // recorded anyway
-            registerRecipeVisit({
-                id: recipe.id.toString()
-            });
-        }
-    }, [recipe?.id]);
-
     if (isFlagged) {
-        const isAuthor = !!user?.id && user.id === recipe.authorId;
-
-        return isAuthor ? (
-            <FlaggedAuthorTemplate recipe={recipe} />
-        ) : (
-            <FlaggedTemplate />
+        return (
+            <RecipeFlaggedGate authorId={recipe.authorId}>
+                <FlaggedAuthorTemplate recipe={recipe} />
+            </RecipeFlaggedGate>
         );
     }
 
@@ -68,9 +38,13 @@ export const RecipeViewTemplate: React.FC<RecipeViewProps> = ({ recipe }) => {
     //?—————————————————————————————————————————————————————————————————————————————————————————?//
 
     return (
-        <RecipeHandlingProvider recipe={recipe}>
-            <MobileRecipeViewTemplate className={'md:hidden'} />
-            <DesktopRecipeViewTemplate className={'hidden md:block'} />
-        </RecipeHandlingProvider>
+        <React.Fragment>
+            <RecipeVisitPing recipeId={recipe.id} />
+
+            <RecipeHandlingProvider recipe={recipe}>
+                <MobileRecipeViewTemplate className={'md:hidden'} />
+                <DesktopRecipeViewTemplate className={'hidden md:block'} />
+            </RecipeHandlingProvider>
+        </React.Fragment>
     );
 };

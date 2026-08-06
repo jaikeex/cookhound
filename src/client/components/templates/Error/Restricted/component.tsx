@@ -1,5 +1,3 @@
-'use client';
-
 import { ButtonBase } from '@/client/components/atoms/Button/Base';
 import { LoginTemplate } from '@/client/components/templates/Auth/Login';
 import { Typography } from '@/client/components/atoms/Typography';

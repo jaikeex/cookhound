@@ -1,5 +1,3 @@
-'use client';
-
 import React from 'react';
 import { Avatar } from '@/client/components/atoms/Avatar';
 import { ButtonBase } from '@/client/components/atoms/Button/Base';

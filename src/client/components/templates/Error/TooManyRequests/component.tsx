@@ -1,5 +1,3 @@
-'use client';
-
 import { ButtonBase } from '@/client/components/atoms/Button/Base';
 import { Typography } from '@/client/components/atoms/Typography';
 import Link from 'next/link';

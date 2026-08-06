@@ -1,5 +1,3 @@
-'use client';
-
 import React from 'react';
 import { Typography } from '@/client/components/atoms/Typography';
 import type { SerializedResponseDoc } from '@/common/types';

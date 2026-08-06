@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Typography } from '@/client/components/atoms/Typography';
-import { RecipeCardList } from '@/client/components/molecules/List/RecipeCardList';
+import { RecipeCardGrid } from '@/client/components/molecules/List/RecipeCardGrid';
 import { HUB_UI, buildHubPath, type HubSibling } from '@/common/constants';
 import { classNames } from '@/client/utils';
 import type { RecipeForDisplayDTO } from '@/common/types';
@@ -62,7 +62,7 @@ export const HubTemplate: React.FC<HubTemplateProps> = ({
             )}
 
             {recipes.length > 0 ? (
-                <RecipeCardList recipes={recipes} hasMore={false} />
+                <RecipeCardGrid recipes={recipes} />
             ) : (
                 <Typography as="p" variant="body" className="my-12 text-center">
                     {HUB_UI.emptyState}
