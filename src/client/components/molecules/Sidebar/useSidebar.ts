@@ -2,11 +2,11 @@
 
 import { useCallback, useState, useRef } from 'react';
 import {
+    getScreenSize,
     useDisableMobileScroll,
     useOutsideClick,
     useParamsChangeListener,
-    usePathnameChangeListener,
-    useScreenSize
+    usePathnameChangeListener
 } from '@/client/hooks';
 import { useRouter, useSearchParams } from 'next/navigation';
 import type { SidebarAnimations, SidebarConfig } from './types';
@@ -91,7 +91,9 @@ export const useSidebar = (config: SidebarConfig = {}) => {
     //TODO: FIND A BETTER SOLUTION
     const lastPathnameRef: React.RefObject<string | null> = useRef(null);
 
-    const { isMobile } = useScreenSize();
+    // The breakpoint is only ever needed at the moment a handler fires (animation
+    // timings, mobile-only history params), so it is read imperatively via
+    // getScreenSize() instead of subscribed to. Keeps these callbacks stable.
     const router = useRouter();
     const searchParams = useSearchParams();
 
@@ -116,6 +118,8 @@ export const useSidebar = (config: SidebarConfig = {}) => {
 
     const toggleSidebarWithAnimation = useCallback(
         (open: boolean) => {
+            const { isMobile } = getScreenSize();
+
             // Timeout for the state change is needed to prevent flickering when closing the sidebar, since the animation
             // is not instant. The time is purposefully set to 10 ms less than the animation duration to ensure
             // the state change happens before the animation ends and starts the second time.
@@ -128,10 +132,12 @@ export const useSidebar = (config: SidebarConfig = {}) => {
             );
             setTimeout(() => setIsSidebarOpen(open), timeout);
         },
-        [isMobile, sidebarAnimations, backdropAnimations]
+        [sidebarAnimations, backdropAnimations]
     );
 
     const closeSidebar = useCallback(() => {
+        const { isMobile } = getScreenSize();
+
         isClosingRef.current = true;
         toggleSidebarWithAnimation(false);
 
@@ -166,7 +172,6 @@ export const useSidebar = (config: SidebarConfig = {}) => {
         useMobileParams,
         searchParams,
         paramKey,
-        isMobile,
         router
     ]);
 
@@ -202,7 +207,7 @@ export const useSidebar = (config: SidebarConfig = {}) => {
             openSidebar();
 
             // On mobile screens, the sidebar is opened with a query parameter to facilitate the back/forward navigation
-            if (useMobileParams && isMobile) {
+            if (useMobileParams && getScreenSize().isMobile) {
                 const params = new URLSearchParams(searchParams);
                 params.set(paramKey, 'true');
                 router.push(`?${params.toString()}`, { scroll: false });
@@ -213,7 +218,6 @@ export const useSidebar = (config: SidebarConfig = {}) => {
         closeSidebar,
         openSidebar,
         useMobileParams,
-        isMobile,
         searchParams,
         paramKey,
         router

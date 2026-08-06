@@ -6,7 +6,7 @@ import { Star, type StarState } from '@/client/components/atoms/Star';
 import { Tooltip } from '@/client/components/atoms/Tooltip';
 import { Typography } from '@/client/components/atoms/Typography';
 import { generateStars } from '@/client/components/molecules/Rating/utils';
-import { useCooldown, useScreenSize } from '@/client/hooks';
+import { getScreenSize, useCooldown } from '@/client/hooks';
 import { useSnackbar } from '@/client/store';
 import { t } from '@/client/locales';
 
@@ -43,7 +43,6 @@ export const Rating: React.FC<RatingProps> = ({
     size = 'md'
 }) => {
     const { alert } = useSnackbar();
-    const { isMobile } = useScreenSize();
 
     const [isHovered, setIsHovered] = useState(false);
     const [isPulsing, setIsPulsing] = useState(false);
@@ -86,6 +85,11 @@ export const Rating: React.FC<RatingProps> = ({
 
     const handleClick = useCallback(
         (event: React.MouseEvent<HTMLDivElement>) => {
+            // Read at click time rather than subscribing: the breakpoint never
+            // affects what this component renders, and a grid can mount a
+            // hundred of these at once.
+            const { isMobile } = getScreenSize();
+
             if (isOnCooldown && isMobile) {
                 alert({
                     message: t('app.recipe.you-can-rate-again-in', {
@@ -129,15 +133,7 @@ export const Rating: React.FC<RatingProps> = ({
                 setIsPulsing(false);
             }, 1000);
         },
-        [
-            onClick,
-            isOnCooldown,
-            startCooldown,
-            cooldown,
-            isMobile,
-            alert,
-            remainingTime
-        ]
+        [onClick, isOnCooldown, startCooldown, cooldown, alert, remainingTime]
     );
 
     useEffect(() => {
