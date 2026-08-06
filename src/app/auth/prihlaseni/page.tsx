@@ -3,8 +3,6 @@ import { LoginTemplate } from '@/client/components';
 import type { Metadata } from 'next';
 import { buildLocalizedMetadata } from '@/server/utils/seo';
 
-export const dynamic = 'force-dynamic';
-
 //|=============================================================================================|//
 
 export default function LoginPage() {

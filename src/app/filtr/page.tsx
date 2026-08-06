@@ -10,8 +10,6 @@ import { StructuredData } from '@/client/components';
 import { t } from '@/client/locales';
 import { deserializeFilterParams } from '@/common/utils';
 
-export const dynamic = 'force-dynamic';
-
 //|=============================================================================================|//
 
 export default async function FilterPage({

@@ -3,8 +3,6 @@ import { RestrictedTemplate } from '@/client/components';
 import { buildLocalizedMetadata } from '@/server/utils/seo';
 import type { Metadata } from 'next';
 
-export const dynamic = 'force-dynamic';
-
 type RestrictedPageProps = Readonly<{
     searchParams: Promise<Readonly<{ anonymous?: boolean; target?: string }>>;
 }>;

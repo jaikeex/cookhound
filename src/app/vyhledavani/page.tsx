@@ -10,8 +10,6 @@ import {
 import { StructuredData } from '@/client/components';
 import { t } from '@/client/locales';
 
-export const dynamic = 'force-dynamic';
-
 //|=============================================================================================|//
 
 export default async function SearchPage({

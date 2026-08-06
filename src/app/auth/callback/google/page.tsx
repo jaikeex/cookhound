@@ -5,8 +5,6 @@ import { ENV_CONFIG_PUBLIC, OAUTH_STATE_KEY } from '@/common/constants';
 import { Loader, Typography } from '@/client/components';
 import { t } from '@/client/locales';
 
-export const dynamic = 'force-dynamic';
-
 export default function GoogleCallbackPage() {
     useEffect(() => {
         if (typeof window === 'undefined') {

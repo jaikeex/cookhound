@@ -1,8 +1,6 @@
 import React, { Suspense } from 'react';
 import { VerifyEmailCallbackTemplate, Loader } from '@/client/components';
 
-export const dynamic = 'force-dynamic';
-
 export default function VerifyEmailCallbackPage() {
     return (
         <Suspense
