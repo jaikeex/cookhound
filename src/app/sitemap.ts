@@ -54,17 +54,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
                     }
                 }
             },
-            {
-                url: `${baseUrl}${ROUTES.search()}`,
-                lastModified: new Date(),
-                changeFrequency: 'daily',
-                priority: 0.8,
-                alternates: {
-                    languages: {
-                        cs: `${baseUrl}${ROUTES.search()}`
-                    }
-                }
-            },
             // Submitted only while it has something to list. With no hub past
             // the threshold the index renders an empty state and marks itself
             // noindex (see its generateMetadata), and submitting a url the

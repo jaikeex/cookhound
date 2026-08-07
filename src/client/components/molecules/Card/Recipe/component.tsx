@@ -40,6 +40,7 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({
                 />
                 <div className="flex flex-col justify-between h-full p-2 space-y-2">
                     <Typography
+                        as="h2"
                         variant="heading-xs"
                         className="text-sm font-semibold line-clamp-2"
                     >

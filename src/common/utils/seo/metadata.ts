@@ -53,8 +53,6 @@ export function buildLocalizedMetadata(config: MetadataConfig): Metadata {
 
     const baseUrl = ENV_CONFIG_PUBLIC.ORIGIN;
 
-    const canonicalUrl = config.canonical || baseUrl;
-
     const title = t(config.titleKey, config.params);
 
     const description = validateDescription(
@@ -83,7 +81,7 @@ export function buildLocalizedMetadata(config: MetadataConfig): Metadata {
             description: ogDescription,
             siteName: 'Cookhound',
             locale: DEFAULT_LOCALE,
-            url: canonicalUrl
+            ...(config.canonical ? { url: config.canonical } : {})
         },
         twitter: {
             card: config.twitterCard || 'summary_large_image',

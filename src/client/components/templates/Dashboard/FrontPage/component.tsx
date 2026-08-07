@@ -40,6 +40,7 @@ export const FrontPageTemplate: React.FC<FrontPageProps> = ({
     return (
         <div className="page-wrapper flex flex-col gap-4 mt-36 md:mt-40">
             <Banner
+                headingKey="app.general.banner.heading"
                 onChange={handleInputChange}
                 onSearch={executeSearch}
                 isLoading={false}

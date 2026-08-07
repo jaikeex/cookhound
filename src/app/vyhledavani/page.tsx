@@ -76,7 +76,8 @@ export async function generateMetadata({
             titleKey: 'meta.search.title',
             descriptionKey: 'meta.search.description',
             canonical: `${ENV_CONFIG_PUBLIC.ORIGIN}${ROUTES.search()}`,
-            noindex: true
+            noindex: true,
+            noindexFollow: true
         });
     }
 
@@ -86,7 +87,8 @@ export async function generateMetadata({
         titleKey: 'meta.search.title',
         descriptionKey: 'meta.search.description',
         canonical: `${ENV_CONFIG_PUBLIC.ORIGIN}${ROUTES.search(q)}`,
-        noindex: true
+        noindex: true,
+        noindexFollow: true
     });
 
     return {

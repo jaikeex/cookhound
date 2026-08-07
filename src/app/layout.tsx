@@ -41,7 +41,8 @@ const kalam = Kalam({
 export const viewport: Viewport = {
     width: 'device-width',
     initialScale: 1,
-    viewportFit: 'cover'
+    viewportFit: 'cover',
+    themeColor: '#1f2937'
 };
 
 //?—————————————————————————————————————————————————————————————————————————————————————————————?//
@@ -106,11 +107,22 @@ export async function generateMetadata(): Promise<Metadata> {
         metadataBase: new URL(ENV_CONFIG_PUBLIC.ORIGIN),
         title,
         description,
+        icons: {
+            icon: [
+                {
+                    url: '/favicon-32x32.png',
+                    sizes: '32x32',
+                    type: 'image/png'
+                },
+                {
+                    url: '/favicon-16x16.png',
+                    sizes: '16x16',
+                    type: 'image/png'
+                }
+            ]
+        },
         openGraph: {
             siteName: 'Cookhound'
-        },
-        other: {
-            'theme-color': '#1f2937'
         }
     };
 }

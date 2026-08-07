@@ -7,11 +7,13 @@ import { RecipeSearchInput } from '@/client/components/organisms/RecipeSearchInp
 import { type ChangeEvent } from 'react';
 import { Typography } from '@/client/components/atoms/Typography';
 import { t } from '@/client/locales';
+import type { I18nMessage } from '@/client/locales';
 import Link from 'next/link';
 import { ROUTES } from '@/common/constants';
 
 type BannerProps = Readonly<{
     defaultSearchValue?: string;
+    headingKey?: I18nMessage;
     hideFiltersLink?: boolean;
     initialQueries?: string[];
     isLoading: boolean;
@@ -22,6 +24,7 @@ type BannerProps = Readonly<{
 
 export const Banner: React.FC<BannerProps> = ({
     defaultSearchValue,
+    headingKey,
     hideFiltersLink,
     initialQueries,
     isLoading,
@@ -29,6 +32,16 @@ export const Banner: React.FC<BannerProps> = ({
     onSearch,
     searchValue
 }) => {
+    const heading = headingKey ? (
+        t(headingKey)
+    ) : (
+        <React.Fragment>
+            <span className="font-bold">{t('app.general.banner.bold')}</span>
+            &nbsp;
+            {t('app.general.banner.normal')}
+        </React.Fragment>
+    );
+
     return (
         <React.Fragment>
             <div
@@ -41,19 +54,19 @@ export const Banner: React.FC<BannerProps> = ({
                 <Image
                     className="absolute top-0 left-0 object-cover w-full h-45 md:h-56.5 opacity-20"
                     src="/img/banner.avif"
-                    alt="Recipe Finder"
+                    alt=""
                     width={1000}
                     height={296}
                     priority
                 />
                 <div className="relative z-20 flex flex-col items-center justify-start h-full px-4 mt-6 text-center">
                     <div className="flex flex-col gap-4 mt-12 mb-3 md:mt-16 md:mb-6">
-                        <Typography variant="body-sm" className="max-w-md">
-                            <span className="font-bold">
-                                {t('app.general.banner.bold')}
-                            </span>
-                            &nbsp;
-                            {t('app.general.banner.normal')}
+                        <Typography
+                            as="h1"
+                            variant="body-sm"
+                            className="max-w-md"
+                        >
+                            {heading}
                         </Typography>
                     </div>
 
