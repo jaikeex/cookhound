@@ -14,7 +14,8 @@ export default defineConfig({
     test: {
         exclude: ['**/node_modules/**', '**/dist/**', '**/e2e/**'],
         env: {
-            NEXT_PUBLIC_ENV: 'test'
+            NEXT_PUBLIC_ENV: 'test',
+            NEXT_PUBLIC_ORIGIN: 'http://localhost:3000'
         }
     }
 });
