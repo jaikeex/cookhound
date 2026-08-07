@@ -10,6 +10,24 @@ at all times.
 
 # Cookhound Project Rules
 
+## Version Control — Hands Off Git
+
+**The developer owns the repository state. Never mutate it without explicit permission.**
+
+Do **not** run, unprompted, any command that changes tracked history, the index, or the working tree:
+
+- `git add` / `git rm` / `git restore` / `git checkout <path>` — the developer curates the staging area himself
+- `git commit` (including `--amend`), `git revert`, `git reset`, `git stash`
+- `git push`, `git pull`, `git merge`, `git rebase`, `git cherry-pick`, `git tag`
+- `git branch` / `git switch -c` — do not create, rename, or delete branches
+- `gh pr create` and any other command that publishes to the remote
+
+Read-only inspection is always fine and encouraged — `git status`, `git diff`, `git log`, `git show`, `git blame`, `git ls-files`, `git stash list`. Use these freely to understand a change before working on it.
+
+**Implicit permission** exists only when the task *is* a git task. If the developer asks you to resolve merge conflicts, bisect a regression, fix a botched rebase, or clean up a branch, the write commands needed to carry that out are authorized by the request itself. Even then, prefer the least destructive option available, and say what you are about to do before running anything irreversible (`reset --hard`, `push --force`, history rewrites).
+
+Everything else — staging, committing, pushing, branching, releasing — is the developer's job. If a change is finished and would normally be committed, simply say so and stop.
+
 ## Project Architecture & Directory Structure
 
 ```
@@ -32,39 +50,78 @@ cookhound-mk3/
 │   │   ├── styles/            # Tailwind CSS v4 theme (colors, animations, utilities)
 │   │   ├── types/             # Client-specific types
 │   │   ├── utils/             # Client utilities
-│   │   └── locales/           # Internationalization
+│   │   ├── locales/           # Translation messages + t() (Czech-only)
+│   │   └── globals.css        # Tailwind entry (imports styles/**)
 │   ├── server/                # Server-side code
-│   │   ├── db/                # Database (Prisma schema, models)
+│   │   ├── db/                # Database (Prisma schema, models, migrations, TypedSQL)
+│   │   ├── data/              # Server data layer (serverData — RSC/action access)
 │   │   ├── error/             # Server error classes
 │   │   ├── services/          # Business logic services
 │   │   ├── search-index/      # Typesense search index
-│   │   ├── utils/             # Server utilities
+│   │   ├── proxy/             # Middleware steps, route policies, redirects
+│   │   ├── utils/             # Server utilities (reqwest, api-docs, rate-limit, …)
 │   │   ├── logger/            # Logging infrastructure
 │   │   ├── integrations/      # External service integrations
+│   │   ├── types/             # Server-specific types
 │   │   └── queues/            # BullMQ queues and jobs
-│   └── common/                # Shared code between client/server
-│       ├── types/             # Shared TypeScript types
-│       ├── constants/         # Shared constants
-│       └── utils/             # Shared utilities
+│   ├── common/                # Shared code between client/server
+│   │   ├── types/             # Shared TypeScript types
+│   │   ├── constants/         # Shared constants
+│   │   └── utils/             # Shared utilities
+│   └── proxy.ts               # Next.js middleware entry (runs src/server/proxy steps)
 ├── libs/                      # Workspace packages (e.g. eslint-plugin-cookhound)
+├── prisma/                    # seed.ts + prisma.config.ts target (schema lives in src/server/db)
+├── e2e/                       # Playwright specs
+├── docs/                      # Long-form project docs (migrations, reviews)
+├── deploy/ docker/            # Deployment config (nginx, compose, Dockerfile)
 ├── public/                    # Static assets
 └── scripts/                   # Build and deployment scripts
 ```
 
 ## Build & Tooling
 
-- This project uses yarn for package management
+- This project uses yarn (v4, `packageManager` pinned) for package management
+- Workspaces: `libs/*`
+
+### Scripts
+
+| Script | Purpose |
+| --- | --- |
+| `yarn dev` | Next dev server (Turbopack) |
+| `yarn dev-worker` | BullMQ worker process (`tsx src/server/queues/runtime/worker.ts`) |
+| `yarn build` | `next build --webpack` + standalone static copy |
+| `yarn typecheck` | `tsc --noEmit` |
+| `yarn lint` | `prettier --write .` then `eslint` (`lint:check` for read-only) |
+| `yarn test` | Vitest, single run |
+| `yarn test:e2e` | Playwright (`test:e2e:ui` for the UI runner) |
+| `yarn migrate` / `generate` / `seed` | Prisma migrate dev / TypedSQL generate / db seed |
+| `yarn redis:flush`, `yarn setup-typesense` | Local infra helpers |
 
 ### Formatting & Linting
 
 - **Prettier**: 4-space indent, single quotes, semicolons, no trailing commas, 80-char width
-- **ESLint**: Flat config (v9). Plugins: `@typescript-eslint`, `react`, `react-hooks`, `next`, `cookhound`
+- **ESLint**: Flat config (v9). Plugins: `@typescript-eslint`, `react`, `react-hooks`, `@next/next`, `cookhound`
 - **Husky + lint-staged**: Pre-commit runs `prettier --write` then `eslint` on staged JS/TS/CSS files
 
 ### Custom ESLint Rules (`eslint-plugin-cookhound`)
 
+All four are `error`. Rule sources live in `libs/eslint-plugin-cookhound/rules/`.
+
 - `require-make-handler` — API route exports must use `makeHandler()`, not raw `pipe()`
 - `no-raw-request-json` — Must use `readJson()` helper instead of `request.json()` to enforce payload size limits
+- `no-raw-cookie-mutation` — Never call `.set()` / `.delete()` / `.clear()` on the `next/headers` `cookies()` store. Use `setCookie()` / `deleteCookie()` from `@/server/utils/reqwest/cookies` so cookie attributes stay centralized (only that module is exempt)
+- `require-log-context` — Every `*Service` class in `src/server/services/**/service.ts` must declare `static readonly LOG_CONTEXT`. `@LogServiceMethod` otherwise falls back to the class name, which the production bundler mangles to a single letter
+
+### Other Enforced Rules Worth Knowing
+
+These fail the build, so write code that satisfies them up front:
+
+- `no-restricted-imports` forbids the `../` pattern — **no relative parent imports**, always use the `@/` alias
+- `@typescript-eslint/consistent-type-imports` — type-only imports must use `import type`
+- `react/jsx-no-bind` — no inline arrow/bound functions in JSX props; hoist to `useCallback` or a named handler
+- `react/prefer-read-only-props` — component props must be `Readonly` (matches the Component Patterns example below)
+- `react/sort-prop-types`, `react/sort-default-props`, `react/self-closing-comp`, `react/no-danger`
+- `@typescript-eslint/no-explicit-any` is **off** — `any` is allowed where genuinely warranted
 
 ## Core Principles
 
@@ -96,12 +153,17 @@ cookhound-mk3/
 
 All API routes use the `makeHandler` factory which auto-applies `withRequestContext` and `withOriginGuard` (CSRF). Additional pipes are composed on top:
 
+Everything lives under `src/server/utils/reqwest/` (`makeHandler.ts`, `pipes/`, `guards/`, `responses.ts`, `cookies.ts`).
+
 ```typescript
 // Pipes: withAuth, withAdmin, withRateLimit — applied as middleware wrappers
-// Guards: assertAuthenticated, assertAnonymous, assertSelf, assertAdmin — called inside handlers
+// Guards (src/server/utils/reqwest/guards/auth.ts) — called inside handlers:
+//   assertAuthenticated, assertAnonymous, assertSelf, assertSelfOrAdmin,
+//   assertAdmin, assertAdminAndNotSelf
 // Response helpers: ok(), created(), noContent() — use instead of raw NextResponse.json()
 // Body parsing: readJson(request) — use instead of request.json() (enforces size limits)
 // Validation: validatePayload(schema, data), validateQuery(schema, url), validateParams(schema, params)
+// Cookies: setCookie() / deleteCookie() — never mutate the cookies() store directly
 
 async function postHandler(request: NextRequest) {
     const userId = assertAuthenticated();
@@ -122,6 +184,27 @@ export const POST = makeHandler(
 - Never export handlers without `makeHandler` (enforced by ESLint)
 - Rate limiting uses sliding window algorithm via Redis, fails open if Redis is down
 
+#### Route documentation (`registerRouteDocs`)
+
+Every route file registers its own docs at module scope — 54 of 55 routes do, so treat it as required for new routes. The registry (`src/server/utils/api-docs/`) is rendered by the in-app viewer at `/admin/api-docs`; there is no OpenAPI file to regenerate.
+
+```typescript
+registerRouteDocs('/api/contact', {
+    category: 'Contact',
+    POST: {
+        summary: 'Submit a contact form message.',
+        description: `Delivers the message to site administrators via email.`,
+        auth: AuthLevel.PUBLIC,
+        rateLimit: { maxRequests: 3, windowSizeInSeconds: 3600 },
+        bodySchema: ContactFormSchema,
+        captchaRequired: true,
+        clientUsage: [{ apiClient: 'apiClient.contact.submitContactForm' }]
+    }
+});
+```
+
+Keep the docs honest: `auth` must match the pipes/guards actually applied, and `rateLimit` must match the `withRateLimit` config. Path params use `{id}` placeholders in the registered path. The `RouteDocs` type is in `src/common/types/api-docs.ts`.
+
 ### 5. Database & Data Access
 
 - Use Prisma for all database operations
@@ -130,11 +213,12 @@ export const POST = makeHandler(
 - Use transactions for complex operations
 - Always validate data before database operations
 - Use proper error handling for database failures
-- PostgreSQL as primary database
-- Prisma migrations in `src/server/db/migrations/`
-- `yarn migrate` for development migrations
-- `yarn generate` for TypedSQL generation
-- `yarn seed` for database seeding
+- PostgreSQL as primary database, reached through `@prisma/adapter-pg`
+- Schema at `src/server/db/schema.prisma`, migrations in `src/server/db/migrations/`, TypedSQL queries in `src/server/db/sql/`, generated client in `src/server/db/generated/` (paths wired up in `prisma.config.ts`)
+- Query wrappers live in `src/server/db/model/<model>/` — services call these, never Prisma directly
+- `yarn migrate` for development migrations — note it hardcodes `--name init`, so pass your own name when the migration deserves one
+- `yarn generate` for TypedSQL generation (`prisma generate --sql`)
+- `yarn seed` for database seeding (`prisma/seed.ts`)
 
 ### 6. Database Model Caching (Redis)
 
@@ -151,7 +235,7 @@ Models in `src/server/db/model/` use `cachePrismaQuery()` with a tiered TTL syst
 
 ### 7. Background Jobs (Queue-First Pattern)
 
-All background work goes through BullMQ queues (`src/server/queues/`). Services never perform side-effects directly — they enqueue jobs instead. Queue namespaces: `EMAILS`, `SEARCH`, `RECIPES`, `RECIPE_EVALUATION`, `ACCOUNTS`. Jobs extend `BaseJob<TData>` and implement `handle()`. The worker runs as a separate process (`yarn dev-worker`).
+All background work goes through BullMQ queues (`src/server/queues/`). Services never perform side-effects directly — they enqueue jobs instead. Queue namespaces (`QUEUE_NAMES` in `src/server/queues/jobs/names.ts`): `EMAILS`, `SEARCH`, `RECIPES`, `RECIPE_EVALUATION`, `ACCOUNTS`, `NOTIFICATIONS`. Jobs extend `BaseJob<TData>`, declare `static queueName`, and implement `handle()`. The worker runs as a separate process (`yarn dev-worker`) under `tsx`, so it must not import Next request-runtime modules — see the barrel-decoupling constraint in the worker entry.
 
 ### 8. Search (Typesense + DB Fallback)
 
@@ -227,10 +311,17 @@ export const Component: React.FC<ComponentProps> = ({
 
 ### Service Layer Patterns
 
-Services are singletons in `src/server/services/`, instantiated at module level. They use `@LogServiceMethod` decorator for automatic structured logging of method entry/exit (sensitive args excluded). Services access user context via `RequestContext` (no parameter passing) and delegate to DB models — never accessing Prisma directly.
+Services are singletons in `src/server/services/`, instantiated at module level. They use `@LogServiceMethod` decorator for automatic structured logging of method entry/exit (sensitive args excluded) — its `names` array labels the positional args that are safe to log. Services access user context via `RequestContext` (no parameter passing) and delegate to DB models — never accessing Prisma directly.
+
+The `static readonly LOG_CONTEXT` field is **mandatory** (`cookhound/require-log-context`): the decorator otherwise falls back to the class name, which minification mangles.
 
 ```typescript
+const LOG_CONTEXT = 'name-service';
+const log = Logger.getInstance(LOG_CONTEXT);
+
 class ServiceName {
+    static readonly LOG_CONTEXT = LOG_CONTEXT;
+
     @LogServiceMethod({ names: ['param'] })
     async methodName(param: Type): Promise<ReturnType> {
         try {
@@ -258,11 +349,16 @@ Error handling in API routes is automatic — `withRequestContext` catches all e
 
 ### 1. Tailwind CSS
 
-- CSS-first configuration (Tailwind v4 - no tailwind.config.js, all in CSS via `@theme`)
-- Custom color palette with semantic color names (primary, secondary, success, danger, warning, info, sheet)
+- CSS-first configuration (Tailwind v4 — all theme config in CSS via `@theme`)
+- Entry point is `src/client/globals.css`, which imports `src/client/styles/`:
+    - `styles/theme/` — `colors.css` (raw oklch scales), `animations.css`, `semantic.css` (`@theme inline` aliases mapping `primary`→blue, `secondary`/`success`→green, `danger`→red, `warning`→yellow, `info`→blue, `sheet`→gray)
+    - `styles/base.css` — resets and the dark-mode variant
+    - `styles/utilities/` — `buttons.css`, `forms.css`, `layout.css`, `logo.css`, `typography.css`
 - Custom animations: slide transitions, fade effects, rating pulse
-- Responsive breakpoints including 3xl (2000px)
-- Dark mode via `@custom-variant dark (&:where(.dark, .dark *))` and `prefers-color-scheme` media query
+- Responsive breakpoints including 3xl (2000px), declared as `--breakpoint-*` in `globals.css`
+- Dark mode via `@custom-variant dark (&:where(.dark, .dark *))` (in `base.css`) and `prefers-color-scheme` media query
+
+> `tailwind.config.cjs` still exists at the repo root but is **deprecated and inert** — its `@config` import in `globals.css` is commented out, and ESLint ignores the file. It is kept only as a migration reference. Never edit it to change styling; edit the CSS theme files.
 
 ### 2. Animation Patterns
 
@@ -299,6 +395,15 @@ Error handling in API routes is automatic — `withRequestContext` catches all e
 - Use proper caching strategies (Redis for server)
 - Bundle splitting and code splitting where appropriate
 
+## Testing
+
+- **Vitest** (`yarn test`) for unit tests. Config in `vitest.config.mjs`: `vite-tsconfig-paths` for the `@/` alias, `server-only` aliased to an empty module, `NEXT_PUBLIC_ENV=test`, `e2e/` excluded.
+- Tests are **colocated** next to the code they cover (`model-cache.test.ts`, `verify-recipe-path.test.ts`), except client data-layer hook tests, which live in `src/client/data/<domain>/__tests__/`.
+- The default environment is **node**. A test that renders or uses `renderHook` must opt in per file with `// @vitest-environment jsdom` on line 1.
+- Hook tests go through the port seam: build a fake repository (`src/client/data/__testing__/`) and pass it to `DataProvider` — never `fetch` or the production `repositories` object. Set `retry: false` on the test `QueryClient`.
+- **Playwright** (`yarn test:e2e`) for e2e specs in `e2e/*.e2e.spec.ts`; helpers in `e2e/utils/`. These are excluded from Vitest and from ESLint.
+- Run `yarn typecheck` alongside tests — the strictest guarantees in this codebase (DTO vs domain types, `I18nMessage` keys) are compile-time, not runtime.
+
 ## Logging & Monitoring
 
 - Use structured logging with Winston (abstracted in `src/server/logger/`)
@@ -309,26 +414,59 @@ Error handling in API routes is automatic — `withRequestContext` catches all e
 
 ## State Management
 
-- **React Context** for global UI state: `AuthContext`, `I18nContext (LocaleProvider)`, `ThemeContext`, `SnackbarContext`, `ModalContext`
-- **Zustand** for complex feature state (e.g. `useCreateRecipeStore`). See @src/client/store/app-store/SELECTORS.md for selector-scoping conventions; never destructure the whole store hook.
+- **React Context** for global UI state, all under `src/client/store/`: `AuthContext`, `ThemeContext`, `SnackbarContext`, `ModalContext`, `ConsentContext`, `QueryContext` (react-query provider), `RecipeHandlingContext`, `MotionProvider` (lazy framer-motion features)
+- **Zustand** for complex feature state — `useCreateRecipeStore`, `useRecipeSelectionStore` (`src/client/store/app-store/`). See @src/client/store/app-store/SELECTORS.md for selector-scoping conventions; never destructure the whole store hook.
 - **@tanstack/react-query** for server state via typed wrappers `useAppQuery()` / `useAppMutation()` — domain query clients aggregated under `chqc` namespace
 - Keep server state separate from client state
+- There is **no** i18n context — translations are a static import, see Internationalization below
 
 ### API Client Architecture
 
-Singleton `apiClient` (`src/client/request/apiClient/`) wraps `fetch` with domain-specific clients (auth, recipe, user, etc.). All requests use `credentials: 'include'`. Query clients in `src/client/request/queryClient/` wrap react-query with pre-typed error handling.
+Singleton `apiClient` (`src/client/request/apiClient/`) wraps `fetch` with domain-specific clients (auth, recipe, user, etc.) over the shared `ApiRequestWrapper`. All requests use `credentials: 'include'`. It returns **DTOs only** and knows nothing about react-query — the react-query layer lives in the data layer below (`src/client/data/<domain>/query/`), not under `request/`.
 
 ### Data Access Layer (Ports + Adapters)
 
-All client data access is organized **by-domain** under `src/client/data/<domain>/` (`admin`, `auth`, `contact`, `cookbook`, `file`, `ingredient`, `recipe`, `tag`, `user`). Every domain follows the same four-role layout: **port** (`port.ts`), **adapter** (`adapters/httpAdapter.ts`), **query client** (`query/client.ts`), and **query keys** (`query/keys.ts`), plus an optional `revive.ts` for domains with `Date` fields. Hooks depend on the port (e.g. `RecipeRepository`) injected via `DataProvider` / `useRepositories()`; the cross-domain aggregator lives at `src/client/data/` and exposes every domain under the `chqc.<domain>.*` namespace. HTTP adapters handle DTO→domain mapping (date revival) and delegate to `apiClient` underneath; tests substitute fake repositories through the same provider. New endpoints follow a fixed five-file checklist (apiClient method → port method → adapter implementation → query key + options type → hook on `<domain>QueryClient`). See @src/client/data/README.md for the full contract, end-to-end flow, testing pattern, and the procedure for adding a new domain.
+All client data access is organized **by-domain** under `src/client/data/<domain>/` (`admin`, `auth`, `contact`, `cookbook`, `file`, `ingredient`, `recipe`, `report`, `tag`, `user`). Every domain follows the same four-role layout: **port** (`port.ts`), **adapter** (`adapters/httpAdapter.ts`), **query client** (`query/client.ts`), and **query keys** (`query/keys.ts`), plus an optional `revive.ts` for domains with `Date` fields. Hooks depend on the port (e.g. `RecipeRepository`) injected via `DataProvider` / `useRepositories()`; the cross-domain aggregator lives at `src/client/data/` and exposes every domain under the `chqc.<domain>.*` namespace. HTTP adapters handle DTO→domain mapping (date revival) and delegate to `apiClient` underneath; tests substitute fake repositories through the same provider. New endpoints follow a fixed five-file checklist (apiClient method → port method → adapter implementation → query key + options type → hook on `<domain>QueryClient`). See @src/client/data/README.md for the full contract, end-to-end flow, testing pattern, and the procedure for adding a new domain.
+
+### Server Data Layer (`serverData`) — no SSR self-fetch
+
+Server Components and server actions must **not** fetch their own API routes. `serverData` (`src/server/data/`) is the server-side counterpart to `chqc.<domain>`: instead of going out over HTTP and back through the request pipeline, it calls the service layer directly, in-process.
+
+```ts
+export const fooServerData = {
+    getById: cache((id: number) =>
+        ensureRenderContext(() => fooService.getById(id))
+    )
+};
+```
+
+- `ensureRenderContext` (`src/server/data/runtime/`) propagates `RequestContext` into an RSC render, which does not run `withRequestContext`
+- Wrap **iff** the service actually reads `RequestContext`. Context-free reads (the whole recipe domain) call the service directly on purpose — building a context touches `cookies()`/`headers()` and would opt static/ISR routes into dynamic rendering
+- `react`'s `cache()` dedupes within a render pass
+
+See @src/server/data/README.md for the render-safety rules and the reasoning behind the context/context-free split.
 
 ### Event Bus
 
 Custom strongly-typed `EventBus<EventMap>` (`src/client/events/`) — supports `on`, `once`, `off`, `emit` (async-aware). Events: `USER_LOGGED_IN`, `USER_LOGGED_OUT`, `CONSENT_CHANGED`, `NOT_FOUND_OPENED/CLOSED`. React integration via `useAppEventListener(event, callback)` hook.
 
-## Internationalization
+## Internationalization (Czech-only)
 
-Custom i18n solution (no library). JSON translation files in `src/client/locales/` (`en.json`, `cs.json`) with dot-notation keys. `LocaleProvider` exposes `t(key, params?, fallback?)` function. Parameter interpolation uses `{{paramName}}` double-brace syntax. Locale detection from cookies/headers, persisted to user preferences.
+The app ships **Czech only**. There is no locale detection, no provider, and no context — the previous `LocaleProvider` / `en.json` setup was removed (see `docs/CZECH-ONLY-MIGRATION.md`).
+
+Translations are a plain static import from `src/client/locales/`:
+
+```typescript
+import { t } from '@/client/locales';
+
+t('recipe.detail.title'); // ~115 files use this
+t('recipe.servings', { count: 4 }); // {{count}} double-brace interpolation
+```
+
+- `cs.json` holds dot-notation keys; `I18nMessage` is the union of its keys, so an unknown key is a **type error**
+- `t(key, params?, fallback?)` — the fallback is itself looked up as a key before being used as a literal
+- Works in Server and Client Components alike (no hook, no subscription)
+- Do not reintroduce `useTranslation()`/`LocaleProvider`-style wiring; if multi-locale returns, that is a deliberate migration, not an incidental one
 
 ## Next.js 16 Patterns
 
@@ -344,24 +482,36 @@ Custom i18n solution (no library). JSON translation files in `src/client/locales
 - `use()` hook for promise resolution in client components
 - Proper loading.tsx and error boundaries
 
-### 3. Middleware (`src/proxy.ts`)
+### 3. Middleware (`src/proxy.ts` + `src/server/proxy/`)
 
-Custom Next.js middleware that runs sequential verification steps on non-API routes. Uses `MiddlewareError` with attached `NextResponse` for early returns. Route access verification applied before page rendering.
+`src/proxy.ts` is the entry point; the steps live in `src/server/proxy/steps/` (`verify-recipe-path`, `verify-route-access`), with route policies in `routes.ts` and redirects in `redirects.ts`. The matcher excludes `api`, `_next/static`, `_next/image`, and `favicon.png`, so middleware never runs on API routes.
+
+Step contract — each step returns a `NextResponse`, returns `null`, or throws:
+
+1. Throwing `MiddlewareError` with an attached `response` stops the chain immediately and uses that response
+2. Returning a `NextResponse` overwrites the running response, but later steps can overwrite it again
+3. Returning `null` continues without modifying the response
+
+Anything else thrown becomes a generic 500. Steps must be imported from their own module path, not the barrel.
 
 ## Technologies used
 
-- **React 19.2**
-- **Next.js 16**
+Versions below are the pinned/current ones — check `package.json` before assuming an API exists.
+
+- **React 19.2** / **Next.js 16.2** (App Router)
 - **TypeScript 5.9.3** with decorators support
 - **Tailwind CSS 4** with CSS-first configuration
-- **Vitest 2** for unit testing
-- **Playwright** for e2e testing
-- **Prisma 7** with TypedSQL
-- **BullMQ 5** for job queues
+- **Vitest 2** for unit testing, **Playwright** for e2e
+- **Prisma 7.8** with TypedSQL, via `@prisma/adapter-pg` over **PostgreSQL**
+- **BullMQ 5** for job queues, on **ioredis** / Redis (also the cache + rate-limit store)
+- **Typesense 2** for recipe search
 - **Zod 4** for validation
 - **Zustand 5** for client state management
 - **@tanstack/react-query 5** for server state management
 - **framer-motion 12** for animations
-- **Winston** for structured logging
+- **Winston** (+ daily-rotate-file) for structured logging
+- **argon2** for password hashing
+- **OpenAI SDK** for recipe evaluation (`src/server/integrations/openai`, `RECIPE_EVALUATION` queue)
+- Other integrations in `src/server/integrations/`: `google` (OAuth), `mail`, `ntfy` (push notifications)
 
 Remember: Prioritize type safety, error handling, and user experience in all implementations. Follow the established patterns and maintain consistency with the existing codebase architecture.
