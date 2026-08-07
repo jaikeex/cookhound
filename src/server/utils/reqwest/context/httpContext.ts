@@ -31,7 +31,8 @@ import {
 //#
 //# This AsyncLocalStorage scope is opt-in and is opened in exactly two places:
 //#   (1) API routes, where the withRequestContext pipe calls runRequestContext(req, …)
-//#   (2) Server Component reads explicitly wrapped in ensureRenderContext.
+//#   (2) Server Component renders explicitly wrapped in ensureRenderContext - either a
+//#       single serverData read, or a whole page body when it has several of them.
 //#
 //# Next.js has nothing to do with this, any call outside those two paths runs with no
 //# scope, so its getters return null and the logger labels the line [server].

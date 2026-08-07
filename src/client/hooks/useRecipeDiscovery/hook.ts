@@ -2,7 +2,10 @@
 
 import { useCallback, useMemo, useState } from 'react';
 import type { RecipeForDisplayDTO } from '@/common/types';
-import { SEARCH_QUERY_SEPARATOR } from '@/common/constants';
+import {
+    RECIPE_DISCOVERY_PER_PAGE,
+    SEARCH_QUERY_SEPARATOR
+} from '@/common/constants';
 import { chqc } from '@/client/data';
 import type { InfiniteData } from '@tanstack/react-query';
 
@@ -23,8 +26,12 @@ import type { InfiniteData } from '@tanstack/react-query';
 ///
 //§—————————————————————————————————————————————————————————————————————————————————————————————§//
 
-const PER_PAGE = 24;
+const PER_PAGE = RECIPE_DISCOVERY_PER_PAGE;
 const MAX_BATCHES = 5;
+
+// Stable identity for "nothing to show", so the recipes memo below does not hand
+// out a fresh array on every render while the active query has no data.
+const NO_RECIPES: RecipeForDisplayDTO[] = [];
 
 /**
  * This hook was written as a unified measure to load a list of recipes anywhere.
@@ -34,7 +41,7 @@ const MAX_BATCHES = 5;
  * and deactivated by removing them all.
  */
 export const useRecipeDiscovery = (
-    initialRecipes: RecipeForDisplayDTO[],
+    initialRecipes: RecipeForDisplayDTO[] | undefined,
     initialQuery: string | string[] = '',
     // When provided, all list/search operations will be scoped to the given user.
     userId?: string
@@ -53,14 +60,18 @@ export const useRecipeDiscovery = (
     //~-----------------------------------------------------------------------------------------~//
     //$                                     SSR CACHE SEED                                      $//
     //
-    // The server already fetched page 1 (list or search results) and streamed it in as
-    // initialRecipes. Seed it into react-query as the first page of the active infinite query
-    // so the client does NOT refetch page 1 over HTTP on mount. initialDataUpdatedAt stamps the
-    // seed as freshly fetched, so it stays within the global staleTime and refetchOnMount is a
-    // no-op for the seeded page.
-    //
-    // Only the query that is active on the INITIAL mount is seeded (mode can change later as the
-    // user types), and only when the server actually provided data.
+    //# The server already fetched page 1 (list or search results) and streamed it in as
+    //# initialRecipes. Seed it into react-query as the first page of the active infinite query
+    //# so the client does NOT refetch page 1 over HTTP on mount. initialDataUpdatedAt stamps the
+    //# seed as freshly fetched, so it stays within the global staleTime and refetchOnMount is a
+    //# no-op for the seeded page.
+    //#
+    //# Only the query that is active on the INITIAL mount is seeded (mode can change later as the
+    //# user types), and only when the server actually provided data.
+    //#
+    //# "Provided data" means the parameter is present, NOT that it is non-empty. An empty array is
+    //# a legitimate answer ("this author has no recipes"). Callers that did not read anything
+    //# pass undefined, which is the only value that means "fetch it yourself".
     //~-----------------------------------------------------------------------------------------~//
 
     const [seededAt] = useState(() => Date.now());
@@ -72,7 +83,7 @@ export const useRecipeDiscovery = (
         InfiniteData<RecipeForDisplayDTO[], number> | undefined
     >(
         () =>
-            initialRecipes.length > 0
+            initialRecipes
                 ? { pages: [initialRecipes], pageParams: [1] }
                 : undefined,
         [initialRecipes]
@@ -142,7 +153,7 @@ export const useRecipeDiscovery = (
                     InfiniteData<RecipeForDisplayDTO[]> | undefined
             )?.pages ?? [];
 
-        if (pages.length === 0) return initialRecipes;
+        if (pages.length === 0) return initialRecipes ?? NO_RECIPES;
 
         return pages.flat();
     }, [activeQuery.data, initialRecipes]);

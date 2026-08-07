@@ -236,6 +236,7 @@ class CookbookService {
  */
 export interface CookbookReads {
     getCookbookByDisplayId(displayId: string): Promise<CookbookDTO>;
+    getCookbooksByOwnerId(ownerId: number): Promise<CookbookDTO[]>;
 }
 
 export const cookbookService = new CookbookService();

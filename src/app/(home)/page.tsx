@@ -8,7 +8,10 @@ import {
     buildLocalizedMetadata
 } from '@/common/utils/seo';
 import { StructuredData } from '@/client/components';
-import { ENV_CONFIG_PUBLIC } from '@/common/constants';
+import {
+    ENV_CONFIG_PUBLIC,
+    RECIPE_DISCOVERY_PER_PAGE
+} from '@/common/constants';
 import { mapServiceErrorForRsc } from '@/server/data/runtime/mapError';
 
 /**
@@ -23,7 +26,7 @@ export const revalidate = 300;
 
 export default async function Home() {
     const recipesForDisplay = serverData.recipe
-        .list(1, 24)
+        .list(1, RECIPE_DISCOVERY_PER_PAGE)
         .catch((error) => mapServiceErrorForRsc(error, `/`));
 
     const websiteSchema = generateWebSiteSchema(ENV_CONFIG_PUBLIC.ORIGIN);

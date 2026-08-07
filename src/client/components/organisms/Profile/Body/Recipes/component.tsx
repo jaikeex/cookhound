@@ -6,10 +6,12 @@ import { classNames } from '@/client/utils';
 import { useRecipeDiscovery } from '@/client/hooks/useRecipeDiscovery/hook';
 import { useMemo } from 'react';
 import type { RecipeCardListGridColumns } from '@/client/components/molecules/List/RecipeCardGrid';
+import type { RecipeForDisplayDTO } from '@/common/types';
 
 export type RecipesProps = Readonly<{
     className?: string;
     cols?: RecipeCardListGridColumns;
+    initialRecipes?: RecipeForDisplayDTO[];
     isCurrentUser: boolean;
     userId: number;
 }>;
@@ -17,11 +19,12 @@ export type RecipesProps = Readonly<{
 export const Recipes: React.FC<RecipesProps> = ({
     className,
     cols,
+    initialRecipes,
     userId,
     isCurrentUser
 }) => {
     const { recipes, loadMore, hasMore, isLoading } = useRecipeDiscovery(
-        [],
+        initialRecipes,
         '',
         userId.toString()
     );

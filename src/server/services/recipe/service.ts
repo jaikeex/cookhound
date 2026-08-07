@@ -1021,6 +1021,11 @@ export interface RecipeReads {
         batch: number,
         perPage: number
     ): Promise<RecipeForDisplayDTO[]>;
+    getUserRecipes(
+        userId: number,
+        batch: number,
+        perPage: number
+    ): Promise<RecipeForDisplayDTO[]>;
 }
 
 export const recipeService = new RecipeService();

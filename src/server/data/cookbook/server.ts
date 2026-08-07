@@ -16,5 +16,22 @@ export const cookbookServerData = {
         ensureRenderContext(() =>
             cookbookReads.getCookbookByDisplayId(displayId)
         ).then(reviveCookbookDates)
+    ),
+
+    /**
+     * The cookbooks of one owner as the current viewer is allowed to see them,
+     * for seeding the profile cookbooks tab.
+     *
+     * Context-bound on purpose: the service filters the list through
+     * canListCookbook, which reads the viewer from the request context. Without
+     * the context the render would silently produce the anonymous view.
+     *
+     * § The result is therefore viewer-specific and must only be rendered on a
+     * § dynamic route. Do not use this on a page that is statically generated or cached.
+     */
+    listByOwner: cache((ownerId: number): Promise<Cookbook[]> =>
+        ensureRenderContext(() =>
+            cookbookReads.getCookbooksByOwnerId(ownerId)
+        ).then((cookbooks) => cookbooks.map(reviveCookbookDates))
     )
 };

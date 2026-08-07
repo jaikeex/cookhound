@@ -1,19 +1,47 @@
 import type { Metadata } from 'next';
 import { ProfileTemplate } from '@/client/components/templates/Profile';
 import { serverData } from '@/server/data';
+import { ensureRenderContext } from '@/server/data/runtime/ensureContext';
 import { mapServiceErrorForRsc } from '@/server/data/runtime/mapError';
 import { ProfileTab } from '@/client/types/core';
 import {
-    SESSION_COOKIE_NAME,
     ENV_CONFIG_PUBLIC,
+    RECIPE_DISCOVERY_PER_PAGE,
     ROUTES
 } from '@/common/constants';
-import { cookies } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
-import { verifySessionFromCookie } from '@/server/utils/session/verify-server';
+import { RequestContext } from '@/server/utils/reqwest/context';
 import React from 'react';
 import { buildLocalizedMetadata } from '@/common/utils/seo';
 import { UserStructuredData } from '@/client/components';
+import { Logger } from '@/server/logger';
+import type { Cookbook, RecipeForDisplayDTO } from '@/common/types';
+
+const log = Logger.getInstance('user-profile-page');
+
+/**
+ * A tab seed is an optimization, never the source of truth: the tab's own query
+ * fetches over http whenever the seed arrives as undefined.
+ */
+const seedOrUnseeded = async <T,>(
+    seed: Promise<T[]>,
+    tab: ProfileTab,
+    userId: number
+): Promise<T[] | undefined> => {
+    try {
+        return await seed;
+    } catch (error: unknown) {
+        log.warn('seed failed - falling back to the client fetch', {
+            error,
+            tab,
+            userId
+        });
+
+        return undefined;
+    }
+};
+
+//|=============================================================================================|//
 
 type UserProfilePageParams = {
     readonly params: Promise<
@@ -26,37 +54,75 @@ type UserProfilePageParams = {
 
 //|=============================================================================================|//
 
-export default async function UserProfilePage({
-    params,
-    searchParams
-}: UserProfilePageParams) {
-    const paramsResolved = await params;
-    const searchParamsResolved = await searchParams;
+async function renderProfile(
+    id: number,
+    incomingTab: ProfileTab | null
+): Promise<React.ReactElement> {
+    //~-----------------------------------------------------------------------------------------~//
+    //$                                     TAB SEED SCOPE                                      $//
+    //#
+    //# Seeded off the INCOMING tab param rather than the resolved one, because the two can only
+    //# differ on a request that redirects instead of rendering (see below) - so the seed is
+    //# always for the tab this response actually shows, and no read is spent on a tab that is
+    //# never mounted. The dashboard tab is settings only and has nothing to seed.
+    //~-----------------------------------------------------------------------------------------~//
 
-    const id = Number(paramsResolved.id);
+    const recipesSeed: Promise<RecipeForDisplayDTO[] | undefined> =
+        incomingTab === ProfileTab.Recipes
+            ? seedOrUnseeded(
+                  serverData.recipe.listByUser(
+                      id,
+                      1,
+                      RECIPE_DISCOVERY_PER_PAGE
+                  ),
+                  ProfileTab.Recipes,
+                  id
+              )
+            : Promise.resolve(undefined);
 
-    if (isNaN(id)) notFound();
+    const cookbooksSeed: Promise<Cookbook[] | undefined> =
+        incomingTab === ProfileTab.Cookbooks
+            ? seedOrUnseeded(
+                  serverData.cookbook.listByOwner(id),
+                  ProfileTab.Cookbooks,
+                  id
+              )
+            : Promise.resolve(undefined);
 
     // Resolve the user BEFORE any redirect or JSX. If the fetch only failed
     // later, deep inside the render, the response status would already be
     // committed as 200 and a missing user would be served as a soft 404.
-    const user = await serverData.user
-        .getById(id)
-        .catch((error) => mapServiceErrorForRsc(error, ROUTES.user.detail(id)));
+    const [user, initialRecipes, initialCookbooks] = await Promise.all([
+        serverData.user
+            .getById(id)
+            .catch((error) =>
+                mapServiceErrorForRsc(error, ROUTES.user.detail(id))
+            ),
+        recipesSeed,
+        cookbooksSeed
+    ]);
 
-    const cookieStore = await cookies();
-    const sessionId = cookieStore.get(SESSION_COOKIE_NAME)?.value;
+    //~-----------------------------------------------------------------------------------------~//
+    //$                                     VIEWER IDENTITY                                     $//
+    //# Read from the ambient context rather than validating the session again. The context this
+    //# render opened already resolved the caller, and its userId is populated only for a session
+    //# that validated, so this is exactly the old isLoggedIn && session.userId === id.
+    //#
+    //# Owner only, deliberately: an admin is not the profile owner and must not land on the
+    //# dashboard tab or see the owner-only controls.
+    //#
+    //# Note this degrades to "guest" if the session lookup failed (buildContext swallows its own
+    //# errors), where the old explicit check threw. That is the better failure for this page - it
+    //# renders public and ProfileTemplate corrects isCurrentUser from useAuth() after hydration.
+    //#
+    //# The answer is handed to the template as its pre-hydration value. Its own useAuth() based
+    //# check cannot resolve until the current-user query lands, and a false negative there costs
+    //# more than a round trip: the dashboard tab would be missing from the tab set the server
+    //# just selected, so the wrong tab mounts and fetches, and the correction effect bounces the
+    //# owner off their own dashboard.
+    //~-----------------------------------------------------------------------------------------~//
 
-    // Check whether the caller is the profile owner, this is important for the default tab
-    // displayed and to hide sensitive info from impostors.
-    let isCurrentUser = false;
-
-    if (sessionId) {
-        const { isLoggedIn, session } = await verifySessionFromCookie();
-        isCurrentUser = isLoggedIn && session?.userId === id;
-    }
-
-    const incomingTab = searchParamsResolved.tab ?? null;
+    const isCurrentUser = RequestContext.getUserId() === id;
 
     let resolvedTab: ProfileTab;
 
@@ -74,9 +140,33 @@ export default async function UserProfilePage({
 
     return (
         <React.Fragment>
-            <ProfileTemplate user={user} initialTab={resolvedTab} />
+            <ProfileTemplate
+                user={user}
+                initialTab={resolvedTab}
+                initialIsCurrentUser={isCurrentUser}
+                initialRecipes={initialRecipes}
+                initialCookbooks={initialCookbooks}
+            />
             <UserStructuredData user={user} />
         </React.Fragment>
+    );
+}
+
+//|=============================================================================================|//
+
+export default async function UserProfilePage({
+    params,
+    searchParams
+}: UserProfilePageParams) {
+    const paramsResolved = await params;
+    const searchParamsResolved = await searchParams;
+
+    const id = Number(paramsResolved.id);
+
+    if (isNaN(id)) notFound();
+
+    return ensureRenderContext(() =>
+        renderProfile(id, searchParamsResolved.tab ?? null)
     );
 }
 

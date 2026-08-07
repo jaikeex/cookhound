@@ -41,5 +41,14 @@ export const recipeServerData = {
             perPage: number
         ): Promise<RecipeForDisplayDTO[]> =>
             recipeReads.searchRecipes(query, batch, perPage)
+    ),
+
+    listByUser: cache(
+        (
+            userId: number,
+            batch: number,
+            perPage: number
+        ): Promise<RecipeForDisplayDTO[]> =>
+            recipeReads.getUserRecipes(userId, batch, perPage)
     )
 };

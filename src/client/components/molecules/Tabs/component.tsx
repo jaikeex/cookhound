@@ -58,6 +58,39 @@ const resolveTabFromParam = (
     return fallbackTab;
 };
 
+/**
+ * Stable identity of a tab, used to track the selection instead of a bare index.
+ *
+ * A caller may change the tab set while this is mounted - the profile grows a
+ * dashboard tab once auth resolves, which pushes every other tab one place
+ * along - and an index would then silently point at whichever tab shifted into
+ * it. Tabs without a param fall back to their index, which is the old behavior.
+ *
+ * @param tab - The tab to identify, or undefined for an out-of-range index
+ * @param index - Position of the tab in the current set
+ */
+const tabIdentity = (tab: TabContent | undefined, index: number): string =>
+    tab?.param ?? String(index);
+
+/**
+ * Resolves an identity back to its position in the current tab set.
+ *
+ * @param identity - The identity to look up
+ * @param tabs - The tab definitions to search
+ * @param fallbackTab - The index to fall back to when the identity is gone
+ */
+const resolveIndexFromIdentity = (
+    identity: string,
+    tabs: TabContent[],
+    fallbackTab: number
+): number => {
+    const tabIndex = tabs.findIndex(
+        (tab, index) => tabIdentity(tab, index) === identity
+    );
+
+    return tabIndex === -1 ? Math.max(fallbackTab, 0) : tabIndex;
+};
+
 type TabsParamSyncProps = Readonly<{
     paramKey: string;
     onParamChange: () => void;
@@ -98,7 +131,15 @@ export const Tabs: React.FC<TabsProps> = ({
 
     const tabWidth = 100 / tabs.length;
 
-    const [currentTab, setCurrentTab] = useState<number>(activeTab);
+    const [currentIdentity, setCurrentIdentity] = useState<string>(() =>
+        tabIdentity(tabs[activeTab], activeTab)
+    );
+
+    const currentTab = resolveIndexFromIdentity(
+        currentIdentity,
+        tabs,
+        activeTab
+    );
 
     const updateUrlParam = useCallback(
         (index: number) => {
@@ -124,11 +165,11 @@ export const Tabs: React.FC<TabsProps> = ({
 
     const handleTabChange = useCallback(
         (index: number) => () => {
-            setCurrentTab(index);
+            setCurrentIdentity(tabIdentity(tabs[index], index));
             updateUrlParam(index);
             onTabChange?.(index);
         },
-        [onTabChange, updateUrlParam]
+        [onTabChange, tabs, updateUrlParam]
     );
 
     const handleParamChange = useCallback(() => {
@@ -139,7 +180,9 @@ export const Tabs: React.FC<TabsProps> = ({
             paramKey
         );
 
-        setCurrentTab(resolveTabFromParam(urlParam, tabs, activeTab));
+        const index = resolveTabFromParam(urlParam, tabs, activeTab);
+
+        setCurrentIdentity(tabIdentity(tabs[index], index));
     }, [paramKey, tabs, activeTab]);
 
     return (

@@ -1,5 +1,6 @@
 import React from 'react';
 import { serverData } from '@/server/data';
+import { ensureRenderContext } from '@/server/data/runtime/ensureContext';
 import { mapServiceErrorForRsc } from '@/server/data/runtime/mapError';
 import { CookbookVisibility } from '@/common/types';
 import { notFound } from 'next/navigation';
@@ -24,10 +25,9 @@ type CookbookPageParams = {
 
 //|=============================================================================================|//
 
-export default async function Page({ params }: CookbookPageParams) {
-    const paramsResolved = await params;
-    const cookbookDisplayId = paramsResolved.displayId;
-
+async function renderCookbook(
+    cookbookDisplayId: string
+): Promise<React.ReactElement> {
     const [user, cookbook] = await Promise.all([
         getCurrentUser(),
         serverData.cookbook
@@ -87,6 +87,27 @@ export default async function Page({ params }: CookbookPageParams) {
             <CookbookTemplate cookbook={cookbook} />
         </React.Fragment>
     );
+}
+
+//|=============================================================================================|//
+
+export default async function Page({ params }: CookbookPageParams) {
+    const paramsResolved = await params;
+
+    //~-----------------------------------------------------------------------------------------~//
+    //$                                 ONE CONTEXT PER RENDER                                  $//
+    //
+    // Both reads in the body need the caller: getCurrentUser resolves the viewer, and
+    // getCookbookByDisplayId gates private cookbooks through canViewCookbook. Run in parallel
+    // they each build their own context, because the idempotency check inside
+    // ensureRenderContext only sees a store that is already active around the caller - so that
+    // is two session validations for one render, each able to refresh the session ttl in redis.
+    //
+    // Opening one context here makes both of them no-ops. Costs nothing: the page reads cookies
+    // through those very calls anyway, so it was never static.
+    //~-----------------------------------------------------------------------------------------~//
+
+    return ensureRenderContext(() => renderCookbook(paramsResolved.displayId));
 }
 
 //|=============================================================================================|//

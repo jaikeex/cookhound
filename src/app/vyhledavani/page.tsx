@@ -2,7 +2,11 @@ import type { Metadata } from 'next';
 import { SearchTemplate } from '@/client/components/templates/Dashboard/Search';
 import { serverData } from '@/server/data';
 import React from 'react';
-import { ENV_CONFIG_PUBLIC, ROUTES } from '@/common/constants';
+import {
+    ENV_CONFIG_PUBLIC,
+    RECIPE_DISCOVERY_PER_PAGE,
+    ROUTES
+} from '@/common/constants';
 import {
     generateBreadcrumbSchema,
     buildLocalizedMetadata
@@ -19,9 +23,13 @@ export default async function SearchPage({
 }>) {
     const searchQuery = (await searchParams)?.query ?? '';
 
+    // Undefined, not an empty array. With no query the template runs its general
+    // list query rather than a search, and an empty array is a real seed - it
+    // would seed that list as "there are no recipes at all" and, since a short
+    // page ends the infinite query, nothing would ever be fetched.
     const recipesForDisplay = searchQuery
-        ? serverData.recipe.search(searchQuery, 1, 24)
-        : Promise.resolve([]);
+        ? serverData.recipe.search(searchQuery, 1, RECIPE_DISCOVERY_PER_PAGE)
+        : Promise.resolve(undefined);
 
     const breadcrumbItems = [
         {

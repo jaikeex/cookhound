@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useCallback, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { Accordion } from '@/client/components/molecules/Accordion';
 import { ButtonBase } from '@/client/components/atoms/Button/Base';
@@ -25,25 +25,38 @@ const CreateCookbookModal = dynamic(
 
 type CookbooksProps = Readonly<{
     className?: string;
+    initialCookbooks?: Cookbook[];
     isCurrentUser: boolean;
     userId: number;
 }>;
 
 export const Cookbooks: React.FC<CookbooksProps> = ({
     className,
+    initialCookbooks,
     isCurrentUser,
     userId
 }) => {
     const { openModal } = useModal();
 
-    const handleOpenCreateCookbook = React.useCallback(() => {
+    const handleOpenCreateCookbook = useCallback(() => {
         openModal((close) => <CreateCookbookModal close={close} />, {
             hideCloseButton: true,
             disableBackdropClick: true
         });
     }, [openModal]);
 
-    const { data: cookbooks } = chqc.cookbook.useCookbooksByUser(userId, {});
+    /**
+     * The server already read this list for the initially rendered tab and streamed it in.
+     * Seeding it as the query's initial data keeps the client from refetching it on mount:
+     * initialDataUpdatedAt stamps the seed as freshly fetched, so it sits inside the global
+     * staleTime and refetchOnMount finds nothing stale to do.
+     */
+    const [seededAt] = useState(() => Date.now());
+
+    const { data: cookbooks } = chqc.cookbook.useCookbooksByUser(userId, {
+        initialData: initialCookbooks,
+        initialDataUpdatedAt: initialCookbooks ? seededAt : undefined
+    });
 
     const isEmpty = cookbooks?.length === 0;
 

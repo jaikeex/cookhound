@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { type ProfileNavigationItem, ProfileTab } from '@/client/types/core';
+import type { ProfileNavigationItem, ProfileTab } from '@/client/types/core';
 import { Menu } from '@/client/components/molecules/Menu';
 import { useParams, useSearchParams } from 'next/navigation';
 import type { User } from '@/common/types';
@@ -9,13 +9,17 @@ import { classNames } from '@/client/utils';
 import { ProfileHeadDesktop } from '@/client/components/organisms/Profile/Head/Desktop';
 import { useParamsChangeListener } from '@/client/hooks';
 import { ROUTES } from '@/common/constants';
+import {
+    PROFILE_FALLBACK_TAB,
+    resolveProfileTabIndex
+} from '@/client/components/templates/Profile/tabs';
 
 export type DesktopRecipeViewProps = Readonly<{
     className?: string;
     items: ProfileNavigationItem[];
     user: User;
     isCurrentUser: boolean;
-    initialTab?: ProfileTab | null;
+    initialTab: ProfileTab;
 }>;
 
 export const DesktopProfileTemplate: React.FC<DesktopRecipeViewProps> = ({
@@ -23,19 +27,20 @@ export const DesktopProfileTemplate: React.FC<DesktopRecipeViewProps> = ({
     items,
     user,
     isCurrentUser,
-    initialTab = ProfileTab.Dashboard
+    initialTab
 }) => {
     const { id } = useParams();
     const searchParams = useSearchParams();
 
-    const [tab, setTab] = useState<ProfileTab>(
-        initialTab ?? ProfileTab.Dashboard
-    );
+    const [tab, setTab] = useState<ProfileTab>(initialTab);
 
     useParamsChangeListener({
         key: 'tab',
         onChange: () => {
-            setTab(searchParams.get('tab') as ProfileTab);
+            setTab(
+                (searchParams.get('tab') as ProfileTab | null) ??
+                    PROFILE_FALLBACK_TAB
+            );
         }
     });
 
@@ -50,7 +55,7 @@ export const DesktopProfileTemplate: React.FC<DesktopRecipeViewProps> = ({
             <div className="grid grid-cols-4 gap-12 mt-10">
                 <Menu items={menuItems} className="col-span-1" />
                 <div className="col-span-3">
-                    {items.find((item) => item.param === tab)?.content}
+                    {items[resolveProfileTabIndex(items, tab)]?.content}
                 </div>
             </div>
         </article>

@@ -14,7 +14,7 @@ import { ROUTES, SEARCH_QUERY_SEPARATOR } from '@/common/constants';
 import { t } from '@/client/locales';
 
 type SearchTemplateProps = Readonly<{
-    initialRecipes: Promise<RecipeForDisplayDTO[]>;
+    initialRecipes: Promise<RecipeForDisplayDTO[] | undefined>;
     initialQuery?: string;
 }>;
 
