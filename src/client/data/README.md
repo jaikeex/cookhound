@@ -51,8 +51,9 @@ src/client/data/
   plus the `*Options` types.
 
 `revive.ts` is optional — only when output types carry `Date` fields.
-The adapter (and Server Components directly) call it; consumers never
-see it.
+The adapter calls it, and so do the `serverData` wrappers on the server
+(`src/server/data/<domain>/server.ts` imports these helpers); consumers
+never see it.
 
 The barrel exports the keys, the default adapter, the query client, and
 the port type. The raw `<domain>ApiClient` is an adapter implementation
@@ -174,14 +175,35 @@ Keeping the list out of `providers.tsx` means tests can build their own
 wiring. `useRepositories()` throws if no provider is mounted — a
 misconfigured tree fails immediately with a clear message.
 
-### Server Components
+### Server Components — use `serverData`, not this layer
 
-`DataProvider` is React context — only Client Components can read it.
-Server Components call `apiClient.<domain>.*` directly and apply the
-revive helper (imported from `@/client/data/<domain>/revive`)
-themselves. The wire types make this compile-time-enforced: a server
-page that forgets to revive cannot type-check its result as the domain
-type.
+`DataProvider` is React context, so only Client Components can read it.
+Server Components and server actions do **not** use this layer at all —
+they use `serverData` (`src/server/data/`), which calls the service
+layer directly in-process:
+
+```ts
+import { serverData } from '@/server/data';
+
+const user = await serverData.user.getById(id);
+```
+
+This deliberately replaces the older "call `apiClient.<domain>.*` from
+the page and revive it yourself" approach, which was an SSR self-fetch:
+the page went out over HTTP to its own API route, paying a second
+request pipeline, extra serialization, and (worst case) a deadlock
+against Next's bounded worker pool. No page in `src/app/` imports
+`apiClient` any more.
+
+The revive helpers in this folder are still the single source of
+DTO→domain mapping — the `serverData` wrappers import them
+(`@/server/data/user/server.ts` → `@/client/data/user/revive`) so both
+transports produce identical domain types. Revival lives in the
+wrapper, not in the page.
+
+See `src/server/data/README.md` for the `ensureRenderContext` rule
+(wrap iff the service reads `RequestContext`, since building one opts
+the route into dynamic rendering).
 
 ---
 
@@ -313,17 +335,23 @@ responsibility and would be tested with MSW.
 
 ---
 > [!IMPORTANT]  
->**No server-side `useRepositories()` exists.** Server Components
-  must call `apiClient.<domain>.*` directly and apply the revive helper
-  themselves. The wire types make forgetting to revive a compile error,
-  but the ergonomics are somewhat unfinished.
+>**No server-side `useRepositories()` exists, and none is needed.**
+  Server Components and server actions use `serverData`
+  (`src/server/data/`), which reaches the service layer directly instead
+  of self-fetching this app's own API routes. Ports, adapters, and
+  `DataProvider` are the client-side path only. The two paths meet at the
+  `revive.ts` helpers, which both call.
 
 > [!NOTE]  
 > **Transport-level navigation side effects.** `ApiRequestWrapper.ts`
   performs `window.location.href = '/error/too-many-requests'` on a 429
-  (client-side) and `notFound()` on a 404 (server-side) before throwing.
+  (branch guarded by `typeof window !== 'undefined'`) and `notFound()` on
+  a 404 (guarded by `typeof window === 'undefined'`) before throwing.
   Every consumer inherits these behaviors. The seam makes moving them to
   a hook, adapter, or route-level error boundary tractable
   (`RequestError.status` is there to dispatch on), but the move is not
-  yet done.
+  yet done. Note the 404 branch is now effectively unreachable — it only
+  fires when `apiClient` runs outside a browser, and since the move to
+  `serverData` nothing renders through it server-side. RSC 404s are
+  raised by the page (or `serverData`), not by the transport.
 
