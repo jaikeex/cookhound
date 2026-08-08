@@ -6,6 +6,7 @@ type RecipeImageProps = Readonly<{
     alt: string | null;
     className?: string;
     height?: number;
+    sizes?: string;
     src: string | null;
     width?: number;
     priority?: boolean;
@@ -15,6 +16,7 @@ export const RecipeImage: React.FC<RecipeImageProps> = ({
     alt,
     className,
     height = 192,
+    sizes,
     src,
     width = 320,
     priority = false
@@ -29,6 +31,7 @@ export const RecipeImage: React.FC<RecipeImageProps> = ({
             )}
             width={width}
             height={height}
+            sizes={sizes}
             placeholder={'blur'}
             blurDataURL={generateImgPlaceholder(80, 80, 80)}
             priority={priority}

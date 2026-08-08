@@ -32,8 +32,7 @@ export const MobileRecipeHead: React.FC<MobileRecipeHeadProps> = ({
         <React.Fragment>
             <RecipeViewImage
                 recipe={recipe}
-                wrapperClassName={'mx-auto max-w-[480px]'}
-                className={'min-w-auto max-w-auto'}
+                wrapperClassName={'mx-auto w-full max-w-[480px]'}
                 priority={true}
                 isPreview={isPreview}
             />

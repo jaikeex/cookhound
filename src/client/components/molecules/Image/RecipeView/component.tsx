@@ -23,6 +23,8 @@ const AddRecipeToCookbookModal = dynamic(
     { ssr: false }
 );
 
+const HERO_IMAGE_SIZES = '(min-width: 768px) 320px, 480px';
+
 export type RecipeViewImageProps = Readonly<{
     className?: string;
     isPreview?: boolean;
@@ -184,16 +186,12 @@ export const RecipeViewImage: React.FC<RecipeViewImageProps> = ({
     //|-----------------------------------------------------------------------------------------|//
 
     return (
-        <div
-            className={classNames(
-                'relative md:min-w-max max-w-max',
-                wrapperClassName
-            )}
-        >
+        <div className={classNames('relative', wrapperClassName)}>
             <RecipeImage
                 alt={recipe.title}
                 className={classNames('', className)}
                 src={recipe.imageUrl}
+                sizes={HERO_IMAGE_SIZES}
                 priority={priority}
             />
 

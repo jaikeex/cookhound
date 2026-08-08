@@ -9,6 +9,9 @@ import ReactCrop, { type Crop, type PixelCrop } from 'react-image-crop';
 import { t } from '@/client/locales';
 import 'react-image-crop/dist/ReactCrop.css';
 
+const MIN_CROP_WIDTH_PX = 640;
+const MIN_CIRCULAR_CROP_WIDTH_PX = 256;
+
 export type ImageCropperModalProps = Readonly<{
     file: File;
     onComplete: (cropped: File) => void;
@@ -27,6 +30,14 @@ export const ImageCropperModal: React.FC<ImageCropperModalProps> = ({
     const { alert } = useSnackbar();
     const imgRef = useRef<HTMLImageElement | null>(null);
     const [imageUrl, setImageUrl] = useState<string>('');
+
+    const minSourceWidth = circularCrop
+        ? MIN_CIRCULAR_CROP_WIDTH_PX
+        : MIN_CROP_WIDTH_PX;
+
+    const [minDisplayWidth, setMinDisplayWidth] = useState<
+        number | undefined
+    >();
 
     // It is suggested in the docs to set initial value here, but it seems pointless.
     // The value will be set on successful loading of the image, and if the load fails
@@ -48,6 +59,34 @@ export const ImageCropperModal: React.FC<ImageCropperModalProps> = ({
         (e: React.SyntheticEvent<HTMLImageElement>) => {
             const img = e.target as HTMLImageElement;
 
+            // The floor applies to the crop, and the crop is aspect-locked, so a short
+            // enough image fails on height even when it is wide enough. No crop of such a
+            // file can satisfy the floor, reject it here rather than letting the user
+            // play with a rectangle that can never be applied.
+            const minSourceHeight = circularCrop
+                ? minSourceWidth
+                : (9 * minSourceWidth) / 16;
+
+            if (
+                img.naturalWidth < minSourceWidth ||
+                img.naturalHeight < minSourceHeight
+            ) {
+                alert({
+                    message: t('app.error.image-dimensions-too-small', {
+                        minWidth: minSourceWidth
+                    }),
+                    variant: 'error'
+                });
+
+                close();
+                return;
+            }
+
+            const scale = img.naturalWidth / img.width;
+            const minWidth = minSourceWidth / scale;
+
+            setMinDisplayWidth(minWidth);
+
             //?—————————————————————————————————————————————————————————————————————————————————?//
             //?                               INITIAL CROP SIZE                                 ?//
             ///
@@ -62,7 +101,16 @@ export const ImageCropperModal: React.FC<ImageCropperModalProps> = ({
 
             const initialCroppedPercentage = 0.8;
 
-            const width = img.width * initialCroppedPercentage;
+            const widthLimitFromHeight = circularCrop
+                ? img.height
+                : (16 * img.height) / 9;
+
+            const width = Math.min(
+                Math.max(img.width * initialCroppedPercentage, minWidth),
+                img.width,
+                widthLimitFromHeight
+            );
+
             const height = circularCrop ? width : (9 * width) / 16;
 
             const initialCrop = {
@@ -75,7 +123,7 @@ export const ImageCropperModal: React.FC<ImageCropperModalProps> = ({
 
             setCrop(initialCrop);
         },
-        [circularCrop]
+        [circularCrop, minSourceWidth, alert, close]
     );
 
     const getCroppedFile = useCallback(
@@ -118,6 +166,23 @@ export const ImageCropperModal: React.FC<ImageCropperModalProps> = ({
 
     const handleApply = useCallback(async () => {
         if (!imgRef.current || !crop?.width || !crop?.height) return;
+
+        // Backstop for the minWidth constraint on the cropper. Rounding at the edges,
+        // or a future change that drops that prop, must not be able to smuggle an
+        // undersized crop through, this is the last point before the file is exported.
+        const scale = imgRef.current.naturalWidth / imgRef.current.width;
+
+        if (crop.width * scale < minSourceWidth - 1) {
+            alert({
+                message: t('app.error.image-dimensions-too-small', {
+                    minWidth: minSourceWidth
+                }),
+                variant: 'error'
+            });
+
+            return;
+        }
+
         try {
             const croppedFile = await getCroppedFile(
                 imgRef.current,
@@ -134,7 +199,7 @@ export const ImageCropperModal: React.FC<ImageCropperModalProps> = ({
 
             close();
         }
-    }, [crop, getCroppedFile, onComplete, close, alert]);
+    }, [crop, getCroppedFile, onComplete, close, alert, minSourceWidth]);
 
     return (
         <div className="flex flex-col items-center w-full h-full gap-4">
@@ -142,10 +207,20 @@ export const ImageCropperModal: React.FC<ImageCropperModalProps> = ({
                 {t('app.form.image-cropper.description')}
             </Typography>
 
+            <Typography
+                variant="body-sm"
+                className="text-center text-gray-600 dark:text-gray-400"
+            >
+                {t('app.form.image-cropper.min-size-hint', {
+                    minWidth: minSourceWidth
+                })}
+            </Typography>
+
             <ReactCrop
                 crop={crop}
                 aspect={circularCrop ? 1 / 1 : 16 / 9}
                 circularCrop={circularCrop}
+                minWidth={minDisplayWidth}
                 onChange={handleCropChange}
                 keepSelection
                 className=" max-h-[50dvh] rounded overflow-hidden"

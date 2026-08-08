@@ -89,7 +89,7 @@ export const DesktopRecipeHead: React.FC<DesktopRecipeHeadProps> = ({
             </div>
 
             <RecipeViewImage
-                className="max-h-[180px] max-w-80"
+                wrapperClassName="w-80 shrink-0"
                 recipe={recipe}
                 priority={true}
                 isPreview={isPreview}
