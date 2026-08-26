@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import type { Ingredient } from '@/common/types';
 import { IngredientRowView } from '@/client/components/molecules/IngredientRow/View';
 import { Typography } from '@/client/components/atoms/Typography';
@@ -28,10 +28,6 @@ export const IngredientsListView: React.FC<IngredientsListViewProps> = ({
 }) => {
     const { recipe, portionSize } = useRecipeHandling();
 
-    const setActiveRecipe = useRecipeSelectionStore(
-        (state) => state.setActiveRecipe
-    );
-
     const selectIngredient = useRecipeSelectionStore(
         (state) => state.selectIngredient
     );
@@ -40,17 +36,23 @@ export const IngredientsListView: React.FC<IngredientsListViewProps> = ({
         (state) => state.deselectIngredient
     );
 
+    // Excludes the preview outright: it renders a recipe being edited rather
+    // than cooked, and its id can equal the active one.
     const selectedIngredientIds = useRecipeSelectionStore((state) =>
-        state.activeRecipeId === recipe.id
+        !isPreview && state.activeRecipeId === recipe.id
             ? state.selectedIngredientIds
             : EMPTY_SELECTION
     );
 
-    useEffect(() => {
-        if (!isPreview) {
-            setActiveRecipe(recipe.id);
-        }
-    }, [isPreview, recipe.id, setActiveRecipe]);
+    const handleSelect = useCallback(
+        (ingredient: Ingredient) => selectIngredient(recipe.id, ingredient),
+        [recipe.id, selectIngredient]
+    );
+
+    const handleDeselect = useCallback(
+        (ingredient: Ingredient) => deselectIngredient(recipe.id, ingredient),
+        [recipe.id, deselectIngredient]
+    );
 
     const originalPortionSize = recipe.portionSize;
 
@@ -122,8 +124,8 @@ export const IngredientsListView: React.FC<IngredientsListViewProps> = ({
             key={index}
             disabled={isPreview}
             ingredient={ingredient}
-            onDeselected={deselectIngredient}
-            onSelected={selectIngredient}
+            onDeselected={handleDeselect}
+            onSelected={handleSelect}
             variant={'responsive'}
             selected={selectedIngredientIds.includes(ingredient.id)}
         />

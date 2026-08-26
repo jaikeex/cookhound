@@ -8,9 +8,10 @@ import { Divider } from '@/client/components/atoms/Divider';
 import { InstructionsView } from '@/client/components/molecules/Instructions/View';
 import { TabBar } from '@/client/components/molecules/Tabs/Bar';
 import { IngredientsListView } from '@/client/components/organisms/IngredientsList/View';
-import { useAuth } from '@/client/store';
+import { useAuth, useRecipeSelectionStore } from '@/client/store';
 import { classNames } from '@/client/utils';
 import { t } from '@/client/locales';
+import { useEffect, useState } from 'react';
 
 export type RecipeViewBodyProps = Readonly<{
     isPreview?: boolean;
@@ -25,7 +26,17 @@ export const RecipeViewBody: React.FC<RecipeViewBodyProps> = ({
 }) => {
     const { user } = useAuth();
 
-    const [activeSection, setActiveSection] = React.useState(0);
+    const [activeSection, setActiveSection] = useState(0);
+
+    const setActiveRecipe = useRecipeSelectionStore(
+        (state) => state.setActiveRecipe
+    );
+
+    useEffect(() => {
+        if (!isPreview) {
+            setActiveRecipe(recipe.id);
+        }
+    }, [isPreview, recipe.id, setActiveRecipe]);
 
     const displayShoppingListButton = user && !isPreview;
 
@@ -110,6 +121,7 @@ export const RecipeViewBody: React.FC<RecipeViewBodyProps> = ({
 
                     <InstructionsView
                         className={'pt-4 @recipe:pt-0'}
+                        isPreview={isPreview}
                         recipe={recipe}
                     />
 
