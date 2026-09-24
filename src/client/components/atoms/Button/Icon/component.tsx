@@ -14,7 +14,11 @@ export type IconButtonProps = Readonly<{
     onPointerDown?: (event: React.PointerEvent) => void;
     size?: number;
     tabIndex?: number;
-}>;
+}> &
+    Pick<
+        React.ButtonHTMLAttributes<HTMLButtonElement>,
+        'aria-label' | 'aria-pressed'
+    >;
 
 export const IconButton: React.FC<IconButtonProps> = React.forwardRef<
     HTMLButtonElement,

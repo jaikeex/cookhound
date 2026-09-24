@@ -2,9 +2,12 @@ export type ViewPortVariant = 'desktop' | 'mobile';
 
 export type SnackbarVariant = 'success' | 'error' | 'info';
 
+export type SnackbarPosition = 'top' | 'bottom';
+
 export type AlertPayload = {
     message: string;
     variant: SnackbarVariant;
+    position?: SnackbarPosition;
 };
 
 export type ProfileNavigationItem = {

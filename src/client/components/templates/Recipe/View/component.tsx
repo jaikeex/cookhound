@@ -2,6 +2,7 @@ import React from 'react';
 import { RecipeFlaggedGate } from './FlaggedGate';
 import { RecipeVisitPing } from './VisitPing';
 import { RecipeViewLayout } from './Layout';
+import { RecipeWakeLockOverlay } from '@/client/components/organisms/Recipe/View/WakeLockOverlay';
 import type { Recipe } from '@/common/types';
 import { RecipeHandlingProvider } from '@/client/store/RecipeHandlingContext';
 import { FlaggedAuthorTemplate } from '@/client/components/templates/Recipe/Flagged';
@@ -43,6 +44,8 @@ export const RecipeViewTemplate: React.FC<RecipeViewProps> = ({ recipe }) => {
             <RecipeHandlingProvider recipe={recipe}>
                 <RecipeViewLayout />
             </RecipeHandlingProvider>
+
+            <RecipeWakeLockOverlay key={recipe.id} />
         </React.Fragment>
     );
 };

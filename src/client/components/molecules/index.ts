@@ -29,3 +29,4 @@ export * from './Tabs';
 export * from './Table';
 export * from './Tag';
 export * from './ThemeSwitcher';
+export * from './WakeLockToggle';

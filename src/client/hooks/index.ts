@@ -17,6 +17,7 @@ export * from './useRecipeFormController';
 export * from './useRunOnce';
 export * from './useScreenSize';
 export * from './useUnsavedChangesWarning';
+export * from './useWakeLock';
 export * from './useShoppingList';
 export * from './useKeyPress';
 export * from './useLogout';

@@ -12,7 +12,7 @@ import Link from 'next/link';
 import { useAuth } from '@/client/store';
 import { Sidebar } from '@/client/components/molecules/Sidebar';
 import { NavMenu } from './Menu';
-import { TOP_NAVBAR_ID } from '@/client/constants';
+import { TOP_NAVBAR_ACTIONS_SLOT_ID, TOP_NAVBAR_ID } from '@/client/constants';
 import { t } from '@/client/locales';
 import { classNames } from '@/client/utils';
 import { usePathname } from 'next/navigation';
@@ -68,15 +68,20 @@ export const TopNavigation: React.FC<TopNavigationProps> = () => {
             {/*?                                MOBILE RIGHT SIDE                                ?*/}
             {/*|---------------------------------------------------------------------------------|*/}
 
-            <button
-                onClick={handleOpenSidebar}
-                className={classNames(
-                    'flex items-center justify-center w-10 h-12',
-                    'block md:hidden'
-                )}
-            >
-                <Avatar size="md" src={avatarSrc || 'anonymous'} />
-            </button>
+            <div className="flex items-center gap-2 md:hidden">
+                {/* Pages portal their own actions in here */}
+                <div
+                    id={TOP_NAVBAR_ACTIONS_SLOT_ID}
+                    className="flex items-center gap-2"
+                />
+
+                <button
+                    onClick={handleOpenSidebar}
+                    className="flex items-center justify-center w-10 h-12"
+                >
+                    <Avatar size="md" src={avatarSrc || 'anonymous'} />
+                </button>
+            </div>
 
             {/*|---------------------------------------------------------------------------------|*/}
             {/*?                                DESKTOP RIGHT SIDE                               ?*/}

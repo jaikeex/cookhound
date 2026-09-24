@@ -20,6 +20,7 @@ import ExitIcon from './exit.svg';
 import FlagIcon from './flag.svg';
 import HomeIcon from './home.svg';
 import InfoIcon from './info.svg';
+import LightbulbIcon from './lightbulb.svg';
 import LinkIcon from './link.svg';
 import MinusIcon from './minus.svg';
 import MoonIcon from './moon.svg';
@@ -56,6 +57,7 @@ export const basicSvg = {
     FlagIcon,
     HomeIcon,
     InfoIcon,
+    LightbulbIcon,
     LinkIcon,
     MinusIcon,
     MoonIcon,
