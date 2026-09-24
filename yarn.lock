@@ -3382,15 +3382,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/cookie@npm:^1.0.0":
-  version: 1.0.0
-  resolution: "@types/cookie@npm:1.0.0"
-  dependencies:
-    cookie: "npm:*"
-  checksum: 10c0/d471539d289c6d9c6ab2986a881b10a55c9e489c2d35da0d1bdbbabdca9a8125de4cbc007bb525060265c64c14288c690f991ba6d84eea8c6ddacaa150179557
-  languageName: node
-  linkType: hard
-
 "@types/d3-array@npm:3.0.3":
   version: 3.0.3
   resolution: "@types/d3-array@npm:3.0.3"
@@ -4884,7 +4875,6 @@ __metadata:
     "@tanstack/react-query": "npm:^5.101.2"
     "@testing-library/dom": "npm:^10.4.2"
     "@testing-library/react": "npm:^16.3.3"
-    "@types/cookie": "npm:^1.0.0"
     "@types/node": "npm:^22.9.0"
     "@types/pg": "npm:^8.23.1"
     "@types/react": "npm:^19.3.0"
@@ -4894,7 +4884,7 @@ __metadata:
     argon2: "npm:^0.45.1"
     bullmq: "npm:^5.81.5"
     class-transformer: "npm:^0.5.1"
-    cookie: "npm:^1.1.1"
+    cookie: "npm:^2.0.1"
     critters: "npm:^0.0.25"
     dotenv: "npm:^17.4.2"
     eslint: "npm:^10.10.0"
@@ -4935,17 +4925,10 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"cookie@npm:*":
+"cookie@npm:^2.0.1":
   version: 2.0.1
   resolution: "cookie@npm:2.0.1"
   checksum: 10c0/dcf3bd6ec9d0f4f32be7575e23242866cb53be55fc3d4cf36215638596661cec1327a3b4ca286ba15eba8f2abd443e422b8c5f708af4ea9f75b4d3dedc67ee4c
-  languageName: node
-  linkType: hard
-
-"cookie@npm:^1.1.1":
-  version: 1.1.1
-  resolution: "cookie@npm:1.1.1"
-  checksum: 10c0/79c4ddc0fcad9c4f045f826f42edf54bcc921a29586a4558b0898277fa89fb47be95bc384c2253f493af7b29500c830da28341274527328f18eba9f58afa112c
   languageName: node
   linkType: hard
 

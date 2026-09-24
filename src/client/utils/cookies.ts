@@ -63,7 +63,9 @@ export const setCookie = (
         ...opts
     } as Required<CookieOptions>;
 
-    document.cookie = cookie.serialize(name, encodeURIComponent(value), {
+    document.cookie = cookie.stringifySetCookie({
+        name,
+        value: encodeURIComponent(value),
         ...other,
         sameSite:
             (sameSite?.toLowerCase() as 'lax' | 'strict' | 'none') ?? 'lax',
@@ -81,7 +83,7 @@ export const setCookie = (
 export const getCookie = (name: string): string | null => {
     if (typeof document === 'undefined') return null;
 
-    const parsed = cookie.parse(document.cookie);
+    const parsed = cookie.parseCookie(document.cookie);
     const raw = parsed[name];
 
     return raw ? decodeURIComponent(raw) : null;

@@ -4,7 +4,7 @@ import {
     SESSION_HINT_COOKIE_NAME
 } from '@/common/constants/general';
 import { ONE_MONTH_IN_SECONDS } from '@/common/constants/time';
-import { serialize } from 'cookie';
+import { stringifySetCookie } from 'cookie';
 import { deleteCookie } from '@/server/utils/reqwest/cookies';
 
 //|=============================================================================================|//
@@ -26,7 +26,9 @@ export const createSessionCookieHeaders = (
     const maxAge = keepLoggedIn ? ONE_MONTH_IN_SECONDS : undefined;
     const secure = ENV_CONFIG_PUBLIC.ENV !== 'development';
 
-    const sessionCookie = serialize(SESSION_COOKIE_NAME, sessionId, {
+    const sessionCookie = stringifySetCookie({
+        name: SESSION_COOKIE_NAME,
+        value: sessionId,
         httpOnly: true,
         sameSite: 'strict',
         path: '/',
@@ -35,7 +37,9 @@ export const createSessionCookieHeaders = (
         maxAge
     });
 
-    const hintCookie = serialize(SESSION_HINT_COOKIE_NAME, '1', {
+    const hintCookie = stringifySetCookie({
+        name: SESSION_HINT_COOKIE_NAME,
+        value: '1',
         httpOnly: false,
         sameSite: 'strict',
         path: '/',
