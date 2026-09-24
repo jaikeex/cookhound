@@ -89,7 +89,8 @@
         "vitest": "^2.1.1"
     },
     "resolutions": {
-        "pg": "^8.23.0"
+        "pg": "^8.23.0",
+        "@types/pg": "^8.23.0"
     },
     "browserslist": [
         "defaults and fully supports es6-module",
