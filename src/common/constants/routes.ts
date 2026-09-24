@@ -52,6 +52,12 @@ export type UserPath = `${typeof SEGMENTS.user}/${string | number}`;
 /** The search path, bare or with an (already url-encoded) query. */
 export type SearchPath = '/vyhledavani' | `/vyhledavani?query=${string}`;
 
+/**
+ * Query param carrying the path to return to after signing in. Shared by the login page and
+ * the restricted-route redirect; read it through `sanitizeReturnTarget`, never raw.
+ */
+export const RETURN_TARGET_PARAM = 'target';
+
 //~—————————————————————————————————————————————————————————————————————————————————————————————~//
 //$                                       ROUTE REGISTRY                                        $//
 //~—————————————————————————————————————————————————————————————————————————————————————————————~//
@@ -169,6 +175,10 @@ export const ROUTES = {
 
     auth: {
         login: `${SEGMENTS.auth}/prihlaseni`,
+
+        loginReturningTo: (target: string) =>
+            `${SEGMENTS.auth}/prihlaseni?${RETURN_TARGET_PARAM}=${encodeURIComponent(target)}` as const,
+
         register: `${SEGMENTS.auth}/registrace`,
         resetPassword: `${SEGMENTS.auth}/reset-hesla`,
         verifyEmail: `${SEGMENTS.auth}/verify-email`,

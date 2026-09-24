@@ -75,7 +75,7 @@ export const Star: React.FC<StarProps> = ({
                 highlight && 'scale-105',
                 pulse && 'animate-rating-pulse',
                 'transition-all duration-200',
-                disabled ? 'cursor-default' : 'cursor-pointer',
+                disabled ? 'cursor-not-allowed' : 'cursor-pointer',
                 className
             )}
         />

@@ -14,6 +14,7 @@ import ReactDOM from 'react-dom';
 import { generateRandomId } from '@/client/utils';
 
 const AUTO_DISMISS = 4000;
+const ACTION_AUTO_DISMISS = 10000;
 const MAX_SNACKBARS = 3;
 
 const SNACKBAR_POSITIONS: readonly SnackbarPosition[] = ['top', 'bottom'];
@@ -59,16 +60,17 @@ export const SnackbarProvider: React.FC<SnackbarProviderProps> = ({
     const activeAlertIds = activeAlerts.join(',');
 
     useEffect(() => {
-        if (activeAlertIds.length > 0) {
-            const timer = setTimeout(
-                () =>
-                    setActiveAlerts((alerts) =>
-                        alerts.slice(0, alerts.length - 1)
-                    ),
-                AUTO_DISMISS
-            );
-            return () => clearTimeout(timer);
-        }
+        if (activeAlerts.length === 0) return;
+
+        const oldest = activeAlerts[activeAlerts.length - 1];
+
+        const timer = setTimeout(
+            () =>
+                setActiveAlerts((alerts) => alerts.slice(0, alerts.length - 1)),
+            oldest?.action ? ACTION_AUTO_DISMISS : AUTO_DISMISS
+        );
+
+        return () => clearTimeout(timer);
     }, [activeAlertIds, activeAlerts]);
 
     const alert = useCallback((alert: AlertPayload) => {
@@ -128,6 +130,7 @@ export const SnackbarProvider: React.FC<SnackbarProviderProps> = ({
                                     }}
                                 >
                                     <Snackbar
+                                        action={alertObj.action}
                                         variant={alertObj.variant}
                                         message={alertObj.message}
                                         onClose={removeAlert(alertObj.id)}

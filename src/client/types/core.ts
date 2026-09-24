@@ -4,7 +4,13 @@ export type SnackbarVariant = 'success' | 'error' | 'info';
 
 export type SnackbarPosition = 'top' | 'bottom';
 
+export type AlertAction = {
+    href: string;
+    label: string;
+};
+
 export type AlertPayload = {
+    action?: AlertAction;
     message: string;
     variant: SnackbarVariant;
     position?: SnackbarPosition;

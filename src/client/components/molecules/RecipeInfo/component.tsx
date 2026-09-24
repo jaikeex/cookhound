@@ -24,6 +24,16 @@ const classConfig = {
     innerGap: {
         sm: 'gap-1',
         md: 'gap-2'
+    },
+    strip: {
+        container: 'grid grid-flow-col auto-cols-fr',
+        item: 'justify-center px-2 pt-2',
+        containerReset: '@recipe:flex',
+        itemReset: '@recipe:justify-start @recipe:p-0',
+        gapReset: {
+            sm: '@recipe:gap-2',
+            md: '@recipe:gap-6'
+        }
     }
 };
 
@@ -35,6 +45,7 @@ type RecipeInfoProps = Readonly<{
     onDecrementPortionSize?: () => void;
     onIncrementPortionSize?: () => void;
     size?: RecipeInfoSize;
+    strip?: boolean | 'responsive';
     time?: number | null;
     typographyVariant?: TypographyVariant;
     verbose?: boolean | 'responsive';
@@ -48,22 +59,35 @@ export const RecipeInfo: React.FC<RecipeInfoProps> = ({
     onDecrementPortionSize,
     onIncrementPortionSize,
     size = 'md',
+    strip = false,
     time,
     typographyVariant = 'body-sm',
     verbose
 }) => {
+    const isResponsiveStrip = strip === 'responsive';
+
+    const itemClassName = classNames(
+        'flex items-center',
+        classConfig.innerGap[size],
+        strip && classConfig.strip.item,
+        isResponsiveStrip && classConfig.strip.itemReset
+    );
+
     return (
         <div
             className={classNames(
-                `flex ${layout === 'vertical' ? 'flex-col items-start' : 'items-center'}`,
-                classConfig.gap[size],
+                strip ? classConfig.strip.container : 'flex',
+                layout === 'vertical' ? 'flex-col items-start' : 'items-center',
+                strip ? null : classConfig.gap[size],
+                isResponsiveStrip && [
+                    classConfig.strip.containerReset,
+                    classConfig.strip.gapReset[size]
+                ],
                 className
             )}
         >
             {time ? (
-                <div
-                    className={`flex items-center ${classConfig.innerGap[size]}`}
-                >
+                <div className={itemClassName}>
                     <Icon name={'time'} size={classConfig.iconSize[size]} />
                     <Typography
                         variant={typographyVariant}
@@ -103,9 +127,7 @@ export const RecipeInfo: React.FC<RecipeInfoProps> = ({
             ) : null}
 
             {portionSize ? (
-                <div
-                    className={`flex items-center ${classConfig.innerGap[size]}`}
-                >
+                <div className={itemClassName}>
                     <Icon name={'servings'} size={classConfig.iconSize[size]} />
                     <Typography
                         variant={typographyVariant}

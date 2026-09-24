@@ -21,17 +21,14 @@ export const MobileRecipeViewSkeleton: React.FC<
                 {/* Recipe title skeleton */}
                 <SkeletonBox className={'h-8 w-64 mx-auto'} />
 
-                {/* Recipe info and rating row */}
-                <div className={'flex items-center gap-4'}>
-                    <div className={'flex justify-between gap-1 w-full'}>
-                        <div className={'flex gap-1'}>
-                            <SkeletonBox className={'h-10 w-20'} />
-                            <SkeletonBox className={'h-10 w-20'} />
-                        </div>
-
-                        <SkeletonBox className={'h-10 w-28'} />
-                    </div>
+                {/* Rating  under the title */}
+                <div className={'flex flex-col items-center gap-1 -mt-2'}>
+                    <SkeletonBox className={'h-6 w-36'} />
+                    <SkeletonBox className={'h-4 w-28'} />
                 </div>
+
+                {/* Recipe info strip */}
+                <SkeletonBox className={'h-12 w-full rounded-lg'} />
 
                 {/* Divider */}
                 <div

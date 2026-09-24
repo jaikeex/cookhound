@@ -94,11 +94,11 @@ export const useCooldown = (
         if (!isOnCooldown) return;
 
         /**
-         * This is what tracks the remaining time. The interval here can be changed as needed.
+         * This is what tracks the remaining time.
          */
         const interval = setInterval(() => {
             updateCooldownState();
-        }, 2000);
+        }, 1000);
         return () => clearInterval(interval);
         //§ This is important as fuck. If this fires on every function update the browser blows up.
         // eslint-disable-next-line react-hooks/exhaustive-deps

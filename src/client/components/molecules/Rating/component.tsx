@@ -1,13 +1,11 @@
 'use client';
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { classNames } from '@/client/utils';
+import { classNames, cooldownCaption } from '@/client/utils';
 import { Star, type StarState } from '@/client/components/atoms/Star';
-import { Tooltip } from '@/client/components/atoms/Tooltip';
 import { Typography } from '@/client/components/atoms/Typography';
 import { generateStars } from '@/client/components/molecules/Rating/utils';
-import { getScreenSize, useCooldown } from '@/client/hooks';
-import { useSnackbar } from '@/client/store';
+import { useCooldown } from '@/client/hooks';
 import { t } from '@/client/locales';
 
 export type RatingSize = 'sm' | 'md' | 'lg';
@@ -25,6 +23,7 @@ export type RatingProps = Readonly<{
     fill?: 'gold' | 'silver' | 'bronze';
     iconSize?: number;
     onClick?: (rating: number) => void;
+    onDisabledClick?: () => void;
     rating: number | null;
     size?: RatingSize;
 }>;
@@ -39,14 +38,12 @@ export const Rating: React.FC<RatingProps> = ({
     fill = 'gold',
     iconSize = 24,
     onClick,
+    onDisabledClick,
     rating,
     size = 'md'
 }) => {
-    const { alert } = useSnackbar();
-
     const [isHovered, setIsHovered] = useState(false);
     const [isPulsing, setIsPulsing] = useState(false);
-    const [isTooltipVisible, setIsTooltipVisible] = useState(false);
 
     const hasRating = rating !== null;
 
@@ -56,7 +53,6 @@ export const Rating: React.FC<RatingProps> = ({
     );
 
     const isSubmitting = useRef(false);
-    const ref = useRef<HTMLDivElement | null>(null);
 
     const [stars, setStars] = useState<StarState[]>(generateStars(rating ?? 0));
 
@@ -73,34 +69,13 @@ export const Rating: React.FC<RatingProps> = ({
         [isOnCooldown, disabled]
     );
 
-    const handleMouseEnter = useCallback(() => {
-        setIsTooltipVisible(true);
-    }, []);
-
     const handleMouseLeave = useCallback(() => {
         setIsHovered(false);
-        setIsTooltipVisible(false);
         setStars(generateStars(rating ?? 0));
     }, [rating]);
 
     const handleClick = useCallback(
         (event: React.MouseEvent<HTMLDivElement>) => {
-            // Read at click time rather than subscribing: the breakpoint never
-            // affects what this component renders, and a grid can mount a
-            // hundred of these at once.
-            const { isMobile } = getScreenSize();
-
-            if (isOnCooldown && isMobile) {
-                alert({
-                    message: t('app.recipe.you-can-rate-again-in', {
-                        seconds: remainingTime
-                            ? Math.round(remainingTime / 1000)
-                            : 0
-                    }),
-                    variant: 'info'
-                });
-            }
-
             if (!onClick || isOnCooldown || isSubmitting.current) return;
 
             isSubmitting.current = true;
@@ -133,7 +108,7 @@ export const Rating: React.FC<RatingProps> = ({
                 setIsPulsing(false);
             }, 1000);
         },
-        [onClick, isOnCooldown, startCooldown, cooldown, alert, remainingTime]
+        [onClick, isOnCooldown, startCooldown, cooldown]
     );
 
     useEffect(() => {
@@ -144,23 +119,32 @@ export const Rating: React.FC<RatingProps> = ({
         setStars(generateStars(rating ?? 0));
     }, [rating, isPulsing]);
 
+    const caption = isOnCooldown
+        ? cooldownCaption(Math.max(1, Math.ceil(remainingTime / 1000)))
+        : hasRating
+          ? null
+          : t('app.recipe.not-yet-rated');
+
+    // A disabled widget still reacts to clicks when a fallback handler is supplied,
+    // so the cursor has to keep advertising that
+    const isClickable = disabled ? Boolean(onDisabledClick) : !isOnCooldown;
+
     return (
         <div className={classNames('relative', className)}>
             <div
-                ref={ref}
                 className={classNames(
-                    'flex items-center max-w-fit',
+                    'flex items-center max-w-fit mx-auto',
                     classConfig.gap[size],
-                    (disabled || isOnCooldown) && 'opacity-80'
+                    (disabled || isOnCooldown) && 'opacity-80',
+                    isOnCooldown && 'cursor-not-allowed'
                 )}
                 onMouseLeave={handleMouseLeave}
-                onClick={disabled ? undefined : handleClick}
-                onMouseEnter={handleMouseEnter}
+                onClick={disabled ? onDisabledClick : handleClick}
             >
                 {stars.map((star, index) => (
                     <Star
                         key={index}
-                        disabled={disabled || isOnCooldown}
+                        disabled={!isClickable}
                         onMouseMove={handleMouseMove(index)}
                         state={star}
                         iconSize={iconSize}
@@ -182,20 +166,12 @@ export const Rating: React.FC<RatingProps> = ({
                 ))}
             </div>
 
-            <Tooltip
-                text={`${t('app.recipe.you-can-rate-again-in', {
-                    seconds: remainingTime
-                        ? Math.round(remainingTime / 1000)
-                        : 0
-                })}`}
-                className={'w-36 max-w-36 hidden md:block'}
-                visible={isOnCooldown && isTooltipVisible}
-                targetRef={ref}
-            />
-
-            {!hasRating ? (
-                <Typography variant={'body-sm'} className="w-fit mx-auto mt-1">
-                    {t('app.recipe.not-yet-rated')}
+            {caption ? (
+                <Typography
+                    variant={'body-sm'}
+                    className="w-fit mx-auto mt-1 tabular-nums"
+                >
+                    {caption}
                 </Typography>
             ) : null}
         </div>

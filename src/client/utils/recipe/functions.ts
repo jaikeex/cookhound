@@ -1,4 +1,5 @@
 import { multiplyNumberInString } from '@/client/utils';
+import { t } from '@/client/locales';
 
 export const scaleIngredientsToPortionSize = <
     T extends { quantity: string | null }
@@ -21,4 +22,11 @@ export const scaleIngredientsToPortionSize = <
         ...ing,
         quantity: multiplyNumberInString(ing.quantity, coef)
     }));
+};
+
+export const cooldownCaption = (seconds: number): string => {
+    if (seconds === 1) return t('app.recipe.rate-again-in.one', { seconds });
+    if (seconds <= 4) return t('app.recipe.rate-again-in.few', { seconds });
+
+    return t('app.recipe.rate-again-in.many', { seconds });
 };

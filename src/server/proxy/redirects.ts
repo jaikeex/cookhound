@@ -1,5 +1,9 @@
 import { NextResponse } from 'next/server';
-import { ENV_CONFIG_PUBLIC, ROUTES } from '@/common/constants';
+import {
+    ENV_CONFIG_PUBLIC,
+    RETURN_TARGET_PARAM,
+    ROUTES
+} from '@/common/constants';
 import { MiddlewareError } from '@/server/error';
 
 export function redirectToRoot(): never {
@@ -21,7 +25,7 @@ export function redirectToRestricted(): never {
 export function redirectToRestrictedWithLogin(pathname: string): never {
     const params = new URLSearchParams();
     params.set('anonymous', 'true');
-    params.set('target', pathname);
+    params.set(RETURN_TARGET_PARAM, pathname);
 
     throw new MiddlewareError(
         'Unauthorized',

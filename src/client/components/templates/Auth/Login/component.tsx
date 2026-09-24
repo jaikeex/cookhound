@@ -19,6 +19,7 @@ import { chqc, QUERY_KEYS } from '@/client/data';
 import { useQueryClient } from '@tanstack/react-query';
 import { AppEvent, eventBus } from '@/client/events';
 import { ROUTES } from '@/common/constants';
+import { sanitizeReturnTarget } from '@/common/utils/params';
 import { t } from '@/client/locales';
 
 //~---------------------------------------------------------------------------------------------~//
@@ -81,7 +82,8 @@ export const LoginTemplate: React.FC<LoginTemplateProps> = ({
 
             alert({ message: t('auth.success.login'), variant: 'success' });
             formRef.current?.reset();
-            router.push(callbackUrl ?? '/');
+
+            router.push(sanitizeReturnTarget(callbackUrl) ?? ROUTES.home);
         },
         [alert, callbackUrl, router, setUser]
     );

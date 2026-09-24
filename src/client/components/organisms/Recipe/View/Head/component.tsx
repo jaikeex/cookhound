@@ -3,43 +3,31 @@
 import * as React from 'react';
 import type { Recipe } from '@/common/types';
 import { Rating } from '@/client/components/molecules/Rating';
-import { Tooltip } from '@/client/components/atoms/Tooltip';
 import { Typography } from '@/client/components/atoms/Typography';
 import { RecipeInfo } from '@/client/components/molecules/RecipeInfo';
 import { RecipeViewImage } from '@/client/components/molecules/Image/RecipeView';
 import { TagList } from '@/client/components/molecules/Tag/Display/List';
 import { RecipeAuthorLinkDesktop } from '@/client/components/molecules/RecipeAuthorLink/Desktop';
-import { useAuth, useRecipeHandling } from '@/client/store';
+import { useAuth, useRecipeHandling, useSnackbar } from '@/client/store';
 import { t } from '@/client/locales';
+import { ROUTES } from '@/common/constants';
 
 const classConfig = {
     grid: [
-        'grid grid-cols-[1fr_auto] gap-y-4',
-        "[grid-template-areas:'image_image'_'title_title'_'tags_tags'_'info_rating']",
-        '@recipe:grid-cols-[minmax(0,1fr)_auto_20rem] @recipe:grid-rows-[auto_auto_1fr_auto]',
+        'flex flex-col gap-4',
+        '@recipe:grid @recipe:grid-cols-[minmax(0,1fr)_auto_20rem] @recipe:grid-rows-[auto_auto_1fr_auto]',
         '@recipe:gap-x-12 @recipe:gap-y-2',
         "@recipe:[grid-template-areas:'title_title_image'_'author_rating_image'_'tags_tags_image'_'info_info_image']"
     ].join(' '),
-
     image: [
-        '[grid-area:image] mx-auto w-full max-w-[480px]',
-        '@recipe:mx-0 @recipe:w-80 @recipe:justify-self-end @recipe:self-start'
+        'mx-auto w-full max-w-[480px]',
+        '@recipe:[grid-area:image] @recipe:mx-0 @recipe:w-80 @recipe:justify-self-end @recipe:self-start'
     ].join(' '),
-
-    title: '[grid-area:title] text-center @recipe:text-left',
-
-    author: '[grid-area:author] hidden @recipe:flex @recipe:mt-2',
-
-    rating: '[grid-area:rating] self-center justify-self-end @recipe:mt-2',
-    ratingCentered: [
-        '[grid-area:info-start/info-start/rating-end/rating-end]',
-        'self-center justify-self-center',
-        '@recipe:[grid-area:rating] @recipe:justify-self-end @recipe:mt-2'
-    ].join(' '),
-
-    tags: '[grid-area:tags] mt-2 justify-center @recipe:justify-start @recipe:self-start',
-
-    info: '[grid-area:info] self-center @recipe:mt-4 @recipe:self-end'
+    title: 'text-center @recipe:[grid-area:title] @recipe:text-left',
+    author: 'hidden @recipe:[grid-area:author] @recipe:flex @recipe:mt-2',
+    rating: 'w-full self-center -mt-2 @recipe:[grid-area:rating] @recipe:mt-2 @recipe:justify-self-end',
+    tags: 'mt-2 justify-center @recipe:[grid-area:tags] @recipe:justify-start @recipe:self-start',
+    info: '@recipe:[grid-area:info] @recipe:mt-4 @recipe:self-end'
 };
 
 export type RecipeViewHeadProps = Readonly<{
@@ -53,7 +41,23 @@ export const RecipeViewHead: React.FC<RecipeViewHeadProps> = ({
     onRateRecipe,
     recipe
 }) => {
-    const { user } = useAuth();
+    const { authResolved, user } = useAuth();
+    const { alert } = useSnackbar();
+
+    const handleLockedRating = React.useCallback(
+        () =>
+            alert({
+                message: t('app.general.register-to-rate'),
+                variant: 'info',
+                action: {
+                    label: t('auth.form.login'),
+                    href: ROUTES.auth.loginReturningTo(
+                        `${window.location.pathname}${window.location.search}`
+                    )
+                }
+            }),
+        [alert]
+    );
 
     const { incrementPortionSize, decrementPortionSize, portionSize } =
         useRecipeHandling();
@@ -87,31 +91,28 @@ export const RecipeViewHead: React.FC<RecipeViewHeadProps> = ({
                 />
             )}
 
-            <Tooltip
-                position={'top'}
-                text={t('app.general.anonymous')}
-                disabled={isPreview || !!user}
-                className={
-                    hasInfo ? classConfig.rating : classConfig.ratingCentered
+            <Rating
+                onClick={onRateRecipe}
+                onDisabledClick={
+                    isPreview || !authResolved ? undefined : handleLockedRating
                 }
-            >
-                <Rating
-                    onClick={onRateRecipe}
-                    disabled={isPreview || !user}
-                    rating={recipe.rating}
-                    fill={'gold'}
-                    iconSize={22}
-                    cooldown={60000}
-                    cooldownKey={recipe.displayId}
-                />
-            </Tooltip>
-
-            <TagList
-                tags={recipe.tags ?? []}
-                linkToHubs={!isPreview}
-                size="responsive"
-                className={classConfig.tags}
+                disabled={isPreview || !user}
+                rating={recipe.rating}
+                fill={'gold'}
+                iconSize={22}
+                cooldown={60000}
+                cooldownKey={recipe.displayId}
+                className={classConfig.rating}
             />
+
+            {recipe.tags?.length ? (
+                <TagList
+                    tags={recipe.tags}
+                    linkToHubs={!isPreview}
+                    size="responsive"
+                    className={classConfig.tags}
+                />
+            ) : null}
 
             {hasInfo ? (
                 <RecipeInfo
@@ -122,6 +123,7 @@ export const RecipeViewHead: React.FC<RecipeViewHeadProps> = ({
                     onDecrementPortionSize={decrementPortionSize}
                     onIncrementPortionSize={incrementPortionSize}
                     verbose={'responsive'}
+                    strip={'responsive'}
                     typographyVariant={'body'}
                 />
             ) : null}

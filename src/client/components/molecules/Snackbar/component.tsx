@@ -1,8 +1,9 @@
 import React from 'react';
+import Link from 'next/link';
 import { Icon } from '@/client/components/atoms/Icons';
 import { IconButton } from '@/client/components/atoms/Button/Icon';
 import { Typography } from '@/client/components/atoms/Typography';
-import type { IconName, SnackbarVariant } from '@/client/types';
+import type { AlertAction, IconName, SnackbarVariant } from '@/client/types';
 import { classNames } from '@/client/utils';
 
 const config: Record<SnackbarVariant, VariantConfig> = {
@@ -28,12 +29,14 @@ type VariantConfig = {
 };
 
 type SnackbarProps = Readonly<{
+    action?: AlertAction;
     message: string;
     onClose: () => void;
     variant: SnackbarVariant;
 }>;
 
 export const Snackbar: React.FC<SnackbarProps> = ({
+    action,
     message,
     onClose,
     variant
@@ -59,6 +62,15 @@ export const Snackbar: React.FC<SnackbarProps> = ({
                 >
                     {message}
                 </Typography>
+                {action ? (
+                    <Link
+                        href={action.href}
+                        onClick={onClose}
+                        className="shrink-0 px-1 text-sm font-bold text-inherit underline underline-offset-2 hover:opacity-80"
+                    >
+                        {action.label}
+                    </Link>
+                ) : null}
                 <IconButton
                     icon="close"
                     size={16}
