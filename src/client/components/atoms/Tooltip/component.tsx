@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useCallback, useState, useEffect } from 'react';
+import React, { useCallback, useState, useEffect, useRef } from 'react';
 import { classNames } from '@/client/utils';
 import { Typography } from '@/client/components/atoms/Typography';
-import { useOutsideClick } from '@/client/hooks';
+import { useEventListener, useOutsideClick } from '@/client/hooks';
 
 type TooltipProps = Readonly<{
     className?: string;
@@ -44,6 +44,9 @@ const classConfig = {
     }
 };
 
+const TOUCH_DISMISS_MS = 2500;
+const PASSIVE: AddEventListenerOptions = { passive: true };
+
 export const Tooltip: React.FC<TooltipProps> = ({
     children,
     className,
@@ -55,66 +58,80 @@ export const Tooltip: React.FC<TooltipProps> = ({
 }) => {
     const [isVisible, setIsVisible] = useState(false);
     const [targetRect, setTargetRect] = useState<DOMRect | null>(null);
-    const [isTouchDevice, setIsTouchDevice] = useState(false);
+    const dismissTimer = useRef<number | undefined>(undefined);
 
-    const shouldShow = visible !== undefined ? visible : isVisible;
+    const isControlled = visible !== undefined;
+    const shouldShow = isControlled ? visible : isVisible;
 
-    useEffect(() => {
-        setIsTouchDevice(
-            'ontouchstart' in window || navigator.maxTouchPoints > 0
-        );
+    const hide = useCallback(() => {
+        window.clearTimeout(dismissTimer.current);
+        setIsVisible(false);
     }, []);
 
-    const outsideClickRef = useOutsideClick<HTMLDivElement>(() => {
-        if (isTouchDevice && visible === undefined) {
-            setIsVisible(false);
+    const outsideClickRef = useOutsideClick<HTMLDivElement>(hide);
+
+    const handleScrollDismiss = useCallback(() => {
+        if (isVisible) {
+            hide();
         }
-    });
+    }, [isVisible, hide]);
 
     useEffect(() => {
-        if (targetRef?.current && visible !== undefined) {
-            const updatePosition = () => {
-                const rect = targetRef.current?.getBoundingClientRect();
-                setTargetRect(rect || null);
-            };
+        return () => window.clearTimeout(dismissTimer.current);
+    }, []);
 
-            updatePosition();
-            window.addEventListener('scroll', updatePosition);
-            window.addEventListener('resize', updatePosition);
-
-            return () => {
-                window.removeEventListener('scroll', updatePosition);
-                window.removeEventListener('resize', updatePosition);
-            };
+    const updatePosition = useCallback(() => {
+        if (targetRef?.current && isControlled) {
+            setTargetRect(targetRef.current.getBoundingClientRect());
         }
-    }, [targetRef, visible]);
+    }, [targetRef, isControlled]);
 
-    const handleMouseEnter = useCallback(() => {
-        if (visible === undefined && !isTouchDevice) {
-            setIsVisible(true);
-        }
-    }, [visible, isTouchDevice]);
+    useEventListener('scroll', handleScrollDismiss, undefined, PASSIVE);
+    useEventListener('scroll', updatePosition, undefined, PASSIVE);
+    useEventListener('resize', updatePosition, undefined, PASSIVE);
 
-    const handleMouseLeave = useCallback(() => {
-        if (visible === undefined && !isTouchDevice) {
-            setIsVisible(false);
-        }
-    }, [visible, isTouchDevice]);
+    // Initial measurement — the listeners above only fire on later changes
+    useEffect(() => {
+        updatePosition();
+    }, [updatePosition, visible]);
 
-    const handleTouchStart = useCallback(() => {
-        if (visible === undefined && isTouchDevice) {
-            setIsVisible(true);
-        }
-    }, [visible, isTouchDevice]);
-
-    const handleClick = useCallback(
-        (e: React.MouseEvent) => {
-            if (isTouchDevice) {
-                e.preventDefault();
-                e.stopPropagation();
+    /*
+     * Input type is checked per event rather than detected once per device,
+     * so a mouse on a touchscreen laptop still gets hover behavior.
+     */
+    const handlePointerEnter = useCallback(
+        (e: React.PointerEvent) => {
+            if (!isControlled && !disabled && e.pointerType === 'mouse') {
+                setIsVisible(true);
             }
         },
-        [isTouchDevice]
+        [isControlled, disabled]
+    );
+
+    const handlePointerLeave = useCallback(
+        (e: React.PointerEvent) => {
+            if (!isControlled && e.pointerType === 'mouse') hide();
+        },
+        [isControlled, hide]
+    );
+
+    // Touch / pen: a tap toggles the tooltip, which then auto-dismisses.
+    const handlePointerDown = useCallback(
+        (e: React.PointerEvent) => {
+            if (isControlled || disabled || e.pointerType === 'mouse') {
+                return;
+            }
+
+            if (isVisible) {
+                hide();
+                return;
+            }
+
+            window.clearTimeout(dismissTimer.current);
+            dismissTimer.current = window.setTimeout(hide, TOUCH_DISMISS_MS);
+            setIsVisible(true);
+        },
+        [isControlled, disabled, isVisible, hide]
     );
 
     if (targetRef && visible !== undefined) {
@@ -222,10 +239,9 @@ export const Tooltip: React.FC<TooltipProps> = ({
         <div
             ref={outsideClickRef}
             className={`relative ${className} group`}
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
-            onTouchStart={handleTouchStart}
-            onClick={handleClick}
+            onPointerEnter={handlePointerEnter}
+            onPointerLeave={handlePointerLeave}
+            onPointerDown={handlePointerDown}
         >
             {children}
             <div
