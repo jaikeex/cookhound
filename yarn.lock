@@ -4862,7 +4862,7 @@ __metadata:
     jsdom: "npm:^29.1.1"
     lint-staged: "npm:^15.2.10"
     next: "npm:16.3.5"
-    openai: "npm:^6.46.0"
+    openai: "npm:^7.17.0"
     pg: "npm:^8.23.0"
     postcss: "npm:^8.5.28"
     prettier: "npm:^3.9.7"
@@ -8280,14 +8280,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"openai@npm:^6.46.0":
-  version: 6.46.0
-  resolution: "openai@npm:6.46.0"
+"openai@npm:^7.17.0":
+  version: 7.17.0
+  resolution: "openai@npm:7.17.0"
   peerDependencies:
     "@aws-sdk/credential-provider-node": ">=3.972.0 <4"
     "@smithy/hash-node": ">=4.3.0 <5"
     "@smithy/signature-v4": ">=5.4.0 <6"
-    ws: ^8.18.0
+    undici: ">=5 <9"
+    ws: ^8.21.0
     zod: ^3.25 || ^4.0
   peerDependenciesMeta:
     "@aws-sdk/credential-provider-node":
@@ -8296,11 +8297,13 @@ __metadata:
       optional: true
     "@smithy/signature-v4":
       optional: true
+    undici:
+      optional: true
     ws:
       optional: true
     zod:
       optional: true
-  checksum: 10c0/50a049f7f876112105e52d72c0ef18c9c87e54398b6c3dedfc38b09b2e591cd1be98ba0a8fb021c6f9e3ab89fbd11b1e26fea374e330f6dae79887a96c3fb5fe
+  checksum: 10c0/97582ed1fd24d1c7a56ead6dd0f34133b0e1f7795e9c60d77bdc506f3e97fd1e6e771bac528bc525dddeb11a5b851b242b5c0f73fbd0717a8a57bc8d86ecfb7f
   languageName: node
   linkType: hard
 
