@@ -11,7 +11,7 @@ import React, {
 import { Snackbar } from '@/client/components/molecules/Snackbar';
 import type { AlertPayload, SnackbarPosition } from '@/client/types';
 import ReactDOM from 'react-dom';
-import { generateRandomId } from '@/client/utils';
+import { classNames, generateRandomId } from '@/client/utils';
 
 const AUTO_DISMISS = 4000;
 const ACTION_AUTO_DISMISS = 10000;
@@ -20,12 +20,15 @@ const MAX_SNACKBARS = 3;
 const SNACKBAR_POSITIONS: readonly SnackbarPosition[] = ['top', 'bottom'];
 
 /**
- * The bottom stack has to clear the mobile bottom navigation and drops to a plain inset
- * from md up, where that navigation is hidden. The offset is responsive, so it cannot
- * live in the inline style like the top stack's does - only the per-snackbar step is passed in.
+ * One fixed flex column per position, so each snackbar takes its real height and wrapped
+ * messages push the next one along instead of overlapping it. The newest
+ * alert sits nearest the screen edge: first at the top, last at the bottom,
+ * where the stack also has to clear the mobile bottom navigation hidden from md up.
  */
-const BOTTOM_STACK_CLASSNAME =
-    'bottom-[calc(4.5rem+var(--snackbar-offset))] md:bottom-[calc(1rem+var(--snackbar-offset))]';
+const STACK_CLASSNAME: Record<SnackbarPosition, string> = {
+    top: 'top-4 flex-col',
+    bottom: 'bottom-[4.5rem] md:bottom-4 flex-col-reverse'
+};
 
 type SnackbarContextType = {
     alert: (a: AlertPayload) => void;
@@ -102,44 +105,38 @@ export const SnackbarProvider: React.FC<SnackbarProviderProps> = ({
         <SnackbarContext.Provider value={value}>
             {children}
             {typeof window !== 'undefined' &&
-                SNACKBAR_POSITIONS.flatMap((position) =>
-                    activeAlerts
-                        .filter((a) => (a.position ?? 'top') === position)
-                        .map((alertObj, index) =>
-                            ReactDOM.createPortal(
-                                <div
+                SNACKBAR_POSITIONS.map((position) => {
+                    const alerts = activeAlerts.filter(
+                        (a) => (a.position ?? 'top') === position
+                    );
+
+                    if (alerts.length === 0) {
+                        return null;
+                    }
+
+                    return ReactDOM.createPortal(
+                        <div
+                            key={position}
+                            className={classNames(
+                                'fixed left-1/2 -translate-x-1/2 z-2000 flex gap-2',
+                                'w-96 max-w-[calc(100vw-2rem)] pointer-events-none',
+                                STACK_CLASSNAME[position]
+                            )}
+                        >
+                            {alerts.map((alertObj) => (
+                                <Snackbar
                                     key={alertObj.id}
-                                    className={
-                                        position === 'bottom'
-                                            ? BOTTOM_STACK_CLASSNAME
-                                            : undefined
-                                    }
-                                    style={{
-                                        width: '384px',
-                                        margin: '0 auto',
-                                        position: 'fixed',
-                                        // 16px initial offset + 70px per snackbar
-                                        ...(position === 'top'
-                                            ? { top: `${16 + index * 70}px` }
-                                            : ({
-                                                  '--snackbar-offset': `${index * 70}px`
-                                              } as React.CSSProperties)),
-                                        left: '50%',
-                                        transform: 'translateX(-50%)',
-                                        zIndex: 2000 - index
-                                    }}
-                                >
-                                    <Snackbar
-                                        action={alertObj.action}
-                                        variant={alertObj.variant}
-                                        message={alertObj.message}
-                                        onClose={removeAlert(alertObj.id)}
-                                    />
-                                </div>,
-                                document.body
-                            )
-                        )
-                )}
+                                    action={alertObj.action}
+                                    variant={alertObj.variant}
+                                    message={alertObj.message}
+                                    onClose={removeAlert(alertObj.id)}
+                                />
+                            ))}
+                        </div>,
+                        document.body,
+                        position
+                    );
+                })}
         </SnackbarContext.Provider>
     );
 };

@@ -9,6 +9,7 @@ import { Typography } from '@/client/components/atoms/Typography';
 export type IconProps = Readonly<{
     className?: string;
     disabled?: boolean;
+    inheritColor?: boolean;
     label?: string;
     name: IconName;
     size?: number;
@@ -17,7 +18,18 @@ export type IconProps = Readonly<{
     React.RefAttributes<HTMLDivElement>;
 
 export const Icon: React.FC<IconProps> = forwardRef<HTMLDivElement, IconProps>(
-    ({ className, disabled, label, name, size = 24, ...props }, ref) => {
+    (
+        {
+            className,
+            disabled,
+            inheritColor = false,
+            label,
+            name,
+            size = 24,
+            ...props
+        },
+        ref
+    ) => {
         const SvgComponent = icons[name];
 
         return (
@@ -28,7 +40,9 @@ export const Icon: React.FC<IconProps> = forwardRef<HTMLDivElement, IconProps>(
                     'flex flex-col items-center gap-0.5',
                     disabled
                         ? 'text-gray-500 dark:text-gray-500'
-                        : 'typography-base!',
+                        : inheritColor
+                          ? 'text-inherit'
+                          : 'typography-base!',
                     className
                 )}
             >

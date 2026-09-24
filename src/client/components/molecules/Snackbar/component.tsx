@@ -54,6 +54,7 @@ export const Snackbar: React.FC<SnackbarProps> = ({
                     name={config[variant].icon}
                     size={24}
                     className="flex-[15%]"
+                    inheritColor
                 />
                 <Typography
                     variant="body-sm"
@@ -74,7 +75,8 @@ export const Snackbar: React.FC<SnackbarProps> = ({
                 <IconButton
                     icon="close"
                     size={16}
-                    className="flex-[8%] cursor-pointer"
+                    className="flex-[8%] cursor-pointer hover:bg-current/15!"
+                    inheritIconColor
                     onClick={onClose}
                 />
             </div>

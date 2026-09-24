@@ -9,6 +9,7 @@ export type IconButtonProps = Readonly<{
     disabled?: boolean;
     icon: IconName;
     iconClassName?: string;
+    inheritIconColor?: boolean;
     loading?: boolean;
     onClick?: () => void;
     onPointerDown?: (event: React.PointerEvent) => void;
@@ -30,6 +31,7 @@ export const IconButton: React.FC<IconButtonProps> = React.forwardRef<
             disabled,
             icon,
             iconClassName,
+            inheritIconColor,
             loading,
             onClick = () => {},
             onPointerDown,
@@ -58,7 +60,12 @@ export const IconButton: React.FC<IconButtonProps> = React.forwardRef<
                 {loading ? (
                     <Loader size="sm" className={iconClassName} />
                 ) : (
-                    <Icon name={icon} size={size} className={iconClassName} />
+                    <Icon
+                        name={icon}
+                        size={size}
+                        className={iconClassName}
+                        inheritColor={inheritIconColor}
+                    />
                 )}
             </button>
         );

@@ -24,8 +24,7 @@ export const WakeLockToggle: React.FC<WakeLockToggleProps> = ({
             if (nowActive) {
                 alert({
                     message: t('app.recipe.keep-screen-on-active'),
-                    variant: 'success',
-                    position: 'bottom'
+                    variant: 'success'
                 });
                 return;
             }
@@ -36,13 +35,11 @@ export const WakeLockToggle: React.FC<WakeLockToggleProps> = ({
                 wasActive
                     ? {
                           message: t('app.recipe.keep-screen-on-inactive'),
-                          variant: 'info',
-                          position: 'bottom'
+                          variant: 'info'
                       }
                     : {
                           message: t('app.recipe.keep-screen-on-error'),
-                          variant: 'error',
-                          position: 'bottom'
+                          variant: 'error'
                       }
             );
         });
