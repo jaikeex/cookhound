@@ -1,5 +1,11 @@
 import { Queue, Worker, QueueEvents } from 'bullmq';
-import type { JobsOptions, Job, Processor, QueueOptions } from 'bullmq';
+import type {
+    JobsOptions,
+    JobSchedulerTemplateOptions,
+    Job,
+    Processor,
+    QueueOptions
+} from 'bullmq';
 import IORedis from 'ioredis';
 import { Logger } from '@/server/logger';
 import { ENV_CONFIG_PRIVATE } from '@/common/constants';
@@ -30,7 +36,8 @@ export type CronJobConfig<TData = unknown> = Readonly<{
     data?: TData;
     timezone?: string;
     enabled?: boolean;
-    jobOptions?: JobsOptions;
+    // Scheduler templates own the job id, delay and repeat settings.
+    jobOptions?: JobSchedulerTemplateOptions;
 }>;
 
 //|=============================================================================================|//
@@ -39,6 +46,8 @@ const log = Logger.getInstance('queue-manager');
 
 const FINAL_FAILURE_ALERT_COOLDOWN_IN_MILLISECONDS = 15 * 60 * 1000;
 const finalFailureAlertedAt = new Map<string, number>();
+
+const getCronSchedulerId = (name: string): string => `cron:${name}`;
 
 //~=============================================================================================~//
 //$                                            CLASS                                            $//
@@ -255,12 +264,12 @@ export class QueueManager {
     //~-----------------------------------------------------------------------------------------~//
 
     /**
-     * Schedules a repeatable (cron-based) job.
-     *
+     * Schedules a repeatable (cron-based) job through a BullMQ Job Scheduler.
+
      * @typeParam TData - Shape of the job payload.
      * @param config - Cron job configuration describing timing, queue and data.
      *
-     * @returns A promise that resolves with the created repeatable Job instance.
+     * @returns A promise that resolves with the next scheduled Job instance.
      */
     public async scheduleCronJob<TData = unknown>(
         config: CronJobConfig<TData>
@@ -288,16 +297,15 @@ export class QueueManager {
         const queue =
             this.queues.get(queueName) ?? this.getOrCreateQueue(queueName);
 
-        const repeat = {
-            cron,
-            tz: timezone
-        } as { cron: string; tz?: string };
+        const schedulerId = getCronSchedulerId(name);
 
-        const job = await queue.add(name, data, {
-            repeat,
-            jobId: `cron:${name}`,
-            ...jobOptions
-        });
+        await this.removeLegacyRepeatableJobs(queue, name, schedulerId);
+
+        const job = await queue.upsertJobScheduler(
+            schedulerId,
+            { pattern: cron, tz: timezone },
+            { name, data, opts: jobOptions }
+        );
 
         if (!enabled) {
             /**
@@ -342,7 +350,7 @@ export class QueueManager {
         }
 
         const target = repeatable.find(
-            (r) => r.id === `cron:${name}` || r.name === name
+            (r) => r.key === getCronSchedulerId(name) || r.name === name
         );
 
         if (!target) {
@@ -440,6 +448,42 @@ export class QueueManager {
     //~-----------------------------------------------------------------------------------------~//
     //$                                     PRIVATE METHODS                                     $//
     //~-----------------------------------------------------------------------------------------~//
+
+    //?—————————————————————————————————————————————————————————————————————————————————————————?//
+    //?                              BULLMQ V6 MIGRATION CLEANUP                                ?//
+    ///
+    //# Cron jobs used to be registered via queue.add(name, data, { repeat }), which stored
+    //# them as legacy repeatable jobs. BullMQ v6 cannot run those (the next iteration is never
+    //# scheduled) and removes the only APIs able to delete them. This drops them while still
+    //# on v5, so the Job Scheduler upserted next is the single source of each cron.
+    //#
+    //# Legacy entries share the repeat sorted set with Job Schedulers, so everything but our
+    //# own scheduler id is treated as legacy. Their keys are md5 hashes, and
+    //# removeRepeatableByKey also drops the already-queued next iteration.
+    ///
+    //?—————————————————————————————————————————————————————————————————————————————————————————?//
+
+    private async removeLegacyRepeatableJobs(
+        queue: Queue,
+        name: string,
+        schedulerId: string
+    ): Promise<void> {
+        const repeatable = await queue.getRepeatableJobs();
+
+        const legacy = repeatable.filter(
+            (r) => r.name === name && r.key !== schedulerId
+        );
+
+        for (const entry of legacy) {
+            const removed = await queue.removeRepeatableByKey(entry.key);
+
+            log.info('removeLegacyRepeatableJobs - legacy repeatable removed', {
+                jobName: name,
+                key: entry.key,
+                removed
+            });
+        }
+    }
 
     private getOrCreateQueue(
         name: string,
