@@ -778,7 +778,7 @@ class RecipeService {
         //?                             FETCH, INTERSECT AND RETURN                             ?//
         //|-------------------------------------------------------------------------------------|//
 
-        let results: RecipeForDisplayDTO[] = [];
+        let results: RecipeForDisplayDTO[];
 
         try {
             if (queryTerms.length === 1) {

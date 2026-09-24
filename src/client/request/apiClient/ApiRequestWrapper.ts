@@ -245,9 +245,7 @@ class ApiRequestWrapper {
         ///
         //?—————————————————————————————————————————————————————————————————————————————————————?//
 
-        let response: Response | null = null;
-
-        response = await fetch(url.toString(), options);
+        const response = await fetch(url.toString(), options);
 
         try {
             data = await response.json();

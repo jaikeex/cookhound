@@ -112,7 +112,7 @@ function getAppRouterClientIdentifier(req: NextRequest): string {
 
     const path = req.nextUrl.pathname;
 
-    let ip = '';
+    let ip: string;
 
     if (forwarded) {
         ip = forwarded.split(',')[0]?.trim() ?? '';

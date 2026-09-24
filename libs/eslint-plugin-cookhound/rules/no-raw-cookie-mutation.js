@@ -29,10 +29,7 @@ const rule = {
         schema: []
     },
     create(context) {
-        const filename =
-            typeof context.getFilename === 'function'
-                ? context.getFilename()
-                : context.filename;
+        const filename = context.filename;
 
         if (isAccessorModule(filename)) {
             return {};

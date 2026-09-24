@@ -68,7 +68,7 @@ export function intersectArrays<T, K = unknown>(
     // Numeric ID representing how many arrays we have already processed.
     // Using an integer rather than a boolean flag per array avoids re-allocating a
     // fresh Map for every pass – we just increment `pass`.
-    let pass = 0;
+    let pass: number;
 
     // The counting hash-table: key -> { item, count }.
     interface Bucket {

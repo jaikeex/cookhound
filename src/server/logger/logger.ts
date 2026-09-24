@@ -176,7 +176,8 @@ export class Logger {
                 throw new Error(
                     `Failed to create logger for context "${context}": ${
                         error instanceof Error ? error.message : String(error)
-                    }`
+                    }`,
+                    { cause: error }
                 );
             }
         }

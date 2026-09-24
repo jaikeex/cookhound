@@ -62,7 +62,9 @@ class RedisClient {
              * critical problem and must be addressed asap, using regular Error
              * here gives additional insurance it will not go unnoticed.
              */
-            throw new Error(InfrastructureErrorCode.REDIS_CONNECTION_FAILED);
+            throw new Error(InfrastructureErrorCode.REDIS_CONNECTION_FAILED, {
+                cause: error
+            });
         }
     }
 

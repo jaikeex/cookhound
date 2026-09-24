@@ -181,7 +181,7 @@ class RecipeSearchIndex {
     }
 
     private async reconcileCollection(): Promise<void> {
-        let collection: { fields?: unknown } | null = null;
+        let collection: { fields?: unknown };
 
         try {
             collection = await this.client

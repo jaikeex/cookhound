@@ -21,7 +21,7 @@ const requireMakeHandler = {
         schema: []
     },
     create(context) {
-        const filename = context.getFilename();
+        const filename = context.filename;
 
         if (!isApiRouteFile(filename)) {
             return {};
