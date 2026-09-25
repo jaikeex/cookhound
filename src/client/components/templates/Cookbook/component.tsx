@@ -1,6 +1,12 @@
 'use client';
 
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, {
+    useCallback,
+    useEffect,
+    useMemo,
+    useRef,
+    useState
+} from 'react';
 import type { Cookbook } from '@/common/types';
 import { DraggableGrid } from '@/client/components/molecules/List/DraggableGrid';
 import { CookbookRecipeCard } from '@/client/components/molecules/Card/CookbookRecipe';
@@ -30,6 +36,9 @@ export const CookbookTemplate: React.FC<CookbookTemplateProps> = ({
     const [order, setOrder] = useState<number[]>(
         cookbook?.recipes?.map((r) => r.id) ?? []
     );
+
+    // The order the server is known to hold, the reorder effect only syncs real changes to it.
+    const savedOrderRef = useRef<number[]>(order);
 
     const isOwner = useMemo(
         () => user?.id === cookbook.ownerId,
@@ -89,25 +98,35 @@ export const CookbookTemplate: React.FC<CookbookTemplateProps> = ({
     //|-----------------------------------------------------------------------------------------|//
 
     useEffect(() => {
+        if (!debouncedOrder || !Array.isArray(debouncedOrder)) {
+            return;
+        }
+
+        // Removed recipes are dropped from the baseline, a removal alone is not a reorder.
+        const remaining = new Set(debouncedOrder);
+        const saved = savedOrderRef.current.filter((id) => remaining.has(id));
+
         if (
-            !debouncedOrder ||
-            !Array.isArray(debouncedOrder) ||
-            !cookbook.recipes
+            saved.length === debouncedOrder.length &&
+            debouncedOrder.every((id, idx) => id === saved[idx])
         ) {
             return;
         }
 
-        if (
-            debouncedOrder.length !== cookbook.recipes.length ||
-            !debouncedOrder.every((id, idx) => id === cookbook.recipes[idx]?.id)
-        ) {
-            reorderRecipes({
-                cookbookId: cookbook.id,
-                orderedRecipeIds: debouncedOrder
-            });
-        }
+        // Baseline is the last order sent, so reverting mid-flight still triggers a save
+        const previousOrder = savedOrderRef.current;
+        savedOrderRef.current = debouncedOrder;
 
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+        reorderRecipes(
+            { cookbookId: cookbook.id, orderedRecipeIds: debouncedOrder },
+            {
+                onError: () => {
+                    if (savedOrderRef.current === debouncedOrder) {
+                        savedOrderRef.current = previousOrder;
+                    }
+                }
+            }
+        );
     }, [cookbook.id, debouncedOrder, reorderRecipes]);
 
     useEffect(() => {
@@ -122,6 +141,7 @@ export const CookbookTemplate: React.FC<CookbookTemplateProps> = ({
             recipeIds.length !== order.length ||
             !order.every((id) => recipesById.has(id))
         ) {
+            savedOrderRef.current = recipeIds;
             setOrder(recipeIds);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps

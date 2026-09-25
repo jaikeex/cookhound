@@ -32,7 +32,7 @@ export const LogoutAllConfirmModal: React.FC<LogoutAllConfirmModalProps> = ({
     const { mutate: logoutEverywhere, isPending } = chqc.auth.useLogoutAll({
         onSuccess: () => {
             setUser(null);
-            queryClient.resetQueries();
+            queryClient.clear();
 
             alert({
                 variant: 'success',

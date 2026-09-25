@@ -5,7 +5,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import {
     createMutationCache,
     createQueryCache,
-    retryUnlessRateLimited
+    DEFAULT_QUERY_RETRIES,
+    retryTransient
 } from '@/client/data/queryErrorHandlers';
 
 export const QueryProvider: React.FC<
@@ -27,7 +28,7 @@ export const QueryProvider: React.FC<
                 defaultOptions: {
                     queries: {
                         staleTime: 60_000,
-                        retry: retryUnlessRateLimited,
+                        retry: retryTransient(DEFAULT_QUERY_RETRIES),
                         refetchOnWindowFocus: false,
                         refetchOnMount: true
                     }

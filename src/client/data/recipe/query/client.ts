@@ -1,6 +1,7 @@
 import { useInfiniteQuery, keepPreviousData } from '@tanstack/react-query';
 import { useAppQuery, useAppMutation } from '@/client/data/queryFactories';
 import { useRepositories } from '@/client/data/DataProvider';
+import { retryTransient } from '@/client/data/queryErrorHandlers';
 import {
     RECIPE_QUERY_KEYS,
     type RecipeByDisplayIdOptions,
@@ -38,7 +39,7 @@ export const recipeQueryClient = {
                 recipeRepository.getByDisplayId({ displayId, signal }),
             {
                 enabled: Boolean(displayId),
-                retry: 1,
+                retry: retryTransient(1),
                 ...options
             }
         );
@@ -56,7 +57,7 @@ export const recipeQueryClient = {
                 recipeRepository.getById({ id: String(id), signal }),
             {
                 enabled: Boolean(id),
-                retry: 1,
+                retry: retryTransient(1),
                 ...options
             }
         );
@@ -74,7 +75,7 @@ export const recipeQueryClient = {
             ({ signal }) => recipeRepository.list({ batch, perPage, signal }),
             {
                 enabled: Boolean(batch > 0 && perPage),
-                retry: 1,
+                retry: retryTransient(1),
                 placeholderData: keepPreviousData,
                 ...options
             }
@@ -127,7 +128,7 @@ export const recipeQueryClient = {
                 }),
             {
                 enabled: Boolean(query && batch > 0 && perPage),
-                retry: 1,
+                retry: retryTransient(1),
                 placeholderData: keepPreviousData,
                 ...options
             }
@@ -184,7 +185,7 @@ export const recipeQueryClient = {
                 }),
             {
                 enabled: Boolean(userId && query && batch > 0 && perPage),
-                retry: 1,
+                retry: retryTransient(1),
                 placeholderData: keepPreviousData,
                 ...options
             }
@@ -247,7 +248,7 @@ export const recipeQueryClient = {
                 }),
             {
                 enabled: Boolean(userId && batch > 0 && perPage),
-                retry: 1,
+                retry: retryTransient(1),
                 placeholderData: keepPreviousData,
                 ...options
             }
@@ -304,7 +305,7 @@ export const recipeQueryClient = {
                 }),
             {
                 enabled: Boolean(batch > 0 && perPage > 0),
-                retry: 1,
+                retry: retryTransient(1),
                 placeholderData: keepPreviousData,
                 ...options
             }

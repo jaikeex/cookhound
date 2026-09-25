@@ -13,7 +13,8 @@ import type {
     UserPreferences
 } from '@/common/types';
 import type {
-    CookieConsent,
+    CookieConsentDTO,
+    CookieConsentFromBrowser,
     CookieConsentPayload
 } from '@/common/types/cookie-consent';
 import type {
@@ -183,9 +184,27 @@ class UserApiClient {
     async createUserCookieConsent(
         data: CookieConsentPayload,
         config?: RequestConfig
-    ): Promise<CookieConsent> {
+    ): Promise<CookieConsentDTO> {
         return await apiRequestWrapper.post({
             url: '/users/me/cookie-consent',
+            data,
+            ...config
+        });
+    }
+
+    /**
+     * Writes the browser consent cookie by calling `PUT /api/users/consent-cookie`.
+     *
+     * @param data - The browser consent to store in the cookie.
+     * @param config - Optional fetch request configuration.
+     * @returns A promise that resolves when the cookie is set.
+     */
+    async setConsentCookie(
+        data: CookieConsentFromBrowser,
+        config?: RequestConfig
+    ): Promise<void> {
+        await apiRequestWrapper.put({
+            url: '/users/consent-cookie',
             data,
             ...config
         });

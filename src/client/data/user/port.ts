@@ -13,7 +13,8 @@ import type {
     UserPreferences
 } from '@/common/types';
 import type {
-    CookieConsent,
+    CookieConsentDTO,
+    CookieConsentFromBrowser,
     CookieConsentPayload
 } from '@/common/types/cookie-consent';
 
@@ -54,7 +55,11 @@ export interface UserRepository {
 
     createCookieConsent(args: {
         input: CookieConsentPayload;
-    }): Promise<CookieConsent>;
+    }): Promise<CookieConsentDTO>;
+
+    setConsentCookie(args: {
+        consent: CookieConsentFromBrowser;
+    }): Promise<void>;
 
     updatePreferences(args: {
         id: number;

@@ -44,6 +44,7 @@ const buildFakeUserRepository = (
     deleteShoppingList: vi.fn().mockResolvedValue(undefined),
     getLastViewedRecipes: vi.fn().mockResolvedValue([]),
     createCookieConsent: vi.fn(),
+    setConsentCookie: vi.fn().mockResolvedValue(undefined),
     updatePreferences: vi.fn().mockResolvedValue(undefined),
     initiateEmailChange: vi.fn().mockResolvedValue(undefined),
     confirmEmailChange: vi.fn().mockResolvedValue(fixtureUser),

@@ -17,12 +17,15 @@ import { ROUTES } from '@/common/constants';
 
 /**
  * A catch-all react hook for managing the shopping list.
+ *
+ * @param initialData - The list the server already rendered, seeded into the query.
  */
-export const useShoppingList = () => {
+export const useShoppingList = (initialData?: ShoppingListDTO[]) => {
     const { user } = useAuth();
     const userId = user?.id;
     const queryClient = useQueryClient();
     const pathname = usePathname();
+    const [seededAt] = useState(() => Date.now());
 
     const listQueryKey = useMemo(() => {
         return userId ? USER_QUERY_KEYS.shoppingList(userId) : undefined;
@@ -72,7 +75,9 @@ export const useShoppingList = () => {
         error: queryError,
         refetch
     } = chqc.user.useShoppingList(userId ?? 0, {
-        enabled: !!userId && pathname === ROUTES.shoppingList
+        enabled: !!userId && pathname === ROUTES.shoppingList,
+        initialData: userId ? initialData : undefined,
+        initialDataUpdatedAt: userId && initialData ? seededAt : undefined
     });
 
     //~-----------------------------------------------------------------------------------------~//
@@ -237,15 +242,6 @@ export const useShoppingList = () => {
     //$                                         HOOK API                                        $//
     //~-----------------------------------------------------------------------------------------~//
 
-    const initialize = useCallback(
-        (list: ShoppingListDTO[]) => {
-            if (listQueryKey) {
-                queryClient.setQueryData(listQueryKey, list);
-            }
-        },
-        [queryClient, listQueryKey]
-    );
-
     const refreshShoppingList = useCallback(async () => {
         await refetch();
     }, [refetch]);
@@ -343,7 +339,6 @@ export const useShoppingList = () => {
         isLoading,
         error,
 
-        initialize,
         startEditing,
         setEditingShoppingList,
         updateEditingShoppingList,

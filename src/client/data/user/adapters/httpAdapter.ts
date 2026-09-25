@@ -42,6 +42,8 @@ export const httpUserRepository: UserRepository = {
     createCookieConsent: ({ input }) =>
         userApiClient.createUserCookieConsent(input),
 
+    setConsentCookie: ({ consent }) => userApiClient.setConsentCookie(consent),
+
     updatePreferences: async ({ id, data }) => {
         await userApiClient.updateUserPreferences(id, data);
     },

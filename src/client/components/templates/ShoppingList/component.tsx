@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import type {
     Ingredient,
     ShoppingListDTO,
@@ -35,7 +35,7 @@ export const ShoppingListTemplate: React.FC<ShoppingListTemplateProps> = ({
         editingShoppingList,
         isLoading,
         ...shoppingListStore
-    } = useShoppingList();
+    } = useShoppingList(initialData);
 
     const isEmpty = initialData.length === 0;
     const data = shoppingList ? shoppingList : initialData;
@@ -48,13 +48,6 @@ export const ShoppingListTemplate: React.FC<ShoppingListTemplateProps> = ({
 
     const binRef = useRef<HTMLDivElement | null>(null);
     const recipeRefs = useRef<Record<number, HTMLDivElement | null>>({});
-
-    useEffect(() => {
-        if (isEmpty || shoppingList !== null) return;
-        shoppingListStore.initialize(initialData);
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [initialData]);
 
     //|-----------------------------------------------------------------------------------------|//
     //?                                         EDITING                                         ?//

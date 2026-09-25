@@ -3,15 +3,19 @@ import { RecipeFlaggedGate } from './FlaggedGate';
 import { RecipeVisitPing } from './VisitPing';
 import { RecipeViewLayout } from './Layout';
 import { RecipeWakeLockOverlay } from '@/client/components/organisms/Recipe/View/WakeLockOverlay';
-import type { Recipe } from '@/common/types';
+import type { Recipe, User } from '@/common/types';
 import { RecipeHandlingProvider } from '@/client/store/RecipeHandlingContext';
 import { FlaggedAuthorTemplate } from '@/client/components/templates/Recipe/Flagged';
 
 export type RecipeViewProps = Readonly<{
+    author?: User;
     recipe: Recipe;
 }>;
 
-export const RecipeViewTemplate: React.FC<RecipeViewProps> = ({ recipe }) => {
+export const RecipeViewTemplate: React.FC<RecipeViewProps> = ({
+    author,
+    recipe
+}) => {
     const isFlagged = recipe.flags?.some((flag) => flag.active);
 
     if (isFlagged) {
@@ -41,7 +45,7 @@ export const RecipeViewTemplate: React.FC<RecipeViewProps> = ({ recipe }) => {
         <React.Fragment>
             <RecipeVisitPing recipeId={recipe.id} />
 
-            <RecipeHandlingProvider recipe={recipe}>
+            <RecipeHandlingProvider recipe={recipe} author={author}>
                 <RecipeViewLayout />
             </RecipeHandlingProvider>
 

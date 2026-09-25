@@ -1,5 +1,6 @@
 import { useAppMutation, useAppQuery } from '@/client/data/queryFactories';
 import { useRepositories } from '@/client/data/DataProvider';
+import { retryTransient } from '@/client/data/queryErrorHandlers';
 import {
     COOKBOOK_QUERY_KEYS,
     type AddRecipeToCookbookOptions,
@@ -30,7 +31,7 @@ export const cookbookQueryClient = {
             ({ signal }) => cookbookRepository.getById({ id, signal }),
             {
                 enabled: Boolean(id),
-                retry: 1,
+                retry: retryTransient(1),
                 ...options
             }
         );
@@ -49,7 +50,7 @@ export const cookbookQueryClient = {
                 cookbookRepository.getByDisplayId({ displayId, signal }),
             {
                 enabled: Boolean(displayId),
-                retry: 1,
+                retry: retryTransient(1),
                 ...options
             }
         );
@@ -67,7 +68,7 @@ export const cookbookQueryClient = {
             ({ signal }) => cookbookRepository.listByUser({ userId, signal }),
             {
                 enabled: Boolean(userId),
-                retry: 1,
+                retry: retryTransient(1),
                 ...options
             }
         );

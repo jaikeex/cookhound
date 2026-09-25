@@ -59,7 +59,7 @@ export const RecipeViewHead: React.FC<RecipeViewHeadProps> = ({
         [alert]
     );
 
-    const { incrementPortionSize, decrementPortionSize, portionSize } =
+    const { author, incrementPortionSize, decrementPortionSize, portionSize } =
         useRecipeHandling();
 
     const hasInfo = Boolean(recipe?.time || recipe?.portionSize);
@@ -73,6 +73,7 @@ export const RecipeViewHead: React.FC<RecipeViewHeadProps> = ({
                 priority={true}
                 isPreview={isPreview}
                 showAuthorLink={true}
+                author={author}
             />
 
             <Typography
@@ -86,6 +87,7 @@ export const RecipeViewHead: React.FC<RecipeViewHeadProps> = ({
             {isPreview ? null : (
                 <RecipeAuthorLinkDesktop
                     authorId={recipe.authorId}
+                    author={author}
                     createdAt={recipe.createdAt}
                     className={classConfig.author}
                 />

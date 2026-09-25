@@ -1,7 +1,7 @@
 import { useAppQuery, useAppMutation } from '@/client/data/queryFactories';
 import { useRepositories } from '@/client/data/DataProvider';
 import { getCookie } from '@/client/utils/cookies';
-import { RequestError } from '@/client/error';
+import { retryTransient } from '@/client/data/queryErrorHandlers';
 import { SESSION_HINT_COOKIE_NAME } from '@/common/constants/general';
 import type { User } from '@/common/types';
 import {
@@ -54,11 +54,8 @@ export const authQueryClient = {
             },
             {
                 staleTime: 0,
-                // absolutely no point in retrying resolved 401s
-                retry: (failureCount, error) =>
-                    error instanceof RequestError && error.status === 401
-                        ? false
-                        : failureCount < 1,
+                // absolutely no point in retrying any resolved 4xx
+                retry: retryTransient(1),
                 refetchOnMount: true,
                 ...options
             }

@@ -1,5 +1,6 @@
 import { useAppQuery } from '@/client/data/queryFactories';
 import { useRepositories } from '@/client/data/DataProvider';
+import { retryTransient } from '@/client/data/queryErrorHandlers';
 import { INGREDIENT_QUERY_KEYS, type IngredientListOptions } from './keys';
 
 export const ingredientQueryClient = {
@@ -14,7 +15,7 @@ export const ingredientQueryClient = {
             ({ signal }) => ingredientRepository.list({ signal }),
             {
                 staleTime: 6 * 60 * 60 * 1000, // 6 hours
-                retry: 1,
+                retry: retryTransient(1),
                 ...options
             }
         );

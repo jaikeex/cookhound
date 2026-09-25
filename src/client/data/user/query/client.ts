@@ -1,5 +1,6 @@
 import { useAppQuery, useAppMutation } from '@/client/data/queryFactories';
 import { useRepositories } from '@/client/data/DataProvider';
+import { retryTransient } from '@/client/data/queryErrorHandlers';
 import {
     USER_QUERY_KEYS,
     type CancelAccountDeletionOptions,
@@ -14,6 +15,7 @@ import {
     type ResendVerificationEmailOptions,
     type ResetPasswordOptions,
     type SendResetPasswordEmailOptions,
+    type SetConsentCookieOptions,
     type ShoppingListOptions,
     type UpdateShoppingListOptions,
     type UpdateUserByIdOptions,
@@ -54,7 +56,7 @@ export const userQueryClient = {
                 userRepository.getShoppingList({ id: userId, signal }),
             {
                 enabled: !!userId,
-                retry: 1,
+                retry: retryTransient(1),
                 ...options
             }
         );
@@ -108,7 +110,7 @@ export const userQueryClient = {
                 userRepository.getLastViewedRecipes({ id: userId, signal }),
             {
                 enabled: !!userId,
-                retry: 1,
+                retry: retryTransient(1),
                 ...options
             }
         );
@@ -131,6 +133,15 @@ export const userQueryClient = {
 
         return useAppMutation(
             (input) => userRepository.createCookieConsent({ input }),
+            options
+        );
+    },
+
+    useSetConsentCookie: (options?: Partial<SetConsentCookieOptions>) => {
+        const { userRepository } = useRepositories();
+
+        return useAppMutation(
+            (consent) => userRepository.setConsentCookie({ consent }),
             options
         );
     },

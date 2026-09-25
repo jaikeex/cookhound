@@ -15,7 +15,7 @@ import { useAuth, useSnackbar } from '@/client/store';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { chqc, QUERY_KEYS } from '@/client/data';
-import { useQueryClient } from '@tanstack/react-query';
+import { hashKey, useQueryClient } from '@tanstack/react-query';
 import { AppEvent, eventBus } from '@/client/events';
 import { ROUTES } from '@/common/constants';
 import { sanitizeReturnTarget } from '@/common/utils/params';
@@ -35,6 +35,8 @@ export const loginSchema = z.object({
         error: 'auth.error.keep-logged-in-required'
     })
 });
+
+const currentUserQueryHash = hashKey(QUERY_KEYS.auth.currentUser);
 
 //~---------------------------------------------------------------------------------------------~//
 //$                                          COMPONENT                                          $//
@@ -63,10 +65,8 @@ export const LoginTemplate: React.FC<LoginTemplateProps> = ({
     } = chqc.auth.useLogin({
         meta: { errorMessage: false },
         onSuccess: (user) => {
-            queryClient.setQueryData(QUERY_KEYS.auth.currentUser, user);
             queryClient.invalidateQueries({
-                predicate: (query) =>
-                    query.queryKey[0] !== QUERY_KEYS.auth.currentUser
+                predicate: (query) => query.queryHash !== currentUserQueryHash
             });
 
             cleanUpAndRedirectAfterLogin(user);

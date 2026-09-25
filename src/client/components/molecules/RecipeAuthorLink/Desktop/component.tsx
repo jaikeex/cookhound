@@ -9,8 +9,10 @@ import { t } from '@/client/locales';
 import { chqc } from '@/client/data';
 import Link from 'next/link';
 import { ROUTES } from '@/common/constants';
+import type { User } from '@/common/types';
 
 export type RecipeAuthorLinkDesktopProps = Readonly<{
+    author?: User;
     authorId: number;
     className?: string;
     createdAt: Date;
@@ -23,11 +25,13 @@ export type RecipeAuthorLinkDesktopProps = Readonly<{
  */
 export const RecipeAuthorLinkDesktop: React.FC<
     RecipeAuthorLinkDesktopProps
-> = ({ authorId, createdAt, className }) => {
+> = ({ author: initialAuthor, authorId, createdAt, className }) => {
     // Fetch author data only if authorId is not -1 (not deleted)
     const { data: author, isLoading: isLoadingAuthor } =
         chqc.user.useGetUserById(authorId, {
-            enabled: authorId !== -1
+            enabled: authorId !== -1,
+            initialData:
+                initialAuthor?.id === authorId ? initialAuthor : undefined
         });
 
     const ageString = getAgeString(createdAt.toISOString());

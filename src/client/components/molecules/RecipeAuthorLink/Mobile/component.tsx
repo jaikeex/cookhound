@@ -5,19 +5,24 @@ import React from 'react';
 import { chqc } from '@/client/data';
 import Link from 'next/link';
 import { ROUTES } from '@/common/constants';
+import type { User } from '@/common/types';
 
 export type RecipeAuthorLinkMobileProps = Readonly<{
+    author?: User;
     authorId: number;
     className?: string;
 }>;
 
 export const RecipeAuthorLinkMobile: React.FC<RecipeAuthorLinkMobileProps> = ({
+    author: initialAuthor,
     authorId,
     className
 }) => {
     const { data: author, isLoading: isLoadingAuthor } =
         chqc.user.useGetUserById(authorId, {
-            enabled: authorId !== -1
+            enabled: authorId !== -1,
+            initialData:
+                initialAuthor?.id === authorId ? initialAuthor : undefined
         });
 
     return (

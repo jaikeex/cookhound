@@ -62,6 +62,7 @@ import '@/app/api/users/[id]/last-viewed/route';
 import '@/app/api/users/me/email/route';
 import '@/app/api/users/me/delete/route';
 import '@/app/api/users/me/cookie-consent/route';
+import '@/app/api/users/consent-cookie/route';
 import '@/app/api/users/me/cookie-consent/[id]/verify/route';
 import '@/app/api/users/me/terms-acceptance/[id]/verify/route';
 import '@/app/api/users/reset-password/route';

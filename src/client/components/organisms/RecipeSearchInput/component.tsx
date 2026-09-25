@@ -72,7 +72,11 @@ export const RecipeSearchInput: React.FC<RecipeSearchInputProps> = ({
     const lastViewedRecipesQuery = chqc.user.useLastViewedRecipes(
         user?.id ?? 0,
         {
-            enabled: !!user?.id && enableSuggestions && !preparedQuery
+            enabled:
+                isInputFocused &&
+                !!user?.id &&
+                enableSuggestions &&
+                !preparedQuery
         }
     );
 
@@ -97,8 +101,11 @@ export const RecipeSearchInput: React.FC<RecipeSearchInputProps> = ({
     //$                                         UTILITY                                         $//
     //~-----------------------------------------------------------------------------------------~//
 
-    // The use of isFetching is intentional here.
-    const isLoading = isSearchMode ? searchRecipesQuery.isFetching : false;
+    // The use of isFetching is intentional here. Last viewed only loads on first focus,
+    // isLoading covers that without flashing on later background refetches.
+    const isLoading = isSearchMode
+        ? searchRecipesQuery.isFetching
+        : lastViewedRecipesQuery.isLoading;
 
     const activeError = isSearchMode
         ? searchRecipesQuery.error

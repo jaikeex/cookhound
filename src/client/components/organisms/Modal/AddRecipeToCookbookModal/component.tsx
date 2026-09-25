@@ -1,14 +1,12 @@
 'use client';
 
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import type { ModalProps } from '@/client/components/organisms/Modal/types';
 import { ButtonBase } from '@/client/components/atoms/Button/Base';
-import {
-    Select,
-    type SelectOption
-} from '@/client/components/molecules/Form/Select';
+import { Loader } from '@/client/components/atoms/Loader';
+import { Select } from '@/client/components/molecules/Form/Select';
 import { Typography } from '@/client/components/atoms/Typography';
-import { useModal, useSnackbar } from '@/client/store';
+import { useAuth, useModal, useSnackbar } from '@/client/store';
 import { chqc, QUERY_KEYS } from '@/client/data';
 import { useQueryClient } from '@tanstack/react-query';
 import dynamic from 'next/dynamic';
@@ -28,7 +26,6 @@ const CreateCookbookModal = dynamic(
 
 export type AddRecipeToCookbookModalProps = Readonly<{
     recipeId: number;
-    options: SelectOption[];
 }> &
     ModalProps;
 
@@ -38,10 +35,27 @@ export type AddRecipeToCookbookModalProps = Readonly<{
 
 export const AddRecipeToCookbookModal: React.FC<
     AddRecipeToCookbookModalProps
-> = ({ recipeId, options, close }) => {
+> = ({ recipeId, close }) => {
     const { alert } = useSnackbar();
     const { openModal } = useModal();
+    const { user } = useAuth();
     const queryClient = useQueryClient();
+
+    const { data: cookbooks = [], isLoading } =
+        chqc.cookbook.useCookbooksByUser(user?.id ?? 0);
+
+    const options = useMemo(
+        () =>
+            cookbooks
+                .map(({ id, title, recipes }) => ({
+                    value: id.toString(),
+                    label: title,
+                    disabled: recipes?.some((r) => r.id === recipeId)
+                }))
+                .sort((a, b) => a.label.localeCompare(b.label))
+                .sort((a, b) => (a.disabled ? 1 : b.disabled ? -1 : 0)),
+        [cookbooks, recipeId]
+    );
 
     const [selectedCookbookId, setSelectedCookbookId] = useState<string | null>(
         null
@@ -110,6 +124,14 @@ export const AddRecipeToCookbookModal: React.FC<
             />
         ));
     }, [openModal, onCreateCookbook]);
+
+    if (isLoading) {
+        return (
+            <div className="flex justify-center px-16 py-8">
+                <Loader />
+            </div>
+        );
+    }
 
     // Empty state when user has no cookbooks
     if (options.length === 0) {

@@ -8,12 +8,11 @@ import React, {
     useMemo,
     useState
 } from 'react';
-import type { Recipe } from '@/common/types';
+import type { Recipe, User } from '@/common/types';
 import { useAuth, useRecipeSelectionStore, useSnackbar } from '@/client/store';
 import { useShoppingList } from '@/client/hooks';
 import { scaleIngredientsToPortionSize } from '@/client/utils';
-import { chqc, QUERY_KEYS } from '@/client/data';
-import { useQueryClient } from '@tanstack/react-query';
+import { chqc } from '@/client/data';
 import { useRouter } from 'next/navigation';
 import { t } from '@/client/locales';
 import { getErrorMessage } from '@/client/error';
@@ -27,6 +26,10 @@ type RecipeHandlingContextType = Readonly<{
      * The recipe being displayed.
      */
     recipe: Recipe;
+    /**
+     * The recipe's author, when the server already loaded it.
+     */
+    author?: User;
     /**
      * The currently selected portion size.
      */
@@ -76,18 +79,19 @@ export const useRecipeHandling = () => {
 
 type RecipeHandlingProviderProps = React.PropsWithChildren<
     Readonly<{
+        author?: User;
         recipe: Recipe;
     }>
 >;
 
 export const RecipeHandlingProvider: React.FC<RecipeHandlingProviderProps> = ({
+    author,
     recipe,
     children
 }) => {
     const { user } = useAuth();
     const { alert } = useSnackbar();
     const router = useRouter();
-    const queryClient = useQueryClient();
     const { createShoppingList } = useShoppingList();
 
     const [portionSize, setPortionSizeState] = useState(recipe.portionSize);
@@ -134,17 +138,13 @@ export const RecipeHandlingProvider: React.FC<RecipeHandlingProviderProps> = ({
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 
     const { mutate: rateRecipeMutate } = chqc.recipe.useRateRecipe({
-        onSuccess: async () => {
+        onSuccess: () => {
             alert({
                 message: t('app.recipe.rated'),
                 variant: 'success'
             });
 
-            // Invalidate is not sufficient here.
-            await queryClient.refetchQueries({
-                queryKey: QUERY_KEYS.recipe.byDisplayId(recipe.displayId)
-            });
-
+            // The recipe comes from the (revalidated) server render, not from a client query.
             setTimeout(() => {
                 router.refresh();
             }, 1000);
@@ -208,6 +208,7 @@ export const RecipeHandlingProvider: React.FC<RecipeHandlingProviderProps> = ({
     const value = useMemo(
         () => ({
             recipe,
+            author,
             portionSize,
             setPortionSize,
             incrementPortionSize,
@@ -217,6 +218,7 @@ export const RecipeHandlingProvider: React.FC<RecipeHandlingProviderProps> = ({
         }),
         [
             recipe,
+            author,
             portionSize,
             setPortionSize,
             incrementPortionSize,

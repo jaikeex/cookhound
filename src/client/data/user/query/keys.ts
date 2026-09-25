@@ -13,7 +13,8 @@ import type {
     UserPreferences
 } from '@/common/types';
 import type {
-    CookieConsent,
+    CookieConsentDTO,
+    CookieConsentFromBrowser,
     CookieConsentPayload
 } from '@/common/types/cookie-consent';
 import type {
@@ -102,7 +103,12 @@ export type UpdateUserByIdOptions = Omit<
 >;
 
 export type CreateUserCookieConsentOptions = Omit<
-    UseMutationOptions<CookieConsent, RequestError, CookieConsentPayload>,
+    UseMutationOptions<CookieConsentDTO, RequestError, CookieConsentPayload>,
+    'mutationFn'
+>;
+
+export type SetConsentCookieOptions = Omit<
+    UseMutationOptions<void, RequestError, CookieConsentFromBrowser>,
     'mutationFn'
 >;
 

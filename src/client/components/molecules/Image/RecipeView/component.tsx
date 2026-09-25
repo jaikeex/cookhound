@@ -9,8 +9,7 @@ import { classNames } from '@/client/utils';
 import React, { useCallback, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import { useAuth, useModal, useSnackbar } from '@/client/store';
-import { chqc } from '@/client/data';
-import type { Recipe } from '@/common/types';
+import type { Recipe, User } from '@/common/types';
 import { ROUTES, ReportTargetType } from '@/common/constants';
 import { t } from '@/client/locales';
 
@@ -28,6 +27,7 @@ const HERO_IMAGE_SIZES =
 const HERO_IMAGE_SIZES_PREVIEW = '480px';
 
 export type RecipeViewImageProps = Readonly<{
+    author?: User;
     className?: string;
     isPreview?: boolean;
     recipe: Recipe;
@@ -37,6 +37,7 @@ export type RecipeViewImageProps = Readonly<{
 }>;
 
 export const RecipeViewImage: React.FC<RecipeViewImageProps> = ({
+    author,
     className,
     isPreview,
     recipe,
@@ -51,22 +52,6 @@ export const RecipeViewImage: React.FC<RecipeViewImageProps> = ({
     const { openModal } = useModal();
     const { user } = useAuth();
     const { alert } = useSnackbar();
-    const { data: cookbooks = [] } = chqc.cookbook.useCookbooksByUser(
-        user?.id ?? 0
-    );
-
-    const options = useMemo(
-        () =>
-            cookbooks
-                .map(({ id, title, recipes }) => ({
-                    value: id.toString(),
-                    label: title,
-                    disabled: recipes?.some((r) => r.id === recipe.id)
-                }))
-                .sort((a, b) => a.label.localeCompare(b.label))
-                .sort((a, b) => (a.disabled ? 1 : b.disabled ? -1 : 0)),
-        [cookbooks, recipe.id]
-    );
 
     //|-----------------------------------------------------------------------------------------|//
     //?                                         HANDLERS                                        ?//
@@ -74,13 +59,9 @@ export const RecipeViewImage: React.FC<RecipeViewImageProps> = ({
 
     const handleOpenCookbookModal = useCallback(() => {
         openModal((close) => (
-            <AddRecipeToCookbookModal
-                recipeId={recipe.id}
-                options={options}
-                close={close}
-            />
+            <AddRecipeToCookbookModal recipeId={recipe.id} close={close} />
         ));
-    }, [recipe.id, openModal, options]);
+    }, [recipe.id, openModal]);
 
     const handleOpenShareModal = React.useCallback(() => {
         openModal((close) => (
@@ -150,9 +131,10 @@ export const RecipeViewImage: React.FC<RecipeViewImageProps> = ({
             />
         );
 
-        const author = (
+        const authorLink = (
             <RecipeAuthorLinkMobile
                 authorId={recipe.authorId}
+                author={author}
                 className="w-8 h-8 @recipe:hidden"
             />
         );
@@ -163,7 +145,7 @@ export const RecipeViewImage: React.FC<RecipeViewImageProps> = ({
                     {addToCookbook}
                     {share}
                     {report}
-                    {showAuthorLink ? author : null}
+                    {showAuthorLink ? authorLink : null}
                 </div>
             </div>
         );
@@ -173,6 +155,7 @@ export const RecipeViewImage: React.FC<RecipeViewImageProps> = ({
         handleOpenShareModal,
         handleOpenReportModal,
         recipe.authorId,
+        author,
         showAuthorLink
     ]);
 

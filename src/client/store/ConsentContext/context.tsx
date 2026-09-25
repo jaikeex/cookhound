@@ -16,13 +16,13 @@ import type {
     CookieConsent,
     CookieConsentPayload
 } from '@/common/types/cookie-consent';
-import type { UserDTO } from '@/common/types';
+import type { User, UserDTO } from '@/common/types';
 import { getCookie } from '@/client/utils';
 import { eventBus } from '@/client/events';
 import { AppEvent } from '@/client/events';
 import { chqc, QUERY_KEYS } from '@/client/data';
+import { retryTransient } from '@/client/data/queryErrorHandlers';
 import { CONSENT_VERSION, CONSENT_COOKIE_NAME } from '@/common/constants';
-import { setConsentCookie } from '@/app/actions';
 import { useAppEventListener } from '@/client/hooks';
 import { useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/client/store/AuthContext';
@@ -149,15 +149,27 @@ export const ConsentProvider: React.FC<ConsentProviderProps> = ({
     const { mutateAsync: createUserCookieConsent } =
         chqc.user.useCreateUserCookieConsent({
             meta: { errorMessage: false },
-            retry: 3,
-            onSuccess: () => {
-                queryClient.invalidateQueries({
-                    predicate: (query) =>
-                        query.queryKey[0] === QUERY_KEYS.user.namespace ||
-                        query.queryKey[0] === QUERY_KEYS.auth.namespace
-                });
+            retry: retryTransient(3),
+            onSuccess: (created) => {
+                queryClient.setQueryData<User | null>(
+                    QUERY_KEYS.auth.currentUser,
+                    (current) =>
+                        current
+                            ? { ...current, cookieConsent: [created] }
+                            : current
+                );
             }
         });
+
+    const { mutateAsync: writeConsentCookie } = chqc.user.useSetConsentCookie({
+        meta: { silent: true }
+    });
+
+    const setConsentCookie = useCallback(
+        (consent: CookieConsent) =>
+            writeConsentCookie(toBrowserConsent(consent)),
+        [writeConsentCookie]
+    );
 
     //|-----------------------------------------------------------------------------------------|//
     //?                                         UPDATE                                          ?//
@@ -210,7 +222,13 @@ export const ConsentProvider: React.FC<ConsentProviderProps> = ({
                 setConsentAndEmit(previousConsent ?? null);
             }
         },
-        [user, createUserCookieConsent, alert, setConsentAndEmit]
+        [
+            user,
+            createUserCookieConsent,
+            alert,
+            setConsentAndEmit,
+            setConsentCookie
+        ]
     );
 
     const acceptAll = useCallback(async () => {
@@ -275,7 +293,14 @@ export const ConsentProvider: React.FC<ConsentProviderProps> = ({
             // Fall back to cookie value for anonymous users or if DB check fails
             setConsentAndEmit(cookie);
         }
-    }, [consent, user, rejectAll, setConsentAndEmit, queryClient]);
+    }, [
+        consent,
+        user,
+        rejectAll,
+        setConsentAndEmit,
+        setConsentCookie,
+        queryClient
+    ]);
 
     useEffect(() => {
         window.addEventListener('focus', verifyConsent);
@@ -393,7 +418,7 @@ export const ConsentProvider: React.FC<ConsentProviderProps> = ({
             };
 
             setConsentAndEmit(anonymousConsent);
-            setConsentCookie(anonymousConsent);
+            void setConsentCookie(anonymousConsent).catch(() => {});
         }
     });
 
@@ -423,7 +448,7 @@ export const ConsentProvider: React.FC<ConsentProviderProps> = ({
             setConsentAndEmit(dbConsent);
             void setConsentCookie(dbConsent).catch(() => {});
         }
-    }, [user, consent, setConsentAndEmit]);
+    }, [user, consent, setConsentAndEmit, setConsentCookie]);
 
     useEffect(() => {
         consentRef.current = consent;
@@ -436,7 +461,7 @@ export const ConsentProvider: React.FC<ConsentProviderProps> = ({
 
     useEffect(() => {
         if (initialConsent && !readConsentCookie()) {
-            setConsentCookie(initialConsent);
+            void setConsentCookie(initialConsent).catch(() => {});
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
@@ -476,6 +501,16 @@ export const ConsentProvider: React.FC<ConsentProviderProps> = ({
 //~---------------------------------------------------------------------------------------------~//
 //$                                       HELPER FUNCTIONS                                      $//
 //~---------------------------------------------------------------------------------------------~//
+
+function toBrowserConsent(consent: CookieConsent): CookieConsentFromBrowser {
+    return {
+        consent: consent.consent,
+        version: consent.version,
+        accepted: consent.accepted,
+        createdAt: new Date(consent.createdAt),
+        userId: consent.userId != null ? String(consent.userId) : null
+    };
+}
 
 function readConsentCookie(): CookieConsent | null {
     // Never run this on the server

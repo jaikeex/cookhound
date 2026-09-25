@@ -1,27 +1,9 @@
 'use server';
 
 import { cookies } from 'next/headers';
-import {
-    CONSENT_COOKIE_MAX_AGE,
-    SESSION_COOKIE_NAME
-} from '@/common/constants';
-import type { CookieConsent } from '@/common/types/cookie-consent';
+import { SESSION_COOKIE_NAME } from '@/common/constants';
 import { cache } from 'react';
 import { serverData } from '@/server/data';
-import { setCookie } from '@/server/utils/reqwest/cookies';
-
-export const setConsentCookie = async (
-    consent: CookieConsent
-): Promise<void> => {
-    await setCookie(
-        'cookie_consent',
-        encodeURIComponent(JSON.stringify(consent)),
-        {
-            maxAge: CONSENT_COOKIE_MAX_AGE,
-            sameSite: 'lax'
-        }
-    );
-};
 
 /**
  * Cached lookup of the current user.

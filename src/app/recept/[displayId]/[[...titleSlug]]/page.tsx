@@ -70,16 +70,18 @@ export default async function Page({ params }: RecipePageParams) {
         permanentRedirect(ROUTES.recipe.detail(recipeDisplayId, recipe.title));
     }
 
-    // A missing author must not break the schema block.
-    const authorName = await serverData.user
+    // A missing author must not break the page or the schema block.
+    const author = await serverData.user
         .getByIdPublic(recipe.authorId)
-        .then((author) => author.username)
         .catch(() => undefined);
 
     return (
         <React.Fragment>
-            <RecipeViewTemplate recipe={recipe} />
-            <RecipeStructuredData recipe={recipe} authorName={authorName} />
+            <RecipeViewTemplate recipe={recipe} author={author} />
+            <RecipeStructuredData
+                recipe={recipe}
+                authorName={author?.username}
+            />
         </React.Fragment>
     );
 }

@@ -124,17 +124,6 @@ export const ProfileTemplate: React.FC<ProfileProps> = ({
         onChange: handleParamChange
     });
 
-    const handleTabSelect = useCallback(
-        (index: number) => {
-            const item = profileNavigationItems[index];
-
-            if (item) {
-                setTab(item.param);
-            }
-        },
-        [profileNavigationItems]
-    );
-
     const activeIndex = resolveProfileTabIndex(profileNavigationItems, tab);
     const initialTabIndex = resolveProfileTabIndex(
         profileNavigationItems,
@@ -206,7 +195,6 @@ export const ProfileTemplate: React.FC<ProfileProps> = ({
                 tabs={tabBarItems}
                 activeTab={initialTabIndex}
                 enableNavigation
-                onTabChange={handleTabSelect}
                 className="mt-4 md:hidden"
                 buttonRowClassName="sticky top-14 z-10"
             />

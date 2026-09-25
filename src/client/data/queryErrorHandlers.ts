@@ -9,19 +9,26 @@ import { AppEvent, eventBus } from '@/client/events';
 import { t } from '@/client/locales';
 import { ROUTES } from '@/common/constants';
 
-const DEFAULT_QUERY_RETRIES = 3;
+export const DEFAULT_QUERY_RETRIES = 3;
 
 const isRateLimited = (error: unknown): boolean =>
     error instanceof RequestError && error.status === 429;
 
 /**
- * Default query retry policy. A 429 is never retried: each retry would land in
- * the same rate-limit window and extend the lockout before the redirect fires.
+ * Network failures (status 0) and 5xx responses can succeed on a second try.
+ * A 4xx will not, and a 429 retry would only extend the rate-limit lockout.
  */
-export const retryUnlessRateLimited = (
-    failureCount: number,
-    error: unknown
-): boolean => !isRateLimited(error) && failureCount < DEFAULT_QUERY_RETRIES;
+const isTransient = (error: unknown): boolean =>
+    error instanceof RequestError &&
+    (error.status === 0 || error.status >= 500);
+
+/**
+ * Retry policy that only retries transient failures.
+ */
+export const retryTransient =
+    (maxRetries: number) =>
+    (failureCount: number, error: unknown): boolean =>
+        isTransient(error) && failureCount < maxRetries;
 
 const redirectToRateLimitPage = () => {
     if (typeof window !== 'undefined') {
