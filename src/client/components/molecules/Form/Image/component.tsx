@@ -290,6 +290,11 @@ export const ImageInput: React.FC<ImageInputProps> = ({
                     <Image
                         width={2560}
                         height={1440}
+                        sizes={
+                            circularCrop
+                                ? '140px'
+                                : '(min-width: 512px) 480px, calc(100vw - 2rem)'
+                        }
                         src={previewUrl}
                         alt="Preview"
                         className={classNames(

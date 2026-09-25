@@ -3,7 +3,7 @@ import { Icon } from '@/client/components/atoms/Icons';
 import { RecipeImage } from '@/client/components/atoms/Image/RecipeImage';
 import { Typography } from '@/client/components/atoms/Typography';
 import { RecipeInfo } from '@/client/components/molecules/RecipeInfo';
-import { Rating } from '@/client/components/molecules/Rating';
+import { RatingDisplay } from '@/client/components/molecules/Rating/Display';
 import Link from 'next/link';
 import type { RecipeCardProps } from '@/client/components/molecules/Card/types';
 import { classNames } from '@/client/utils';
@@ -51,9 +51,8 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({
 
                         {rating ? (
                             <React.Fragment>
-                                <Rating
+                                <RatingDisplay
                                     rating={rating}
-                                    disabled
                                     size="sm"
                                     className="shrink-0 hidden md:block"
                                 />

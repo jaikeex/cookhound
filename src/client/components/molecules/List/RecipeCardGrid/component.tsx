@@ -26,7 +26,7 @@ export type RecipeCardGridProps = Readonly<{
     withHandling?: boolean;
 }>;
 
-export const RecipeCardGrid: React.FC<RecipeCardGridProps> = ({
+const RecipeCardGridComponent: React.FC<RecipeCardGridProps> = ({
     className,
     cols = {
         sm: GRID_COLS[2],
@@ -68,3 +68,5 @@ export const RecipeCardGrid: React.FC<RecipeCardGridProps> = ({
         </React.Fragment>
     );
 };
+
+export const RecipeCardGrid = React.memo(RecipeCardGridComponent);

@@ -35,8 +35,6 @@ export const TagSelectionModal: React.FC<TagSelectionModalProps> = ({
 }) => {
     const { alert } = useSnackbar();
 
-    const recipeObject = useCreateRecipeStore((state) => state.recipeObject);
-
     const incrementSuggestions = useCreateRecipeStore(
         (state) => state.incrementSuggestions
     );
@@ -108,6 +106,8 @@ export const TagSelectionModal: React.FC<TagSelectionModalProps> = ({
     );
 
     const handleSuggest = useCallback(() => {
+        const { recipeObject } = useCreateRecipeStore.getState();
+
         if (!recipeObject) return;
 
         if (!canSuggest()) {
@@ -121,7 +121,7 @@ export const TagSelectionModal: React.FC<TagSelectionModalProps> = ({
         }
 
         suggestTags(recipeObject);
-    }, [recipeObject, suggestTags, alert, canSuggest, getRemainingsuggestions]);
+    }, [suggestTags, alert, canSuggest, getRemainingsuggestions]);
 
     const handleApply = useCallback(() => {
         onApply?.(selectedTags);

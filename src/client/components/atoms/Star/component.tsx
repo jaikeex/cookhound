@@ -15,12 +15,6 @@ export type StarProps = Readonly<{
     state: 'full' | 'half' | 'empty';
 }>;
 
-export enum StarState {
-    FULL = 'full',
-    HALF = 'half',
-    EMPTY = 'empty'
-}
-
 const config = {
     fill: {
         gold: 'fill-yellow-500 dark:fill-yellow-400',

@@ -1,5 +1,13 @@
-import { MAX_RATING } from './component';
-import { StarState } from '@/client/components/atoms/Star';
+import { StarState } from '@/client/components/atoms/Star/types';
+
+export const MAX_RATING = 5;
+
+export type RatingSize = 'sm' | 'md' | 'lg';
+
+export const RATING_CLASS_CONFIG = {
+    starSize: { sm: 'w-4 h-4', md: 'w-6 h-6', lg: 'w-8 h-8' },
+    gap: { sm: 'gap-1', md: 'gap-2', lg: 'gap-3' }
+} as const satisfies Record<'starSize' | 'gap', Record<RatingSize, string>>;
 
 const VALUE_MAP = {
     [StarState.FULL]: 1,

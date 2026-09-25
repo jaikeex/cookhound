@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import type { Recipe } from '@/common/types';
-import { Rating } from '@/client/components/molecules/Rating';
+import { RatingInteractive } from '@/client/components/molecules/Rating/Interactive';
 import { Typography } from '@/client/components/atoms/Typography';
 import { RecipeInfo } from '@/client/components/molecules/RecipeInfo';
 import { RecipeViewImage } from '@/client/components/molecules/Image/RecipeView';
@@ -93,7 +93,7 @@ export const RecipeViewHead: React.FC<RecipeViewHeadProps> = ({
                 />
             )}
 
-            <Rating
+            <RatingInteractive
                 onClick={onRateRecipe}
                 onDisabledClick={
                     isPreview || !authResolved ? undefined : handleLockedRating

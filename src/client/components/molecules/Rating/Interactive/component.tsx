@@ -2,20 +2,19 @@
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { classNames, cooldownCaption } from '@/client/utils';
-import { Star, type StarState } from '@/client/components/atoms/Star';
+import { Star } from '@/client/components/atoms/Star';
+import type { StarState } from '@/client/components/atoms/Star/types';
 import { Typography } from '@/client/components/atoms/Typography';
-import { generateStars } from '@/client/components/molecules/Rating/utils';
+import {
+    generateStars,
+    MAX_RATING,
+    RATING_CLASS_CONFIG,
+    type RatingSize
+} from '@/client/components/molecules/Rating/utils';
 import { useCooldown } from '@/client/hooks';
 import { t } from '@/client/locales';
 
-export type RatingSize = 'sm' | 'md' | 'lg';
-
-const classConfig = {
-    starSize: { sm: 'w-4 h-4', md: 'w-6 h-6', lg: 'w-8 h-8' },
-    gap: { sm: 'gap-1', md: 'gap-2', lg: 'gap-3' }
-};
-
-export type RatingProps = Readonly<{
+export type RatingInteractiveProps = Readonly<{
     className?: string;
     cooldown?: number;
     cooldownKey?: string;
@@ -28,9 +27,7 @@ export type RatingProps = Readonly<{
     size?: RatingSize;
 }>;
 
-export const MAX_RATING = 5;
-
-export const Rating: React.FC<RatingProps> = ({
+export const RatingInteractive: React.FC<RatingInteractiveProps> = ({
     className,
     cooldown,
     cooldownKey,
@@ -134,7 +131,7 @@ export const Rating: React.FC<RatingProps> = ({
             <div
                 className={classNames(
                     'flex items-center max-w-fit mx-auto',
-                    classConfig.gap[size],
+                    RATING_CLASS_CONFIG.gap[size],
                     (disabled || isOnCooldown) && 'opacity-80',
                     isOnCooldown && 'cursor-not-allowed'
                 )}
@@ -150,7 +147,7 @@ export const Rating: React.FC<RatingProps> = ({
                         iconSize={iconSize}
                         fill={stars[index] !== 'empty' ? fill : 'silver'}
                         className={classNames(
-                            classConfig.starSize[size],
+                            RATING_CLASS_CONFIG.starSize[size],
                             !hasRating &&
                                 (isHovered ? 'opacity-100' : 'opacity-80')
                         )}
