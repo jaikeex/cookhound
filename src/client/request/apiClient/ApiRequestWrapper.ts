@@ -1,5 +1,5 @@
 import { RequestError } from '@/client/error';
-import { ENV_CONFIG_PUBLIC, ROUTES } from '@/common/constants';
+import { ENV_CONFIG_PUBLIC } from '@/common/constants';
 
 /**
  * A type alias for a URL string that must start with a forward slash.
@@ -262,11 +262,6 @@ class ApiRequestWrapper {
         }
 
         if (!response.ok) {
-            // Handle 429 Too Many Requests on client side
-            if (response.status === 429 && typeof window !== 'undefined') {
-                window.location.href = ROUTES.error.tooManyRequests;
-            }
-
             throw RequestError.fromResponse(data, response);
         }
 

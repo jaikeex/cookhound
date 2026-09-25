@@ -147,12 +147,6 @@ export const RecipeHandlingProvider: React.FC<RecipeHandlingProviderProps> = ({
             setTimeout(() => {
                 router.refresh();
             }, 1000);
-        },
-        onError: () => {
-            alert({
-                message: t('app.error.default'),
-                variant: 'error'
-            });
         }
     });
 

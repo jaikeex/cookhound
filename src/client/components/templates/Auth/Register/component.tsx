@@ -88,6 +88,7 @@ export const RegisterTemplate: React.FC<RegisterTemplateProps> = () => {
         isPending,
         error: createUserError
     } = chqc.user.useCreateUser({
+        meta: { errorMessage: false },
         onSuccess: (user) => {
             alert({
                 message: t('auth.success.register'),

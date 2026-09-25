@@ -148,6 +148,7 @@ export const ConsentProvider: React.FC<ConsentProviderProps> = ({
 
     const { mutateAsync: createUserCookieConsent } =
         chqc.user.useCreateUserCookieConsent({
+            meta: { errorMessage: false },
             retry: 3,
             onSuccess: () => {
                 queryClient.invalidateQueries({

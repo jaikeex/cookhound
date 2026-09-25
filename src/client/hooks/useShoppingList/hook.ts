@@ -80,6 +80,7 @@ export const useShoppingList = () => {
     //~-----------------------------------------------------------------------------------------~//
 
     const upsertMutation = chqc.user.useUpsertShoppingList(userId ?? 0, {
+        meta: { errorMessage: false },
         onMutate: async (payload) => {
             // The following code deals with optimistically updating the ui while trying not to fuck everything up.
             if (!listQueryKey) return { previous: null } as const;
@@ -140,6 +141,7 @@ export const useShoppingList = () => {
 
     // Update mutation – simpler optimistic path handled in onMutate (same pattern as above)
     const updateMutation = chqc.user.useUpdateShoppingList(userId ?? 0, {
+        meta: { errorMessage: false },
         onMutate: async (payload) => {
             // The following code deals with optimistically updating the ui while trying not to fuck everything up.
             // Same pattern and priciples as above apply here
@@ -187,6 +189,7 @@ export const useShoppingList = () => {
     });
 
     const deleteMutation = chqc.user.useDeleteShoppingList(userId ?? 0, {
+        meta: { errorMessage: false },
         onMutate: async (payload) => {
             if (!listQueryKey) return { previous: null };
 

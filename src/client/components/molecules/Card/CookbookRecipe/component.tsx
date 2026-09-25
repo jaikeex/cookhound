@@ -52,12 +52,6 @@ export const CookbookRecipeCard: React.FC<CookbookRecipeCardProps> = ({
                 });
 
                 onRemoved?.(recipeProps.id);
-            },
-            onError: () => {
-                alert({
-                    message: t('app.error.default'),
-                    variant: 'error'
-                });
             }
         });
 

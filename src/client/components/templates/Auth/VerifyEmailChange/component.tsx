@@ -25,6 +25,7 @@ export const VerifyEmailChangeTemplate: React.FC = () => {
         isSuccess,
         error
     } = chqc.user.useConfirmEmailChange({
+        meta: { errorMessage: false },
         onSuccess: () => {
             queryClient.invalidateQueries({
                 predicate: (query) =>

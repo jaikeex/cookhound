@@ -27,12 +27,7 @@ export const PendingDeletionBanner: React.FC<PendingDeletionBannerProps> = ({
 
                 window.location.reload(); // to remove the banner
             },
-            onError: () => {
-                alert({
-                    variant: 'error',
-                    message: t('app.profile.pendingDeletion.cancel.error')
-                });
-            }
+            meta: { errorMessage: 'app.profile.pendingDeletion.cancel.error' }
         });
 
     const { daysRemaining, formattedDate, isLessThan24Hours } = useMemo(() => {

@@ -40,12 +40,7 @@ export const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
 
                 window.location.reload(); // to show the banner
             },
-            onError: () => {
-                alert({
-                    variant: 'error',
-                    message: t('app.profile.deleteAccount.error')
-                });
-            }
+            meta: { errorMessage: 'app.profile.deleteAccount.error' }
         });
 
     const handleCancel = useCallback(() => {

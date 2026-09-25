@@ -12,6 +12,8 @@ import { Snackbar } from '@/client/components/molecules/Snackbar';
 import type { AlertPayload, SnackbarPosition } from '@/client/types';
 import ReactDOM from 'react-dom';
 import { classNames, generateRandomId } from '@/client/utils';
+import { AppEvent, type EventPayload } from '@/client/events';
+import { useAppEventListener } from '@/client/hooks/useAppEventListener/hook';
 
 const AUTO_DISMISS = 4000;
 const ACTION_AUTO_DISMISS = 10000;
@@ -98,6 +100,15 @@ export const SnackbarProvider: React.FC<SnackbarProviderProps> = ({
     const clearAlerts = useCallback(() => {
         setActiveAlerts([]);
     }, []);
+
+    const alertRequestFailure = useCallback(
+        ({ message }: EventPayload<AppEvent.REQUEST_FAILED>) => {
+            alert({ message, variant: 'error' });
+        },
+        [alert]
+    );
+
+    useAppEventListener(AppEvent.REQUEST_FAILED, alertRequestFailure);
 
     const value = useMemo(() => ({ alert, clearAlerts }), [alert, clearAlerts]);
 

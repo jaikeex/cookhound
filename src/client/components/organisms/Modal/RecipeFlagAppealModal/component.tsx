@@ -44,6 +44,7 @@ export const RecipeFlagAppealModal: React.FC<RecipeFlagAppealModalProps> = ({
     );
 
     const { mutate: submitAppeal, isPending } = chqc.recipe.useSubmitAppeal({
+        meta: { errorMessage: false },
         onSuccess: () => {
             alert({
                 message: t('recipe.flag.appeal.success'),

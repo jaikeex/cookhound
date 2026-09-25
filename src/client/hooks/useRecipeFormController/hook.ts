@@ -66,10 +66,13 @@ export const useRecipeFormController = ({
     const formRef = useRef<HTMLFormElement>(null);
 
     const { mutateAsync: uploadImageMutation, isPending: isUploadingImage } =
-        chqc.file.useUploadRecipeImage();
+        chqc.file.useUploadRecipeImage({
+            meta: { errorMessage: 'app.error.image-upload-failed' }
+        });
 
     const { mutate: createRecipe, isPending: isCreating } =
         chqc.recipe.useCreateRecipe({
+            meta: { errorMessage: false },
             onSuccess: (recipe) => handleSubmitSuccess(recipe),
             onError: (error) => {
                 setFormErrors({
@@ -80,6 +83,7 @@ export const useRecipeFormController = ({
 
     const { mutate: updateRecipe, isPending: isUpdating } =
         chqc.recipe.useUpdateRecipe({
+            meta: { errorMessage: false },
             onSuccess: (recipe) => handleSubmitSuccess(recipe),
             onError: (error) => {
                 setFormErrors({
@@ -108,9 +112,9 @@ export const useRecipeFormController = ({
         async (data: FormData): Promise<string | null> => {
             let image_url: string | null = null;
 
-            try {
-                const imageFile = data.get('recipe-image') as File;
+            const imageFile = data.get('recipe-image') as File;
 
+            try {
                 if (imageFile && imageFile.size > 0) {
                     const response = await uploadImageMutation({
                         fileName: `recipe-image-${generateUuid()}`,
@@ -119,16 +123,13 @@ export const useRecipeFormController = ({
 
                     image_url = response.objectUrl;
                 }
-            } catch (error: unknown) {
-                alert({
-                    message: t('app.error.image-upload-failed'),
-                    variant: 'error'
-                });
+            } catch {
+                // Do nothing here, the global handlers get this!
             }
 
             return image_url;
         },
-        [alert, uploadImageMutation]
+        [uploadImageMutation]
     );
 
     //~-----------------------------------------------------------------------------------------~//

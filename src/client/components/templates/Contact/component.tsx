@@ -54,6 +54,7 @@ export const ContactTemplate: React.FC<ContactTemplateProps> = () => {
         isPending,
         error: submitError
     } = chqc.contact.useSubmitContactForm({
+        meta: { errorMessage: false },
         onSuccess: () => {
             alert({
                 message: t('contact.success.sent'),

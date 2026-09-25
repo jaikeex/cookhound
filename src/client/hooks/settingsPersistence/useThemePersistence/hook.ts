@@ -15,7 +15,7 @@ export const useThemePersistence = (userId?: number): void => {
     const { canUsePreferences } = useConsent();
 
     const { mutate: updateUserPreferences } =
-        chqc.user.useUpdateUserPreferences();
+        chqc.user.useUpdateUserPreferences({ meta: { silent: true } });
 
     const handleRestore = useCallback(
         (theme: string) => {

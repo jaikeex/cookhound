@@ -60,6 +60,7 @@ export const LoginTemplate: React.FC<LoginTemplateProps> = ({
         isPending,
         error: loginError
     } = chqc.auth.useLogin({
+        meta: { errorMessage: false },
         onSuccess: (user) => {
             queryClient.setQueryData(QUERY_KEYS.auth.currentUser, user);
             queryClient.invalidateQueries({

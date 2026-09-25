@@ -48,12 +48,6 @@ export const RecipeWithHandling: React.FC<RecipeCardProps> = ({
                 message: t('auth.success.delete-recipe'),
                 variant: 'success'
             });
-        },
-        onError: () => {
-            alert({
-                message: t('app.error.default'),
-                variant: 'error'
-            });
         }
     });
 

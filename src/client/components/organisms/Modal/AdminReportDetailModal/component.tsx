@@ -86,12 +86,7 @@ export const AdminReportDetailModal: React.FC<AdminReportDetailModalProps> = ({
             });
             invalidateQueries();
         },
-        onError: () => {
-            alert({
-                variant: 'error',
-                message: t('admin.reports.action.error')
-            });
-        }
+        meta: { errorMessage: 'admin.reports.action.error' }
     });
 
     const handleMarkReviewing = useCallback(() => {

@@ -53,12 +53,6 @@ export const FlaggedAuthorTemplate: React.FC<FlaggedAuthorTemplateProps> = ({
                 });
 
                 router.push(user ? ROUTES.user.detail(user.id) : ROUTES.home);
-            },
-            onError: () => {
-                alert({
-                    message: t('app.error.default'),
-                    variant: 'error'
-                });
             }
         });
 

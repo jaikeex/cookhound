@@ -29,6 +29,7 @@ export const useGoogleSignIn: UseGoogleSignInType = ({ onSuccess }) => {
         error,
         isPending
     } = chqc.auth.useLoginWithGoogleOauth({
+        meta: { errorMessage: false },
         onSuccess: (user) => {
             onSuccess?.(user);
             queryClient.setQueryData(QUERY_KEYS.auth.currentUser, user);

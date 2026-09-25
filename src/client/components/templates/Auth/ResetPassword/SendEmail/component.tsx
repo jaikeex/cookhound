@@ -48,6 +48,7 @@ export const SendResetPasswordEmailTemplate: React.FC<
         error,
         isPending
     } = chqc.user.useSendResetPasswordEmail({
+        meta: { errorMessage: false },
         onSuccess: () => {
             formRef.current?.reset();
             disableForm();

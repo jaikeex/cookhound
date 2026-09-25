@@ -15,7 +15,7 @@ export const VerifyEmailTemplate: React.FC<VerifyEmailTemplateProps> = ({
     new: newParam
 }) => {
     const { mutate: resendVerificationEmail, error } =
-        chqc.user.useResendVerificationEmail();
+        chqc.user.useResendVerificationEmail({ meta: { errorMessage: false } });
 
     const handleResendVerificationEmail = useCallback(async () => {
         const email = new URLSearchParams(window.location.search).get('email');

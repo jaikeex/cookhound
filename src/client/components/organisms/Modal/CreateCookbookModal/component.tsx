@@ -18,6 +18,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { z } from 'zod';
 import { validateFormData } from '@/client/utils';
 import { t } from '@/client/locales';
+import { getErrorMessageKey } from '@/client/error';
 
 //~---------------------------------------------------------------------------------------------~//
 //$                                          VALIDATION                                         $//
@@ -59,6 +60,7 @@ export const CreateCookbookModal: React.FC<CreateCookbookModalProps> = ({
 
     const { mutateAsync: createCookbook, isPending } =
         chqc.cookbook.useCreateCookbook({
+            meta: { errorMessage: false },
             onSuccess: (cookbook) => {
                 queryClient.invalidateQueries({
                     predicate: (query) =>
@@ -73,10 +75,8 @@ export const CreateCookbookModal: React.FC<CreateCookbookModalProps> = ({
                 onCreate?.(cookbook.id);
                 close();
             },
-            onError: () => {
-                setErrors({
-                    server: 'app.error.default'
-                });
+            onError: (error) => {
+                setErrors({ server: getErrorMessageKey(error) });
             }
         });
 

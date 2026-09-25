@@ -17,6 +17,7 @@ export const RecipeVisitPing: React.FC<RecipeVisitPingProps> = ({
     const { user } = useAuth();
 
     const { mutate: registerRecipeVisit } = chqc.recipe.useRegisterRecipeVisit({
+        meta: { silent: true },
         onSuccess: () => {
             if (!user?.id) return;
 

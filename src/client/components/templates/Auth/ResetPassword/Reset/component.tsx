@@ -61,6 +61,7 @@ export const ResetPasswordTemplate: React.FC = () => {
         error,
         isPending
     } = chqc.user.useResetPassword({
+        meta: { errorMessage: false },
         onSuccess: () => {
             formRef.current?.reset();
             disableForm();

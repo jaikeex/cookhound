@@ -76,12 +76,7 @@ export const AdminUserDetailModal: React.FC<AdminUserDetailModalProps> = ({
             });
             invalidateQueries();
         },
-        onError: () => {
-            alert({
-                variant: 'error',
-                message: t('admin.users.action.changeRole.error')
-            });
-        }
+        meta: { errorMessage: 'admin.users.action.changeRole.error' }
     });
 
     const { mutateAsync: changeStatus } = chqc.admin.useChangeUserStatus({
@@ -95,12 +90,7 @@ export const AdminUserDetailModal: React.FC<AdminUserDetailModalProps> = ({
             });
             invalidateQueries();
         },
-        onError: () => {
-            alert({
-                variant: 'error',
-                message: t('admin.users.action.ban.error')
-            });
-        }
+        meta: { errorMessage: 'admin.users.action.ban.error' }
     });
 
     const { mutateAsync: forceLogout } = chqc.admin.useForceLogout({
@@ -110,12 +100,7 @@ export const AdminUserDetailModal: React.FC<AdminUserDetailModalProps> = ({
                 message: t('admin.users.action.forceLogout.success')
             });
         },
-        onError: () => {
-            alert({
-                variant: 'error',
-                message: t('admin.users.action.forceLogout.error')
-            });
-        }
+        meta: { errorMessage: 'admin.users.action.forceLogout.error' }
     });
 
     const { mutateAsync: forcePasswordReset } =
@@ -126,11 +111,8 @@ export const AdminUserDetailModal: React.FC<AdminUserDetailModalProps> = ({
                     message: t('admin.users.action.forcePasswordReset.success')
                 });
             },
-            onError: () => {
-                alert({
-                    variant: 'error',
-                    message: t('admin.users.action.forcePasswordReset.error')
-                });
+            meta: {
+                errorMessage: 'admin.users.action.forcePasswordReset.error'
             }
         });
 
@@ -142,12 +124,7 @@ export const AdminUserDetailModal: React.FC<AdminUserDetailModalProps> = ({
             });
             invalidateQueries();
         },
-        onError: () => {
-            alert({
-                variant: 'error',
-                message: t('admin.users.action.verifyEmail.error')
-            });
-        }
+        meta: { errorMessage: 'admin.users.action.verifyEmail.error' }
     });
 
     const { mutateAsync: scheduleDeletion } =
@@ -159,12 +136,7 @@ export const AdminUserDetailModal: React.FC<AdminUserDetailModalProps> = ({
                 });
                 invalidateQueries();
             },
-            onError: () => {
-                alert({
-                    variant: 'error',
-                    message: t('admin.users.action.delete.error')
-                });
-            }
+            meta: { errorMessage: 'admin.users.action.delete.error' }
         });
 
     const { mutateAsync: cancelDeletion } = chqc.admin.useCancelAccountDeletion(
@@ -176,12 +148,7 @@ export const AdminUserDetailModal: React.FC<AdminUserDetailModalProps> = ({
                 });
                 invalidateQueries();
             },
-            onError: () => {
-                alert({
-                    variant: 'error',
-                    message: t('admin.users.action.cancelDeletion.error')
-                });
-            }
+            meta: { errorMessage: 'admin.users.action.cancelDeletion.error' }
         }
     );
 

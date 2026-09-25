@@ -26,6 +26,7 @@ export const VerifyEmailCallbackTemplate: React.FC = () => {
         isSuccess,
         error
     } = chqc.user.useVerifyEmail({
+        meta: { errorMessage: false },
         onSuccess: () => {
             queryClient.invalidateQueries({
                 predicate: (query) =>

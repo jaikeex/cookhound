@@ -59,9 +59,6 @@ export const AddRecipeToCookbookModal: React.FC<
                     variant: 'success'
                 });
                 close();
-            },
-            onError: () => {
-                alert({ message: t('app.error.default'), variant: 'error' });
             }
         });
 
@@ -98,12 +95,6 @@ export const AddRecipeToCookbookModal: React.FC<
                         });
 
                         close();
-                    },
-                    onError: () => {
-                        alert({
-                            message: t('app.error.default'),
-                            variant: 'error'
-                        });
                     }
                 }
             );

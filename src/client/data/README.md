@@ -122,7 +122,15 @@ checker.
 
 **(d) Errors are `RequestError`** (`src/client/error/request.ts`),
 carrying HTTP status, code, and request id. Consumers rely on this
-without unwrapping transport-specific shapes.
+without unwrapping transport-specific shapes. The transport guarantees
+it: network failures become `RequestError.network()` (`status: 0`,
+`code: 'NETWORK_ERROR'`), and bodies without a known i18n key get a
+status-based message, so `RequestError.message` is always an
+`I18nMessage`. Aborts are the one exception, rethrown untouched so
+react-query sees a cancellation. To display any caught value, use
+`getErrorMessage()` / `getErrorMessageKey()` from `@/client/error`
+rather than reading `.message` yourself: they also cover errors that
+did not come from the transport (revive failures, plain `TypeError`s).
 
 ---
 
@@ -234,6 +242,30 @@ Each layer minds its own business: hooks know nothing about HTTP, the
 adapter knows nothing about react-query, the transport knows nothing
 about domain types.
 
+### Error policy (global handlers)
+
+Failures are handled once, in the `QueryCache` / `MutationCache` built by
+`queryErrorHandlers.ts` and mounted in `QueryProvider`. They run before
+any per-hook `onError`, which stays free for local work (optimistic
+rollbacks, form state).
+
+- **Queries**: a 429 redirects to `/error/too-many-requests`. Nothing
+  else; the component renders load failures (`isError`).
+- **Mutations**: a 429 redirects; any other failure shows one error
+  snackbar with the error's own message.
+
+Opt out per hook through the typed `meta` (`queryMeta.ts`):
+
+```ts
+chqc.recipe.useCreateRecipe({ meta: { errorMessage: false } });   // rendered inline
+chqc.admin.useForceLogout({ meta: { errorMessage: 'admin.users.action.forceLogout.error' } });
+chqc.recipe.useRegisterRecipeVisit({ meta: { silent: true } });    // background: no snackbar, no redirect
+```
+
+Do not add an `onError` that only shows a snackbar; that is the default.
+`QueryProvider` sits above `SnackbarProvider`, so the handlers reach it
+through the `AppEvent.REQUEST_FAILED` event.
+
 ---
 
 ## 7. Adding a new endpoint
@@ -343,15 +375,10 @@ responsibility and would be tested with MSW.
   `revive.ts` helpers, which both call.
 
 > [!NOTE]  
-> **Transport-level navigation side effects.** `ApiRequestWrapper.ts`
-  performs `window.location.href = '/error/too-many-requests'` on a 429
-  (branch guarded by `typeof window !== 'undefined'`) and `notFound()` on
-  a 404 (guarded by `typeof window === 'undefined'`) before throwing.
-  Every consumer inherits these behaviors. The seam makes moving them to
-  a hook, adapter, or route-level error boundary tractable
-  (`RequestError.status` is there to dispatch on), but the move is not
-  yet done. Note the 404 branch is now effectively unreachable — it only
-  fires when `apiClient` runs outside a browser, and since the move to
-  `serverData` nothing renders through it server-side. RSC 404s are
-  raised by the page (or `serverData`), not by the transport.
+> **No navigation in the transport.** `ApiRequestWrapper.ts` only
+  throws. The 429 redirect it used to perform now lives in the global
+  handlers (see "Error policy" in section 6), where background callers
+  can opt out. The former server-side `notFound()` on a 404 is gone too:
+  nothing renders through the transport server-side since the move to
+  `serverData`, and RSC 404s are raised by the page (or `serverData`).
 

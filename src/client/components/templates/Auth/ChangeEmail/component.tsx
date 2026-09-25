@@ -41,6 +41,7 @@ export const ChangeEmailTemplate: React.FC<ChangeEmailTemplateProps> = () => {
         isPending,
         error: initiateError
     } = chqc.user.useInitiateEmailChange({
+        meta: { errorMessage: false },
         onSuccess: () => {
             alert({
                 message: t('auth.change-email.success'),

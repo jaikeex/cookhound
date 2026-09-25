@@ -64,6 +64,7 @@ export const ReportContentModal: React.FC<ReportContentModalProps> = ({
     );
 
     const { mutate: submitReport, isPending } = chqc.report.useSubmitReport({
+        meta: { errorMessage: false },
         onSuccess: () => {
             alert({
                 message: t('report.modal.success'),

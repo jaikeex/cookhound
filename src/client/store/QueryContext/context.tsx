@@ -1,7 +1,12 @@
 'use client';
 
 import React, { useState, type ReactNode } from 'react';
-import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import {
+    createMutationCache,
+    createQueryCache,
+    retryUnlessRateLimited
+} from '@/client/data/queryErrorHandlers';
 
 export const QueryProvider: React.FC<
     Readonly<{
@@ -17,9 +22,12 @@ export const QueryProvider: React.FC<
     const [client] = useState(
         () =>
             new QueryClient({
+                queryCache: createQueryCache(),
+                mutationCache: createMutationCache(),
                 defaultOptions: {
                     queries: {
                         staleTime: 60_000,
+                        retry: retryUnlessRateLimited,
                         refetchOnWindowFocus: false,
                         refetchOnMount: true
                     }

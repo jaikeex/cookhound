@@ -3,10 +3,9 @@
 import React, { useCallback } from 'react';
 import { ImageInput } from '@/client/components/molecules/Form/Image';
 import { chqc, QUERY_KEYS } from '@/client/data';
-import { useAuth, useSnackbar } from '@/client/store';
+import { useAuth } from '@/client/store';
 import { generateUuid } from '@/client/utils';
 import { useQueryClient } from '@tanstack/react-query';
-import { t } from '@/client/locales';
 
 export type AvatarInputProps = Readonly<{
     className?: string;
@@ -16,13 +15,13 @@ export const AvatarInput: React.FC<AvatarInputProps> = ({ className }) => {
     //~-----------------------------------------------------------------------------------------~//
     //$                                   STATE & MUTATIONS                                     $//
     //~-----------------------------------------------------------------------------------------~//
-    const { alert } = useSnackbar();
     const { user, authResolved } = useAuth();
 
     const queryClient = useQueryClient();
 
     const { mutateAsync: updateUserById, isPending: isUpdatingUserById } =
         chqc.user.useUpdateUserById({
+            meta: { errorMessage: 'app.error.image-upload-failed' },
             onSuccess: () => {
                 queryClient.invalidateQueries({
                     predicate: (query) =>
@@ -35,7 +34,9 @@ export const AvatarInput: React.FC<AvatarInputProps> = ({ className }) => {
     const {
         mutateAsync: uploadAvatarImage,
         isPending: isUploadingAvatarImage
-    } = chqc.file.useUploadAvatarImage();
+    } = chqc.file.useUploadAvatarImage({
+        meta: { errorMessage: 'app.error.image-upload-failed' }
+    });
 
     const isUploading = isUploadingAvatarImage || isUpdatingUserById;
 
@@ -59,14 +60,11 @@ export const AvatarInput: React.FC<AvatarInputProps> = ({ className }) => {
                         data: { avatarUrl: imageUrl }
                     });
                 }
-            } catch (error: unknown) {
-                alert({
-                    message: t('app.error.image-upload-failed'),
-                    variant: 'error'
-                });
+            } catch {
+                // Do nothing here, the global handlers get this!
             }
         },
-        [alert, uploadAvatarImage, updateUserById, user?.id]
+        [uploadAvatarImage, updateUserById, user?.id]
     );
 
     //~-----------------------------------------------------------------------------------------~//
