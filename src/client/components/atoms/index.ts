@@ -6,7 +6,6 @@ export * from './Divider';
 export * from './Checkbox';
 export * from './Chip';
 export * from './GoogleAnalytics';
-export * from './Head';
 export * from './Icons';
 export * from './Image';
 export * from './Input';

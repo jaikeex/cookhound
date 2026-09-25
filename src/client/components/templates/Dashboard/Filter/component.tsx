@@ -55,18 +55,17 @@ export const FilterTemplate: React.FC<FilterTemplateProps> = ({
      * This should be considered the only source of truth for the filter params router updates.
      * Packaging this with the handlers causes issues with batched updates and can lead to
      * incosistent states...
-     * Also, this always results in a router call on first mount, but should be no concern.
-     * The serialized url will be the same as the current one.
      */
     useEffect(() => {
         const params = serializeFilterParams(filters);
         const search = params.toString();
+        const target = search ? `${ROUTES.filter}?${search}` : ROUTES.filter;
 
-        router.replace(search ? `${ROUTES.filter}?${search}` : ROUTES.filter, {
-            scroll: false
-        });
-        // this is intentional
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+        if (target === `${window.location.pathname}${window.location.search}`) {
+            return;
+        }
+
+        window.history.replaceState(null, '', target);
     }, [filters]);
 
     //~-----------------------------------------------------------------------------------------~//

@@ -3,14 +3,13 @@ import '@/client/globals.css';
 import type { Metadata, Viewport } from 'next';
 import { Kalam, Open_Sans } from 'next/font/google';
 
-import { QueryProvider } from '@/client/store';
+import { QueryProvider } from '@/client/store/QueryContext';
 import { AppProviders } from './providers';
 import { ClientShell } from './shell';
 import {
     BottomNavigation,
     TopNavigation,
     ScrollToTop,
-    Head,
     Footer,
     ConsentBanner,
     GoogleAnalytics
@@ -22,7 +21,7 @@ import { t } from '@/client/locales';
 import { DEFAULT_LOCALE, ENV_CONFIG_PUBLIC } from '@/common/constants';
 
 const openSans = Open_Sans({
-    subsets: ['latin'],
+    subsets: ['latin', 'latin-ext'],
     display: 'swap',
     variable: '--font-open-sans',
     preload: true,
@@ -31,7 +30,7 @@ const openSans = Open_Sans({
 
 const kalam = Kalam({
     subsets: ['latin'],
-    weight: ['300', '400', '700'],
+    weight: ['400'],
     display: 'swap',
     variable: '--font-kalam',
     preload: true,
@@ -63,7 +62,6 @@ export default function RootLayout({
 }>) {
     return (
         <html lang={DEFAULT_LOCALE} suppressHydrationWarning>
-            <Head />
             <body className={`${kalam.variable} ${openSans.variable}`}>
                 <QueryProvider>
                     <AppProviders initialTheme="dark" initialConsent={null}>

@@ -149,7 +149,6 @@ const nextConfig = {
     },
 
     experimental: {
-        optimizeCss: true,
         optimizePackageImports: [
             '@/client/components',
             '@/client/utils',

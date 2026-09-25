@@ -1,19 +1,29 @@
 'use client';
 
 import React from 'react';
+import dynamic from 'next/dynamic';
 import { useAuth } from '@/client/store';
 import { Loader } from '@/client/components/atoms/Loader';
-import { FlaggedTemplate } from '@/client/components/templates/Error/Flagged';
+import type { Recipe } from '@/common/types';
 
-export type RecipeFlaggedGateProps = React.PropsWithChildren<
-    Readonly<{
-        authorId: number;
-    }>
->;
+const FlaggedAuthorTemplate = dynamic(() =>
+    import('@/client/components/templates/Recipe/Flagged').then(
+        (mod) => mod.FlaggedAuthorTemplate
+    )
+);
+
+const FlaggedTemplate = dynamic(() =>
+    import('@/client/components/templates/Error/Flagged').then(
+        (mod) => mod.FlaggedTemplate
+    )
+);
+
+export type RecipeFlaggedGateProps = Readonly<{
+    recipe: Recipe;
+}>;
 
 export const RecipeFlaggedGate: React.FC<RecipeFlaggedGateProps> = ({
-    authorId,
-    children
+    recipe
 }) => {
     const { authResolved, user } = useAuth();
 
@@ -29,10 +39,10 @@ export const RecipeFlaggedGate: React.FC<RecipeFlaggedGateProps> = ({
         );
     }
 
-    const isAuthor = !!user?.id && user.id === authorId;
+    const isAuthor = !!user?.id && user.id === recipe.authorId;
 
     return isAuthor ? (
-        <React.Fragment>{children}</React.Fragment>
+        <FlaggedAuthorTemplate recipe={recipe} />
     ) : (
         <FlaggedTemplate />
     );

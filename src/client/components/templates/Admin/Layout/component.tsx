@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { Suspense, useMemo } from 'react';
 import { Menu, type MenuItem } from '@/client/components/molecules/Menu';
 import { NavTabs } from '@/client/components/molecules/NavTabs';
 import { Typography } from '@/client/components/atoms/Typography';
@@ -43,11 +43,13 @@ export const AdminLayoutShell: React.FC<AdminLayoutShellProps> = ({
                     {t('admin.title')}
                 </Typography>
 
-                <Menu
-                    items={menuItems}
-                    aria-label="Admin navigation"
-                    className="hidden md:flex"
-                />
+                <Suspense fallback={null}>
+                    <Menu
+                        items={menuItems}
+                        aria-label="Admin navigation"
+                        className="hidden md:flex"
+                    />
+                </Suspense>
                 <NavTabs
                     items={menuItems}
                     aria-label="Admin navigation"

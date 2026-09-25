@@ -72,6 +72,7 @@ export const Logo: React.FC<LogoProps> = ({
                     className="absolute inset-0 object-contain dark:opacity-0"
                     alt="logo"
                     loading="eager"
+                    fetchPriority="low"
                     fill
                     sizes={`${classConfig[size].img}px`}
                     priority={priority}
@@ -81,6 +82,7 @@ export const Logo: React.FC<LogoProps> = ({
                     className="absolute inset-0 object-contain opacity-0 dark:opacity-100"
                     alt="logo"
                     loading="eager"
+                    fetchPriority="low"
                     fill
                     sizes={`${classConfig[size].img}px`}
                     priority={priority}

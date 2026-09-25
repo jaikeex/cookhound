@@ -206,11 +206,11 @@ export const useSidebar = (config: SidebarConfig = {}) => {
         else {
             openSidebar();
 
-            // On mobile screens, the sidebar is opened with a query parameter to facilitate the back/forward navigation
+            // On mobile screens, the sidebar is opened with a query parameter to facilitate the back/forward navigation.
             if (useMobileParams && getScreenSize().isMobile) {
                 const params = new URLSearchParams(searchParams);
                 params.set(paramKey, 'true');
-                router.push(`?${params.toString()}`, { scroll: false });
+                window.history.pushState(null, '', `?${params.toString()}`);
             }
         }
     }, [
@@ -219,8 +219,7 @@ export const useSidebar = (config: SidebarConfig = {}) => {
         openSidebar,
         useMobileParams,
         searchParams,
-        paramKey,
-        router
+        paramKey
     ]);
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -247,7 +246,7 @@ export const useSidebar = (config: SidebarConfig = {}) => {
             currentUrl.searchParams.delete(paramKey);
 
             const cleanUrl = currentUrl.pathname + (currentUrl.search || '');
-            router.replace(cleanUrl);
+            window.history.replaceState(null, '', cleanUrl);
         } else if (!searchParams.get(paramKey) && isSidebarOpen) {
             // This fires in two different cases:
             // (1) the user opens a link from inside the sidebar
@@ -263,7 +262,7 @@ export const useSidebar = (config: SidebarConfig = {}) => {
             lastPathnameRef.current = window.location.pathname;
             return;
         }
-    }, [searchParams, paramKey, isSidebarOpen, router, toggleSidebar]);
+    }, [searchParams, paramKey, isSidebarOpen, toggleSidebar]);
 
     // Only set up params listener if mobile params are enabled
     useParamsChangeListener({

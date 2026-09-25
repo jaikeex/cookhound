@@ -49,6 +49,7 @@ export const HubTemplate: React.FC<HubTemplateProps> = ({
                         <Link
                             key={sibling.hubSlug}
                             href={`/recepty/${sibling.hubSlug}`}
+                            prefetch={false}
                             className={classNames(
                                 'rounded-full px-3 py-1 text-sm transition-colors',
                                 'bg-sheet-200 text-sheet-800 hover:bg-sheet-300',

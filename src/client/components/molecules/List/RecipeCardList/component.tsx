@@ -3,6 +3,7 @@
 import { Loader } from '@/client/components/atoms/Loader';
 import {
     RecipeCardGrid,
+    type RecipeCardGridProps,
     type RecipeCardListGridColumns
 } from '@/client/components/molecules/List/RecipeCardGrid';
 import { useInfinityScroll } from '@/client/hooks';
@@ -10,23 +11,23 @@ import type { RecipeForDisplayDTO } from '@/common/types';
 import * as React from 'react';
 
 type RecipeCardListProps = Readonly<{
+    cardComponent?: RecipeCardGridProps['cardComponent'];
     className?: string;
     cols?: RecipeCardListGridColumns;
     hasMore: boolean;
     isLoading?: boolean;
     loadMore?: () => void;
     recipes: RecipeForDisplayDTO[];
-    withHandling?: boolean;
 }>;
 
 export const RecipeCardList: React.FC<RecipeCardListProps> = ({
+    cardComponent,
     className,
     cols,
     hasMore,
     isLoading,
     loadMore = () => {},
-    recipes,
-    withHandling = false
+    recipes
 }) => {
     const { sentinelRef } = useInfinityScroll({
         loadMore,
@@ -40,7 +41,7 @@ export const RecipeCardList: React.FC<RecipeCardListProps> = ({
                 className={className}
                 cols={cols}
                 recipes={recipes}
-                withHandling={withHandling}
+                cardComponent={cardComponent}
             />
 
             <div ref={sentinelRef} className="w-full h-1" />

@@ -3,8 +3,6 @@
 import { IconButton } from '@/client/components/atoms/Button/Icon';
 import { RecipeAuthorLinkMobile } from '@/client/components/molecules/RecipeAuthorLink/Mobile';
 import { RecipeImage } from '@/client/components/atoms/Image/RecipeImage';
-import { ShareModal } from '@/client/components/organisms/Modal/ShareModal';
-import { ReportContentModal } from '@/client/components/organisms/Modal/ReportContentModal';
 import { classNames } from '@/client/utils';
 import React, { useCallback, useMemo } from 'react';
 import dynamic from 'next/dynamic';
@@ -12,6 +10,22 @@ import { useAuth, useModal, useSnackbar } from '@/client/store';
 import type { Recipe, User } from '@/common/types';
 import { ROUTES, ReportTargetType } from '@/common/constants';
 import { t } from '@/client/locales';
+
+const ShareModal = dynamic(
+    () =>
+        import('@/client/components/organisms/Modal/ShareModal').then(
+            (mod) => mod.ShareModal
+        ),
+    { ssr: false }
+);
+
+const ReportContentModal = dynamic(
+    () =>
+        import('@/client/components/organisms/Modal/ReportContentModal').then(
+            (mod) => mod.ReportContentModal
+        ),
+    { ssr: false }
+);
 
 const AddRecipeToCookbookModal = dynamic(
     () =>

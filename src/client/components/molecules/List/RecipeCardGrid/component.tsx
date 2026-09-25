@@ -1,7 +1,7 @@
 import { RecipeCard } from '@/client/components/molecules/Card/Recipe';
-import { RecipeWithHandling } from '@/client/components/molecules/Card/RecipeWithHandling';
 import { GRID_COLS } from '@/client/constants';
 import type { RecipeForDisplayDTO } from '@/common/types';
+import type { RecipeCardProps } from '@/client/components/molecules/Card/types';
 import * as React from 'react';
 
 //~---------------------------------------------------------------------------------------------~//
@@ -20,13 +20,14 @@ export type RecipeCardListGridColumns = {
 //~---------------------------------------------------------------------------------------------~//
 
 export type RecipeCardGridProps = Readonly<{
+    cardComponent?: React.ComponentType<RecipeCardProps>;
     className?: string;
     cols?: RecipeCardListGridColumns;
     recipes: RecipeForDisplayDTO[];
-    withHandling?: boolean;
 }>;
 
 const RecipeCardGridComponent: React.FC<RecipeCardGridProps> = ({
+    cardComponent: RecipeCardComponent = RecipeCard,
     className,
     cols = {
         sm: GRID_COLS[2],
@@ -34,11 +35,8 @@ const RecipeCardGridComponent: React.FC<RecipeCardGridProps> = ({
         lg: GRID_COLS[4],
         xl: GRID_COLS[4]
     },
-    recipes,
-    withHandling = false
+    recipes
 }) => {
-    const RecipeCardComponent = withHandling ? RecipeWithHandling : RecipeCard;
-
     // If you ask why this is necessary... it's hydration... it's always hydration...
     const baseClasses = `grid ${cols.sm} gap-4 md:${cols.md} lg:${cols.lg} xl:${cols.xl}`;
     const finalClassName = className

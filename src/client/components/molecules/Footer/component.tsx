@@ -64,7 +64,10 @@ export const Footer: React.FC<FooterProps> = ({ className }) => {
                     {t('app.footer.contact')}
                 </Link>
 
-                <span className="text-sm text-gray-800 dark:text-gray-400">
+                <span
+                    className="text-sm text-gray-800 dark:text-gray-400"
+                    suppressHydrationWarning
+                >
                     {t('app.footer.copyright', {
                         year: currentYear,
                         version: VERSION

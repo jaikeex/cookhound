@@ -1,5 +1,6 @@
 import React from 'react';
 import { RecipeCardList } from '@/client/components/molecules/List/RecipeCardList';
+import { RecipeWithHandling } from '@/client/components/molecules/Card/RecipeWithHandling';
 import { SkeletonCard } from '@/client/components/atoms/Skeleton/SkeletonCard';
 import { GRID_COLS } from '@/client/constants';
 import { classNames } from '@/client/utils';
@@ -61,7 +62,7 @@ export const Recipes: React.FC<RecipesProps> = ({
             loadMore={loadMore}
             hasMore={hasMore}
             isLoading={isLoading}
-            withHandling={isCurrentUser}
+            cardComponent={isCurrentUser ? RecipeWithHandling : undefined}
         />
     );
 };

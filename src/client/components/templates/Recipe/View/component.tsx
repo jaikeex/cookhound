@@ -5,7 +5,6 @@ import { RecipeViewLayout } from './Layout';
 import { RecipeWakeLockOverlay } from '@/client/components/organisms/Recipe/View/WakeLockOverlay';
 import type { Recipe, User } from '@/common/types';
 import { RecipeHandlingProvider } from '@/client/store/RecipeHandlingContext';
-import { FlaggedAuthorTemplate } from '@/client/components/templates/Recipe/Flagged';
 
 export type RecipeViewProps = Readonly<{
     author?: User;
@@ -19,11 +18,7 @@ export const RecipeViewTemplate: React.FC<RecipeViewProps> = ({
     const isFlagged = recipe.flags?.some((flag) => flag.active);
 
     if (isFlagged) {
-        return (
-            <RecipeFlaggedGate authorId={recipe.authorId}>
-                <FlaggedAuthorTemplate recipe={recipe} />
-            </RecipeFlaggedGate>
-        );
+        return <RecipeFlaggedGate recipe={recipe} />;
     }
 
     //?—————————————————————————————————————————————————————————————————————————————————————————?//

@@ -7,8 +7,7 @@ import React, {
     useContext,
     useMemo,
     useRef,
-    useState,
-    useTransition
+    useState
 } from 'react';
 import ReactDOM from 'react-dom';
 import { AnimatePresence, m } from 'framer-motion';
@@ -64,7 +63,6 @@ type ModalProviderProps = React.PropsWithChildren<NonNullable<unknown>>;
 
 export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
     const [modals, setModals] = useState<Modal[]>([]);
-    const [_, startTransition] = useTransition();
 
     const router = useRouter();
 
@@ -148,14 +146,12 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
             if (!params.get(MODAL_PARAM_KEY)) {
                 params.set(MODAL_PARAM_KEY, id);
 
-                startTransition(() => {
-                    router.push(`?${params.toString()}`, { scroll: false });
-                });
+                window.history.pushState(null, '', `?${params.toString()}`);
             }
 
             return id;
         },
-        [router, readSearchParams, startTransition]
+        [readSearchParams]
     );
 
     const handleClose = useCallback(
@@ -174,7 +170,11 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
         if (hasParam && modals.length === 0) {
             const currentUrl = new URL(window.location.href);
             currentUrl.searchParams.delete(MODAL_PARAM_KEY);
-            router.replace(currentUrl.pathname + (currentUrl.search || ''));
+            window.history.replaceState(
+                null,
+                '',
+                currentUrl.pathname + (currentUrl.search || '')
+            );
         }
 
         // Case 2: URL no longer contains the param while a modal is open → close all modals.
@@ -186,7 +186,7 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
         if (!hasParam) {
             isNavigatingBackRef.current = false;
         }
-    }, [modals, readSearchParams, router, closeAll]);
+    }, [modals, readSearchParams, closeAll]);
 
     const value = useMemo(
         () => ({ openModal, closeModal, closeAll }),

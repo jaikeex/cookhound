@@ -1,12 +1,10 @@
 import React from 'react';
-import {
-    ThemeProvider,
-    AuthProvider,
-    SnackbarProvider,
-    ModalProvider,
-    MotionProvider,
-    ConsentProvider
-} from '@/client/store';
+import { ThemeProvider } from '@/client/store/ThemeContext';
+import { AuthProvider } from '@/client/store/AuthContext';
+import { SnackbarProvider } from '@/client/store/SnackbarContext';
+import { ModalProvider } from '@/client/store/ModalContext';
+import { MotionProvider } from '@/client/store/MotionProvider';
+import { ConsentProvider } from '@/client/store/ConsentContext';
 import { DataProvider, repositories } from '@/client/data';
 import type { CookieConsent } from '@/common/types/cookie-consent';
 
