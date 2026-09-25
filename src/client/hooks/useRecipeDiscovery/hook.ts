@@ -67,7 +67,9 @@ export const useRecipeDiscovery = (
     //# no-op for the seeded page.
     //#
     //# Only the query that is active on the INITIAL mount is seeded (mode can change later as the
-    //# user types), and only when the server actually provided data.
+    //# user types), and only when the server actually provided data. The seed belongs to the
+    //# initial query string alone. Handing it to any other key would mark the previous query's
+    //# results as fresh data for the new one, and nothing would ever be fetched.
     //#
     //# "Provided data" means the parameter is present, NOT that it is non-empty. An empty array is
     //# a legitimate answer ("this author has no recipes"). Callers that did not read anything
@@ -75,22 +77,24 @@ export const useRecipeDiscovery = (
     //~-----------------------------------------------------------------------------------------~//
 
     const [seededAt] = useState(() => Date.now());
-    const [initialIsSearch] = useState(
-        () => normaliseToArray(initialQuery).length > 0
+    const [initialQueryString] = useState(() =>
+        normaliseToArray(initialQuery).join(SEARCH_QUERY_SEPARATOR)
     );
+
+    const isInitialQuery = queryString === initialQueryString;
 
     const seed = useMemo<
         InfiniteData<RecipeForDisplayDTO[], number> | undefined
     >(
         () =>
-            initialRecipes
+            initialRecipes && isInitialQuery
                 ? { pages: [initialRecipes], pageParams: [1] }
                 : undefined,
-        [initialRecipes]
+        [initialRecipes, isInitialQuery]
     );
 
-    const listSeed = !initialIsSearch ? seed : undefined;
-    const searchSeed = initialIsSearch ? seed : undefined;
+    const listSeed = !isSearchMode ? seed : undefined;
+    const searchSeed = isSearchMode ? seed : undefined;
 
     //~-----------------------------------------------------------------------------------------~//
     //$                                         QUERIES                                         $//
@@ -153,10 +157,12 @@ export const useRecipeDiscovery = (
                     InfiniteData<RecipeForDisplayDTO[]> | undefined
             )?.pages ?? [];
 
-        if (pages.length === 0) return initialRecipes ?? NO_RECIPES;
+        if (pages.length === 0) {
+            return isInitialQuery ? (initialRecipes ?? NO_RECIPES) : NO_RECIPES;
+        }
 
         return pages.flat();
-    }, [activeQuery.data, initialRecipes]);
+    }, [activeQuery.data, initialRecipes, isInitialQuery]);
 
     //~-----------------------------------------------------------------------------------------~//
     //$                                         HOOK API                                        $//
