@@ -5,9 +5,9 @@ import { ErrorBoundaryTemplate } from '@/client/components/templates/Error/Bound
 
 type ErrorBoundaryProps = Readonly<{
     error: Error & { digest?: string };
-    reset: () => void;
+    retry: () => void;
 }>;
 
-export default function RootError({ error, reset }: ErrorBoundaryProps) {
-    return <ErrorBoundaryTemplate error={error} reset={reset} />;
+export default function RootError({ error, retry }: ErrorBoundaryProps) {
+    return <ErrorBoundaryTemplate error={error} retry={retry} />;
 }

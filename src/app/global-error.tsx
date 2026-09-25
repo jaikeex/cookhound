@@ -10,10 +10,10 @@ const FALLBACK_THEME = 'dark';
 
 type ErrorPageProps = Readonly<{
     error: Error & { digest?: string };
-    reset: () => void;
+    retry: () => void;
 }>;
 
-export default function GlobalError({ error, reset }: ErrorPageProps) {
+export default function GlobalError({ error, retry }: ErrorPageProps) {
     return (
         <html
             lang={DEFAULT_LOCALE}
@@ -23,7 +23,7 @@ export default function GlobalError({ error, reset }: ErrorPageProps) {
             <body className="min-h-screen bg-green-50 dark:bg-gray-950 typography-base">
                 <ErrorBoundaryTemplate
                     error={error}
-                    reset={reset}
+                    retry={retry}
                     titleKey="app.error.global"
                     descriptionKey="app.error.global.description"
                     logLabel="Global error"

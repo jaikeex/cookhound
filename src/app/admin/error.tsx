@@ -5,14 +5,14 @@ import { ErrorBoundaryTemplate } from '@/client/components/templates/Error/Bound
 
 type ErrorBoundaryProps = Readonly<{
     error: Error & { digest?: string };
-    reset: () => void;
+    retry: () => void;
 }>;
 
-export default function AdminError({ error, reset }: ErrorBoundaryProps) {
+export default function AdminError({ error, retry }: ErrorBoundaryProps) {
     return (
         <ErrorBoundaryTemplate
             error={error}
-            reset={reset}
+            retry={retry}
             descriptionKey="app.error.boundary.admin.description"
         />
     );

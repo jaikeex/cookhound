@@ -10,7 +10,7 @@ import type { I18nMessage } from '@/client/locales';
 
 export type ErrorBoundaryTemplateProps = Readonly<{
     error: Error & { digest?: string };
-    reset: () => void;
+    retry: () => void;
     titleKey?: I18nMessage;
     descriptionKey?: I18nMessage;
     logLabel?: string;
@@ -19,7 +19,7 @@ export type ErrorBoundaryTemplateProps = Readonly<{
 
 export const ErrorBoundaryTemplate: React.FC<ErrorBoundaryTemplateProps> = ({
     error,
-    reset,
+    retry,
     titleKey = 'app.error.boundary',
     descriptionKey = 'app.error.boundary.description',
     logLabel = 'Segment error boundary',
@@ -45,7 +45,7 @@ export const ErrorBoundaryTemplate: React.FC<ErrorBoundaryTemplateProps> = ({
             </Typography>
 
             <div className="flex flex-col items-center gap-3">
-                <ButtonBase className="w-52" color="primary" onClick={reset}>
+                <ButtonBase className="w-52" color="primary" onClick={retry}>
                     {t('app.error.retry')}
                 </ButtonBase>
 
