@@ -21,7 +21,7 @@ import { Logger, LogServiceMethod } from '@/server/logger';
 import { sessions } from '@/server/utils/session/manager';
 import { deleteSessionCookie } from '@/server/utils/session/cookie';
 import { RequestContext } from '@/server/utils/reqwest/context';
-import { ApplicationErrorCode } from '@/server/error/codes';
+import { ApplicationErrorCode } from '@/common/constants/error-codes';
 import { createUserDTO } from '@/server/services/user/utils';
 import { assertAuthenticated } from '@/server/utils/reqwest/guards';
 import {

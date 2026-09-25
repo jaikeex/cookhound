@@ -6,7 +6,7 @@ import { assertAuthenticated } from '@/server/utils/reqwest/guards';
 import { randomUUID } from 'crypto';
 import db from '@/server/db/model';
 import { NotFoundError, ServerError } from '@/server/error';
-import { InfrastructureErrorCode } from '@/server/error/codes';
+import { InfrastructureErrorCode } from '@/common/constants/error-codes';
 import {
     canListCookbook,
     canViewCookbook,

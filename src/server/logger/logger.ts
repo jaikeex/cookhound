@@ -9,7 +9,7 @@ import { LOG_LEVELS, type LogLevel } from './types';
 import { getLoggerContext } from '@/server/logger/context-reader';
 import { safeStringify } from '@/server/logger/redact';
 import { ServerError } from '@/server/error';
-import { ApplicationErrorCode } from '@/server/error/codes';
+import { ApplicationErrorCode } from '@/common/constants/error-codes';
 
 // Directory where log files will be stored. Can be overridden through the `LOG_DIR` env variable.
 const LOG_DIR =

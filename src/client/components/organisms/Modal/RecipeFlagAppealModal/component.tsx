@@ -10,11 +10,7 @@ import { useSnackbar } from '@/client/store';
 import { chqc } from '@/client/data';
 import type { ModalProps } from '@/client/components/organisms/Modal/types';
 import { t } from '@/client/locales';
-
-const APPEAL_ERROR_CODE = {
-    APPEAL_ALREADY_PENDING: 'APPEAL_ALREADY_PENDING',
-    FLAG_NOT_ACTIVE: 'FLAG_NOT_ACTIVE'
-} as const;
+import { ApplicationErrorCode } from '@/common/constants';
 
 const MIN_LEN = 10;
 const MAX_LEN = 2000;
@@ -54,9 +50,9 @@ export const RecipeFlagAppealModal: React.FC<RecipeFlagAppealModalProps> = ({
             close();
         },
         onError: (error) => {
-            if (error.code === APPEAL_ERROR_CODE.APPEAL_ALREADY_PENDING) {
+            if (error.code === ApplicationErrorCode.APPEAL_ALREADY_PENDING) {
                 setServerError(t('recipe.flag.appeal.error.already-pending'));
-            } else if (error.code === APPEAL_ERROR_CODE.FLAG_NOT_ACTIVE) {
+            } else if (error.code === ApplicationErrorCode.FLAG_NOT_ACTIVE) {
                 setServerError(t('recipe.flag.appeal.error.flag-not-active'));
             } else {
                 setServerError(t('recipe.flag.appeal.error.default'));

@@ -1,6 +1,6 @@
 import { expect } from 'vitest';
 import type { Mock } from 'vitest';
-import type { ApplicationErrorCode } from '@/server/error/codes';
+import type { ApplicationErrorCode } from '@/common/constants/error-codes';
 import { UserRole, Status } from '@/common/types';
 
 //~=============================================================================================~//

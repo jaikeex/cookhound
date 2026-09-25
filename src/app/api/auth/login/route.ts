@@ -9,7 +9,7 @@ import {
     validatePayload
 } from '@/server/utils/reqwest';
 import { z } from 'zod';
-import { ApplicationErrorCode } from '@/server/error/codes';
+import { ApplicationErrorCode } from '@/common/constants/error-codes';
 import { createSessionCookieHeaders } from '@/server/utils/session/cookie';
 import { withRateLimit } from '@/server/utils/rate-limit';
 import { registerRouteDocs, UserResponseSchema } from '@/server/utils/api-docs';

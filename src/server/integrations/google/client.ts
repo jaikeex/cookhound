@@ -3,7 +3,7 @@ import { loadServiceAccount } from './gsa/gsaStore';
 import { TokenManager } from './tokenManager';
 import type { ServiceAccount, ServiceAccountIdentifier } from './types';
 import { Logger } from '@/server/logger';
-import { InfrastructureErrorCode } from '@/server/error/codes';
+import { InfrastructureErrorCode } from '@/common/constants/error-codes';
 import { IS_TEST_MODE } from '@/server/integrations/deferClientInTestMode';
 
 const log = Logger.getInstance('google-api-client');

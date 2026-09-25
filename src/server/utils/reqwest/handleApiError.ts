@@ -1,7 +1,7 @@
 import { isServerError } from '@/server/error';
 import { logErrorResponse, Logger } from '@/server/logger';
 import { RequestContext } from './context';
-import { ApplicationErrorCode } from '@/server/error/codes';
+import { ApplicationErrorCode } from '@/common/constants/error-codes';
 import { NextResponse } from 'next/server';
 
 const log = Logger.getInstance('api');

@@ -1,7 +1,7 @@
 import { ValidationError } from '@/server/error';
 import { Logger } from '@/server/logger';
 import type { z } from 'zod';
-import { ApplicationErrorCode } from '@/server/error/codes';
+import { ApplicationErrorCode } from '@/common/constants/error-codes';
 
 const log = Logger.getInstance('api');
 

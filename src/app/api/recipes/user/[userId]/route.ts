@@ -1,4 +1,4 @@
-import { ApplicationErrorCode } from '@/server/error/codes';
+import { ApplicationErrorCode } from '@/common/constants/error-codes';
 import { ValidationError } from '@/server/error/server';
 import { recipeService } from '@/server/services';
 import { makeHandler, ok, validateQuery } from '@/server/utils/reqwest';

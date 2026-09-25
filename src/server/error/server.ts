@@ -3,7 +3,7 @@ import {
     ApplicationErrorCode,
     type ServerErrorCode,
     type InfrastructureErrorCode
-} from './codes';
+} from '@/common/constants/error-codes';
 
 export enum ServerErrorName {
     ServerError = 'ServerError',

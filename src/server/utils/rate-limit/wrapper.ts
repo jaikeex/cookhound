@@ -4,7 +4,7 @@ import { SlidingWindowRateLimit } from './limiters/SlidingWindow';
 import type { RateLimitConfig, RateLimiter, RateLimitResult } from './types';
 import { InfrastructureError } from '@/server/error';
 import { Logger } from '@/server/logger';
-import { InfrastructureErrorCode } from '@/server/error/codes';
+import { InfrastructureErrorCode } from '@/common/constants/error-codes';
 import { isE2ETestMode } from '@/common/constants';
 
 const logger = Logger.getInstance('rate-limit');

@@ -1,5 +1,5 @@
 import { ValidationError } from '@/server/error';
-import { ApplicationErrorCode } from '@/server/error/codes';
+import { ApplicationErrorCode } from '@/common/constants/error-codes';
 import { userService } from '@/server/services';
 import {
     assertAuthenticated,

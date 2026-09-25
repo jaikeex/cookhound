@@ -6,7 +6,7 @@ import {
     invalidateTags
 } from '@/server/db/model/model-cache';
 import { NotFoundError } from '@/server/error';
-import { ApplicationErrorCode } from '@/server/error/codes';
+import { ApplicationErrorCode } from '@/common/constants/error-codes';
 import { prisma } from '@/server/integrations';
 import { Logger } from '@/server/logger';
 import type { Prisma, Recipe } from '@/server/db/generated/prisma/client';

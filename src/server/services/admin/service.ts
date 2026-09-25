@@ -21,7 +21,7 @@ import { RequestContext } from '@/server/utils/reqwest/context';
 import { sessions } from '@/server/utils/session/manager';
 import { mailService } from '@/server/services/mail/service';
 import { NotFoundError, ValidationError } from '@/server/error';
-import { ApplicationErrorCode } from '@/server/error/codes';
+import { ApplicationErrorCode } from '@/common/constants/error-codes';
 
 //|=============================================================================================|//
 

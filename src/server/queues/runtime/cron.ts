@@ -2,7 +2,7 @@ import { InfrastructureError } from '@/server/error';
 import { queueManager } from '@/server/queues/QueueManager';
 import { JOB_NAMES, QUEUE_NAMES } from '@/server/queues/jobs/names';
 import { Logger } from '@/server/logger';
-import { InfrastructureErrorCode } from '@/server/error/codes';
+import { InfrastructureErrorCode } from '@/common/constants/error-codes';
 
 const log = Logger.getInstance('queue-crons');
 

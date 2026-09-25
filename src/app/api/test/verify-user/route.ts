@@ -1,7 +1,7 @@
 import { isE2ETestMode } from '@/common/constants/env';
 import db from '@/server/db/model';
 import { NotFoundError } from '@/server/error';
-import { ApplicationErrorCode } from '@/server/error/codes';
+import { ApplicationErrorCode } from '@/common/constants/error-codes';
 import {
     makeHandler,
     ok,

@@ -1,6 +1,6 @@
 import IORedis from 'ioredis';
 import { ENV_CONFIG_PRIVATE } from '@/common/constants';
-import { InfrastructureErrorCode } from '@/server/error/codes';
+import { InfrastructureErrorCode } from '@/common/constants/error-codes';
 
 class RedisClient {
     private client: IORedis;

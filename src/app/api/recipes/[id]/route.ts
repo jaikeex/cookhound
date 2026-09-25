@@ -13,7 +13,7 @@ import {
     withAuth
 } from '@/server/utils/reqwest';
 import { validatePayload } from '@/server/utils/reqwest';
-import { ApplicationErrorCode } from '@/server/error/codes';
+import { ApplicationErrorCode } from '@/common/constants/error-codes';
 import { z } from 'zod';
 import { withRateLimit } from '@/server/utils/rate-limit/wrapper';
 import { AuthLevel } from '@/common/types';

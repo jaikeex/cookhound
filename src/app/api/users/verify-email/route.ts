@@ -9,7 +9,7 @@ import {
 } from '@/server/utils/reqwest';
 import type { NextRequest } from 'next/server';
 import { z } from 'zod';
-import { ApplicationErrorCode } from '@/server/error/codes';
+import { ApplicationErrorCode } from '@/common/constants/error-codes';
 import { withRateLimit } from '@/server/utils/rate-limit';
 import { registerRouteDocs } from '@/server/utils/api-docs/registry';
 import { AuthLevel } from '@/common/types';

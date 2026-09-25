@@ -1,4 +1,4 @@
-import { ApplicationErrorCode } from '@/server/error/codes';
+import { ApplicationErrorCode } from '@/common/constants/error-codes';
 import { ValidationError } from '@/server/error/server';
 import { userService } from '@/server/services/user/service';
 import {

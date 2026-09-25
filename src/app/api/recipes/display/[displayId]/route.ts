@@ -2,7 +2,7 @@ import { recipeService } from '@/server/services/recipe/service';
 import type { NextRequest } from 'next/server';
 import { NotFoundError, ValidationError } from '@/server/error';
 import { makeHandler, ok } from '@/server/utils/reqwest';
-import { ApplicationErrorCode } from '@/server/error/codes';
+import { ApplicationErrorCode } from '@/common/constants/error-codes';
 import {
     registerRouteDocs,
     RecipeResponseSchema

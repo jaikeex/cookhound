@@ -1,7 +1,7 @@
 import { gmailService } from '@/server/integrations';
 import { Logger } from '@/server/logger';
 import { InfrastructureError } from '@/server/error';
-import { InfrastructureErrorCode } from '@/server/error/codes';
+import { InfrastructureErrorCode } from '@/common/constants/error-codes';
 import { encodeHeaderUtf8 } from '@/server/queues/jobs/emails/utils/encoding';
 
 export interface MailAddress {

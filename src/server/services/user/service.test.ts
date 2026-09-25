@@ -26,7 +26,7 @@ import {
 } from '@/server/error';
 import { generateProofHash } from '@/server/utils/crypto';
 import { serializeConsentContent } from '@/server/utils/consent';
-import { ApplicationErrorCode } from '@/server/error/codes';
+import { ApplicationErrorCode } from '@/common/constants/error-codes';
 import type { CookieConsentForCreate } from '@/common/types/cookie-consent';
 
 //|=============================================================================================|//

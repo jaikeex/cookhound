@@ -14,7 +14,7 @@ import { z } from 'zod';
 import { generateProofHash } from '@/server/utils/crypto';
 import { serializeConsentContent } from '@/server/utils/consent';
 import { ValidationError } from '@/server/error';
-import { ApplicationErrorCode } from '@/server/error/codes';
+import { ApplicationErrorCode } from '@/common/constants/error-codes';
 import { registerRouteDocs } from '@/server/utils/api-docs';
 import { AuthLevel } from '@/common/types';
 import { CONSENT_VERSION } from '@/common/constants';

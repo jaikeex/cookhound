@@ -2,7 +2,7 @@ import type { NextRequest } from 'next/server';
 import { recipeService } from '@/server/services/recipe/service';
 import { z } from 'zod';
 import { validateQuery } from '@/server/utils/reqwest';
-import { ApplicationErrorCode } from '@/server/error/codes';
+import { ApplicationErrorCode } from '@/common/constants/error-codes';
 import { ValidationError } from '@/server/error/server';
 import { makeHandler, ok } from '@/server/utils/reqwest';
 import {

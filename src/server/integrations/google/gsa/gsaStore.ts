@@ -1,6 +1,6 @@
 import { ENV_CONFIG_PRIVATE } from '@/common/constants/env';
 import { InfrastructureError } from '@/server/error';
-import { InfrastructureErrorCode } from '@/server/error/codes';
+import { InfrastructureErrorCode } from '@/common/constants/error-codes';
 
 export type ServiceAccount = {
     type: string;

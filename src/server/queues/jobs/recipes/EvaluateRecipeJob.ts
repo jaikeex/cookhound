@@ -8,7 +8,7 @@ import { openaiClient } from '@/server/integrations';
 import { Logger } from '@/server/logger';
 import recipeFlagModel from '@/server/db/model/recipe-flag/model';
 import { InfrastructureError } from '@/server/error/server';
-import { InfrastructureErrorCode } from '@/server/error/codes';
+import { InfrastructureErrorCode } from '@/common/constants/error-codes';
 import { RecipeFlagReason, ROUTES } from '@/common/constants';
 import { zodTextFormat, OPENAI_MODEL } from '@/server/utils/openai';
 import { z } from 'zod';

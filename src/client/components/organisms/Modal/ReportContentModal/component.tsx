@@ -11,19 +11,17 @@ import { Typography } from '@/client/components/atoms/Typography';
 import { useSnackbar } from '@/client/store';
 import { chqc } from '@/client/data';
 import type { ModalProps } from '@/client/components/organisms/Modal/types';
-import { ReportReason, type ReportTargetType } from '@/common/constants';
+import {
+    ReportReason,
+    type ReportTargetType,
+    ApplicationErrorCode
+} from '@/common/constants';
 import { REPORT_REASON_LABEL_KEY, REPORT_REASON_ORDER } from '@/client/utils';
 import { t } from '@/client/locales';
 
 //~---------------------------------------------------------------------------------------------~//
 //$                                          CONSTANTS                                          $//
 //~---------------------------------------------------------------------------------------------~//
-
-const REPORT_ERROR_CODE = {
-    ALREADY_PENDING: 'REPORT_ALREADY_PENDING',
-    TARGET_NOT_FOUND: 'REPORT_TARGET_NOT_FOUND',
-    SELF_NOT_ALLOWED: 'REPORT_SELF_NOT_ALLOWED'
-} as const;
 
 /** When "Other" is picked the reporter must explain */
 const OTHER_DETAILS_MIN_LEN = 10;
@@ -74,11 +72,15 @@ export const ReportContentModal: React.FC<ReportContentModalProps> = ({
             close();
         },
         onError: (error) => {
-            if (error.code === REPORT_ERROR_CODE.ALREADY_PENDING) {
+            if (error.code === ApplicationErrorCode.REPORT_ALREADY_PENDING) {
                 setServerError(t('report.error.already-reported'));
-            } else if (error.code === REPORT_ERROR_CODE.TARGET_NOT_FOUND) {
+            } else if (
+                error.code === ApplicationErrorCode.REPORT_TARGET_NOT_FOUND
+            ) {
                 setServerError(t('report.error.target-not-found'));
-            } else if (error.code === REPORT_ERROR_CODE.SELF_NOT_ALLOWED) {
+            } else if (
+                error.code === ApplicationErrorCode.REPORT_SELF_NOT_ALLOWED
+            ) {
                 setServerError(t('report.error.self-report'));
             } else {
                 setServerError(t('report.modal.error.default'));

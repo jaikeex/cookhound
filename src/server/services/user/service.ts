@@ -24,7 +24,7 @@ import { createUserDTO, getUserDataPermissionGroups } from './utils';
 import db, { getUserSelect } from '@/server/db/model';
 import { Logger } from '@/server/logger';
 import { LogServiceMethod } from '@/server/logger';
-import { ApplicationErrorCode } from '@/server/error/codes';
+import { ApplicationErrorCode } from '@/common/constants/error-codes';
 import type {
     ConsentCategory,
     CookieConsent,

@@ -25,7 +25,7 @@ import { revalidateRouteCache } from '@/server/utils/revalidateRouteCache';
 import { SEARCH_QUERY_SEPARATOR, ROUTES } from '@/common/constants';
 import { queueManager } from '@/server/queues/QueueManager';
 import { JOB_NAMES } from '@/server/queues/jobs/names';
-import { ApplicationErrorCode } from '@/server/error/codes';
+import { ApplicationErrorCode } from '@/common/constants/error-codes';
 import { openaiApiService } from '@/server/services/openai-api/service';
 import { notificationService } from '@/server/services/notification/service';
 import type { RecipeFlagDTO } from '@/common/types/flags/recipe-flag';

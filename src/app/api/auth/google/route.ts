@@ -3,7 +3,7 @@ import { authService } from '@/server/services/auth/service';
 import { makeHandler, readJson, validatePayload } from '@/server/utils/reqwest';
 import { AuthErrorForbidden } from '@/server/error';
 import { z } from 'zod';
-import { ApplicationErrorCode } from '@/server/error/codes';
+import { ApplicationErrorCode } from '@/common/constants/error-codes';
 import { createSessionCookieHeaders } from '@/server/utils/session/cookie';
 import { assertAnonymous, ok } from '@/server/utils/reqwest';
 import { withRateLimit } from '@/server/utils/rate-limit';

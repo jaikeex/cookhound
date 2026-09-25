@@ -4,7 +4,7 @@ import { ENV_CONFIG_PUBLIC, ENV_CONFIG_PRIVATE } from '@/common/constants/env';
 import { Logger } from '@/server/logger';
 import { randomUUID } from 'crypto';
 import { InfrastructureError } from '@/server/error';
-import { InfrastructureErrorCode } from '@/server/error/codes';
+import { InfrastructureErrorCode } from '@/common/constants/error-codes';
 import { deferClientInTestMode } from '@/server/integrations/deferClientInTestMode';
 
 const log = Logger.getInstance('typesense-client');

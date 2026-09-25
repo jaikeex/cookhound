@@ -2,7 +2,7 @@ import { createSign } from 'crypto';
 import type { ServiceAccount, AccessToken } from './types';
 import { Logger } from '@/server/logger';
 import { InfrastructureError } from '@/server/error';
-import { InfrastructureErrorCode } from '@/server/error/codes';
+import { InfrastructureErrorCode } from '@/common/constants/error-codes';
 
 const log = Logger.getInstance('google-token-manager');
 

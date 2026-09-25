@@ -3,7 +3,7 @@ import {
     ConflictError,
     NotFoundError
 } from '@/server/error';
-import { ApplicationErrorCode } from '@/server/error/codes';
+import { ApplicationErrorCode } from '@/common/constants/error-codes';
 import { Logger, LogServiceMethod } from '@/server/logger';
 import { assertAuthenticated } from '@/server/utils/reqwest/guards';
 import db from '@/server/db/model';

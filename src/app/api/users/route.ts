@@ -9,7 +9,7 @@ import {
 } from '@/server/utils/reqwest';
 import { AuthErrorForbidden, ValidationError } from '@/server/error';
 import { z } from 'zod';
-import { ApplicationErrorCode } from '@/server/error/codes';
+import { ApplicationErrorCode } from '@/common/constants/error-codes';
 import { TERMS_VERSION } from '@/common/constants/terms';
 import type { TermsAcceptanceForCreate } from '@/common/types';
 import { RequestContext } from '@/server/utils/reqwest/context';

@@ -6,7 +6,7 @@ import { JOB_NAMES, QUEUE_NAMES } from '@/server/queues/jobs/names';
 import { QUEUE_OPTIONS } from './constants';
 import { Logger } from '@/server/logger';
 import { InfrastructureError } from '@/server/error';
-import { InfrastructureErrorCode } from '@/server/error/codes';
+import { InfrastructureErrorCode } from '@/common/constants/error-codes';
 import type { NtfyNotificationJobData } from '@/server/services/notification/types';
 
 const log = Logger.getInstance('ntfy-notification-worker');

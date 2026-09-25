@@ -3,7 +3,7 @@ import { redisClient } from '@/server/integrations/redis';
 import { randomUUID } from 'crypto';
 import { Logger } from '@/server/logger';
 import { InfrastructureError, ValidationError } from '@/server/error';
-import { InfrastructureErrorCode } from '@/server/error/codes';
+import { InfrastructureErrorCode } from '@/common/constants/error-codes';
 import {
     ONE_HOUR_IN_SECONDS,
     ONE_MONTH_IN_SECONDS

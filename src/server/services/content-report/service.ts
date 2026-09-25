@@ -1,5 +1,5 @@
 import { ConflictError, NotFoundError, ValidationError } from '@/server/error';
-import { ApplicationErrorCode } from '@/server/error/codes';
+import { ApplicationErrorCode } from '@/common/constants/error-codes';
 import { Logger, LogServiceMethod } from '@/server/logger';
 import {
     assertAdmin,

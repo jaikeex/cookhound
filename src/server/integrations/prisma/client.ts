@@ -4,7 +4,7 @@ import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient, Prisma } from '@/server/db/generated/prisma/client';
 import { Logger } from '@/server/logger';
 import { InfrastructureError, isServerError } from '@/server/error/server';
-import { InfrastructureErrorCode } from '@/server/error/codes';
+import { InfrastructureErrorCode } from '@/common/constants/error-codes';
 import { ENV_CONFIG_PRIVATE } from '@/common/constants/env';
 
 const globalForPrisma = global as unknown as {

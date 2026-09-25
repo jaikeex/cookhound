@@ -1,7 +1,7 @@
 import type { RecipeForDisplayDTO, RecipeFilterParams } from '@/common/types';
 import db from '@/server/db/model';
 import { ValidationError } from '@/server/error';
-import { ApplicationErrorCode } from '@/server/error/codes';
+import { ApplicationErrorCode } from '@/common/constants/error-codes';
 import { Logger, LogServiceMethod } from '@/server/logger';
 
 //|=============================================================================================|//

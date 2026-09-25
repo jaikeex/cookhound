@@ -5,7 +5,7 @@ import { queueManager } from '@/server/queues/QueueManager';
 import { JOB_NAMES, QUEUE_NAMES } from '@/server/queues/jobs/names';
 import { QUEUE_OPTIONS } from './constants';
 import { InfrastructureError } from '@/server/error/server';
-import { InfrastructureErrorCode } from '@/server/error/codes';
+import { InfrastructureErrorCode } from '@/common/constants/error-codes';
 import recipeModel from '@/server/db/model/recipe/model';
 import userModel from '@/server/db/model/user/model';
 

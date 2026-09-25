@@ -2,7 +2,7 @@ import type { Job, JobsOptions, Processor, QueueOptions } from 'bullmq';
 import { randomUUID } from 'crypto';
 import { Logger } from '@/server/logger';
 import { InfrastructureError } from '@/server/error';
-import { InfrastructureErrorCode } from '@/server/error/codes';
+import { InfrastructureErrorCode } from '@/common/constants/error-codes';
 import { runWithContext } from '@/server/utils/reqwest/context/store';
 
 const log = Logger.getInstance('base-job');

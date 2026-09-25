@@ -3,7 +3,7 @@ import { Logger } from '@/server/logger';
 import type { Recipe, RecipeForDisplayDTO } from '@/common/types';
 import { redisClient } from '@/server/integrations';
 import { InfrastructureError } from '@/server/error';
-import { InfrastructureErrorCode } from '@/server/error/codes';
+import { InfrastructureErrorCode } from '@/common/constants/error-codes';
 import { CACHE_TTL } from '@/server/db/model/model-cache';
 import type { CollectionFieldSchema } from 'typesense/lib/Typesense/Collection';
 import type { Client } from 'typesense';

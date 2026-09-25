@@ -1,5 +1,5 @@
 import { randomInt } from 'crypto';
-import { InfrastructureErrorCode } from '@/server/error/codes';
+import { InfrastructureErrorCode } from '@/common/constants/error-codes';
 
 /**
  * Generates a public recipe display id: a fixed length 6-digit number with a

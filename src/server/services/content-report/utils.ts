@@ -1,4 +1,4 @@
-import { InfrastructureErrorCode } from '@/server/error/codes';
+import { InfrastructureErrorCode } from '@/common/constants/error-codes';
 
 const OPEN_REPORT_INDEX = 'content_reports_one_open_per_target';
 

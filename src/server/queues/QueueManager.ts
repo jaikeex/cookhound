@@ -10,7 +10,7 @@ import IORedis from 'ioredis';
 import { Logger } from '@/server/logger';
 import { ENV_CONFIG_PRIVATE } from '@/common/constants';
 import { InfrastructureError } from '@/server/error';
-import { InfrastructureErrorCode } from '@/server/error/codes';
+import { InfrastructureErrorCode } from '@/common/constants/error-codes';
 import ntfyClient from '@/server/integrations/ntfy/client';
 import { QUEUE_NAME as NOTIFICATIONS_QUEUE_NAME } from './jobs/notifications/constants';
 

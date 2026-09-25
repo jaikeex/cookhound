@@ -19,7 +19,7 @@ import {
     AuthErrorUnauthorized,
     ValidationError
 } from '@/server/error';
-import { ApplicationErrorCode } from '@/server/error/codes';
+import { ApplicationErrorCode } from '@/common/constants/error-codes';
 
 //|=============================================================================================|//
 //$                                           MOCKS                                             $//
