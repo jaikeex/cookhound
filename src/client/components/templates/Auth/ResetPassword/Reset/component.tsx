@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import type { LoginFormErrors } from '@/client/components/organisms/Form/Login';
 import type { ResetPasswordFormErrors } from '@/client/components/organisms/Form/ResetPassword';
 import { ResetPasswordForm } from '@/client/components/organisms/Form/ResetPassword';
@@ -8,12 +8,11 @@ import { Typography } from '@/client/components/atoms/Typography';
 import type { ResetPasswordPayload } from '@/common/types';
 import { z } from 'zod';
 
-import { validateFormData } from '@/client/utils';
+import { validateFormData, withServerError } from '@/client/utils';
 import Link from 'next/link';
 import { chqc } from '@/client/data';
 import { ROUTES } from '@/common/constants';
 import { t } from '@/client/locales';
-import { getErrorMessageKey } from '@/client/error';
 
 //~---------------------------------------------------------------------------------------------~//
 //$                                          VALIDATION                                         $//
@@ -58,6 +57,7 @@ export const ResetPasswordTemplate: React.FC = () => {
 
     const {
         mutate: resetPassword,
+        reset: resetResetPassword,
         error,
         isPending
     } = chqc.user.useResetPassword({
@@ -81,6 +81,8 @@ export const ResetPasswordTemplate: React.FC = () => {
     const handleSubmit = useCallback(
         async (event: React.FormEvent<HTMLFormElement>) => {
             event.preventDefault();
+
+            resetResetPassword();
 
             const formElement = event.currentTarget;
             const data = new FormData(formElement);
@@ -118,14 +120,8 @@ export const ResetPasswordTemplate: React.FC = () => {
 
             resetPassword(payload);
         },
-        [resetPassword]
+        [resetPassword, resetResetPassword]
     );
-
-    useEffect(() => {
-        if (error) {
-            setFormErrors({ server: getErrorMessageKey(error) });
-        }
-    }, [error]);
 
     return (
         <div className="flex flex-col items-center w-full max-w-md mx-auto space-y-4">
@@ -135,7 +131,7 @@ export const ResetPasswordTemplate: React.FC = () => {
 
             <form className="w-full" onSubmit={handleSubmit} ref={formRef}>
                 <ResetPasswordForm
-                    errors={formErrors}
+                    errors={withServerError(formErrors, error)}
                     disabled={disabled}
                     pending={isPending}
                 />

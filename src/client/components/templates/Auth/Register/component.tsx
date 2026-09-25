@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import type { UserForCreatePayload } from '@/common/types';
 import { useGoogleSignIn, useCaptcha } from '@/client/hooks';
 import type { RegisterFormErrors } from '@/client/components/organisms/Form/Register';
@@ -9,7 +9,11 @@ import { Divider } from '@/client/components/atoms/Divider';
 import { GoogleSigninButton } from '@/client/components/atoms/Button/GoogleSignin';
 import { RegisterForm } from '@/client/components/organisms/Form/Register';
 import { Typography } from '@/client/components/atoms/Typography';
-import { validateFormData, executeCaptcha } from '@/client/utils';
+import {
+    validateFormData,
+    executeCaptcha,
+    withServerError
+} from '@/client/utils';
 import { useRouter } from 'next/navigation';
 import { useAuth, useSnackbar } from '@/client/store';
 import Link from 'next/link';
@@ -18,7 +22,6 @@ import { z } from 'zod';
 import { chqc } from '@/client/data';
 import { ROUTES } from '@/common/constants';
 import { t } from '@/client/locales';
-import { getErrorMessageKey } from '@/client/error';
 
 //~---------------------------------------------------------------------------------------------~//
 //$                                          VALIDATION                                         $//
@@ -85,6 +88,7 @@ export const RegisterTemplate: React.FC<RegisterTemplateProps> = () => {
 
     const {
         mutate: createUser,
+        reset: resetCreateUser,
         isPending,
         error: createUserError
     } = chqc.user.useCreateUser({
@@ -133,6 +137,7 @@ export const RegisterTemplate: React.FC<RegisterTemplateProps> = () => {
 
     const {
         signInUserWithGoogleOauth,
+        reset: resetGoogleSignIn,
         error: googleSignInError,
         isPending: isGoogleSignInPending
     } = useGoogleSignIn({
@@ -148,6 +153,9 @@ export const RegisterTemplate: React.FC<RegisterTemplateProps> = () => {
     const handleSubmit = useCallback(
         async (event: React.FormEvent<HTMLFormElement>) => {
             event.preventDefault();
+
+            resetCreateUser();
+            resetGoogleSignIn();
 
             const formElement = event.currentTarget;
             const data = new FormData(formElement);
@@ -188,24 +196,24 @@ export const RegisterTemplate: React.FC<RegisterTemplateProps> = () => {
 
             createUser(userForCreate);
         },
-        [createUser]
+        [createUser, resetCreateUser, resetGoogleSignIn]
     );
 
-    useEffect(() => {
-        if (createUserError) {
-            setFormErrors({ server: getErrorMessageKey(createUserError) });
-        }
-
-        if (googleSignInError) {
-            setFormErrors({ server: getErrorMessageKey(googleSignInError) });
-        }
-    }, [createUserError, googleSignInError]);
+    const handleGoogleSignIn = useCallback(() => {
+        resetCreateUser();
+        setFormErrors({});
+        signInUserWithGoogleOauth();
+    }, [resetCreateUser, signInUserWithGoogleOauth]);
 
     return (
         <div className="flex flex-col items-center w-full max-w-md mx-auto space-y-4 pt-4">
             <form className="w-full" onSubmit={handleSubmit} ref={formRef}>
                 <RegisterForm
-                    errors={formErrors}
+                    errors={withServerError(
+                        formErrors,
+                        createUserError,
+                        googleSignInError
+                    )}
                     pending={
                         isPending || isGoogleSignInPending || !captchaReady
                     }
@@ -221,7 +229,7 @@ export const RegisterTemplate: React.FC<RegisterTemplateProps> = () => {
             <Divider text={t('app.general.or').toUpperCase()} />
 
             <GoogleSigninButton
-                onClick={signInUserWithGoogleOauth}
+                onClick={handleGoogleSignIn}
                 label={t('auth.form.continue-with-google')}
                 pending={isGoogleSignInPending}
             />

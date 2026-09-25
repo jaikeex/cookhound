@@ -7,13 +7,15 @@ import { Logo } from '@/client/components/atoms/Logo';
 import { Typography } from '@/client/components/atoms/Typography';
 import { t } from '@/client/locales';
 import type { I18nMessage } from '@/client/locales';
+import { RequestError, reportClientError } from '@/client/error';
+import type { ClientErrorSource } from '@/common/constants';
 
 export type ErrorBoundaryTemplateProps = Readonly<{
     error: Error & { digest?: string };
     retry: () => void;
     titleKey?: I18nMessage;
     descriptionKey?: I18nMessage;
-    logLabel?: string;
+    source?: Extract<ClientErrorSource, 'boundary' | 'global-error'>;
     withLogo?: boolean;
 }>;
 
@@ -22,12 +24,22 @@ export const ErrorBoundaryTemplate: React.FC<ErrorBoundaryTemplateProps> = ({
     retry,
     titleKey = 'app.error.boundary',
     descriptionKey = 'app.error.boundary.description',
-    logLabel = 'Segment error boundary',
+    source = 'boundary',
     withLogo = false
 }) => {
     useEffect(() => {
-        console.error(`${logLabel}:`, error.digest, error);
-    }, [error, logLabel]);
+        console.error(`[${source}]`, error.digest, error);
+
+        if (!error.digest) {
+            reportClientError(error, source);
+        }
+    }, [error, source]);
+
+    const reference =
+        error.digest ??
+        (error instanceof RequestError && error.requestId !== 'unknown'
+            ? error.requestId
+            : undefined);
 
     return (
         <div className="flex flex-col items-center pt-10 text-center">
@@ -56,12 +68,12 @@ export const ErrorBoundaryTemplate: React.FC<ErrorBoundaryTemplateProps> = ({
                 </Link>
             </div>
 
-            {error.digest && (
+            {reference && (
                 <Typography
                     variant="body-sm"
                     className="mt-8 text-gray-500 dark:text-gray-400"
                 >
-                    {t('app.error.reference', { digest: error.digest })}
+                    {t('app.error.reference', { digest: reference })}
                 </Typography>
             )}
         </div>

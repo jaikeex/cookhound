@@ -50,7 +50,7 @@ export const SimpleEmailForm: React.FC<SimpleEmailFormProps> = ({
             />
 
             {errors?.server ? (
-                <Typography variant={'error'} align={'center'}>
+                <Typography role="alert" variant={'error'} align={'center'}>
                     {t(errors.server)}
                 </Typography>
             ) : null}

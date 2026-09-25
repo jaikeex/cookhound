@@ -263,7 +263,9 @@ export const useShoppingList = () => {
 
     const deleteRecipeShoppingList = useCallback(
         async (recipeId: number) => {
-            await deleteMutation.mutateAsync({ recipeId });
+            await deleteMutation
+                .mutateAsync({ recipeId })
+                .catch(() => undefined);
         },
         [deleteMutation]
     );
@@ -314,13 +316,16 @@ export const useShoppingList = () => {
                 ]
             };
 
-            await upsertMutation.mutateAsync(payload).finally(() => {
-                setPendingToggles((prev) => {
-                    const next = new Set(prev);
-                    next.delete(toggleKey);
-                    return next;
+            await upsertMutation
+                .mutateAsync(payload)
+                .catch(() => undefined) // rolled back and exposed via `error`
+                .finally(() => {
+                    setPendingToggles((prev) => {
+                        const next = new Set(prev);
+                        next.delete(toggleKey);
+                        return next;
+                    });
                 });
-            });
         },
         [upsertMutation, listQueryKey, queryClient, pendingToggles]
     );

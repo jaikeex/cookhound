@@ -1,7 +1,10 @@
 import React from 'react';
 import { BaseSelect } from '@/client/components/atoms/Input/BaseSelect';
 import { Icon } from '@/client/components/atoms/Icons';
-import { InputError } from '@/client/components/atoms/Input/InputError';
+import {
+    InputError,
+    inputErrorId
+} from '@/client/components/atoms/Input/InputError';
 import { InputLabel } from '@/client/components/atoms/Input/InputLabel';
 import type { FormInputProps } from '@/client/components/molecules/Form/types';
 import { classNames } from '@/client/utils';
@@ -47,6 +50,8 @@ export const Select: React.FC<SelectProps> = ({
 
                 <BaseSelect
                     id={id}
+                    aria-invalid={error ? true : undefined}
+                    aria-describedby={error ? inputErrorId(id) : undefined}
                     name={name}
                     className={classNames('appearance-none pr-8', className)}
                     defaultValue={
@@ -80,7 +85,9 @@ export const Select: React.FC<SelectProps> = ({
                     )}
                 </BaseSelect>
 
-                {error ? <InputError message={error} /> : null}
+                {error ? (
+                    <InputError id={inputErrorId(id)} message={error} />
+                ) : null}
             </div>
         </div>
     );

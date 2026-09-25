@@ -1,6 +1,9 @@
 import React from 'react';
 import type { FocusEventHandler } from 'react';
-import { InputError } from '@/client/components/atoms/Input/InputError';
+import {
+    InputError,
+    inputErrorId
+} from '@/client/components/atoms/Input/InputError';
 import { InputLabel } from '@/client/components/atoms/Input/InputLabel';
 import { BaseTextarea } from '@/client/components/atoms/Input/BaseTextarea';
 import type { FormInputProps } from '@/client/components/molecules/Form/types';
@@ -41,6 +44,8 @@ export const Textarea: React.FC<TextareaProps> = ({
                 placeholder={placeholder}
                 className={className}
                 id={id}
+                aria-invalid={error ? true : undefined}
+                aria-describedby={error ? inputErrorId(id) : undefined}
                 name={name}
                 onChange={onChange}
                 onKeyDown={onKeyDown}
@@ -49,7 +54,9 @@ export const Textarea: React.FC<TextareaProps> = ({
                 rows={rows}
                 maxLength={maxLength}
             />
-            {error ? <InputError message={error} /> : null}
+            {error ? (
+                <InputError id={inputErrorId(id)} message={error} />
+            ) : null}
         </div>
     );
 };

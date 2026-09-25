@@ -229,7 +229,7 @@ export const RecipeForm: React.FC<RecipeFormProps> = ({
             />
 
             {errors?.server ? (
-                <Typography align={'center'} variant={'error'}>
+                <Typography role="alert" align={'center'} variant={'error'}>
                     {t(errors.server)}
                 </Typography>
             ) : null}

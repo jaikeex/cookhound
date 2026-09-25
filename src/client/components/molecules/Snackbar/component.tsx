@@ -44,6 +44,7 @@ export const Snackbar: React.FC<SnackbarProps> = ({
     return (
         <div className="pointer-events-none">
             <div
+                role={variant === 'error' ? 'alert' : 'status'}
                 className={classNames(
                     'min-h-10 max-w-72 md:max-w-96 py-2.5 px-2 mx-auto rounded-md z-50 flex items-center gap-2',
                     'animate-fade-in pointer-events-auto',

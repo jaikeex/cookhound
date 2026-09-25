@@ -62,21 +62,24 @@ export const SnackbarProvider: React.FC<SnackbarProviderProps> = ({
 }) => {
     const [activeAlerts, setActiveAlerts] = useState<Alert[]>([]);
 
-    const activeAlertIds = activeAlerts.join(',');
+    // Keyed on the oldest alert only, so newer alerts do not restart its dismiss timer.
+    const oldest = activeAlerts.at(-1);
+    const oldestId = oldest?.id;
+    const oldestHasAction = Boolean(oldest?.action);
 
     useEffect(() => {
-        if (activeAlerts.length === 0) return;
-
-        const oldest = activeAlerts[activeAlerts.length - 1];
+        if (!oldestId) return;
 
         const timer = setTimeout(
             () =>
-                setActiveAlerts((alerts) => alerts.slice(0, alerts.length - 1)),
-            oldest?.action ? ACTION_AUTO_DISMISS : AUTO_DISMISS
+                setActiveAlerts((alerts) =>
+                    alerts.filter((a) => a.id !== oldestId)
+                ),
+            oldestHasAction ? ACTION_AUTO_DISMISS : AUTO_DISMISS
         );
 
         return () => clearTimeout(timer);
-    }, [activeAlertIds, activeAlerts]);
+    }, [oldestId, oldestHasAction]);
 
     const alert = useCallback((alert: AlertPayload) => {
         const newAlert = {

@@ -17,7 +17,7 @@ export const PendingDeletionBanner: React.FC<PendingDeletionBannerProps> = ({
 }) => {
     const { alert } = useSnackbar();
 
-    const { mutateAsync: cancelDeletion, isPending } =
+    const { mutate: cancelDeletion, isPending } =
         chqc.user.useCancelAccountDeletion({
             onSuccess: () => {
                 alert({
@@ -48,8 +48,8 @@ export const PendingDeletionBanner: React.FC<PendingDeletionBannerProps> = ({
         };
     }, [deletionScheduledFor]);
 
-    const handleCancelDeletion = useCallback(async () => {
-        await cancelDeletion(undefined);
+    const handleCancelDeletion = useCallback(() => {
+        cancelDeletion(undefined);
     }, [cancelDeletion]);
 
     const message = isLessThan24Hours

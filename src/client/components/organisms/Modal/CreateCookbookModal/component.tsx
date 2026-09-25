@@ -58,7 +58,7 @@ export const CreateCookbookModal: React.FC<CreateCookbookModalProps> = ({
 
     const [errors, setErrors] = useState<CookbookFormErrors>({});
 
-    const { mutateAsync: createCookbook, isPending } =
+    const { mutate: createCookbook, isPending } =
         chqc.cookbook.useCreateCookbook({
             meta: { errorMessage: false },
             onSuccess: (cookbook) => {
@@ -113,7 +113,7 @@ export const CreateCookbookModal: React.FC<CreateCookbookModalProps> = ({
                 visibility: formData.visibility as CookbookVisibility
             };
 
-            await createCookbook({ input: payload });
+            createCookbook({ input: payload });
         },
         [createCookbook]
     );

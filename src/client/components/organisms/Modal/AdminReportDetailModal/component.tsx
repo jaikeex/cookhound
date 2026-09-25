@@ -78,20 +78,21 @@ export const AdminReportDetailModal: React.FC<AdminReportDetailModalProps> = ({
         });
     }, [queryClient, reportId]);
 
-    const { mutateAsync: resolveReport } = chqc.admin.useResolveReport({
-        onSuccess: () => {
-            alert({
-                variant: 'success',
-                message: t('admin.reports.action.success')
-            });
-            invalidateQueries();
-        },
-        meta: { errorMessage: 'admin.reports.action.error' }
-    });
+    const { mutate: markReport, mutateAsync: resolveReport } =
+        chqc.admin.useResolveReport({
+            onSuccess: () => {
+                alert({
+                    variant: 'success',
+                    message: t('admin.reports.action.success')
+                });
+                invalidateQueries();
+            },
+            meta: { errorMessage: 'admin.reports.action.error' }
+        });
 
     const handleMarkReviewing = useCallback(() => {
-        void resolveReport({ reportId, status: ReportStatus.REVIEWING });
-    }, [resolveReport, reportId]);
+        markReport({ reportId, status: ReportStatus.REVIEWING });
+    }, [markReport, reportId]);
 
     // Returns a stable confirm handler bound to the chosen terminal status,
     // so the JSX below passes a function reference rather than an inline arrow.

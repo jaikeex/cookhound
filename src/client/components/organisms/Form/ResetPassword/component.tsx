@@ -53,7 +53,7 @@ export const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({
             />
 
             {errors?.server ? (
-                <Typography variant={'error'} align={'center'}>
+                <Typography role="alert" variant={'error'} align={'center'}>
                     {t(errors.server)}
                 </Typography>
             ) : null}

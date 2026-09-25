@@ -16,6 +16,7 @@ import { chqc, QUERY_KEYS } from '@/client/data';
 import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { t } from '@/client/locales';
+import { getErrorMessage } from '@/client/error';
 
 //~=============================================================================================~//
 //$                                            TYPES                                            $//
@@ -192,10 +193,7 @@ export const RecipeHandlingProvider: React.FC<RecipeHandlingProviderProps> = ({
                 variant: 'success'
             });
         } catch (error: unknown) {
-            alert({
-                message: t('app.error.default'),
-                variant: 'error'
-            });
+            alert({ message: getErrorMessage(error), variant: 'error' });
         }
     }, [
         recipe.ingredients,

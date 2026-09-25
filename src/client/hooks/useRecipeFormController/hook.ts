@@ -110,24 +110,16 @@ export const useRecipeFormController = ({
 
     const uploadRecipeImage = useCallback(
         async (data: FormData): Promise<string | null> => {
-            let image_url: string | null = null;
+            const imageFile = data.get('recipe-image') as File | null;
 
-            const imageFile = data.get('recipe-image') as File;
+            if (!imageFile || imageFile.size === 0) return null;
 
-            try {
-                if (imageFile && imageFile.size > 0) {
-                    const response = await uploadImageMutation({
-                        fileName: `recipe-image-${generateUuid()}`,
-                        file: imageFile
-                    });
+            const response = await uploadImageMutation({
+                fileName: `recipe-image-${generateUuid()}`,
+                file: imageFile
+            });
 
-                    image_url = response.objectUrl;
-                }
-            } catch {
-                // Do nothing here, the global handlers get this!
-            }
-
-            return image_url;
+            return response.objectUrl;
         },
         [uploadImageMutation]
     );
@@ -183,13 +175,21 @@ export const useRecipeFormController = ({
                     return;
                 }
             } catch {
-                setFormErrors({ server: 'auth.error.default' });
+                setFormErrors({ server: 'app.error.default' });
                 return;
             }
 
             setFormErrors({});
 
-            const imageUrl = await uploadRecipeImage(data);
+            let imageUrl: string | null;
+
+            try {
+                imageUrl = await uploadRecipeImage(data);
+            } catch {
+                // Do nothing here, the global handler gets this!
+                return;
+            }
+
             if (imageUrl) {
                 formData.imageUrl = imageUrl;
             }

@@ -9,7 +9,10 @@ import React, {
 } from 'react';
 import { BaseInput } from '@/client/components/atoms/Input/Base';
 import { Icon } from '@/client/components/atoms/Icons';
-import { InputError } from '@/client/components/atoms/Input/InputError';
+import {
+    InputError,
+    inputErrorId
+} from '@/client/components/atoms/Input/InputError';
 import { InputLabel } from '@/client/components/atoms/Input/InputLabel';
 import type { FormInputProps } from '@/client/components/molecules/Form/types';
 import { classNames } from '@/client/utils';
@@ -242,6 +245,8 @@ export const ComboInput: React.FC<ComboInputProps> = ({
                     {...props}
                     type="text"
                     id={id}
+                    aria-invalid={error ? true : undefined}
+                    aria-describedby={error ? inputErrorId(id) : undefined}
                     name={name}
                     value={inputValue}
                     placeholder={placeholder}
@@ -327,7 +332,9 @@ export const ComboInput: React.FC<ComboInputProps> = ({
                 </div>
             ) : null}
 
-            {error ? <InputError message={error} /> : null}
+            {error ? (
+                <InputError id={inputErrorId(id)} message={error} />
+            ) : null}
         </div>
     );
 };

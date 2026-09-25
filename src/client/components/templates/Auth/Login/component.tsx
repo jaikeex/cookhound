@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import type { LoginFormErrors } from '@/client/components/organisms/Form/Login';
 import { Divider } from '@/client/components/atoms/Divider';
 import { GoogleSigninButton } from '@/client/components/atoms/Button/GoogleSignin';
@@ -20,7 +20,7 @@ import { AppEvent, eventBus } from '@/client/events';
 import { ROUTES } from '@/common/constants';
 import { sanitizeReturnTarget } from '@/common/utils/params';
 import { t } from '@/client/locales';
-import { getErrorMessageKey } from '@/client/error';
+import { withServerError } from '@/client/utils';
 
 //~---------------------------------------------------------------------------------------------~//
 //$                                          VALIDATION                                         $//
@@ -57,6 +57,7 @@ export const LoginTemplate: React.FC<LoginTemplateProps> = ({
 
     const {
         mutate: login,
+        reset: resetLogin,
         isPending,
         error: loginError
     } = chqc.auth.useLogin({
@@ -91,6 +92,7 @@ export const LoginTemplate: React.FC<LoginTemplateProps> = ({
 
     const {
         signInUserWithGoogleOauth,
+        reset: resetGoogleSignIn,
         error,
         isPending: isGoogleSignInPending
     } = useGoogleSignIn({
@@ -106,6 +108,9 @@ export const LoginTemplate: React.FC<LoginTemplateProps> = ({
     const handleSubmit = useCallback(
         async (event: React.FormEvent<HTMLFormElement>) => {
             event.preventDefault();
+
+            resetLogin();
+            resetGoogleSignIn();
 
             const formElement = event.currentTarget;
             const data = new FormData(formElement);
@@ -128,24 +133,20 @@ export const LoginTemplate: React.FC<LoginTemplateProps> = ({
             setFormErrors({});
             login(formData);
         },
-        [login]
+        [login, resetLogin, resetGoogleSignIn]
     );
 
-    useEffect(() => {
-        if (loginError) {
-            setFormErrors({ server: getErrorMessageKey(loginError) });
-        }
-
-        if (error) {
-            setFormErrors({ server: getErrorMessageKey(error) });
-        }
-    }, [error, loginError]);
+    const handleGoogleSignIn = useCallback(() => {
+        resetLogin();
+        setFormErrors({});
+        signInUserWithGoogleOauth();
+    }, [resetLogin, signInUserWithGoogleOauth]);
 
     return (
         <div className="flex flex-col items-center w-full max-w-md mx-auto space-y-4 pt-4">
             <form className="w-full" onSubmit={handleSubmit} ref={formRef}>
                 <LoginForm
-                    errors={formErrors}
+                    errors={withServerError(formErrors, loginError, error)}
                     pending={isPending || isGoogleSignInPending}
                 />
             </form>
@@ -165,7 +166,7 @@ export const LoginTemplate: React.FC<LoginTemplateProps> = ({
             <Divider text={t('app.general.or').toUpperCase()} />
 
             <GoogleSigninButton
-                onClick={signInUserWithGoogleOauth}
+                onClick={handleGoogleSignIn}
                 label={t('auth.form.continue-with-google')}
                 pending={isGoogleSignInPending}
             />

@@ -92,7 +92,11 @@ export const ShoppingListTemplate: React.FC<ShoppingListTemplateProps> = ({
             })
         );
 
-        await shoppingListStore.updateShoppingList(payloads);
+        try {
+            await shoppingListStore.updateShoppingList(payloads);
+        } catch {
+            return;
+        }
 
         shoppingListStore.setEditingShoppingList(null);
         setBinIngredients([]);

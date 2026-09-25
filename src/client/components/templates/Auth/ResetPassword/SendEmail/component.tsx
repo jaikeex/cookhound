@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import type { LoginFormErrors } from '@/client/components/organisms/Form/Login';
 import type { SimpleEmailFormErrors } from '@/client/components/organisms/Form/SimpleEmailForm';
 import { CaptchaDisclosure } from '@/client/components/molecules/CaptchaDisclosure';
@@ -9,10 +9,13 @@ import { Typography } from '@/client/components/atoms/Typography';
 import type { ResetPasswordEmailFormData } from '@/common/types';
 import { z } from 'zod';
 import { useCaptcha } from '@/client/hooks';
-import { validateFormData, executeCaptcha } from '@/client/utils';
+import {
+    validateFormData,
+    executeCaptcha,
+    withServerError
+} from '@/client/utils';
 import { chqc } from '@/client/data';
 import { t } from '@/client/locales';
-import { getErrorMessageKey } from '@/client/error';
 
 export type SendResetPasswordEmailTemplateProps = Readonly<{
     email: string;
@@ -45,6 +48,7 @@ export const SendResetPasswordEmailTemplate: React.FC<
 
     const {
         mutate: sendResetPasswordEmail,
+        reset: resetSendResetPasswordEmail,
         error,
         isPending
     } = chqc.user.useSendResetPasswordEmail({
@@ -75,6 +79,8 @@ export const SendResetPasswordEmailTemplate: React.FC<
     const handleSubmit = useCallback(
         async (event: React.FormEvent<HTMLFormElement>) => {
             event.preventDefault();
+
+            resetSendResetPasswordEmail();
 
             const formElement = event.currentTarget;
             const data = new FormData(formElement);
@@ -111,14 +117,8 @@ export const SendResetPasswordEmailTemplate: React.FC<
 
             sendResetPasswordEmail({ ...formData, captchaToken });
         },
-        [sendResetPasswordEmail]
+        [sendResetPasswordEmail, resetSendResetPasswordEmail]
     );
-
-    useEffect(() => {
-        if (error) {
-            setFormErrors({ server: getErrorMessageKey(error) });
-        }
-    }, [error]);
 
     return (
         <div className="flex flex-col items-center w-full max-w-md mx-auto space-y-4">
@@ -128,7 +128,7 @@ export const SendResetPasswordEmailTemplate: React.FC<
 
             <form className="w-full" onSubmit={handleSubmit} ref={formRef}>
                 <SimpleEmailForm
-                    errors={formErrors}
+                    errors={withServerError(formErrors, error)}
                     disabled={disabled || !captchaReady}
                     pending={isPending}
                     defaultEmail={email}

@@ -4,6 +4,8 @@ export type SnackbarVariant = 'success' | 'error' | 'info';
 
 export type SnackbarPosition = 'top' | 'bottom';
 
+export type Theme = 'light' | 'dark';
+
 export type AlertAction = {
     href: string;
     label: string;

@@ -29,22 +29,20 @@ export const LogoutAllConfirmModal: React.FC<LogoutAllConfirmModalProps> = ({
 
     const [password, setPassword] = useState('');
 
-    const { mutateAsync: logoutEverywhere, isPending } = chqc.auth.useLogoutAll(
-        {
-            onSuccess: () => {
-                setUser(null);
-                queryClient.resetQueries();
+    const { mutate: logoutEverywhere, isPending } = chqc.auth.useLogoutAll({
+        onSuccess: () => {
+            setUser(null);
+            queryClient.resetQueries();
 
-                alert({
-                    variant: 'success',
-                    message: t('auth.logout-all.success')
-                });
+            alert({
+                variant: 'success',
+                message: t('auth.logout-all.success')
+            });
 
-                eventBus.emit(AppEvent.USER_LOGGED_OUT, undefined);
-                router.push('/');
-            }
+            eventBus.emit(AppEvent.USER_LOGGED_OUT, undefined);
+            router.push('/');
         }
-    );
+    });
 
     const handleCancel = useCallback(() => {
         onClose?.();
@@ -58,8 +56,8 @@ export const LogoutAllConfirmModal: React.FC<LogoutAllConfirmModalProps> = ({
         []
     );
 
-    const handleConfirm = useCallback(async () => {
-        await logoutEverywhere(undefined);
+    const handleConfirm = useCallback(() => {
+        logoutEverywhere(undefined);
     }, [logoutEverywhere]);
 
     const needsPassword = user?.authType === AuthType.Local;

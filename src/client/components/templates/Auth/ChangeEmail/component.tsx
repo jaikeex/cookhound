@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import type { ChangeEmailFormErrors } from '@/client/components/organisms/Form/ChangeEmail';
 import { ChangeEmailForm } from '@/client/components/organisms/Form/ChangeEmail';
 import { useSnackbar } from '@/client/store';
@@ -9,7 +9,7 @@ import { z } from 'zod';
 import { chqc } from '@/client/data';
 import { useRouter } from 'next/navigation';
 import { t } from '@/client/locales';
-import { getErrorMessageKey } from '@/client/error';
+import { withServerError } from '@/client/utils';
 
 //~---------------------------------------------------------------------------------------------~//
 //$                                          VALIDATION                                         $//
@@ -38,6 +38,7 @@ export const ChangeEmailTemplate: React.FC<ChangeEmailTemplateProps> = () => {
 
     const {
         mutate: initiateEmailChange,
+        reset: resetInitiateEmailChange,
         isPending,
         error: initiateError
     } = chqc.user.useInitiateEmailChange({
@@ -62,6 +63,8 @@ export const ChangeEmailTemplate: React.FC<ChangeEmailTemplateProps> = () => {
         async (event: React.FormEvent<HTMLFormElement>) => {
             event.preventDefault();
 
+            resetInitiateEmailChange();
+
             const formElement = event.currentTarget;
             const data = new FormData(formElement);
 
@@ -85,19 +88,16 @@ export const ChangeEmailTemplate: React.FC<ChangeEmailTemplateProps> = () => {
             setFormErrors({});
             initiateEmailChange(formData);
         },
-        [initiateEmailChange]
+        [initiateEmailChange, resetInitiateEmailChange]
     );
-
-    useEffect(() => {
-        if (initiateError) {
-            setFormErrors({ server: getErrorMessageKey(initiateError) });
-        }
-    }, [initiateError]);
 
     return (
         <div className="flex flex-col items-center w-full max-w-md mx-auto space-y-4">
             <form className="w-full" onSubmit={handleSubmit} ref={formRef}>
-                <ChangeEmailForm errors={formErrors} pending={isPending} />
+                <ChangeEmailForm
+                    errors={withServerError(formErrors, initiateError)}
+                    pending={isPending}
+                />
             </form>
         </div>
     );

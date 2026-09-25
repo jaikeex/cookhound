@@ -47,9 +47,12 @@ export const TextInputRow: React.FC<TextInputRowProps> = ({
     );
 
     const handleSave = useCallback(async () => {
-        await onSave?.(value);
-
-        stopEditing();
+        try {
+            await onSave?.(value);
+            stopEditing();
+        } catch {
+            // Stay in edit mode so the value can be corrected.
+        }
     }, [onSave, stopEditing, value]);
 
     useEffect(() => {

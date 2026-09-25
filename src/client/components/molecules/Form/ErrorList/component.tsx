@@ -10,6 +10,7 @@ export type ErrorListProps = Readonly<{
 export const ErrorList: React.FC<ErrorListProps> = ({ errors, className }) => {
     return (
         <ul
+            role="alert"
             className={classNames(
                 'text-red-700 dark:text-red-500 space-y-1',
                 errors.length === 0 ? 'hidden' : '',

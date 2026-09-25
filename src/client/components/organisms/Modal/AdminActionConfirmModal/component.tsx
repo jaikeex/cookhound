@@ -48,6 +48,8 @@ export const AdminActionConfirmModal: React.FC<
             await onConfirm(reason);
             onClose?.();
             close?.();
+        } catch {
+            // Do nothing here, the global handler gets this!
         } finally {
             setIsPending(false);
         }

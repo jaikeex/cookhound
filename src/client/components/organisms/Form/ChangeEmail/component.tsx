@@ -53,7 +53,7 @@ export const ChangeEmailForm: React.FC<ChangeEmailFormProps> = ({
             />
 
             {errors?.server ? (
-                <Typography variant={'error'} align={'center'}>
+                <Typography role="alert" variant={'error'} align={'center'}>
                     {t(errors.server)}
                 </Typography>
             ) : null}

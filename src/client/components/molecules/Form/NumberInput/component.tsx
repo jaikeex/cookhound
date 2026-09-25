@@ -1,6 +1,9 @@
 import React, { useCallback } from 'react';
 import { BaseInput } from '@/client/components/atoms/Input/Base';
-import { InputError } from '@/client/components/atoms/Input/InputError';
+import {
+    InputError,
+    inputErrorId
+} from '@/client/components/atoms/Input/InputError';
 import { InputLabel } from '@/client/components/atoms/Input/InputLabel';
 import type { FormInputProps } from '@/client/components/molecules/Form/types';
 import { classNames } from '@/client/utils';
@@ -58,6 +61,8 @@ export const NumberInput: React.FC<NumberInputProps> = ({
                     hideArrows && 'no-number-arrows'
                 )}
                 id={id}
+                aria-invalid={error ? true : undefined}
+                aria-describedby={error ? inputErrorId(id) : undefined}
                 name={name}
                 onChange={handleChange}
                 onKeyDown={onKeyDown}
@@ -67,7 +72,9 @@ export const NumberInput: React.FC<NumberInputProps> = ({
                 min={min}
                 max={max}
             />
-            {error ? <InputError message={error} /> : null}
+            {error ? (
+                <InputError id={inputErrorId(id)} message={error} />
+            ) : null}
         </div>
     );
 };

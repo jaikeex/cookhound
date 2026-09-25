@@ -1,6 +1,9 @@
 import React from 'react';
 import { BaseInput } from '@/client/components/atoms/Input/Base';
-import { InputError } from '@/client/components/atoms/Input/InputError';
+import {
+    InputError,
+    inputErrorId
+} from '@/client/components/atoms/Input/InputError';
 import { InputLabel } from '@/client/components/atoms/Input/InputLabel';
 import type { FormInputProps } from '@/client/components/molecules/Form/types';
 import { classNames } from '@/client/utils';
@@ -27,13 +30,17 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
             <BaseInput
                 {...props}
                 id={id}
+                aria-invalid={error ? true : undefined}
+                aria-describedby={error ? inputErrorId(id) : undefined}
                 type="password"
                 name={name}
                 disabled={disabled}
                 autoComplete={autoComplete}
                 onChange={onChange}
             />
-            {error ? <InputError message={error} /> : null}
+            {error ? (
+                <InputError id={inputErrorId(id)} message={error} />
+            ) : null}
         </div>
     );
 };

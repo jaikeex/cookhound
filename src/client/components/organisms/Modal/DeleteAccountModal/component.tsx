@@ -28,7 +28,7 @@ export const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
     const [reason, setReason] = useState('');
     const [confirmed, setConfirmed] = useState(false);
 
-    const { mutateAsync: initiateAccountDeletion, isPending } =
+    const { mutate: initiateAccountDeletion, isPending } =
         chqc.user.useInitiateAccountDeletion({
             onSuccess: () => {
                 alert({
@@ -69,8 +69,8 @@ export const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
         []
     );
 
-    const handleDelete = useCallback(async () => {
-        await initiateAccountDeletion({
+    const handleDelete = useCallback(() => {
+        initiateAccountDeletion({
             password,
             reason: reason.trim() || undefined
         });

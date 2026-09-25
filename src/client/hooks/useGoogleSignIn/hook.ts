@@ -20,6 +20,7 @@ type UseGoogleSignInType = (options: UseGoogleSignInArgs) => {
     signInUserWithGoogleOauth: () => void;
     error: Error | null;
     isPending: boolean;
+    reset: () => void;
 };
 
 export const useGoogleSignIn: UseGoogleSignInType = ({ onSuccess }) => {
@@ -27,7 +28,8 @@ export const useGoogleSignIn: UseGoogleSignInType = ({ onSuccess }) => {
     const {
         mutate: loginWithGoogleOauth,
         error,
-        isPending
+        isPending,
+        reset
     } = chqc.auth.useLoginWithGoogleOauth({
         meta: { errorMessage: false },
         onSuccess: (user) => {
@@ -101,5 +103,5 @@ export const useGoogleSignIn: UseGoogleSignInType = ({ onSuccess }) => {
         false
     );
 
-    return { signInUserWithGoogleOauth, error, isPending };
+    return { signInUserWithGoogleOauth, error, isPending, reset };
 };

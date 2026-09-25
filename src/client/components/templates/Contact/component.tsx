@@ -1,18 +1,21 @@
 'use client';
 
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import type { ContactFormErrors } from '@/client/components/organisms/Form/Contact';
 import { CaptchaDisclosure } from '@/client/components/molecules/CaptchaDisclosure';
 import { ContactForm } from '@/client/components/organisms/Form/Contact';
 import { Typography } from '@/client/components/atoms/Typography';
 import type { ContactFormData } from '@/common/types';
 import { z } from 'zod';
-import { validateFormData, executeCaptcha } from '@/client/utils';
+import {
+    validateFormData,
+    executeCaptcha,
+    withServerError
+} from '@/client/utils';
 import { useSnackbar } from '@/client/store';
 import { chqc } from '@/client/data';
 import { useCaptcha } from '@/client/hooks';
 import { t } from '@/client/locales';
-import { getErrorMessageKey } from '@/client/error';
 
 //~---------------------------------------------------------------------------------------------~//
 //$                                          VALIDATION                                         $//
@@ -51,6 +54,7 @@ export const ContactTemplate: React.FC<ContactTemplateProps> = () => {
 
     const {
         mutate: submitContact,
+        reset: resetSubmitContact,
         isPending,
         error: submitError
     } = chqc.contact.useSubmitContactForm({
@@ -68,6 +72,8 @@ export const ContactTemplate: React.FC<ContactTemplateProps> = () => {
     const handleSubmit = useCallback(
         async (event: React.FormEvent<HTMLFormElement>) => {
             event.preventDefault();
+
+            resetSubmitContact();
 
             const formElement = event.currentTarget;
             const data = new FormData(formElement);
@@ -99,14 +105,8 @@ export const ContactTemplate: React.FC<ContactTemplateProps> = () => {
             setFormErrors({});
             submitContact({ ...formData, captchaToken });
         },
-        [submitContact]
+        [submitContact, resetSubmitContact]
     );
-
-    useEffect(() => {
-        if (submitError) {
-            setFormErrors({ server: getErrorMessageKey(submitError) });
-        }
-    }, [submitError]);
 
     return (
         <article className="flex flex-col items-center w-full max-w-2xl mx-auto space-y-6">
@@ -128,7 +128,7 @@ export const ContactTemplate: React.FC<ContactTemplateProps> = () => {
 
             <form className="w-full" onSubmit={handleSubmit} ref={formRef}>
                 <ContactForm
-                    errors={formErrors}
+                    errors={withServerError(formErrors, submitError)}
                     pending={isPending || !captchaReady}
                 />
             </form>
