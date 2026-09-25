@@ -12,13 +12,13 @@ import { Typography } from '@/client/components/atoms/Typography';
 import { validateFormData, executeCaptcha } from '@/client/utils';
 import { useRouter } from 'next/navigation';
 import { useAuth, useSnackbar } from '@/client/store';
-import type { I18nMessage } from '@/client/locales';
 import Link from 'next/link';
 import type { User } from '@/common/types';
 import { z } from 'zod';
 import { chqc } from '@/client/data';
 import { ROUTES } from '@/common/constants';
 import { t } from '@/client/locales';
+import { getErrorMessageKey } from '@/client/error';
 
 //~---------------------------------------------------------------------------------------------~//
 //$                                          VALIDATION                                         $//
@@ -192,11 +192,11 @@ export const RegisterTemplate: React.FC<RegisterTemplateProps> = () => {
 
     useEffect(() => {
         if (createUserError) {
-            setFormErrors({ server: createUserError.message as I18nMessage });
+            setFormErrors({ server: getErrorMessageKey(createUserError) });
         }
 
         if (googleSignInError) {
-            setFormErrors({ server: googleSignInError.message as I18nMessage });
+            setFormErrors({ server: getErrorMessageKey(googleSignInError) });
         }
     }, [createUserError, googleSignInError]);
 

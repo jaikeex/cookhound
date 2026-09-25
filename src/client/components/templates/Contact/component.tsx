@@ -9,10 +9,10 @@ import type { ContactFormData } from '@/common/types';
 import { z } from 'zod';
 import { validateFormData, executeCaptcha } from '@/client/utils';
 import { useSnackbar } from '@/client/store';
-import type { I18nMessage } from '@/client/locales';
 import { chqc } from '@/client/data';
 import { useCaptcha } from '@/client/hooks';
 import { t } from '@/client/locales';
+import { getErrorMessageKey } from '@/client/error';
 
 //~---------------------------------------------------------------------------------------------~//
 //$                                          VALIDATION                                         $//
@@ -103,7 +103,7 @@ export const ContactTemplate: React.FC<ContactTemplateProps> = () => {
 
     useEffect(() => {
         if (submitError) {
-            setFormErrors({ server: submitError.message as I18nMessage });
+            setFormErrors({ server: getErrorMessageKey(submitError) });
         }
     }, [submitError]);
 

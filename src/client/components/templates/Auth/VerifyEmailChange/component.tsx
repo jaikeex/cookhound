@@ -6,11 +6,11 @@ import { Typography } from '@/client/components/atoms/Typography';
 import { ButtonBase } from '@/client/components/atoms/Button/Base';
 import { chqc, QUERY_KEYS } from '@/client/data';
 import { useQueryClient } from '@tanstack/react-query';
-import type { I18nMessage } from '@/client/locales';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { ROUTES } from '@/common/constants';
 import { t } from '@/client/locales';
+import { getErrorMessage } from '@/client/error';
 
 export const VerifyEmailChangeTemplate: React.FC = () => {
     const queryClient = useQueryClient();
@@ -70,9 +70,9 @@ export const VerifyEmailChangeTemplate: React.FC = () => {
             );
         }
 
-        const errorMessage = error
-            ? t(error.message as I18nMessage, undefined, 'auth.error.default')
-            : t('auth.error.default');
+        const errorMessage = getErrorMessage(error, {
+            fallback: 'auth.error.default'
+        });
 
         return (
             <div className="flex flex-col items-center space-y-6">

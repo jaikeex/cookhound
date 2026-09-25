@@ -5,6 +5,13 @@ export type Messages = Record<I18nMessage, string>;
 
 export const csMessages: Messages = cs;
 
+export function isI18nMessage(value: unknown): value is I18nMessage {
+    return (
+        typeof value === 'string' &&
+        Object.prototype.hasOwnProperty.call(csMessages, value)
+    );
+}
+
 export function t(
     key: I18nMessage | undefined,
     params?: Record<string, string | number | boolean>,

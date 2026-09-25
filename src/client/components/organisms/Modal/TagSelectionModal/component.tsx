@@ -9,6 +9,7 @@ import { TagSelectionList } from '@/client/components/molecules/Tag/Select/List'
 import { TagSelectionBox } from '@/client/components/molecules/Tag/Select/Box';
 import { useCreateRecipeStore, useSnackbar } from '@/client/store';
 import type { RequestError } from '@/client/error';
+import { getErrorMessage } from '@/client/error';
 import { MAX_TAGS, RECIPE_TAG_CATEGORY_LIMITS_BY_ID } from '@/common/constants';
 import { chqc } from '@/client/data';
 import { t } from '@/client/locales';
@@ -134,7 +135,7 @@ export const TagSelectionModal: React.FC<TagSelectionModalProps> = ({
 
     useEffect(() => {
         if (error) {
-            alert({ message: t('app.error.default'), variant: 'error' });
+            alert({ message: getErrorMessage(error), variant: 'error' });
         }
     }, [error, alert]);
 

@@ -24,6 +24,7 @@ import type { I18nMessage } from '@/client/locales';
 import type { RecipeFormErrors } from '@/client/components';
 import type { RecipeFormMode } from '@/client/types/core';
 import { ROUTES } from '@/common/constants';
+import { getErrorMessageKey } from '@/client/error';
 
 export interface UseRecipeFormControllerProps {
     //When in edit mode, this existing recipe will pre-fill the form.
@@ -72,8 +73,7 @@ export const useRecipeFormController = ({
             onSuccess: (recipe) => handleSubmitSuccess(recipe),
             onError: (error) => {
                 setFormErrors({
-                    server:
-                        (error?.message as I18nMessage) || 'app.error.default'
+                    server: getErrorMessageKey(error)
                 });
             }
         });
@@ -83,8 +83,7 @@ export const useRecipeFormController = ({
             onSuccess: (recipe) => handleSubmitSuccess(recipe),
             onError: (error) => {
                 setFormErrors({
-                    server:
-                        (error?.message as I18nMessage) || 'app.error.default'
+                    server: getErrorMessageKey(error)
                 });
             }
         });

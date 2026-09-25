@@ -6,7 +6,6 @@ import { useOutsideClick } from '@/client/hooks';
 import { useDebounce } from '@/client/hooks/useDebounce';
 import { useAuth } from '@/client/store';
 import { t } from '@/client/locales';
-import type { I18nMessage } from '@/client/locales';
 import { ROUTES, SEARCH_QUERY_SEPARATOR } from '@/common/constants';
 import type { SearchInputProps } from '@/client/components/molecules/Form/SearchInput/component';
 import { Chip } from '@/client/components/atoms/Chip';
@@ -14,6 +13,7 @@ import { Typography } from '@/client/components/atoms/Typography';
 import { SearchInput } from '@/client/components/molecules/Form/SearchInput';
 import { chqc } from '@/client/data';
 import Link from 'next/link';
+import { getErrorMessage } from '@/client/error';
 
 export type RecipeSearchInputProps = Readonly<{
     enableSuggestions?: boolean;
@@ -104,9 +104,7 @@ export const RecipeSearchInput: React.FC<RecipeSearchInputProps> = ({
         ? searchRecipesQuery.error
         : lastViewedRecipesQuery.error;
 
-    const error = activeError
-        ? t(activeError.message as I18nMessage, undefined, 'app.error.default')
-        : null;
+    const error = activeError ? getErrorMessage(activeError) : null;
 
     const isEmpty = !isLoading && suggestions.length === 0;
     const isShowingSearchResults = !!inputValue && preparedQuery.length > 0;

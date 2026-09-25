@@ -10,10 +10,10 @@ import { z } from 'zod';
 
 import { validateFormData } from '@/client/utils';
 import Link from 'next/link';
-import type { I18nMessage } from '@/client/locales';
 import { chqc } from '@/client/data';
 import { ROUTES } from '@/common/constants';
 import { t } from '@/client/locales';
+import { getErrorMessageKey } from '@/client/error';
 
 //~---------------------------------------------------------------------------------------------~//
 //$                                          VALIDATION                                         $//
@@ -122,7 +122,7 @@ export const ResetPasswordTemplate: React.FC = () => {
 
     useEffect(() => {
         if (error) {
-            setFormErrors({ server: error.message as I18nMessage });
+            setFormErrors({ server: getErrorMessageKey(error) });
         }
     }, [error]);
 

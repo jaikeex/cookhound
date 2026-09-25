@@ -7,9 +7,9 @@ import { useSnackbar } from '@/client/store';
 import { validateFormData } from '@/client/utils/form';
 import { z } from 'zod';
 import { chqc } from '@/client/data';
-import type { I18nMessage } from '@/client/locales';
 import { useRouter } from 'next/navigation';
 import { t } from '@/client/locales';
+import { getErrorMessageKey } from '@/client/error';
 
 //~---------------------------------------------------------------------------------------------~//
 //$                                          VALIDATION                                         $//
@@ -89,7 +89,7 @@ export const ChangeEmailTemplate: React.FC<ChangeEmailTemplateProps> = () => {
 
     useEffect(() => {
         if (initiateError) {
-            setFormErrors({ server: initiateError.message as I18nMessage });
+            setFormErrors({ server: getErrorMessageKey(initiateError) });
         }
     }, [initiateError]);
 

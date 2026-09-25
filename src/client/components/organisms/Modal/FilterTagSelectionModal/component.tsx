@@ -9,6 +9,7 @@ import { TagSelectionList } from '@/client/components/molecules/Tag/Select/List'
 import { TagSelectionBox } from '@/client/components/molecules/Tag/Select/Box';
 import { useSnackbar } from '@/client/store';
 import type { RequestError } from '@/client/error';
+import { getErrorMessage } from '@/client/error';
 import { t } from '@/client/locales';
 
 type FilterTagSelectionModalProps = Readonly<{
@@ -61,7 +62,7 @@ export const FilterTagSelectionModal: React.FC<
 
     useEffect(() => {
         if (error) {
-            alert({ message: t('app.error.default'), variant: 'error' });
+            alert({ message: getErrorMessage(error), variant: 'error' });
         }
     }, [error, alert]);
 

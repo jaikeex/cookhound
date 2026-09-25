@@ -10,9 +10,9 @@ import type { ResetPasswordEmailFormData } from '@/common/types';
 import { z } from 'zod';
 import { useCaptcha } from '@/client/hooks';
 import { validateFormData, executeCaptcha } from '@/client/utils';
-import type { I18nMessage } from '@/client/locales';
 import { chqc } from '@/client/data';
 import { t } from '@/client/locales';
+import { getErrorMessageKey } from '@/client/error';
 
 export type SendResetPasswordEmailTemplateProps = Readonly<{
     email: string;
@@ -115,7 +115,7 @@ export const SendResetPasswordEmailTemplate: React.FC<
 
     useEffect(() => {
         if (error) {
-            setFormErrors({ server: error.message as I18nMessage });
+            setFormErrors({ server: getErrorMessageKey(error) });
         }
     }, [error]);
 

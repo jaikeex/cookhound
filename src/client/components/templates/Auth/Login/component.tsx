@@ -12,7 +12,6 @@ import { validateFormData } from '@/client/utils/form';
 
 import { useGoogleSignIn } from '@/client/hooks';
 import { useAuth, useSnackbar } from '@/client/store';
-import type { I18nMessage } from '@/client/locales';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { chqc, QUERY_KEYS } from '@/client/data';
@@ -21,6 +20,7 @@ import { AppEvent, eventBus } from '@/client/events';
 import { ROUTES } from '@/common/constants';
 import { sanitizeReturnTarget } from '@/common/utils/params';
 import { t } from '@/client/locales';
+import { getErrorMessageKey } from '@/client/error';
 
 //~---------------------------------------------------------------------------------------------~//
 //$                                          VALIDATION                                         $//
@@ -132,11 +132,11 @@ export const LoginTemplate: React.FC<LoginTemplateProps> = ({
 
     useEffect(() => {
         if (loginError) {
-            setFormErrors({ server: loginError.message as I18nMessage });
+            setFormErrors({ server: getErrorMessageKey(loginError) });
         }
 
         if (error) {
-            setFormErrors({ server: error.message as I18nMessage });
+            setFormErrors({ server: getErrorMessageKey(error) });
         }
     }, [error, loginError]);
 

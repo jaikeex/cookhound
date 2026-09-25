@@ -6,9 +6,9 @@ import { Icon } from '@/client/components/atoms/Icons';
 import { Loader } from '@/client/components/atoms/Loader';
 import { useSnackbar, useModal } from '@/client/store';
 import Image from 'next/image';
-import type { I18nMessage } from '@/client/locales';
 import { t } from '@/client/locales';
 import { ImageCropperModal } from '@/client/components/organisms/Modal/ImageCropperModal';
+import { getErrorMessage } from '@/client/error';
 
 type ImageInputProps = Readonly<{
     className?: string;
@@ -152,17 +152,13 @@ export const ImageInput: React.FC<ImageInputProps> = ({
                 }
             } catch (error: unknown) {
                 alert({
-                    message: t(
-                        error instanceof Error
-                            ? (error.message as I18nMessage)
-                            : 'app.error.default',
-                        {
+                    message: getErrorMessage(error, {
+                        params: {
                             maxSize: maxSize / 1024 / 1024,
                             maxWidth,
                             maxHeight
-                        },
-                        'app.error.default'
-                    ),
+                        }
+                    }),
                     variant: 'error'
                 });
             }

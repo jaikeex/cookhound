@@ -4,8 +4,8 @@ import React, { useCallback } from 'react';
 import { ButtonWithCooldown } from '@/client/components/molecules/Button/WithCooldown';
 import { Typography } from '@/client/components/atoms/Typography';
 import { chqc } from '@/client/data';
-import type { I18nMessage } from '@/client/locales';
 import { t } from '@/client/locales';
+import { getErrorMessage } from '@/client/error';
 
 export type VerifyEmailTemplateProps = Readonly<{
     new: boolean;
@@ -49,7 +49,7 @@ export const VerifyEmailTemplate: React.FC<VerifyEmailTemplateProps> = ({
                 {t('app.general.resend-email')}
             </ButtonWithCooldown>
 
-            {error && <p>{t(error.message as I18nMessage)}</p>}
+            {error && <p>{getErrorMessage(error)}</p>}
         </div>
     );
 };
