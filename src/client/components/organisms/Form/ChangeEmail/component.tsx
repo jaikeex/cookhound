@@ -22,7 +22,9 @@ export const ChangeEmailForm: React.FC<ChangeEmailFormProps> = ({
     errors,
     pending
 }) => {
-    const errorsToDisplay = Object.values(errors).map((error) => t(error));
+    const errorsToDisplay = Object.entries(errors)
+        .filter(([field]) => field !== 'server')
+        .map(([, error]) => t(error));
 
     return (
         <div className="base-form">

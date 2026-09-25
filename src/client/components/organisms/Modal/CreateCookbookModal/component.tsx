@@ -9,7 +9,6 @@ import {
 import { ButtonBase } from '@/client/components/atoms/Button/Base';
 import { Submit } from '@/client/components/molecules/Form/Submit';
 import { useSnackbar } from '@/client/store';
-import type { I18nMessage } from '@/client/locales';
 import { chqc, QUERY_KEYS } from '@/client/data';
 import {
     type CookbookForCreatePayload,
@@ -101,7 +100,7 @@ export const CreateCookbookModal: React.FC<CreateCookbookModalProps> = ({
                 }
             } catch (error: unknown) {
                 setErrors({
-                    server: 'app.general.unknown-error' as I18nMessage
+                    server: 'app.error.default'
                 });
                 return;
             }

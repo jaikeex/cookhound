@@ -5,7 +5,6 @@ import { Loader } from '@/client/components/atoms/Loader';
 import { Typography } from '@/client/components/atoms/Typography';
 import { ButtonBase } from '@/client/components/atoms/Button/Base';
 import { chqc, QUERY_KEYS } from '@/client/data';
-import type { RequestError } from '@/client/error';
 import { useQueryClient } from '@tanstack/react-query';
 import type { I18nMessage } from '@/client/locales';
 import { useSearchParams } from 'next/navigation';
@@ -21,6 +20,7 @@ export const VerifyEmailChangeTemplate: React.FC = () => {
 
     const {
         mutate: confirmEmailChange,
+        isIdle,
         isPending,
         isSuccess,
         error
@@ -41,7 +41,7 @@ export const VerifyEmailChangeTemplate: React.FC = () => {
     }, [token, confirmEmailChange]);
 
     const renderContent = () => {
-        if (isPending) {
+        if (isPending || (token && isIdle)) {
             return (
                 <div className="flex flex-col items-center space-y-4">
                     <Loader size="lg" />
@@ -71,7 +71,7 @@ export const VerifyEmailChangeTemplate: React.FC = () => {
         }
 
         const errorMessage = error
-            ? t((error as RequestError).message as I18nMessage)
+            ? t(error.message as I18nMessage, undefined, 'auth.error.default')
             : t('auth.error.default');
 
         return (

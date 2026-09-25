@@ -29,7 +29,9 @@ export const CookbookForm: React.FC<CookbookFormProps> = ({
     hideSubmit,
     pending
 }) => {
-    const errorsToDisplay = Object.values(errors).map((err) => t(err));
+    const errorsToDisplay = Object.entries(errors)
+        .filter(([field]) => field !== 'server')
+        .map(([, error]) => t(error));
 
     return (
         <div className={classNames('base-form', className)}>

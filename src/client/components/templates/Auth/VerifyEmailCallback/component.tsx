@@ -6,7 +6,6 @@ import { Loader } from '@/client/components/atoms/Loader';
 import { Typography } from '@/client/components/atoms/Typography';
 import Link from 'next/link';
 import { chqc, QUERY_KEYS } from '@/client/data';
-import type { RequestError } from '@/client/error';
 import { useQueryClient } from '@tanstack/react-query';
 import type { I18nMessage } from '@/client/locales';
 import { useSearchParams } from 'next/navigation';
@@ -22,6 +21,7 @@ export const VerifyEmailCallbackTemplate: React.FC = () => {
 
     const {
         mutate: verifyEmail,
+        isIdle,
         isPending,
         isSuccess,
         error
@@ -42,7 +42,7 @@ export const VerifyEmailCallbackTemplate: React.FC = () => {
     }, [token, verifyEmail]);
 
     const renderContent = () => {
-        if (isPending) {
+        if (isPending || (token && isIdle)) {
             return (
                 <div className="flex flex-col items-center space-y-4">
                     <Loader size="lg" />
@@ -72,7 +72,7 @@ export const VerifyEmailCallbackTemplate: React.FC = () => {
         }
 
         const errorMessage = error
-            ? t((error as RequestError).message as I18nMessage)
+            ? t(error.message as I18nMessage, undefined, 'auth.error.default')
             : t('auth.error.default');
 
         const encodedEmail = email ? encodeURIComponent(email) : '';

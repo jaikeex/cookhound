@@ -15,7 +15,15 @@ export default function GoogleCallbackPage() {
         const authCode = params.get('code');
         const state = params.get('state');
 
+        // Google redirects back with ?error=... and no code, e.g. access_denied when the
+        // user cancels the consent screen. Report it and close, or the popup spins forever.
         if (!authCode || !state) {
+            window.opener?.postMessage(
+                { error: params.get('error') ?? 'missing_code' },
+                ENV_CONFIG_PUBLIC.ORIGIN
+            );
+
+            window.close();
             return;
         }
 
@@ -31,7 +39,7 @@ export default function GoogleCallbackPage() {
             return;
         }
 
-        window.opener.postMessage(
+        window.opener?.postMessage(
             { authCode, state },
             ENV_CONFIG_PUBLIC.ORIGIN
         );

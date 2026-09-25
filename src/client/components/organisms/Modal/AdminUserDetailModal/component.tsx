@@ -13,6 +13,7 @@ import { ADMIN_QUERY_KEYS } from '@/client/data/admin';
 import { formatDate } from '@/client/utils';
 import { AuthType, Status, UserRole } from '@/common/types';
 import { t } from '@/client/locales';
+import type { I18nMessage } from '@/client/locales';
 
 export type AdminUserDetailModalProps = Readonly<{
     userId: number;
@@ -54,7 +55,14 @@ export const AdminUserDetailModal: React.FC<AdminUserDetailModalProps> = ({
     const { openModal } = useModal();
     const queryClient = useQueryClient();
 
-    const { data: user, isLoading } = chqc.admin.useAdminUserDetail(userId);
+    const {
+        data: user,
+        isLoading,
+        error,
+        refetch
+    } = chqc.admin.useAdminUserDetail(userId);
+
+    const handleRetry = useCallback(() => void refetch(), [refetch]);
 
     //~---------------------------------------------------------------------------------------------~//
     //$                                        MUTATIONS                                             $//
@@ -352,6 +360,23 @@ export const AdminUserDetailModal: React.FC<AdminUserDetailModalProps> = ({
     //~---------------------------------------------------------------------------------------------~//
     //$                                          RENDER                                              $//
     //~---------------------------------------------------------------------------------------------~//
+
+    if (error) {
+        return (
+            <div className="flex flex-col items-center gap-3 w-full max-w-[90dvw] md:max-w-[50dvw] xl:max-w-[40dvw] px-4 py-6">
+                <Typography variant="body-sm">
+                    {t(
+                        error.message as I18nMessage,
+                        undefined,
+                        'app.error.default'
+                    )}
+                </Typography>
+                <ButtonBase size="sm" color="primary" onClick={handleRetry}>
+                    {t('app.error.retry')}
+                </ButtonBase>
+            </div>
+        );
+    }
 
     if (isLoading || !user) {
         return (

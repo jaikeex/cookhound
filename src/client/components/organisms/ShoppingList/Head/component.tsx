@@ -6,6 +6,7 @@ import { ButtonBase } from '@/client/components/atoms/Button/Base';
 import { Loader } from '@/client/components/atoms/Loader';
 import { classNames } from '@/client/utils';
 import { t } from '@/client/locales';
+import type { I18nMessage } from '@/client/locales';
 
 type ShoppingListHeadProps = Readonly<{
     editing?: boolean;
@@ -54,7 +55,11 @@ export const ShoppingListHead: React.FC<ShoppingListHeadProps> = ({
                     variant="error"
                     className="mt-4 text-center text-red-500"
                 >
-                    {error.message}
+                    {t(
+                        error.message as I18nMessage,
+                        undefined,
+                        'app.error.default'
+                    )}
                 </Typography>
             ) : null}
         </React.Fragment>

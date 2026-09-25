@@ -6,6 +6,7 @@ import { useOutsideClick } from '@/client/hooks';
 import { useDebounce } from '@/client/hooks/useDebounce';
 import { useAuth } from '@/client/store';
 import { t } from '@/client/locales';
+import type { I18nMessage } from '@/client/locales';
 import { ROUTES, SEARCH_QUERY_SEPARATOR } from '@/common/constants';
 import type { SearchInputProps } from '@/client/components/molecules/Form/SearchInput/component';
 import { Chip } from '@/client/components/atoms/Chip';
@@ -99,9 +100,13 @@ export const RecipeSearchInput: React.FC<RecipeSearchInputProps> = ({
     // The use of isFetching is intentional here.
     const isLoading = isSearchMode ? searchRecipesQuery.isFetching : false;
 
-    const error = isSearchMode
-        ? ((searchRecipesQuery.error as Error | null)?.message ?? null)
-        : ((lastViewedRecipesQuery.error as Error | null)?.message ?? null);
+    const activeError = isSearchMode
+        ? searchRecipesQuery.error
+        : lastViewedRecipesQuery.error;
+
+    const error = activeError
+        ? t(activeError.message as I18nMessage, undefined, 'app.error.default')
+        : null;
 
     const isEmpty = !isLoading && suggestions.length === 0;
     const isShowingSearchResults = !!inputValue && preparedQuery.length > 0;

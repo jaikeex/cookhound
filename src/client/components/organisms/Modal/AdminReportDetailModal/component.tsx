@@ -19,6 +19,7 @@ import {
 } from '@/client/utils';
 import { ReportStatus } from '@/common/types';
 import { t } from '@/client/locales';
+import type { I18nMessage } from '@/client/locales';
 
 export type AdminReportDetailModalProps = Readonly<{
     reportId: number;
@@ -56,8 +57,14 @@ export const AdminReportDetailModal: React.FC<AdminReportDetailModalProps> = ({
     const { openModal } = useModal();
     const queryClient = useQueryClient();
 
-    const { data: report, isLoading } =
-        chqc.admin.useAdminReportDetail(reportId);
+    const {
+        data: report,
+        isLoading,
+        error,
+        refetch
+    } = chqc.admin.useAdminReportDetail(reportId);
+
+    const handleRetry = useCallback(() => void refetch(), [refetch]);
 
     const invalidateQueries = useCallback(() => {
         void queryClient.invalidateQueries({
@@ -141,6 +148,23 @@ export const AdminReportDetailModal: React.FC<AdminReportDetailModalProps> = ({
         () => openDecision(ReportStatus.ACTIONED),
         [openDecision]
     );
+
+    if (error) {
+        return (
+            <div className="items-center gap-3 flex flex-col w-full max-w-[90dvw] md:max-w-[40dvw] px-4">
+                <Typography variant="body-sm">
+                    {t(
+                        error.message as I18nMessage,
+                        undefined,
+                        'app.error.default'
+                    )}
+                </Typography>
+                <ButtonBase size="sm" color="primary" onClick={handleRetry}>
+                    {t('app.error.retry')}
+                </ButtonBase>
+            </div>
+        );
+    }
 
     if (isLoading || !report) {
         return (

@@ -66,7 +66,13 @@ export const useGoogleSignIn: UseGoogleSignInType = ({ onSuccess }) => {
                 return;
             }
 
-            if (event.data.error === 'invalid_state') {
+            // Other same-origin senders may post non-object payloads.
+            if (!event.data || typeof event.data !== 'object') {
+                return;
+            }
+
+            // invalid_state, access_denied (user cancelled), ... nothing to do
+            if (event.data.error) {
                 return;
             }
 

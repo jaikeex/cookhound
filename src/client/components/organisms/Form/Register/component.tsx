@@ -34,7 +34,9 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
     // This hook call does nothing at the moment as it only works with react server actions.
     // It is left here for reference and to possibly inspire another solution in the future :D
     // const { pending } = useFormStatus();
-    const errorsToDisplay = Object.values(errors).map((error) => t(error));
+    const errorsToDisplay = Object.entries(errors)
+        .filter(([field]) => field !== 'server')
+        .map(([, error]) => t(error));
 
     const termsLabel = (
         <>
